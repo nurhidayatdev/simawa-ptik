@@ -527,6 +527,9 @@ if (isset($_POST['update'])) {
                         </div>
             </form>
         </div>
+        <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
+            © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
+        </footer>
     </main>
 
     <script>
