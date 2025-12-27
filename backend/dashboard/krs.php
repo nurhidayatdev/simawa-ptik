@@ -228,8 +228,8 @@ while ($row = mysqli_fetch_assoc($krs)) {
         </div>
     </aside>
 
-    <main class="ml-0 lg:ml-48 pt-20 p-6">
-        <div class="bg-white rounded-lg border border-slate-200 p-6">
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
 
             <h3 class="text-2xl font-bold mb-4">Kartu Rencana Studi (KRS)</h3>
 

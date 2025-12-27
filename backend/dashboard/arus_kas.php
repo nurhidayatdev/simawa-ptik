@@ -269,8 +269,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
         </div>
     </aside>
 
-    <main class="ml-0 lg:ml-48 pt-20 p-6">
-        <div class="max-w-6xl mx-auto">
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+        <div class="max-w-6xl mx-auto flex-grow w-full">
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
                 <div class="bg-white p-4 rounded shadow">
                     <div class="text-xs text-slate-500">Pemasukan dari Kas (Lunas)</div>

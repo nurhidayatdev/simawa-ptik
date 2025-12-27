@@ -213,8 +213,8 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
         </div>
     </aside>
 
-    <main class="ml-0 md:ml-64 pt-20 p-6">
-        <div class="bg-white rounded-lg border border-slate-200 p-6">
+    <main class="ml-0 md:ml-64 pt-20 p-6 flex flex-col min-h-screen">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font- text-slate-800">User Profile</h1>
                 <a href="../crud/edit_profile.php?<?= $data['user_id']; ?>" id="edit-profile" class="px-4 py-2 bg-indigo-900 text-white rounded-lg hover:bg-indigo-800 text-xs">

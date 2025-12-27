@@ -183,8 +183,8 @@ if (!empty($search)) {
         </div>
     </aside>
 
-    <main class="ml-0 lg:ml-48 pt-20 p-6">
-        <div class="bg-white rounded-lg border border-slate-200 p-6">
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Mata Kuliah</h3>

@@ -347,8 +347,8 @@ if (isset($_POST['update'])) {
         </div>
     </aside>
 
-    <main class="ml-0 md:ml-48 pt-20 p-6">
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
+    <main class="ml-0 md:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+        <div class="bg-white rounded-lg border border-gray-200 p-6 flex-grow w-full">
 
             <form class="space-y-6" method="POST" enctype="multipart/form-data">
                 <div class="border-b border-gray-200 pb-6">

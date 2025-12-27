@@ -186,12 +186,12 @@ foreach ($tables as $table => $link) {
         </div>
     </aside>
 
-	<main class="ml-0 lg:ml-48 pt-20 p-6">
-		<div class="max-w-6xl mx-auto">
-			<h1 class="text-2xl font-bold text-slate-800 mb-6">Ringkasan Sistem</h1>
+	<main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+		<div class="max-w-6xl mx-auto flex-grow w-full">
+			
 
             <!-- Welcome & Realtime Section -->
-            <div class="mb-6 bg-white border-l-4 border-indigo-600 p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="mb-6 bg-white  p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
                      <div class="h-14 w-14 rounded-full overflow-hidden border-2 border-indigo-200">
                         <img src="../img/profile/<?= htmlspecialchars($foto) ?>" alt="Profile" class="w-full h-full object-cover">
