@@ -11,25 +11,35 @@ $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
 	$stmt = mysqli_prepare(
 		$koneksi,
 		"SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, mk.nama_matkul
-		 FROM tugas t
+		 JOIN tugas t
 		 LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
-		 WHERE mk.nama_matkul LIKE ?
-		 OR t.deskripsi LIKE ?
+		 WHERE (mk.nama_matkul LIKE ?
+		 OR t.deskripsi LIKE ?)
+		 AND t.periode_id = ?
 		 ORDER BY t.deadline_tanggal ASC"
 	);
 
 	$like = "%$search%";
-	mysqli_stmt_bind_param($stmt, "ss", $like, $like);
+	$like = "%$search%";
+	mysqli_stmt_bind_param($stmt, "ssi", $like, $like, $periode_id);
 	mysqli_stmt_execute($stmt);
 	$result = mysqli_stmt_get_result($stmt);
 } else {
-	$result = mysqli_query($koneksi, "SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, mk.nama_matkul FROM tugas t LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id ORDER BY t.deadline_tanggal ASC");
+	$result = mysqli_query($koneksi, "SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, mk.nama_matkul FROM tugas t LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id WHERE t.periode_id = $periode_id ORDER BY t.deadline_tanggal ASC");
 }
 
 // If this is an AJAX live-search request, return only the table rows

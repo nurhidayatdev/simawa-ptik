@@ -11,10 +11,19 @@ $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 // Ambil daftar mata kuliah yang punya kelompok tersimpan
 $matkuls_res = mysqli_query($koneksi, "SELECT DISTINCT k.matkul_id AS id, mk.nama_matkul
 	FROM kelompok k
 	JOIN mata_kuliah mk ON k.matkul_id = mk.id
+	WHERE k.periode_id = $periode_id
 	ORDER BY mk.semester, mk.nama_matkul");
 
 $selected_matkul = intval($_GET['matkul_id'] ?? 0);
@@ -22,8 +31,8 @@ $groups = [];
 $student_map = [];
 
 if ($selected_matkul) {
-	$stmt = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? ORDER BY kelompok_no");
-	mysqli_stmt_bind_param($stmt, 'i', $selected_matkul);
+	$stmt = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? ORDER BY kelompok_no");
+	mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
 	mysqli_stmt_execute($stmt);
 	$res = mysqli_stmt_get_result($stmt);
 	while ($r = mysqli_fetch_assoc($res)) {
@@ -198,7 +207,23 @@ if ($selected_matkul) {
     </aside>
 <main class="ml-0 lg:ml-48 pt-20 p-6">
 	<div class="bg-white rounded-lg border border-slate-200 p-6">
-		<h3 class="text-xl font-bold text-slate-800 mb-4">Data Kelompok</h3>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Data Kelompok</h3>
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        
+
+                        
+                        
+                        <a href="kelompok.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                           
+                                Atur Kelompok
+                          
+                        </a>
+                    </form>
+                </div>
+            </div>
+		
 
 		<form id="selectForm" method="GET" class="mb-4">
 			<label class="text-xs block mb-1">Pilih Mata Kuliah:</label>

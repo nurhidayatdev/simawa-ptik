@@ -11,6 +11,14 @@ $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 if (isset($_POST['simpan_kas'])) {
     $minggu = $_POST['minggu_ke'];
 
@@ -27,7 +35,7 @@ if (isset($_POST['simpan_kas'])) {
             }
 
             // fetch existing kas row if any
-            $res = mysqli_query($koneksi, "SELECT status, tanggal_bayar FROM kas WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe'");
+            $res = mysqli_query($koneksi, "SELECT status, tanggal_bayar FROM kas WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
             $exists = mysqli_num_rows($res) > 0;
             $existing = $exists ? mysqli_fetch_assoc($res) : null;
 
@@ -44,16 +52,16 @@ if (isset($_POST['simpan_kas'])) {
             if ($exists) {
                 // Update: only set tanggal_bayar if not null, otherwise set NULL
                 if ($tanggal_to_save !== null) {
-                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar='$tanggal_to_save' WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe'");
+                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar='$tanggal_to_save' WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
                 } else {
-                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar=NULL WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe'");
+                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar=NULL WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
                 }
             } else {
                 // Insert new row
                 if ($tanggal_to_save !== null) {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$tanggal_to_save')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$tanggal_to_save', '$periode_id')");
                 } else {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$periode_id')");
                 }
             }
         }
@@ -216,11 +224,15 @@ if (isset($_POST['simpan_kas'])) {
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Bayar Kas</h3>
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+<a href="db_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Kembali</a>
+                    </form>
+                </div>
                 
             </div>
-            <form method="GET" class="flex items-center gap-3 mb-6">
-                <label class="text-xs text-slate-700">Minggu:</label>
-                <select name="minggu_ke" required onchange="this.form.submit()" class="border rounded px-2 py-1 text-xs">
+            <form method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <select name="minggu_ke" required onchange="this.form.submit()" class="border p-2 rounded-lg text-xs">
                     <option value="">-- Pilih Minggu --</option>
                     <?php for ($i = 1; $i <= 16; $i++): ?>
                         <option value="<?= $i ?>" <?= ($_GET['minggu_ke'] ?? '') == $i ? 'selected' : '' ?>>Minggu <?= $i ?></option>
@@ -228,13 +240,13 @@ if (isset($_POST['simpan_kas'])) {
                 </select>
 
                 <label class="sr-only">Filter</label>
-                <select name="filter" onchange="this.form.submit()" class="border rounded px-2 py-1 text-xs">
+                <select name="filter" onchange="this.form.submit()" class="border p-2 rounded-lg text-xs">
                     <option value="all" <?= ($_GET['filter'] ?? 'all') == 'all' ? 'selected' : '' ?>>Semua</option>
                     <option value="Lunas" <?= ($_GET['filter'] ?? '') == 'Lunas' ? 'selected' : '' ?>>Lunas</option>
                     <option value="Belum" <?= ($_GET['filter'] ?? '') == 'Belum' ? 'selected' : '' ?>>Belum</option>
                 </select>
 
-                <a href="db_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Kembali</a>
+                
             </form>
 
             <!-- filter links removed; filter dropdown will be next to save button -->
@@ -249,11 +261,7 @@ if (isset($_POST['simpan_kas'])) {
                 <div class="overflow-x-auto">
                     
                                 <input type="hidden" name="minggu_ke" value="<?= $minggu ?>">
-                                <div class="flex items-center justify-end mb-4">
-                                    <button type="submit" name="simpan_kas" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs">
-                                        Simpan Kas
-                                    </button>
-                                </div>
+                                
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-indigo-900">
                                 <tr>
@@ -294,7 +302,7 @@ if (isset($_POST['simpan_kas'])) {
         k.status,
         k.tanggal_bayar
     FROM mahasiswa m
-    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu'
+    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id'
     $where_clause
     ORDER BY m.nim ASC
     ");
@@ -324,6 +332,11 @@ if (isset($_POST['simpan_kas'])) {
                             </tbody>
 
                         </table>
+                        <div class="flex items-center justify-end mb-4 mt-4">
+                                    <button type="submit" name="simpan_kas" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs">
+                                        Simpan Kas
+                                    </button>
+                                </div>
                     </form>
                 </div>
             <?php endif; ?>

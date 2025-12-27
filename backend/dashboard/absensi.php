@@ -14,12 +14,21 @@ $foto = $_SESSION['foto'];
 
 
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 $query_matkul = "
 SELECT DISTINCT
     mk.id AS matkul_id,
     mk.nama_matkul
 FROM krs k
 JOIN mata_kuliah mk ON k.matkul_id = mk.id
+WHERE k.periode_id = $periode_id
 ORDER BY mk.nama_matkul ASC
 ";
 
@@ -34,22 +43,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pertemuan = $_POST['pertemuan'];
     $status    = $_POST['status'];
 
+
+    // Ensure period is active
+    if (!$periode_id) {
+        die("Error: Tidak ada periode aktif. Harap setel periode aktif terlebih dahulu di menu Data Periode.");
+    }
+
     foreach ($status as $mahasiswa_id => $st) {
 
         $query = "
-        INSERT INTO absensi (mahasiswa_id, matkul_id, pertemuan, status)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO absensi (mahasiswa_id, matkul_id, pertemuan, status, periode_id)
+        VALUES (?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE status = ?
         ";
 
         $stmt = mysqli_prepare($koneksi, $query);
         mysqli_stmt_bind_param(
             $stmt,
-            "iiiss",
+            "iiisis",
             $mahasiswa_id,
             $matkul_id,
             $pertemuan,
             $st,
+            $periode_id,
             $st
         );
         mysqli_stmt_execute($stmt);
@@ -295,12 +311,13 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
             AND a.matkul_id = k.matkul_id
             AND a.pertemuan = ?
         WHERE k.matkul_id = ?
+        AND k.periode_id = ?
         $where_clause
         ORDER BY m.nim ASC
     ";
 
     $stmt = mysqli_prepare($koneksi, $query);
-    mysqli_stmt_bind_param($stmt, "ii", $pertemuan, $matkul_id);
+    mysqli_stmt_bind_param($stmt, "iii", $pertemuan, $matkul_id, $periode_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 ?>

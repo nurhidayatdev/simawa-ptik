@@ -11,6 +11,15 @@ $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 
+$foto = $_SESSION['foto'] ?? '';
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT * FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semester_nama'] : 'Tidak ada periode aktif';
+
 // counts
 $counts = [];
 $tables = [
@@ -181,6 +190,34 @@ foreach ($tables as $table => $link) {
 		<div class="max-w-6xl mx-auto">
 			<h1 class="text-2xl font-bold text-slate-800 mb-6">Ringkasan Sistem</h1>
 
+            <!-- Welcome & Realtime Section -->
+            <div class="mb-6 bg-white border-l-4 border-indigo-600 p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                     <div class="h-14 w-14 rounded-full overflow-hidden border-2 border-indigo-200">
+                        <img src="../img/profile/<?= htmlspecialchars($foto) ?>" alt="Profile" class="w-full h-full object-cover">
+                     </div>
+                     <div>
+                        <h2 class="font-bold text-lg text-slate-800">Selamat Datang, <span class="text-indigo-600"><?= htmlspecialchars($nama_lengkap) ?></span>!</h2>
+                        <p class="text-sm text-slate-600 flex items-center gap-2">
+                            <i class="fa fa-calendar-check text-green-600"></i>
+                            Periode Aktif: <span class="font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs"><?= htmlspecialchars($periode_text) ?></span>
+                         </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-4 mt-2 md:mt-0">
+                    <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <i class="fa fa-calendar-alt text-indigo-500 text-xs"></i>
+                        <div id="realtime-date" class="text-xs font-medium text-slate-600 uppercase tracking-wide">...</div>
+                    </div>
+                    <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <i class="fa fa-clock text-indigo-500 text-xs"></i>
+                        <div id="realtime-clock" class="text-xs font-mono font-bold text-slate-700 tracking-wider">--:--:--</div>
+                    </div>
+                </div>
+               
+            </div>
+
 			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 				<a href="db_mahasiswa.php" class="bg-white p-4 rounded shadow card-hover ">
 					<div class="text-xs text-slate-500">Mahasiswa</div>
@@ -265,6 +302,17 @@ foreach ($tables as $table => $link) {
 				}
 			});
 		}
+		// Realtime Clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('realtime-clock').textContent = timeString.replaceAll('.', ':');
+            document.getElementById('realtime-date').textContent = dateString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // initial call
 	</script>
 </body>
 

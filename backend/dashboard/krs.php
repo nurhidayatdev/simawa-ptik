@@ -10,6 +10,13 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
 /* =====================
    AMBIL MAHASISWA_ID
    ===================== */
@@ -32,17 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // hapus KRS lama
     mysqli_query(
         $koneksi,
-        "DELETE FROM krs WHERE mahasiswa_id = $mahasiswa_id"
+        "DELETE FROM krs WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id"
     );
 
     // insert KRS baru
     $stmt = mysqli_prepare(
         $koneksi,
-        "INSERT INTO krs (mahasiswa_id, matkul_id) VALUES (?, ?)"
+        "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)"
     );
 
     foreach ($matkul as $matkul_id) {
-        mysqli_stmt_bind_param($stmt, "ii", $mahasiswa_id, $matkul_id);
+        mysqli_stmt_bind_param($stmt, "iii", $mahasiswa_id, $matkul_id, $periode_id);
         mysqli_stmt_execute($stmt);
     }
 
@@ -66,6 +73,7 @@ while ($r = mysqli_fetch_assoc($res_matkul)) {
 $krs = mysqli_query($koneksi, "
     SELECT matkul_id FROM krs
     WHERE mahasiswa_id = $mahasiswa_id
+    AND periode_id = $periode_id
 ");
 
 $diambil = [];

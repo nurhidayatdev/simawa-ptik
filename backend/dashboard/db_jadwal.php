@@ -11,6 +11,14 @@ $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
@@ -24,13 +32,15 @@ FROM jadwal_matkul jm
 JOIN mata_kuliah mk ON jm.matkul_id = mk.id
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id 
-         WHERE jm.hari LIKE ? 
-         OR mk.nama_matkul LIKE ?
+LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id 
+         WHERE (jm.hari LIKE ? 
+         OR mk.nama_matkul LIKE ?)
+         AND jm.periode_id = ?
          ORDER BY jm.hari, jm.jam_mulai"
     );
 
     $like = "%$search%";
-    mysqli_stmt_bind_param($stmt, "ss", $like, $like);
+    mysqli_stmt_bind_param($stmt, "ssi", $like, $like, $periode_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
@@ -42,6 +52,7 @@ FROM jadwal_matkul jm
 JOIN mata_kuliah mk ON jm.matkul_id = mk.id
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
+WHERE jm.periode_id = $periode_id
 ORDER BY jm.hari, jm.jam_mulai");
 }
 

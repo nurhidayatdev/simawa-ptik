@@ -14,12 +14,21 @@ $foto = $_SESSION['foto'];
 
 
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 $query_matkul = "
 SELECT DISTINCT
     mk.id AS matkul_id,
     mk.nama_matkul
 FROM krs k
 JOIN mata_kuliah mk ON k.matkul_id = mk.id
+WHERE k.periode_id = $periode_id
 ORDER BY mk.nama_matkul ASC
 ";
 
@@ -60,7 +69,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan");
     exit;
 }
+// CSV export handler (top of file) - responds to ?export=csv&pertemuan=...&matkul_id=...&filter=...
+if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemuan']) && isset($_GET['matkul_id'])) {
+    $pertemuan = (int) $_GET['pertemuan'];
+    $matkul_id = (int) $_GET['matkul_id'];
+    $filter = $_GET['filter'] ?? 'all';
+    $filter = in_array($filter, ['all', 'Hadir', 'Izin', 'Sakit', 'Alpha']) ? $filter : 'all';
 
+    $where_clause = '';
+    if ($filter !== 'all') {
+        $where_clause = " AND a.status = '" . mysqli_real_escape_string($koneksi, $filter) . "'";
+    }
+
+    $q = "SELECT DISTINCT
+            m.id AS mahasiswa_id,
+            m.nim,
+            m.nama_lengkap,
+            COALESCE(a.status, '') AS status
+        FROM krs k
+        JOIN mahasiswa m ON k.mahasiswa_id = m.id
+        LEFT JOIN absensi a 
+            ON a.mahasiswa_id = m.id
+        AND a.matkul_id = k.matkul_id
+            AND a.pertemuan = ?
+        WHERE k.matkul_id = ?
+        AND k.periode_id = ?
+        " . $where_clause . "
+        ORDER BY m.nim ASC";
+
+    $stmt = mysqli_prepare($koneksi, $q);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, 'iii', $pertemuan, $matkul_id, $periode_id);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+
+        // Resolve mata kuliah name for filename
+        $matkul_name = '';
+        $mq = mysqli_prepare($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = ?");
+        if ($mq) {
+            mysqli_stmt_bind_param($mq, 'i', $matkul_id);
+            mysqli_stmt_execute($mq);
+            $mres = mysqli_stmt_get_result($mq);
+            if ($mrow = mysqli_fetch_assoc($mres)) {
+                $matkul_name = $mrow['nama_matkul'];
+            }
+        }
+
+        // sanitize name for filename
+        $safe_name = $matkul_name ?: 'matkul_' . $matkul_id;
+        $safe_name = preg_replace('/[^A-Za-z0-9 _-]/', '', $safe_name);
+        $safe_name = trim($safe_name);
+        $safe_name = str_replace(' ', '_', $safe_name);
+        $safe_name = substr($safe_name, 0, 80);
+
+        $filename = 'absensi_' . $safe_name . '_p' . $pertemuan . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $out = fopen('php://output', 'w');
+        fputcsv($out, ['NIM', 'Nama Lengkap', 'Status']);
+        while ($r = mysqli_fetch_assoc($res)) {
+            // Ensure NIM is numeric when possible
+            $nim_value = is_numeric($r['nim']) ? ($r['nim'] + 0) : $r['nim'];
+            fputcsv($out, [$nim_value, $r['nama_lengkap'], $r['status']]);
+        }
+        fclose($out);
+        exit;
+    } else {
+        // fallback: query error
+        die('Query error: ' . mysqli_error($koneksi));
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -215,12 +294,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Absensi</h3>
                 <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <form method="GET" class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        
+
+                        <a href="?export=csv&matkul_id=<?= urlencode($_GET['matkul_id'] ?? '') ?>&pertemuan=<?= $_GET['pertemuan'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class=" bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center">Export CSV</a>
                         
                         <a href="absensi.php?matkul_id=<?= $_GET['matkul_id']; ?>&pertemuan=<?= $_GET['pertemuan']; ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
-                            <button type="button">
+                           
                                 Absensi
-                            </button>
+                          
                         </a>
                     </form>
                 </div>
@@ -286,12 +368,13 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
             AND a.matkul_id = k.matkul_id
             AND a.pertemuan = ?
         WHERE k.matkul_id = ?
+        AND k.periode_id = ?
         $where_clause
         ORDER BY m.nim ASC
     ";
 
     $stmt = mysqli_prepare($koneksi, $query);
-    mysqli_stmt_bind_param($stmt, "ii", $pertemuan, $matkul_id);
+    mysqli_stmt_bind_param($stmt, "iii", $pertemuan, $matkul_id, $periode_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 ?>

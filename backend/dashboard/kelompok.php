@@ -11,6 +11,14 @@ $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 
+
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'];
+
 // Handle save
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'save') {
     $mata_kuliah_id = intval($_POST['mata_kuliah_id'] ?? 0);
@@ -18,17 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $groups = json_decode($groups_json, true);
 
     if ($mata_kuliah_id && is_array($groups)) {
-        // Remove existing groups for this mata kuliah
-        $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ?");
-        mysqli_stmt_bind_param($stmt, 'i', $mata_kuliah_id);
+        // Remove existing groups for this mata kuliah and period
+        $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ? AND periode_id = ?");
+        mysqli_stmt_bind_param($stmt, 'ii', $mata_kuliah_id, $periode_id);
         mysqli_stmt_execute($stmt);
 
         // Insert new groups
-        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota) VALUES (?, ?, ?)");
+        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id) VALUES (?, ?, ?, ?)");
         foreach ($groups as $no => $anggotaArr) {
             $anggotaStr = implode(',', array_map(function($s){ return $s['nim']; }, $anggotaArr));
             $kel_no = $no + 1;
-            mysqli_stmt_bind_param($insert, 'iis', $mata_kuliah_id, $kel_no, $anggotaStr);
+            mysqli_stmt_bind_param($insert, 'iisi', $mata_kuliah_id, $kel_no, $anggotaStr, $periode_id);
             mysqli_stmt_execute($insert);
         }
 
@@ -45,14 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 $matkuls = mysqli_query($koneksi, "SELECT DISTINCT jm.matkul_id AS id, mk.nama_matkul
     FROM jadwal_matkul jm
     JOIN mata_kuliah mk ON jm.matkul_id = mk.id
+    WHERE jm.periode_id = $periode_id
     ORDER BY mk.semester, mk.nama_matkul");
 
 // Determine selected matkul from GET so we can load only mahasiswa yang mengambil matkul ini (dari krs)
 $selected_matkul = intval($_GET['matkul_id'] ?? 0);
 $students = [];
 if ($selected_matkul) {
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? ORDER BY m.nim");
-    mysqli_stmt_bind_param($stmt, 'i', $selected_matkul);
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
+    mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     while ($r = mysqli_fetch_assoc($res)) {
@@ -210,38 +219,55 @@ if ($selected_matkul) {
 
 <main class="ml-0 lg:ml-48 pt-20 p-6">
     <div class="bg-white rounded-lg border border-slate-200 p-6">
-        <h3 class="text-xl font-bold text-slate-800 mb-4">Pengaturan Kelompok</h3>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Pengaturan Kelompok</h3>
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        
 
-        <form id="selectForm" method="GET" class="mb-4">
-            <label class="text-xs block mb-1">Pilih Mata Kuliah</label>
-            <select id="mata_kuliah" name="matkul_id" class="w-full px-3 py-2 border rounded text-xs">
-                <option value="">-- Pilih --</option>
-                <?php while ($mk = mysqli_fetch_assoc($matkuls)) : ?>
-                    <option value="<?= $mk['id'] ?>" <?= ($mk['id'] == $selected_matkul) ? 'selected' : '' ?>><?= htmlspecialchars($mk['nama_matkul']) ?></option>
-                <?php endwhile; ?>
-            </select>
-        </form>
-
-        <form id="kelompokForm" method="POST">
-            <input type="hidden" name="action" value="save">
-            <input type="hidden" name="mata_kuliah_id" id="mata_kuliah_hidden" value="<?= $selected_matkul ?>">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="text-xs">Jumlah Orang per Kelompok</label>
-                    <input id="per_group" type="number" min="1" max="17" value="3" class="w-full px-3 py-2 border rounded text-xs" />
-                </div>
-
-                <div class="flex items-end gap-2">
-                    <button id="acakBtn" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded text-xs">Acak</button>
-                    <button id="manualBtn" type="button" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs">Manual</button>
-                    <button id="simpanBtn" type="submit" class="bg-indigo-800 hover:bg-indigo-950 text-white px-4 py-2 rounded text-xs">Simpan</button>
+                        
+                        
+                        <a href="db_kelompok.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                           
+                                Kembali
+                          
+                        </a>
+                    </form>
                 </div>
             </div>
+<div class="flex flex-wrap items-end gap-4 mb-4">
+    
+    <form id="selectForm" method="GET" class="flex-1 min-w-[200px]">
+        <label class="text-xs block mb-1">Pilih Mata Kuliah</label>
+        <select id="mata_kuliah" name="matkul_id" class="w-full px-3 py-2 border rounded text-xs">
+            <option value="">-- Pilih --</option>
+            <?php while ($mk = mysqli_fetch_assoc($matkuls)) : ?>
+                <option value="<?= $mk['id'] ?>" <?= ($mk['id'] == $selected_matkul) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($mk['nama_matkul']) ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+    </form>
 
-            <input type="hidden" name="groups_json" id="groups_json" value="[]">
+    <form id="kelompokForm" method="POST" class="flex flex-wrap items-end gap-2">
+        <input type="hidden" name="action" value="save">
+        <input type="hidden" name="mata_kuliah_id" id="mata_kuliah_hidden" value="<?= $selected_matkul ?>">
+        <input type="hidden" name="groups_json" id="groups_json" value="[]">
 
-            <div id="groupsContainer" class="flex flex-wrap gap-4 justify-between"></div>
-        </form>
+        <div>
+            <label class="text-xs block mb-1">Jumlah Orang per Kelompok</label>
+            <input id="per_group" type="number" min="1" max="17" value="3" class="w-full px-3 py-2 border rounded text-xs" />
+        </div>
+
+        <button id="acakBtn" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded text-xs h-[34px]">Acak</button>
+        
+        <button id="manualBtn" type="button" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs h-[34px]">Manual</button>
+        
+        <button id="simpanBtn" type="submit" class="bg-indigo-800 hover:bg-indigo-950 text-white px-4 py-2 rounded text-xs h-[34px]">Simpan</button>
+    </form>
+</div>
+
+<div id="groupsContainer" class="flex flex-wrap gap-4 justify-between mt-4"></div>
     </div>
     <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
       © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
