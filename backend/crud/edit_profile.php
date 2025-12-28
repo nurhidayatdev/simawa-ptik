@@ -249,7 +249,7 @@ if (isset($_POST['update'])) {
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
                         <a href="profile.php" class="block px-4 py-2 text-xs hover:bg-indigo-100">Profile</a>
-                        <a href="../login/login.php" class="block px-4 py-2 text-xs hover:bg-indigo-100">Logout</a>
+                        <a href="../../index.php" class="block px-4 py-2 text-xs hover:bg-indigo-100">Logout</a>
                     </div>
                 </div>
             </div>
