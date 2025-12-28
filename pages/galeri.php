@@ -106,62 +106,51 @@ include '../koneksi.php';
 				<h2 class="text-3xl font-bold mb-6 text-gray-800">Galeri Kegiatan</h2>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-					<!-- Card with slider (sample static content) -->
-					<div class="bg-white rounded-xl shadow-md overflow-hidden">
-						<div class="relative group">
-							<div class="slider overflow-hidden relative" data-slider-id="s1">
-								<div class="slides flex transition-transform duration-500">
-									<img src="../img/img-1.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto1">
-									<img src="../img/img-2.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto2">
-									<img src="../img/img-3.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto3">
-								</div>
-							</div>
-							<button data-prev data-slider="s1" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-left text-indigo-800"></i></button>
-							<button data-next data-slider="s1" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-right text-indigo-800"></i></button>
-						</div>
-						<div class="p-4">
-							<h3 class="font-semibold text-lg mb-1">Nama Kegiatan Contoh</h3>
-							<p class="text-sm text-gray-600 mb-3">Deskripsi singkat kegiatan. Diisi dari dashboard nanti.</p>
-							
-						</div>
-					</div>
+					<?php
+					$query_galeri = "SELECT * FROM galeri ORDER BY created_at DESC";
+					$result_galeri = mysqli_query($koneksi, $query_galeri);
 
-					<!-- Duplicate sample cards (copyable for dynamic rendering later) -->
-					<div class="bg-white rounded-xl shadow-md overflow-hidden">
-						<div class="relative group">
-							<div class="slider overflow-hidden relative" data-slider-id="s2">
-								<div class="slides flex transition-transform duration-500">
-									<img src="../img/img-4.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto1">
-									<img src="../img/img-5.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto2">
+					if (mysqli_num_rows($result_galeri) > 0) {
+						while ($row = mysqli_fetch_assoc($result_galeri)) {
+							$galeri_id = $row['id'];
+							$slider_id = "s" . $galeri_id;
+							?>
+							<div class="bg-white rounded-xl shadow-md overflow-hidden">
+								<div class="relative group">
+									<div class="slider overflow-hidden relative" data-slider-id="<?= $slider_id ?>">
+										<div class="slides flex transition-transform duration-500">
+											<?php
+											$query_foto = "SELECT * FROM galeri_foto WHERE galeri_id = $galeri_id";
+											$result_foto = mysqli_query($koneksi, $query_foto);
+											if (mysqli_num_rows($result_foto) > 0) {
+												while ($foto = mysqli_fetch_assoc($result_foto)) {
+													?>
+													<img src="../backend/<?= $foto['foto_path'] ?>" class="w-full h-48 object-cover flex-shrink-0" alt="<?= $row['judul'] ?>">
+													<?php
+												}
+											} else {
+												?>
+												<img src="../img/placeholder.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="No image">
+												<?php
+											}
+											?>
+										</div>
+									</div>
+									<button data-prev data-slider="<?= $slider_id ?>" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-left text-indigo-800"></i></button>
+									<button data-next data-slider="<?= $slider_id ?>" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-right text-indigo-800"></i></button>
+								</div>
+								<div class="p-4">
+									<h3 class="font-semibold text-lg mb-1"><?= $row['judul'] ?></h3>
+									<p class="text-sm text-gray-600 mb-3"><?= $row['deskripsi'] ?></p>
+									<p class="text-[10px] text-gray-400"><i class="far fa-calendar-alt mr-1"></i><?= date('d M Y', strtotime($row['tanggal_kegiatan'])) ?></p>
 								</div>
 							</div>
-							<button data-prev data-slider="s2" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-left text-indigo-800"></i></button>
-							<button data-next data-slider="s2" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-right text-indigo-800"></i></button>
-						</div>
-						<div class="p-4">
-							<h3 class="font-semibold text-lg mb-1">Kegiatan Seminar</h3>
-							<p class="text-sm text-gray-600 mb-3">Ringkasan singkat seminar atau workshop.</p>
-							
-						</div>
-					</div>
-
-					<div class="bg-white rounded-xl shadow-md overflow-hidden">
-						<div class="relative group">
-							<div class="slider overflow-hidden relative" data-slider-id="s3">
-								<div class="slides flex transition-transform duration-500">
-									<img src="../img/img-6.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto1">
-									<img src="../img/img-7.jpg" class="w-full h-48 object-cover flex-shrink-0" alt="foto2">
-								</div>
-							</div>
-							<button data-prev data-slider="s3" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-left text-indigo-800"></i></button>
-							<button data-next data-slider="s3" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block"><i class="fas fa-chevron-right text-indigo-800"></i></button>
-						</div>
-						<div class="p-4">
-							<h3 class="font-semibold text-lg mb-1">Kegiatan Lapangan</h3>
-							<p class="text-sm text-gray-600 mb-3">Ringkasan singkat kegiatan lapangan atau kunjungan.</p>
-							
-						</div>
-					</div>
+							<?php
+						}
+					} else {
+						echo "<p class='text-center text-gray-500 col-span-full'>Belum ada galeri kegiatan.</p>";
+					}
+					?>
 				</div>
 			</div>
 		</section>

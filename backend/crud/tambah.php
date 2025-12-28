@@ -185,6 +185,15 @@ if (isset($_POST['tambah'])) {
             $redirect = "../dashboard/db_tugas.php";
 
             break;
+            case 'tugas':
+            $matkul_id = $_POST['matkul_id'];
+            $deadline_tanggal = $_POST['deadline_tanggal'];
+            $deadline_pukul = $_POST['deadline_pukul'];
+            $deskripsi = $_POST['deskripsi'];
+            $link_kirim = $_POST['link_kirim'];
+            
+            // Handle file upload
+            $file_tugas = '';
             if (!empty($_FILES['file_tugas']['name'])) {
                 $target_dir = "../files/tugas/";
                 // Create directory if not exists
@@ -205,6 +214,53 @@ if (isset($_POST['tambah'])) {
                 VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
             $redirect = "../dashboard/db_tugas.php";
 
+            break;
+
+        case 'galeri':
+            $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+            $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+            $tanggal_kegiatan = $_POST['tanggal_kegiatan'];
+            
+            mysqli_query($koneksi, "INSERT INTO galeri (judul, deskripsi, tanggal_kegiatan) VALUES ('$judul', '$deskripsi', '$tanggal_kegiatan')");
+            $galeri_id = mysqli_insert_id($koneksi);
+            
+            if (!empty($_FILES['fotos']['name'][0])) {
+                $target_dir = "../img/gallery/";
+                if (!is_dir($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+                
+                foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
+                    $file_name = $_FILES['fotos']['name'][$key];
+                    $new_file_name = time() . "_" . $key . "_" . basename($file_name);
+                    $target_file = $target_dir . $new_file_name;
+                    $db_path = "img/gallery/" . $new_file_name;
+                    
+                    if (move_uploaded_file($tmp_name, $target_file)) {
+                        mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
+                    }
+                }
+            }
+            $redirect = "../dashboard/db_galeri.php";
+            break;
+
+        case 'akademik':
+            $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+            $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+            $link = mysqli_real_escape_string($koneksi, $_POST['link']);
+            
+            mysqli_query($koneksi, "INSERT INTO akademik (judul, deskripsi, link) VALUES ('$judul', '$deskripsi', '$link')");
+            $redirect = "../dashboard/db_berita.php";
+            break;
+
+        case 'kalender_akademik':
+            $periode_id = intval($_POST['periode_id']);
+            $kegiatan = mysqli_real_escape_string($koneksi, $_POST['kegiatan']);
+            $tanggal_mulai = $_POST['tanggal_mulai'];
+            $tanggal_selesai = $_POST['tanggal_selesai'];
+
+            mysqli_query($koneksi, "INSERT INTO kalender_akademik (periode_id, kegiatan, tanggal_mulai, tanggal_selesai) VALUES ('$periode_id', '$kegiatan', '$tanggal_mulai', '$tanggal_selesai')");
+            $redirect = "../dashboard/db_kalender.php";
             break;
     }
     echo "
@@ -625,6 +681,82 @@ if (isset($_POST['tambah'])) {
                                     <option value="Bendahara">Bendahara</option>
                                     <option value="Mahasiswa">Mahasiswa</option>
                                 </select>
+                            </div>
+                        </div>
+
+                    <?php elseif ($tabel === 'galeri'): ?>
+                        <h3 class="text-xl font-bold mb-6">Galeri Kegiatan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Judul Kegiatan</label>
+                                <input type="text" name="judul" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Kegiatan</label>
+                                <input type="date" name="tanggal_kegiatan" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea name="deskripsi" rows="3" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Foto-foto (Bisa pilih banyak)</label>
+                                <input type="file" name="fotos[]" multiple accept="image/*" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'akademik'): ?>
+                        <h3 class="text-xl font-bold mb-6">Berita & Informasi Akademik</h3>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Judul Berita</label>
+                                <input type="text" name="judul" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea name="deskripsi" rows="3" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Link (Opsional)</label>
+                                <input type="text" name="link"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'kalender_akademik'): ?>
+                        <h3 class="text-xl font-bold mb-6">Tambah Agenda Kalender Akademik</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Periode</label>
+                                <select name="periode_id" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    <option value="">-- Pilih Periode --</option>
+                                    <?php
+                                    $q_per = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY id DESC");
+                                    while ($per = mysqli_fetch_assoc($q_per)) {
+                                        echo "<option value='{$per['id']}'>{$per['tahun_periode']} - {$per['semester_nama']}</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Kegiatan</label>
+                                <textarea name="kegiatan" rows="2" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                                <input type="date" name="tanggal_mulai" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Selesai</label>
+                                <input type="date" name="tanggal_selesai" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
                             </div>
                         </div>
                     <?php endif; ?>

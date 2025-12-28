@@ -1,12 +1,5 @@
 <?php
 include '../koneksi.php';
-
-// Logika Hapus Pesan
-if (isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
-    mysqli_query($koneksi, "DELETE FROM pesan WHERE id = '$id'");
-    header("Location: db_pesan.php");
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -73,12 +66,7 @@ if (isset($_GET['hapus'])) {
                                 </div>
                             </div>
                             
-                            <a href="?hapus=<?php echo $row['id']; ?>" 
-                               onclick="event.stopPropagation(); return confirm('Apakah Anda yakin ingin menghapus pesan ini secara permanen?')"
-                               class="text-gray-500 hover:text-red-400 p-2 hover:bg-red-500/10 rounded-lg transition-colors group/delete"
-                               title="Hapus Pesan">
-                                <i class="fas fa-trash-alt group-hover/delete:scale-110 transition-transform"></i>
-                            </a>
+
                         </div>
                         
                         <!-- Content -->
@@ -169,11 +157,7 @@ if (isset($_GET['hapus'])) {
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="shareWhatsApp()" class="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-green-900/20">
-                        <i class="fab fa-whatsapp text-lg"></i>
-                        WhatsApp
-                    </button>
+                <div class="grid grid-cols-1">
                     <button onclick="shareInstagram()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-pink-900/20">
                         <i class="fas fa-download text-lg"></i>
                         Simpan Gambar
@@ -214,10 +198,6 @@ if (isset($_GET['hapus'])) {
             }, 300);
         }
 
-        function shareWhatsApp() {
-            const text = `Ada pesan baru nih di PTIK C 2024:\n\n"${currentPesan}"\n\nLihat selengkapnya disini: ${window.location.href}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
 
         function shareInstagram() {
             const captureArea = document.getElementById('captureArea');

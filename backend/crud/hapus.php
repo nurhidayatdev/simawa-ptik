@@ -53,7 +53,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
     $tabel = $_GET['tabel'];
     $id = intval($_GET['id']);
 
-    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah','jadwal_matkul', 'users', 'dosen', 'tugas'];
+    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah','jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik'];
 
     if (!in_array($tabel, $tabel_diizinkan)) {
         echo "Tabel tidak diizinkan!";
@@ -83,6 +83,18 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
             break;
             case 'tugas':
             $redirect = '../dashboard/db_tugas.php';
+            break;
+            case 'galeri':
+            $redirect = '../dashboard/db_galeri.php';
+            break;
+            case 'pesan':
+            $redirect = '../dashboard/db_pesan.php';
+            break;
+            case 'akademik':
+            $redirect = '../dashboard/db_berita.php';
+            break;
+            case 'kalender_akademik':
+            $redirect = '../dashboard/db_kalender.php';
             break;
     }
 

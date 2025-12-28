@@ -20,27 +20,30 @@ $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'akti
 $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'];
 
+// Auto-update status based on deadline
+mysqli_query($koneksi, "UPDATE tugas SET status = 'selesai' WHERE (deadline_tanggal < CURDATE() OR (deadline_tanggal = CURDATE() AND deadline_pukul < CURTIME())) AND status = 'belum'");
+
 $search = $_GET['search'] ?? '';
+$status_filter = $_GET['status'] ?? 'belum';
 
 if (!empty($search)) {
 	$stmt = mysqli_prepare(
 		$koneksi,
-		"SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, mk.nama_matkul
-		 JOIN tugas t
+		"SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, t.status, mk.nama_matkul
+		 FROM tugas t
 		 LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
-		 WHERE (mk.nama_matkul LIKE ?
-		 OR t.deskripsi LIKE ?)
+		 WHERE (mk.nama_matkul LIKE ? OR t.deskripsi LIKE ?)
 		 AND t.periode_id = ?
+		 AND t.status = ?
 		 ORDER BY t.deadline_tanggal ASC"
 	);
 
 	$like = "%$search%";
-	$like = "%$search%";
-	mysqli_stmt_bind_param($stmt, "ssi", $like, $like, $periode_id);
+	mysqli_stmt_bind_param($stmt, "ssis", $like, $like, $periode_id, $status_filter);
 	mysqli_stmt_execute($stmt);
 	$result = mysqli_stmt_get_result($stmt);
 } else {
-	$result = mysqli_query($koneksi, "SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, mk.nama_matkul FROM tugas t LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id WHERE t.periode_id = $periode_id ORDER BY t.deadline_tanggal ASC");
+	$result = mysqli_query($koneksi, "SELECT t.id, t.matkul_id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, t.file_tugas, t.link_kirim, t.status, mk.nama_matkul FROM tugas t LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id WHERE t.periode_id = $periode_id AND t.status = '$status_filter' ORDER BY t.deadline_tanggal ASC");
 }
 
 // If this is an AJAX live-search request, return only the table rows
@@ -66,6 +69,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		} else {
 			echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
 		}
+		$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+		echo '<td class="px-3 py-2 whitespace-nowrap text-xs"><span class="px-2 py-1 rounded-full border ' . $statusColor . '">' . ucfirst($row['status']) . '</span></td>';
 		echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
 		echo '<a href="../crud/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
 		echo '<a href="../crud/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus tugas ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
@@ -173,7 +178,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <a href="db_tugas.php"
                                 class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Tugas</a>
 
-                            
+                             <a href="db_berita.php"
+                                 class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Berita</a>
+                              <a href="db_kalender.php"
+                                  class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Kalender</a>
                         </div>
 
                         <button
@@ -207,6 +215,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 </a>
                             </div>
                         </button>
+
+                        <a href="db_galeri.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                            <i class="fa fa-images w-5 h-5 mr-4"></i>
+                            <span class="text-xs">Galeri</span>
+                        </a>
+
+                        <a href="db_pesan.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                            <i class="fa fa-envelope w-5 h-5 mr-4"></i>
+                            <span class="text-xs">Pesan Anonim</span>
+                        </a>
+
 <?php if ($role === 'Administrator Utama'): ?>
                         <button
                             class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
@@ -233,13 +252,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 				<div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
+							<select name="status" id="statusFilter" onchange="this.form.submit()" 
+								class="basis-1/5 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-[10px]">
+								<option value="belum" <?= ($status_filter == 'belum') ? 'selected' : '' ?>>Belum Selesai</option>
+								<option value="selesai" <?= ($status_filter == 'selesai') ? 'selected' : '' ?>>Selesai</option>
+							</select>
 							<input
 								id="searchInput"
 								type="text"
 								name="search"
 								value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
 								placeholder="Cari Mata Kuliah / Deskripsi..."
-								class="basis-4/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-[10px]">
 
 							<a href="../crud/tambah.php?tabel=tugas" class="basis-1/5 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
 								<i class="fa fa-plus"></i>
@@ -267,6 +291,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Link Kirim</th>
 							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+								Status</th>
+							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Actions</th>
 						</tr>
 					</thead>
@@ -284,6 +310,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php $d = strip_tags($row['deskripsi']); echo htmlspecialchars((strlen($d)>120)?substr($d,0,117).'...':$d); ?></td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php if(!empty($row['file_tugas'])): ?><a href="../files/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a><?php else: echo '-'; endif; ?></td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php if(!empty($row['link_kirim'])): ?><a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="text-blue-600 underline">Kirim</a><?php else: echo '-'; endif; ?></td>
+
+								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+									<?php 
+									$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+									?>
+									<span class="px-2 py-1 rounded-full border <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
+								</td>
 
 								<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
 									<a href="../crud/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
@@ -355,22 +388,25 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		// Live search via AJAX (debounced) - keep focus in input
 		(function(){
 			const input = document.getElementById('searchInput');
-			if (!input) return;
+			const statusSelect = document.getElementById('statusFilter');
+			if (!input || !statusSelect) return;
 			let timer = null;
-			input.addEventListener('input', function(){
+			function performSearch() {
 				clearTimeout(timer);
 				timer = setTimeout(() => {
 					const q = encodeURIComponent(input.value || '');
-					const url = window.location.pathname + '?search=' + q + '&ajax=1';
+					const s = encodeURIComponent(statusSelect.value || 'belum');
+					const url = window.location.pathname + '?search=' + q + '&status=' + s + '&ajax=1';
 					fetch(url, { credentials: 'same-origin' })
 						.then(r => r.text())
 						.then(html => {
 							const tbody = document.querySelector('table tbody');
-							if (tbody) tbody.innerHTML = html || '<tr><td colspan="7" class="px-3 py-2 text-xs text-slate-500">No results</td></tr>';
-							input.focus();
+							if (tbody) tbody.innerHTML = html || '<tr><td colspan="8" class="px-3 py-2 text-xs text-slate-500 text-center">No results</td></tr>';
 						}).catch(err => console.error(err));
 				}, 250);
-			});
+			}
+			input.addEventListener('input', performSearch);
+			statusSelect.addEventListener('change', performSearch);
 		})();
 	</script>
 </body>

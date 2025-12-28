@@ -180,7 +180,8 @@ if (isset($_POST['update'])) {
                     deadline_pukul='{$_POST['deadline_pukul']}',
                     deskripsi='{$_POST['deskripsi']}',
                     file_tugas='$file_tugas',
-                    link_kirim='{$_POST['link_kirim']}'
+                    link_kirim='{$_POST['link_kirim']}',
+                    status='{$_POST['status']}'
                     WHERE id='$id'");
             
             // =====================
@@ -261,6 +262,66 @@ if (isset($_POST['update'])) {
                     dosen_mitra_id='{$_POST['dosen_mitra_id']}'
                     WHERE id='$id'");
             $redirect = "../dashboard/db_jadwal.php";
+            break;
+
+        case 'galeri':
+            $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+            $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+            $tanggal_kegiatan = $_POST['tanggal_kegiatan'];
+            
+            mysqli_query($koneksi, "UPDATE galeri SET judul='$judul', deskripsi='$deskripsi', tanggal_kegiatan='$tanggal_kegiatan' WHERE id='$id'");
+            
+            // Handle new photos
+            if (!empty($_FILES['fotos']['name'][0])) {
+                $target_dir = "../img/gallery/";
+                if (!is_dir($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+                
+                foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
+                    $file_name = $_FILES['fotos']['name'][$key];
+                    $new_file_name = time() . "_" . $key . "_" . basename($file_name);
+                    $target_file = $target_dir . $new_file_name;
+                    $db_path = "img/gallery/" . $new_file_name;
+                    
+                    if (move_uploaded_file($tmp_name, $target_file)) {
+                        mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$id', '$db_path')");
+                    }
+                }
+            }
+            
+            // Handle photo deletion (if any IDs are passed)
+            if (isset($_POST['delete_photos'])) {
+                foreach ($_POST['delete_photos'] as $foto_id) {
+                    $q_f = mysqli_query($koneksi, "SELECT foto_path FROM galeri_foto WHERE id = '$foto_id'");
+                    $f_data = mysqli_fetch_assoc($q_f);
+                    if ($f_data) {
+                        @unlink("../" . $f_data['foto_path']);
+                        mysqli_query($koneksi, "DELETE FROM galeri_foto WHERE id = '$foto_id'");
+                    }
+                }
+            }
+            
+            $redirect = "../dashboard/db_galeri.php";
+            break;
+
+        case 'akademik':
+            $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+            $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+            $link = mysqli_real_escape_string($koneksi, $_POST['link']);
+            
+            mysqli_query($koneksi, "UPDATE akademik SET judul='$judul', deskripsi='$deskripsi', link='$link' WHERE id='$id'");
+            $redirect = "../dashboard/db_berita.php";
+            break;
+
+        case 'kalender_akademik':
+            $periode_id = intval($_POST['periode_id']);
+            $kegiatan = mysqli_real_escape_string($koneksi, $_POST['kegiatan']);
+            $tanggal_mulai = $_POST['tanggal_mulai'];
+            $tanggal_selesai = $_POST['tanggal_selesai'];
+
+            mysqli_query($koneksi, "UPDATE kalender_akademik SET periode_id='$periode_id', kegiatan='$kegiatan', tanggal_mulai='$tanggal_mulai', tanggal_selesai='$tanggal_selesai' WHERE id='$id'");
+            $redirect = "../dashboard/db_kalender.php";
             break;
     }
 
@@ -595,7 +656,8 @@ if (isset($_POST['update'])) {
                                         JOIN mata_kuliah mk ON k.matkul_id = mk.id
                                         ORDER BY mk.nama_matkul ASC");
                                     while ($mk = mysqli_fetch_assoc($query_mk)) {
-                                        echo "<option value='{$mk['matkul_id']}'>{$mk['nama_matkul']}</option>";
+                                        $selected = ($data['matkul_id'] == $mk['matkul_id']) ? 'selected' : '';
+                                        echo "<option value='{$mk['matkul_id']}' $selected>{$mk['nama_matkul']}</option>";
                                     }
                                     ?>
                                 </select>
@@ -624,6 +686,13 @@ if (isset($_POST['update'])) {
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Link Kirim</label>
                                 <input type="text" name="link_kirim" value="<?= $data['link_kirim']; ?>"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" required>
+                                    <option value="belum" <?= ($data['status'] == 'belum') ? 'selected' : '' ?>>Belum Selesai</option>
+                                    <option value="selesai" <?= ($data['status'] == 'selesai') ? 'selected' : '' ?>>Selesai</option>
+                                </select>
                             </div>
                         </div>
                         <?php elseif ($tabel === 'jadwal_matkul'): ?>
@@ -701,6 +770,102 @@ if (isset($_POST['update'])) {
                                     }
                                     ?>
                                     </select>
+                            </div>
+                        </div>
+                        </div>
+                        <?php elseif ($tabel === 'galeri'): ?>
+                        <h3 class="text-xl font-bold mb-6">Edit Galeri Kegiatan</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Judul Kegiatan</label>
+                                <input type="text" name="judul" value="<?= htmlspecialchars($data['judul']); ?>" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Kegiatan</label>
+                                <input type="date" name="tanggal_kegiatan" value="<?= $data['tanggal_kegiatan']; ?>" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea name="deskripsi" rows="3" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"><?= htmlspecialchars($data['deskripsi']); ?></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tambah Foto Baru</label>
+                                <input type="file" name="fotos[]" multiple accept="image/*"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Kelola Foto Saat Ini (Centang untuk hapus)</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+                                    <?php
+                                    $q_f = mysqli_query($koneksi, "SELECT * FROM galeri_foto WHERE galeri_id = '$id'");
+                                    while ($f = mysqli_fetch_assoc($q_f)) {
+                                        ?>
+                                        <div class="relative group">
+                                            <img src="../<?= htmlspecialchars($f['foto_path']) ?>" class="w-full h-24 object-cover rounded-lg">
+                                            <div class="absolute top-1 right-1">
+                                                <input type="checkbox" name="delete_photos[]" value="<?= $f['id'] ?>" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500">
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                        <?php elseif ($tabel === 'akademik'): ?>
+                        <h3 class="text-xl font-bold mb-6">Edit Berita & Informasi Akademik</h3>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Judul Berita</label>
+                                <input type="text" name="judul" value="<?= htmlspecialchars($data['judul']); ?>" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea name="deskripsi" rows="3" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"><?= htmlspecialchars($data['deskripsi']); ?></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Link (Opsional)</label>
+                                <input type="text" name="link" value="<?= htmlspecialchars($data['link']); ?>"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                        </div>
+                        <?php elseif ($tabel === 'kalender_akademik'): ?>
+                        <h3 class="text-xl font-bold mb-6">Edit Agenda Kalender Akademik</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Periode</label>
+                                <select name="periode_id" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    <option value="">-- Pilih Periode --</option>
+                                    <?php
+                                    $q_per = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY id DESC");
+                                    while ($per = mysqli_fetch_assoc($q_per)) {
+                                        $selected = ($per['id'] == $data['periode_id']) ? 'selected' : '';
+                                        echo "<option value='{$per['id']}' $selected>{$per['tahun_periode']} - {$per['semester_nama']}</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Kegiatan</label>
+                                <textarea name="kegiatan" rows="2" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"><?= htmlspecialchars($data['kegiatan']); ?></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                                <input type="date" name="tanggal_mulai" value="<?= $data['tanggal_mulai']; ?>" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Selesai</label>
+                                <input type="date" name="tanggal_selesai" value="<?= $data['tanggal_selesai']; ?>" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
                             </div>
                         </div>
                         <?php endif; ?>

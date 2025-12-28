@@ -180,7 +180,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <a href="db_tugas.php"
                                 class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Tugas</a>
 
-                            
+                             <a href="db_berita.php"
+                                 class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Berita</a>
+                              <a href="db_kalender.php"
+                                  class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Kalender</a>
                         </div>
 
                         <button
@@ -214,6 +217,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 </a>
                             </div>
                         </button>
+
+                        <a href="db_galeri.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                            <i class="fa fa-images w-5 h-5 mr-4"></i>
+                            <span class="text-xs">Galeri</span>
+                        </a>
+
+                        <a href="db_pesan.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                            <i class="fa fa-envelope w-5 h-5 mr-4"></i>
+                            <span class="text-xs">Pesan Anonim</span>
+                        </a>
+
 <?php if ($role === 'Administrator Utama'): ?>
                         <button
                             class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
