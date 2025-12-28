@@ -54,8 +54,14 @@ if (isset($_POST['tambah'])) {
             $ruangan = $_POST['ruangan'];
             $dosen_pengampu_id = $_POST['dosen_pengampu_id'];
             $dosen_mitra_id = $_POST['dosen_mitra_id'];
-            mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_ke, jam_mulai, jam_selesai, ruangan, dosen_pengampu_id, dosen_mitra_id)
-                VALUES ('$matkul_id', '$hari', '$jam_ke', '$jam_mulai', '$jam_selesai', '$ruangan', '$dosen_pengampu_id', '$dosen_mitra_id')");
+            
+            // Get active periode_id
+            $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+            $periode = mysqli_fetch_assoc($q_periode);
+            $periode_id = $periode['id'] ?? 0;
+            
+            mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_ke, jam_mulai, jam_selesai, ruangan, dosen_pengampu_id, dosen_mitra_id, periode_id)
+                VALUES ('$matkul_id', '$hari', '$jam_ke', '$jam_mulai', '$jam_selesai', '$ruangan', '$dosen_pengampu_id', '$dosen_mitra_id', '$periode_id')");
             $redirect = "../dashboard/db_jadwal.php";
 
             break;
@@ -84,10 +90,88 @@ if (isset($_POST['tambah'])) {
             $deadline_tanggal = $_POST['deadline_tanggal'];
             $deadline_pukul = $_POST['deadline_pukul'];
             $deskripsi = $_POST['deskripsi'];
-            $file_tugas = $_POST['file_tugas'];
             $link_kirim = $_POST['link_kirim'];
-            mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim)
-                VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim')");
+            
+            // Handle file upload
+            $file_tugas = '';
+            if (!empty($_FILES['file_tugas']['name'])) {
+                $target_dir = "../files/tugas/";
+                // Create directory if not exists
+                if (!is_dir($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+                $file_tugas = time() . "_" . basename($_FILES["file_tugas"]["name"]);
+                $target_file = $target_dir . $file_tugas;
+                move_uploaded_file($_FILES["file_tugas"]["tmp_name"], $target_file);
+            }
+            
+            // Get active periode_id
+            $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+            $periode = mysqli_fetch_assoc($q_periode);
+            $periode_id = $periode['id'] ?? 0;
+            
+            // Get nama mata kuliah untuk notifikasi
+            $q_matkul = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = '$matkul_id'");
+            $matkul_data = mysqli_fetch_assoc($q_matkul);
+            $nama_matkul = $matkul_data['nama_matkul'] ?? 'Unknown';
+            
+            mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id)
+                VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
+            
+            // =====================
+            // TELEGRAM NOTIFICATION
+            // =====================
+            $telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
+            $telegram_chat_id = "-1003577478223";
+            
+            // Format pesan
+            $message = "📚 *TUGAS BARU DITAMBAHKAN!*\n\n";
+            $message .= "📖 *Mata Kuliah:* " . $nama_matkul . "\n";
+            $message .= "📅 *Deadline:* " . $deadline_tanggal . " pukul " . $deadline_pukul . "\n";
+            $message .= "📝 *Deskripsi:* " . ($deskripsi ?: '-') . "\n";
+            if (!empty($link_kirim)) {
+                $message .= "🔗 *Link Kirim:* " . $link_kirim . "\n";
+            }
+            $message .= "\n_Segera kerjakan tugasmu!_ 💪";
+            
+            // Kirim ke Telegram
+            $telegram_url = "https://api.telegram.org/bot{$telegram_token}/sendMessage";
+            $telegram_data = [
+                'chat_id' => $telegram_chat_id,
+                'text' => $message,
+                'parse_mode' => 'Markdown'
+            ];
+            
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $telegram_url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $telegram_data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_exec($ch);
+            curl_close($ch);
+            
+            $redirect = "../dashboard/db_tugas.php";
+
+            break;
+            if (!empty($_FILES['file_tugas']['name'])) {
+                $target_dir = "../files/tugas/";
+                // Create directory if not exists
+                if (!is_dir($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+                $file_tugas = time() . "_" . basename($_FILES["file_tugas"]["name"]);
+                $target_file = $target_dir . $file_tugas;
+                move_uploaded_file($_FILES["file_tugas"]["tmp_name"], $target_file);
+            }
+            
+            // Get active periode_id
+            $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+            $periode = mysqli_fetch_assoc($q_periode);
+            $periode_id = $periode['id'] ?? 0;
+            
+            mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id)
+                VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
             $redirect = "../dashboard/db_tugas.php";
 
             break;

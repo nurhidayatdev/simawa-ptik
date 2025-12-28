@@ -279,7 +279,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['nama_matkul'] ?? '—'); ?></td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : '') . ' ' . htmlspecialchars($row['deadline_pukul']); ?></td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php $d = strip_tags($row['deskripsi']); echo htmlspecialchars((strlen($d)>120)?substr($d,0,117).'...':$d); ?></td>
-								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php if(!empty($row['file_tugas'])): ?><a href="../img/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a><?php else: echo '-'; endif; ?></td>
+								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php if(!empty($row['file_tugas'])): ?><a href="../files/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a><?php else: echo '-'; endif; ?></td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php if(!empty($row['link_kirim'])): ?><a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="text-blue-600 underline">Kirim</a><?php else: echo '-'; endif; ?></td>
 
 								<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
