@@ -12,6 +12,34 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+if ($_SESSION['role'] !== 'Administrator Utama') {
+    // Kita tetap butuh HTML dikit untuk menjalankan JS
+    echo "<!DOCTYPE html>
+    <html>
+    <head>
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Akses Ditolak!',
+                text: 'Hanya Admin yang dapat mengakses halaman ini.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'index.php';
+                } else {
+                    window.location.href = 'index.php';
+                }
+            });
+        </script>
+    </body>
+    </html>";
+    exit();
+}
+
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {

@@ -12,6 +12,34 @@ $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
+if ($_SESSION['role'] !== 'Administrator Utama' || $_SESSION['role'] !== 'Bendahara') {
+    // Kita tetap butuh HTML dikit untuk menjalankan JS
+    echo "<!DOCTYPE html>
+    <html>
+    <head>
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Akses Ditolak!',
+                text: 'Hanya Admin yang dapat mengakses halaman ini.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../../index.php';
+                } else {
+                    window.location.href = '../../index.php';
+                }
+            });
+        </script>
+    </body>
+    </html>";
+    exit();
+}
+
 // handle add entry
 // handle update entry
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_arus'])) {
@@ -342,7 +370,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
                                 </a>
                             </div>
                         </button>
-
+<?php if ($role === 'Administrator Utama'): ?>
                         <button
                             class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
                             <div class="flex items-center">
@@ -352,7 +380,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
                                 </a>
                             </div>
                         </button>
-
+<?php endif; ?>
                     </div>
                 </div>
             </nav>

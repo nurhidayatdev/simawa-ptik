@@ -373,7 +373,7 @@ if (isset($_POST['tambah'])) {
                                 </a>
                             </div>
                         </button>
-
+<?php if ($role === 'Administrator Utama'): ?>
                         <button
                             class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
                             <div class="flex items-center">
@@ -383,7 +383,7 @@ if (isset($_POST['tambah'])) {
                                 </a>
                             </div>
                         </button>
-
+<?php endif; ?>
                     </div>
                 </div>
             </nav>
