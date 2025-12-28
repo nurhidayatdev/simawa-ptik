@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
+$role = $_SESSION['role'];
 
 // CSV export handler (top of file) - responds to ?export=csv&minggu_ke=...&filter=...
 if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_ke'])) {
@@ -197,6 +198,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Absensi</h3>
+                <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         
@@ -210,6 +212,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                     </form>
                 
             </div>
+            <?php endif; ?>
         </div>
 
         <form method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

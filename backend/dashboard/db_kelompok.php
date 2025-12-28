@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
+$role = $_SESSION['role'];
 
 
 /* =====================
@@ -209,6 +210,7 @@ if ($selected_matkul) {
 	<div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                 <h3 class="text-xl font-bold text-slate-800 mb-4">Data Kelompok</h3>
+                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                 <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         
@@ -222,6 +224,7 @@ if ($selected_matkul) {
                         </a>
                     </form>
                 </div>
+                <?php endif; ?>
             </div>
 		
 

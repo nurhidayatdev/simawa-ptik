@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $nama_panggilan = $_SESSION['nama_panggilan'];
 $foto = $_SESSION['foto'];
+$role = $_SESSION['role'];
 $tabel = $_GET['tabel'] ?? '';
 $id = $_GET['id'] ?? '';
 $query = mysqli_query($koneksi, "SELECT * FROM $tabel WHERE id='$id'");

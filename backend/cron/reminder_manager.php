@@ -14,6 +14,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
+$role = $_SESSION['role'];
 
 // Handle manual trigger
 $manual_run_result = null;

@@ -33,6 +33,8 @@ $force_web = isset($_GET['force']);
 $force_cli = isset($argv) && in_array('--force', $argv);
 $force_manual = isset($force_include) && $force_include === true;
 
+/* 
+// SEMENTARA DIMATIKAN UNTUK TESTING CRON JOBS
 if (file_exists($last_run_file) && !($force_web || $force_cli || $force_manual)) {
     $last_run = trim(file_get_contents($last_run_file));
     if ($last_run === $today) {
@@ -44,6 +46,7 @@ if (file_exists($last_run_file) && !($force_web || $force_cli || $force_manual))
         }
     }
 }
+*/
 
 /**
  * Resilient Telegram Message Sender
@@ -69,7 +72,7 @@ function sendTelegramMessage($token, $chat_id, $message) {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'PTIKC24_Bot/1.0');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.31');
         // DNS Bypass Header
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Host: api.telegram.org']);
         

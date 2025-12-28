@@ -11,6 +11,7 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $tabel = $_GET['tabel'] ?? '';
 $file = $_GET['file'] ?? '';
+$role = $_SESSION['role'];
 
 if (isset($_POST['tambah'])) {
     $redirect = "";

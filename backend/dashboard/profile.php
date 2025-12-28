@@ -10,6 +10,8 @@ if (!isset($_SESSION['user_id'])) {
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $user_id = $_SESSION['user_id'];
 $foto = $_SESSION['foto'];
+$role = $_SESSION['role'];
+
 $query = "SELECT id FROM mahasiswa WHERE user_id = ?";
 $stmt  = mysqli_prepare($koneksi, $query);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
