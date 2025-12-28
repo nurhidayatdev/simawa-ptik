@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
+$role = $_SESSION['role'];
 
 
 
@@ -293,6 +294,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Absensi</h3>
+<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                 <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         
@@ -306,6 +308,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                         </a>
                     </form>
                 </div>
+<?php endif; ?>
             </div>
             <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 

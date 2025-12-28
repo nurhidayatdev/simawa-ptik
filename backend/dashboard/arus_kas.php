@@ -66,6 +66,95 @@ $res_out = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_kelua
 $total_keluar = ($res_out && $r = mysqli_fetch_assoc($res_out)) ? $r['total_keluar'] : 0;
 $saldo = $total_masuk - $total_keluar;
 
+// =====================
+// TELEGRAM NOTIFICATION HANDLER
+// =====================
+if (isset($_POST['send_telegram']) && isset($_POST['minggu_notif'])) {
+    $minggu_notif = mysqli_real_escape_string($koneksi, $_POST['minggu_notif']);
+    
+    // Get list of students who haven't paid for the selected week
+    $q_belum = "SELECT m.nim, m.nama_panggilan
+                FROM kas k
+                JOIN mahasiswa m ON k.mahasiswa_id = m.id
+                WHERE k.minggu_ke = '$minggu_notif' 
+                AND (k.status IS NULL OR k.status != 'Lunas')
+                ORDER BY m.nim ASC";
+    
+    $res_belum = mysqli_query($koneksi, $q_belum);
+    
+    if ($res_belum && mysqli_num_rows($res_belum) > 0) {
+        $telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
+        $telegram_chat_id = "-1003577478223";
+        
+        // Build message
+        $message = "💰 *PENGINGAT PEMBAYARAN KAS MINGGUAN*\n\n";
+        $message .= "📅 *Minggu ke-" . $minggu_notif . "*\n\n";
+        $message .= "Berikut daftar mahasiswa yang *BELUM* membayar kas:\n\n";
+        
+        $no = 1;
+        while ($row = mysqli_fetch_assoc($res_belum)) {
+            $message .= $no . ". " . $row['nama_panggilan'] . "\n";
+            $no++;
+        }
+        
+        $message .= "\n_Segera lakukan pembayaran!_ 🙏";
+        
+        // Send to Telegram (Resilient DNS Bypass Method)
+        $tg_ip = "149.154.167.220";
+        $telegram_url = "https://{$tg_ip}/bot{$telegram_token}/sendMessage";
+        $telegram_data = [
+            'chat_id' => $telegram_chat_id,
+            'text' => $message,
+            'parse_mode' => 'Markdown'
+        ];
+        
+        // Try Method 1: CURL (DNS Bypass)
+        $sent = false;
+        if (function_exists('curl_init')) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $telegram_url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($telegram_data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'PTIKC24_Bot/1.0');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Host: api.telegram.org']); // DNS Bypass
+            $res = curl_exec($ch);
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+            if ($info['http_code'] == 200) $sent = true;
+        }
+        
+        // Try Method 2: FGC (Fallback DNS Bypass)
+        if (!$sent && ini_get('allow_url_fopen')) {
+            $opts = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\n" .
+                               "Host: api.telegram.org\r\n" . 
+                               "User-Agent: PTIKC24_Bot/1.0\r\n",
+                    'content' => http_build_query($telegram_data),
+                    'timeout' => 15
+                ],
+                'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]
+            ];
+            $ctx = stream_context_create($opts);
+            $res_fgc = @file_get_contents($telegram_url, false, $ctx);
+            if ($res_fgc !== FALSE) $sent = true;
+        }
+        
+        $telegram_sent = $sent;
+        $telegram_count = mysqli_num_rows($res_belum);
+        mysqli_data_seek($res_belum, 0); // Reset pointer
+    } else {
+        $telegram_sent = false;
+        $telegram_error = "Tidak ada mahasiswa yang belum bayar di minggu ini.";
+    }
+}
+
 // optional edit fetch
 $editing = false;
 $form_tipe = 'masuk';
@@ -289,6 +378,52 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_csv') {
                     <div class="text-2xl font-bold text-indigo-900">Rp <?= number_format($saldo, 0, ',', '.') ?></div>
                 </div>
             </div>
+
+            <!-- Telegram Notification Section -->
+            <div class="bg-white p-4 rounded shadow mb-6">
+                <h2 class="text-lg font-semibold mb-2">📱 Kirim Pengingat Pembayaran Kas</h2>
+                <form method="POST" class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Pilih Minggu</label>
+                        <select name="minggu_notif" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" required>
+                            <option value="">-- Pilih Minggu --</option>
+                            <?php for ($i = 1; $i <= 16; $i++): ?>
+                                <option value="<?= $i ?>">Minggu <?= $i ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" name="send_telegram" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-xs flex items-center justify-center gap-2">
+                            <i class="fab fa-telegram"></i> Kirim ke Telegram
+                        </button>
+                    </div>
+                </form>
+                <p class="text-xs text-gray-500 mt-2">
+                    <i class="fa fa-info-circle"></i> Notifikasi akan dikirim ke grup Telegram dengan daftar mahasiswa yang belum membayar kas di minggu terpilih.
+                </p>
+            </div>
+
+            <?php if (isset($telegram_sent) && $telegram_sent): ?>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Notifikasi berhasil dikirim ke Telegram untuk <?= $telegram_count ?> mahasiswa yang belum bayar.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                </script>
+            <?php elseif (isset($telegram_sent) && !$telegram_sent): ?>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    Swal.fire({
+                        title: 'Informasi',
+                        text: '<?= $telegram_error ?? "Terjadi kesalahan" ?>',
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                </script>
+            <?php endif; ?>
 
             <div class="bg-white p-4 rounded shadow mb-6">
                 <h2 class="text-lg font-semibold mb-2">Tambah Pemasukan / Pengeluaran</h2>
