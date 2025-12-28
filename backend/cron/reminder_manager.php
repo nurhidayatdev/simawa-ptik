@@ -71,9 +71,10 @@ if (file_exists($log_file)) {
     $log_content = implode("\n", $log_lines);
 }
 
-// Check tomorrow's tasks
-$tomorrow = date('Y-m-d', strtotime('+1 day'));
-$query_tomorrow = "SELECT 
+// Check active tasks (Upcoming)
+$now_date = date('Y-m-d');
+$now_time = date('H:i:s');
+$query_upcoming = "SELECT 
                     t.id,
                     t.deadline_tanggal,
                     t.deadline_pukul,
@@ -81,9 +82,10 @@ $query_tomorrow = "SELECT
                     mk.nama_matkul
                   FROM tugas t
                   JOIN mata_kuliah mk ON t.matkul_id = mk.id
-                  WHERE t.deadline_tanggal = '$tomorrow'
-                  ORDER BY t.deadline_pukul ASC";
-$result_tomorrow = mysqli_query($koneksi, $query_tomorrow);
+                  WHERE t.status = 'belum' 
+                  AND (t.deadline_tanggal > '$now_date' OR (t.deadline_tanggal = '$now_date' AND t.deadline_pukul > '$now_time'))
+                  ORDER BY t.deadline_tanggal ASC, t.deadline_pukul ASC";
+$result_upcoming = mysqli_query($koneksi, $query_upcoming);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -139,18 +141,19 @@ $result_tomorrow = mysqli_query($koneksi, $query_tomorrow);
             </form>
         </div>
 
-        <!-- Tasks Tomorrow -->
+        <!-- Tasks Upcoming -->
         <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
             <h2 class="text-xl font-bold text-gray-800 mb-4">
-                <i class="fa fa-calendar-check text-orange-500"></i> Tugas Besok (<?= date('d/m/Y', strtotime($tomorrow)) ?>)
+                <i class="fa fa-calendar-check text-orange-500"></i> Daftar Tugas Aktif Mendatang
             </h2>
-            <?php if ($result_tomorrow && mysqli_num_rows($result_tomorrow) > 0): ?>
+            <?php if ($result_upcoming && mysqli_num_rows($result_upcoming) > 0): ?>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mata Kuliah</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deadline</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
                             </tr>
@@ -158,11 +161,12 @@ $result_tomorrow = mysqli_query($koneksi, $query_tomorrow);
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php 
                             $no = 1;
-                            while ($task = mysqli_fetch_assoc($result_tomorrow)): 
+                            while ($task = mysqli_fetch_assoc($result_upcoming)): 
                             ?>
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-3"><?= $no++ ?></td>
                                     <td class="px-4 py-3 font-semibold"><?= htmlspecialchars($task['nama_matkul']) ?></td>
+                                    <td class="px-4 py-3"><?= date('d M Y', strtotime($task['deadline_tanggal'])) ?></td>
                                     <td class="px-4 py-3">
                                         <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">
                                             <i class="fa fa-clock"></i> <?= date('H:i', strtotime($task['deadline_pukul'])) ?> WITA
@@ -177,7 +181,7 @@ $result_tomorrow = mysqli_query($koneksi, $query_tomorrow);
             <?php else: ?>
                 <div class="text-center py-8 text-gray-500">
                     <i class="fa fa-inbox text-4xl mb-2"></i>
-                    <p>Tidak ada tugas dengan deadline besok</p>
+                    <p>Tidak ada tugas aktif yang belum selesai</p>
                 </div>
             <?php endif; ?>
         </div>

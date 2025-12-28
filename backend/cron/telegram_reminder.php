@@ -122,7 +122,9 @@ function logMessage($message) {
 // Start logging
 logMessage("=== Starting Telegram Reminder Check ===");
 
-// Query untuk mendapatkan tugas yang deadline-nya besok
+// Query untuk mendapatkan semua tugas yang belum selesai dan belum deadline
+$now_date = date('Y-m-d');
+$now_time = date('H:i:s');
 $query = "SELECT 
             t.id,
             t.deadline_tanggal,
@@ -132,37 +134,50 @@ $query = "SELECT
             mk.nama_matkul
           FROM tugas t
           JOIN mata_kuliah mk ON t.matkul_id = mk.id
-          WHERE t.deadline_tanggal = '$tomorrow'
-          ORDER BY t.deadline_pukul ASC";
+          WHERE t.status = 'belum' 
+          AND (t.deadline_tanggal > '$now_date' OR (t.deadline_tanggal = '$now_date' AND t.deadline_pukul > '$now_time'))
+          ORDER BY t.deadline_tanggal ASC, t.deadline_pukul ASC";
 
 $result = mysqli_query($koneksi, $query);
 $task_count = mysqli_num_rows($result);
 
 if ($task_count > 0) {
     // Build message
-    $message = "⏰ *REMINDER: DEADLINE TUGAS BESOK!* ⏰\n\n";
-    $message .= "📅 *Tanggal: " . date('d/m/Y', strtotime($tomorrow)) . "*\n\n";
-    $message .= "Berikut tugas yang harus dikumpulkan *BESOK*:\n\n";
+    $message = "🔔 *REKAP TUGAS AKTIF PTIK C* 🔔\n\n";
+    $message .= "Berikut adalah daftar tugas yang *belum dikumpulkan*:\n\n";
     
     $no = 1;
     while ($row = mysqli_fetch_assoc($result)) {
+        $deadline_dt = strtotime($row['deadline_tanggal'] . ' ' . $row['deadline_pukul']);
+        $diff = $deadline_dt - time();
+        $days = floor($diff / (60 * 60 * 24));
+        
+        $status_time = "";
+        if ($row['deadline_tanggal'] == $now_date) {
+            $status_time = "⚠️ *HARI INI*";
+        } elseif ($row['deadline_tanggal'] == date('Y-m-d', strtotime('+1 day'))) {
+            $status_time = "⏰ *BESOK*";
+        } else {
+            $status_time = "📅 " . date('d M Y', strtotime($row['deadline_tanggal']));
+        }
+
         $message .= "*{$no}. {$row['nama_matkul']}*\n";
-        $message .= "   ⏰ Deadline: " . date('H:i', strtotime($row['deadline_pukul'])) . " WITA\n";
+        $message .= "   {$status_time} | " . date('H:i', strtotime($row['deadline_pukul'])) . " WITA\n";
         
         if (!empty($row['deskripsi'])) {
             $message .= "   📝 " . $row['deskripsi'] . "\n";
         }
         
         if (!empty($row['link_kirim'])) {
-            $message .= "   🔗 Link: " . $row['link_kirim'] . "\n";
+            $message .= "   🔗 Link: [Klik di Sini](" . $row['link_kirim'] . ")\n";
         }
         
         $message .= "\n";
         $no++;
     }
     
-    $message .= "_Jangan lupa kerjakan dan kumpulkan tepat waktu!_ 🚀\n";
-    $message .= "_H-1 sebelum deadline_ ⚠️";
+    $message .= "_Segera kerjakan dan kumpulkan sebelum deadline!_ 🚀\n";
+    $message .= "_Update Otomatis Kelas PTIK C_";
     
     // Send to Telegram
     $response = sendTelegramMessage($telegram_token, $telegram_chat_id, $message);

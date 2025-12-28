@@ -12,7 +12,7 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
-if ($_SESSION['role'] !== 'Administrator Utama' || $_SESSION['role'] !== 'Ketua Tingkat') {
+if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Sekretaris') {
     // Kita tetap butuh HTML dikit untuk menjalankan JS
     echo "<!DOCTYPE html>
     <html>
