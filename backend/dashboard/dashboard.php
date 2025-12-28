@@ -27,10 +27,10 @@ $tables = [
 	'mata_kuliah' => 'db_matkul.php',
 	'dosen' => 'db_dosen.php',
 	'jadwal_matkul' => 'db_jadwal.php',
-	'absensi' => 'db_absensi.php',
-	'krs' => 'krs.php',
-	'kas' => 'db_kas.php',
-	'users' => 'db_users.php'
+	'tugas' => 'db_tugas.php',
+	'galeri' => 'db_galeri.php',
+	'pesan' => 'db_pesan.php',
+	'akademik' => 'db_berita.php'
 ];
 
 foreach ($tables as $table => $link) {
@@ -42,6 +42,23 @@ foreach ($tables as $table => $link) {
 		$counts[$table] = 0;
 	}
 }
+
+// Task Status Distribution
+$q_task_stat = mysqli_query($koneksi, "SELECT status, COUNT(*) as cnt FROM tugas GROUP BY status");
+$task_stats = ['belum' => 0, 'selesai' => 0];
+while ($row = mysqli_fetch_assoc($q_task_stat)) {
+    $task_stats[$row['status']] = $row['cnt'];
+}
+
+// Recent Messages (Anonymous)
+$q_recent_pesan = mysqli_query($koneksi, "SELECT * FROM pesan ORDER BY tanggal DESC LIMIT 5");
+
+// Recent News (Akademik)
+$q_recent_berita = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DESC LIMIT 5");
+
+// Gallery Photos Count
+$q_gal_photos = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM galeri_foto");
+$gallery_photos_count = mysqli_fetch_assoc($q_gal_photos)['cnt'] ?? 0;
 
 ?>
 <!DOCTYPE html>
@@ -60,6 +77,8 @@ foreach ($tables as $table => $link) {
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<style>
 		.card-hover:hover { transform: translateY(-4px); }
 		.rotate-180 { transform: rotate(180deg); }
@@ -232,31 +251,123 @@ foreach ($tables as $table => $link) {
                
             </div>
 
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-				<a href="db_mahasiswa.php" class="bg-white p-4 rounded shadow card-hover ">
-					<div class="text-xs text-slate-500">Mahasiswa</div>
-					<div class="text-2xl font-bold text-indigo-900"><?= $counts['mahasiswa'] ?></div>
+				<a href="db_mahasiswa.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
+                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                        <i class="fa fa-user-graduate text-xl"></i>
+                    </div>
+                    <div>
+					    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mahasiswa</div>
+					    <div class="text-xl font-bold text-slate-800"><?= number_format($counts['mahasiswa']) ?></div>
+                    </div>
 				</a>
 
-				<a href="db_matkul.php" class="bg-white p-4 rounded shadow card-hover ">
-					<div class="text-xs text-slate-500">Mata Kuliah</div>
-					<div class="text-2xl font-bold text-indigo-900"><?= $counts['mata_kuliah'] ?></div>
+				<a href="db_matkul.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
+                    <div class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                        <i class="fa fa-book text-xl"></i>
+                    </div>
+                    <div>
+					    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mata Kuliah</div>
+					    <div class="text-xl font-bold text-slate-800"><?= number_format($counts['mata_kuliah']) ?></div>
+                    </div>
 				</a>
 
-				<a href="db_dosen.php" class="bg-white p-4 rounded shadow card-hover ">
-					<div class="text-xs text-slate-500">Dosen</div>
-					<div class="text-2xl font-bold text-indigo-900"><?= $counts['dosen'] ?></div>
+				<a href="db_tugas.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
+                    <div class="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">
+                        <i class="fa fa-tasks text-xl"></i>
+                    </div>
+                    <div>
+					    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tugas Aktif</div>
+					    <div class="text-xl font-bold text-slate-800"><?= number_format($counts['tugas']) ?></div>
+                    </div>
 				</a>
 
-				<a href="db_jadwal.php" class="bg-white p-4 rounded shadow card-hover ">
-					<div class="text-xs text-slate-500">Jadwal</div>
-					<div class="text-2xl font-bold text-indigo-900"><?= $counts['jadwal_matkul'] ?></div>
+				<a href="db_galeri.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
+                    <div class="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600">
+                        <i class="fa fa-images text-xl"></i>
+                    </div>
+                    <div>
+					    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Galeri Foto</div>
+					    <div class="text-xl font-bold text-slate-800"><?= number_format($gallery_photos_count) ?></div>
+                    </div>
 				</a>
-
-				
-
-				
 			</div>
+
+            <!-- Visualization Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                <!-- Task Completion Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa fa-chart-pie text-indigo-500"></i>
+                        Status Tugas
+                    </h3>
+                    <div class="relative h-64">
+                        <canvas id="taskStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Info -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa fa-envelope-open-text text-indigo-500"></i>
+                        Pesan Anonim Terbaru
+                    </h3>
+                    <div class="space-y-4">
+                        <?php if (mysqli_num_rows($q_recent_pesan) > 0): ?>
+                            <?php while($p = mysqli_fetch_assoc($q_recent_pesan)): ?>
+                            <div class="flex gap-4 p-3 rounded-lg bg-slate-50 border border-slate-100 border-l-4 border-l-indigo-500">
+                                <div class="flex-grow">
+                                    <p class="text-xs text-slate-700 line-clamp-1 italic">"<?= htmlspecialchars($p['isi_pesan']) ?>"</p>
+                                    <span class="text-[10px] text-slate-400"><?= date('d M Y, H:i', strtotime($p['tanggal'])) ?></span>
+                                </div>
+                            </div>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <p class="text-xs text-slate-400 text-center py-8">Belum ada pesan anonim.</p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="db_pesan.php" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">Lihat Semua Pesan <i class="fa fa-arrow-right ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Activity Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa fa-newspaper text-indigo-500"></i>
+                        Berita & Pengumuman Terbaru
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                    <th class="pb-2 font-bold">Judul Berita</th>
+                                    <th class="pb-2 font-bold">Preview</th>
+                                    <th class="pb-2 font-bold text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                <?php if (mysqli_num_rows($q_recent_berita) > 0): ?>
+                                    <?php while($b = mysqli_fetch_assoc($q_recent_berita)): ?>
+                                    <tr>
+                                        <td class="py-3 font-semibold text-slate-700"><?= htmlspecialchars($b['judul']) ?></td>
+                                        <td class="py-3 text-slate-500 line-clamp-1"><?= htmlspecialchars(substr($b['deskripsi'], 0, 50)) ?>...</td>
+                                        <td class="py-3 text-right">
+                                            <a href="db_berita.php" class="text-indigo-600 hover:underline font-bold">Edit</a>
+                                        </td>
+                                    </tr>
+                                    <?php endwhile; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3" class="py-10 text-center text-slate-400 italic">Belum ada berita dipublikasikan.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
 			
 
@@ -327,6 +438,36 @@ foreach ($tables as $table => $link) {
         }
         setInterval(updateClock, 1000);
         updateClock(); // initial call
+
+        // Task Status Chart
+        const taskCtx = document.getElementById('taskStatusChart').getContext('2d');
+        new Chart(taskCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Belum Selesai', 'Selesai'],
+                datasets: [{
+                    data: [<?= $task_stats['belum'] ?>, <?= $task_stats['selesai'] ?>],
+                    backgroundColor: ['#f59e0b', '#10b981'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 10 }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
 	</script>
 </body>
 

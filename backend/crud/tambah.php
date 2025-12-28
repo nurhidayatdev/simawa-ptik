@@ -232,11 +232,56 @@ if (isset($_POST['tambah'])) {
                 
                 foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
                     $file_name = $_FILES['fotos']['name'][$key];
-                    $new_file_name = time() . "_" . $key . "_" . basename($file_name);
-                    $target_file = $target_dir . $new_file_name;
-                    $db_path = "img/gallery/" . $new_file_name;
+                    $ext_orig = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                    $basename = preg_replace('/[^a-zA-Z0-9_]/', '_', pathinfo($file_name, PATHINFO_FILENAME));
+                    $new_file_name_base = time() . "_" . $key . "_" . $basename;
                     
-                    if (move_uploaded_file($tmp_name, $target_file)) {
+                    $temp_final_name = $new_file_name_base . "." . $ext_orig;
+                    $target_dir_abs = __DIR__ . "/../img/gallery/";
+                    $dest_path = $target_dir_abs . $temp_final_name;
+                    
+                    if (move_uploaded_file($tmp_name, $dest_path)) {
+                        $db_path = "img/gallery/" . $temp_final_name; // default
+                        
+                        if (function_exists('imagecreatefromstring')) {
+                            $src = null;
+                            if ($ext_orig == 'jpg' || $ext_orig == 'jpeg') $src = @imagecreatefromjpeg($dest_path);
+                            elseif ($ext_orig == 'png') $src = @imagecreatefrompng($dest_path);
+                            elseif ($ext_orig == 'webp') $src = @imagecreatefromwebp($dest_path);
+                            
+                            if (!$src) {
+                                $img_data = @file_get_contents($dest_path);
+                                if ($img_data) $src = @imagecreatefromstring($img_data);
+                            }
+
+                            if ($src) {
+                                $w = imagesx($src);
+                                $h = imagesy($src);
+                                
+                                // Set target width (e.g., 1280)
+                                $target_w = ($w > 1280) ? 1280 : $w;
+                                $target_h = ($w > 1280) ? floor($h * (1280 / $w)) : $h;
+                                
+                                $dst = imagecreatetruecolor($target_w, $target_h);
+                                if ($ext_orig == 'png' || $ext_orig == 'webp') {
+                                    imagealphablending($dst, false);
+                                    imagesavealpha($dst, true);
+                                }
+                                
+                                imagecopyresampled($dst, $src, 0, 0, 0, 0, $target_w, $target_h, $w, $h);
+                                
+                                if (function_exists('imagewebp')) {
+                                    $webp_name = $new_file_name_base . ".webp";
+                                    $webp_path = $target_dir_abs . $webp_name;
+                                    if (imagewebp($dst, $webp_path, 80)) {
+                                        @unlink($dest_path);
+                                        $db_path = "img/gallery/" . $webp_name;
+                                    }
+                                }
+                                imagedestroy($src);
+                                imagedestroy($dst);
+                            }
+                        }
                         mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
                     }
                 }
