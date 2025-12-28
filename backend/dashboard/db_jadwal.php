@@ -248,20 +248,47 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <!-- Modified this section for better mobile responsiveness -->
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-xs flex justify-between items-center">
+                    <span><?= $_SESSION['success']; unset($_SESSION['success']); ?></span>
+                    <button onclick="this.parentElement.remove()" class="text-green-700 font-bold">&times;</button>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-xs flex justify-between items-center">
+                    <span><?= $_SESSION['error']; unset($_SESSION['error']); ?></span>
+                    <button onclick="this.parentElement.remove()" class="text-red-700 font-bold">&times;</button>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['info'])): ?>
+                <div class="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg text-xs flex justify-between items-center">
+                    <span><?= $_SESSION['info']; unset($_SESSION['info']); ?></span>
+                    <button onclick="this.parentElement.remove()" class="text-blue-700 font-bold">&times;</button>
+                </div>
+            <?php endif; ?>
+
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Jadwal Mata Kuliah</h3>
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
-                            <input
+                             <input
                                 id="searchInput"
                                 type="text"
                                 name="search"
                                 value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
                                 placeholder="Cari Hari / Mata Kuliah..."
-                                class="basis-4/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                class="flex-grow px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
 
-                            <a href="../crud/tambah.php?tabel=jadwal_matkul" class="basis-1/5 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
+                            <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                            <a href="../crud/kirim_jadwal.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Telegram" onclick="return confirm('Kirim jadwal besok ke Telegram?');">
+                                <i class="fa-brands fa-telegram"></i>
+                            </a>
+                            <?php endif; ?>
+
+                            <a href="../crud/tambah.php?tabel=jadwal_matkul" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
                                 <i class="fa fa-plus"></i>
                             </a>
                         </div>
