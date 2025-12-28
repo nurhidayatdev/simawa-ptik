@@ -55,6 +55,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $groups = json_decode($groups_json, true);
 
     if ($mata_kuliah_id && is_array($groups)) {
+        // [CHECK] Prevent duplicate groups
+        $check = mysqli_query($koneksi, "SELECT id FROM kelompok WHERE matkul_id = $mata_kuliah_id AND periode_id = $periode_id LIMIT 1");
+        if (mysqli_num_rows($check) > 0) {
+            $_SESSION['error'] = "Kelompok untuk mata kuliah ini sudah ada. Silakan gunakan menu Edit.";
+            header("Location: db_kelompok.php?matkul_id=$mata_kuliah_id");
+            exit;
+        }
+
+        // Get matkul name for notification
+        $q_mk = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = $mata_kuliah_id");
+        $mk_data = mysqli_fetch_assoc($q_mk);
+        $nama_matkul = $mk_data['nama_matkul'] ?? 'Mata Kuliah';
+
         // Remove existing groups for this mata kuliah and period
         $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ? AND periode_id = ?");
         mysqli_stmt_bind_param($stmt, 'ii', $mata_kuliah_id, $periode_id);
@@ -62,18 +75,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         // Insert new groups
         $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id) VALUES (?, ?, ?, ?)");
+        $message_groups = "";
+        
         foreach ($groups as $no => $anggotaArr) {
             $anggotaStr = implode(',', array_map(function($s){ return $s['nim']; }, $anggotaArr));
             $kel_no = $no + 1;
             mysqli_stmt_bind_param($insert, 'iisi', $mata_kuliah_id, $kel_no, $anggotaStr, $periode_id);
             mysqli_stmt_execute($insert);
+
+            // Format message for Telegram
+            $namesArr = array_map(function($s){ return "• " . $s['nama_lengkap']; }, $anggotaArr);
+            $message_groups .= "👥 *Kelompok {$kel_no}*\n" . implode("\n", $namesArr) . "\n\n";
         }
 
-        $_SESSION['flash'] = "Kelompok berhasil disimpan.";
+        // =====================
+        // TELEGRAM NOTIFICATION
+        // =====================
+        $telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
+        $telegram_chat_id = "-1003577478223";
+
+        $message = "📢 *PEMBAGIAN KELOMPOK BARU*\n\n";
+        $message .= "📘 *Mata Kuliah:* " . $nama_matkul . "\n\n";
+        $message .= $message_groups;
+        $message .= "_Silakan hubungi teman kelompok kalian untuk koordinasi!_ 🤝";
+
+        $tg_ip = "149.154.167.220";
+        $telegram_url = "https://{$tg_ip}/bot{$telegram_token}/sendMessage";
+        $telegram_data = [
+            'chat_id' => $telegram_chat_id,
+            'text' => $message,
+            'parse_mode' => 'Markdown'
+        ];
+
+        // Method 1: CURL (DNS Bypass)
+        $sent = false;
+        if (function_exists('curl_init')) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $telegram_url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($telegram_data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Host: api.telegram.org']);
+            $res = curl_exec($ch);
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+            if ($info['http_code'] == 200) $sent = true;
+        }
+
+        // Method 2: Fallback
+        if (!$sent && ini_get('allow_url_fopen')) {
+            $opts = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\nHost: api.telegram.org\r\n",
+                    'content' => http_build_query($telegram_data),
+                    'timeout' => 10
+                ],
+                'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]
+            ];
+            @file_get_contents($telegram_url, false, stream_context_create($opts));
+        }
+
+        $_SESSION['success'] = "Kelompok berhasil disimpan dan notifikasi telah dikirim ke Telegram.";
         header("Location: db_kelompok.php");
         exit;
     } else {
-        $_SESSION['flash'] = "Data tidak valid.";
+        $_SESSION['error'] = "Data tidak valid.";
         header("Location: db_kelompok.php");
         exit;
     }
@@ -88,7 +157,16 @@ $matkuls = mysqli_query($koneksi, "SELECT DISTINCT jm.matkul_id AS id, mk.nama_m
 // Determine selected matkul from GET so we can load only mahasiswa yang mengambil matkul ini (dari krs)
 $selected_matkul = intval($_GET['matkul_id'] ?? 0);
 $students = [];
+
 if ($selected_matkul) {
+    // Check if groups already exist for this matkul
+    $check_exist = mysqli_query($koneksi, "SELECT id FROM kelompok WHERE matkul_id = $selected_matkul AND periode_id = $periode_id LIMIT 1");
+    if (mysqli_num_rows($check_exist) > 0) {
+        $existing_data = true;
+    } else {
+        $existing_data = false;
+    }
+
     $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
@@ -128,6 +206,7 @@ if ($selected_matkul) {
 
         /* live-search script removed from style block; see script at document end */
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-100">
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
@@ -249,7 +328,7 @@ if ($selected_matkul) {
 <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
     <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                <h3 class="text-xl font-bold text-slate-800 mb-4">Pengaturan Kelompok</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Pengaturan Kelompok (Baru)</h3>
                 <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         
@@ -264,6 +343,14 @@ if ($selected_matkul) {
                     </form>
                 </div>
             </div>
+<div id="statusAlert" class="mb-4 hidden">
+    <?php if (isset($existing_data) && $existing_data): ?>
+        <div class="p-3 bg-red-100 text-red-700 text-xs rounded-lg border border-red-200">
+            <i class="fa fa-exclamation-triangle mr-2"></i> PERHATIAN: Kelompok untuk mata kuliah ini sudah dibuat. Anda tidak bisa menambahkannya lagi.
+        </div>
+    <?php endif; ?>
+</div>
+
 <div class="flex flex-wrap items-end gap-4 mb-4">
     
     <form id="selectForm" method="GET" class="flex-1 min-w-[200px]">
@@ -355,6 +442,8 @@ if ($selected_matkul) {
         }
 // Students data from PHP (only those who took selected matkul via KRS)
 const students = <?= json_encode($students, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>;
+
+// Removed existingGroups loading for Add Only page
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -489,9 +578,20 @@ document.getElementById('mata_kuliah').addEventListener('change', function(){
 });
 
 // Ensure hidden matkul id updates before save
-document.getElementById('kelompokForm').addEventListener('submit', function(){
+document.getElementById('kelompokForm').addEventListener('submit', function(e){
     const selectVal = document.getElementById('mata_kuliah').value || document.getElementById('mata_kuliah_hidden').value;
     document.getElementById('mata_kuliah_hidden').value = selectVal;
+    
+    // PHP level check also exists, but let's be nice to the user
+    <?php if (isset($existing_data) && $existing_data): ?>
+        e.preventDefault();
+        Swal.fire({
+            icon: 'error',
+            title: 'Sudah Ada!',
+            text: 'Kelompok untuk mata kuliah ini sudah ada. Silakan gunakan menu Edit.'
+        });
+        return false;
+    <?php endif; ?>
 });
 
 // When form submits, ensure a matkul is selected and groups_json present
@@ -513,6 +613,29 @@ document.getElementById('kelompokForm').addEventListener('submit', function(e){
     // The select already has name="mata_kuliah_id"
     return true;
 });
+
+// SweetAlert2 Session Messages
+<?php if (isset($_SESSION['success'])): ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '<?= $_SESSION['success'] ?>',
+        timer: 3000,
+        showConfirmButton: false
+    });
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error'])): ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: '<?= $_SESSION['error'] ?>',
+        timer: 3000,
+        showConfirmButton: false
+    });
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
 </script>
 
 </body>

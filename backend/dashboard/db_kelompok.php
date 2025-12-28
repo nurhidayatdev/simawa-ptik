@@ -89,6 +89,7 @@ if ($selected_matkul) {
 
         /* live-search script removed from style block; see script at document end */
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-100">
 	<header class="bg-indigo-950  fixed w-full top-0 z-50">
@@ -226,11 +227,21 @@ if ($selected_matkul) {
 
                         
                         
-                        <a href="kelompok.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
-                           
-                                Atur Kelompok
-                          
-                        </a>
+                        <?php if ($selected_matkul): ?>
+                            <?php if (count($groups) > 0): ?>
+                                <a href="edit_kelompok.php?matkul_id=<?= $selected_matkul ?>" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-800 text-center text-xs">
+                                    <i class="fa fa-edit mr-2"></i> Edit Kelompok
+                                </a>
+                            <?php else: ?>
+                                <a href="kelompok.php?matkul_id=<?= $selected_matkul ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                                    <i class="fa fa-plus mr-2"></i> Atur Kelompok
+                                </a>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <a href="kelompok.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                                <i class="fa fa-plus mr-2"></i> Atur Kelompok
+                            </a>
+                        <?php endif; ?>
                     </form>
                 </div>
                 <?php endif; ?>
@@ -329,6 +340,29 @@ const mobileMenuButton = document.getElementById('mobile-menu-button');
         }
 
 document.getElementById('mata_kuliah').addEventListener('change', function(){ document.getElementById('selectForm').submit(); });
+
+// SweetAlert2 Session Messages
+<?php if (isset($_SESSION['success'])): ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '<?= $_SESSION['success'] ?>',
+        timer: 3000,
+        showConfirmButton: false
+    });
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error'])): ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: '<?= $_SESSION['error'] ?>',
+        timer: 3000,
+        showConfirmButton: false
+    });
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
 </script>
 
 </body>

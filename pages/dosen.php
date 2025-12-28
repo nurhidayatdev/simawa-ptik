@@ -127,29 +127,22 @@ $result = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
 
 
   <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Mahasiswa</h1>
-    <!-- Rest of the content remains the same -->
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-slate-200">
-        <thead class="bg-indigo-900">
-          <tr>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Dosen</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-slate-200">
-          <?php
-          $no = 1;
-          $id = 1;
-          while ($row = mysqli_fetch_assoc($result)) : ?>
-            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo $no++; ?></td>
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo htmlspecialchars($row['nama_dosen']); ?></td>
-
-            </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
+    <h1 class="text-2xl font-bold mb-8 text-center text-indigo-950">Daftar Dosen Pengampu</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <?php
+      $no = 1;
+      while ($row = mysqli_fetch_assoc($result)) : ?>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center hover:border-indigo-400 hover:shadow-md transition-all group">
+          <div class="bg-indigo-900 text-white w-10 h-10 rounded-lg flex items-center justify-center mr-4 text-sm font-bold shadow-indigo-200 shadow-lg group-hover:scale-110 transition-transform">
+            <?php echo $no++; ?>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold text-slate-800 group-hover:text-indigo-900 transition-colors uppercase"><?php echo htmlspecialchars($row['nama_dosen']); ?></span>
+            <span class="text-[10px] text-slate-500 italic">Dosen Pengampu PTIK C 2024</span>
+          </div>
+        </div>
+      <?php endwhile; ?>
     </div>
   </div>
 

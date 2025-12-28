@@ -61,6 +61,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -220,6 +222,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                         <a href="arus_kas.php" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center w-full">Arus Kas</a>
                         
                             <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class=" bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Bayar Kas</a>
+                            
+                            <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
+                            <a href="../crud/kirim_reminder_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?>" class=" bg-sky-600 text-white px-3 py-2 rounded-lg hover:bg-sky-800 text-center text-xs flex items-center justify-center w-full">Kirim Reminder</a>
+                            <?php endif; ?>
 
                             <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center">Export CSV</a>
                             
@@ -381,6 +387,36 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                 }
             });
         }
+
+        // SweetAlert2 Session Messages
+        <?php if (isset($_SESSION['success'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '<?= $_SESSION['success'] ?>',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: '<?= $_SESSION['error'] ?>'
+            });
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['info'])): ?>
+            Swal.fire({
+                icon: 'info',
+                title: 'Informasi',
+                text: '<?= $_SESSION['info'] ?>'
+            });
+            <?php unset($_SESSION['info']); ?>
+        <?php endif; ?>
     </script>
 </body>
 

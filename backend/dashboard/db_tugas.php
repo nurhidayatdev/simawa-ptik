@@ -97,6 +97,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<style>
 		.rotate-180 {
 			transform: rotate(180deg);
@@ -265,6 +267,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								placeholder="Cari Mata Kuliah / Deskripsi..."
 								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-[10px]">
 
+							<a href="../crud/kirim_reminder.php" class="basis-1/5 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
+								<i class="fa fa-paper-plane"></i>
+							</a>
 							<a href="../crud/tambah.php?tabel=tugas" class="basis-1/5 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
 								<i class="fa fa-plus"></i>
 							</a>
@@ -408,6 +413,36 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			input.addEventListener('input', performSearch);
 			statusSelect.addEventListener('change', performSearch);
 		})();
+
+		// SweetAlert2 Session Messages
+		<?php if (isset($_SESSION['success'])): ?>
+			Swal.fire({
+				icon: 'success',
+				title: 'Berhasil!',
+				text: '<?= $_SESSION['success'] ?>',
+				timer: 3000,
+				showConfirmButton: false
+			});
+			<?php unset($_SESSION['success']); ?>
+		<?php endif; ?>
+
+		<?php if (isset($_SESSION['error'])): ?>
+			Swal.fire({
+				icon: 'error',
+				title: 'Gagal!',
+				text: '<?= $_SESSION['error'] ?>'
+			});
+			<?php unset($_SESSION['error']); ?>
+		<?php endif; ?>
+
+		<?php if (isset($_SESSION['info'])): ?>
+			Swal.fire({
+				icon: 'info',
+				title: 'Informasi',
+				text: '<?= $_SESSION['info'] ?>'
+			});
+			<?php unset($_SESSION['info']); ?>
+		<?php endif; ?>
 	</script>
 </body>
 
