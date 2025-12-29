@@ -60,6 +60,26 @@ $q_recent_berita = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DE
 $q_gal_photos = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM galeri_foto");
 $gallery_photos_count = mysqli_fetch_assoc($q_gal_photos)['cnt'] ?? 0;
 
+// Tebak Kata Leaderboard
+$q_tebak_kata = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, s.current_streak, s.total_games 
+    FROM tebak_kata_stats s 
+    JOIN mahasiswa m ON s.user_id = m.user_id 
+    ORDER BY s.current_streak DESC, s.total_games DESC 
+    LIMIT 5");
+
+function getFireColor($streak) {
+    if ($streak >= 1000) return '#ff0000';
+    if ($streak >= 500) return '#ff00ff';
+    if ($streak >= 200) return '#00ffff';
+    if ($streak >= 100) return '#ffd700';
+    if ($streak >= 50) return '#ff6600';
+    if ($streak >= 30) return '#9966ff';
+    if ($streak >= 10) return '#3399ff';
+    if ($streak >= 3) return '#ff9500';
+    return null;
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -202,6 +222,11 @@ $gallery_photos_count = mysqli_fetch_assoc($q_gal_photos)['cnt'] ?? 0;
                             <span class="text-xs">Pesan Anonim</span>
                         </a>
 
+                        <a href="tebak_kata.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                            <i class="fa fa-gamepad w-5 h-5 mr-4"></i>
+                            <span class="text-xs">Tebak Kata</span>
+                        </a>
+
 <?php if ($role === 'Administrator Utama'): ?>
                         <button
                             class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
@@ -305,6 +330,42 @@ $gallery_photos_count = mysqli_fetch_assoc($q_gal_photos)['cnt'] ?? 0;
                     </div>
                 </div>
 
+                <!-- Tebak Kata Leaderboard -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
+                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fa fa-fire text-orange-500"></i>
+                        Tebak Kata Leaderboard
+                    </h3>
+                    <div class="space-y-2">
+                        <?php 
+                        $rank = 1;
+                        if (mysqli_num_rows($q_tebak_kata) > 0): 
+                            while($tk = mysqli_fetch_assoc($q_tebak_kata)): 
+                                $fireColor = getFireColor($tk['current_streak']);
+                        ?>
+                        <div class="flex items-center gap-3 p-2 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition">
+                            <span class="text-xs font-black w-5 text-center <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-400' : ($rank == 3 ? 'text-orange-400' : 'text-slate-500')) ?>"><?= $rank++ ?></span>
+                            <div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-300">
+                                <img src="../img/profile/<?= htmlspecialchars($tk['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='../../img/profile/default.png'">
+                            </div>
+                            <div class="flex-grow min-w-0">
+                                <div class="text-xs font-bold text-slate-700 truncate flex items-center gap-1">
+                                    <?= htmlspecialchars($tk['nama_panggilan']) ?>
+                                    <?php if ($fireColor): ?><i class="fa fa-fire" style="color: <?= $fireColor ?>;"></i><?php endif; ?>
+                                </div>
+                                <div class="text-[10px] text-slate-500"><?= $tk['current_streak'] ?> streak • <?= $tk['total_games'] ?> games</div>
+                            </div>
+                        </div>
+                        <?php endwhile; ?>
+                        <?php else: ?>
+                            <p class="text-xs text-slate-400 text-center py-4">Belum ada data.</p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="tebak_kata.php" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">Main Sekarang <i class="fa fa-arrow-right ml-1"></i></a>
+                    </div>
+                </div>
+
                 <!-- Recent Activity & Info -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-2">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -329,7 +390,8 @@ $gallery_photos_count = mysqli_fetch_assoc($q_gal_photos)['cnt'] ?? 0;
                         <a href="db_pesan.php" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">Lihat Semua Pesan <i class="fa fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
-            </div>
+
+               
 
             <!-- News Activity Section -->
             <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
