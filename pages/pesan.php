@@ -7,6 +7,8 @@ include '../koneksi.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../backend/img/main/icon.png" />
     <title>Kirim Pesan Anonim - PTIK C 2024</title>
     <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
   <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
@@ -33,7 +35,7 @@ include '../koneksi.php';
 
                 <div class="flex items-center space-x-3 mb-6 relative z-10">
                     <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 p-2">
-                        <img src="../img/logo.png" alt="Logo Kelas" class="w-full h-full object-contain filter drop-shadow-md">
+                        <img src="../backend/img/main/logo.png" alt="Logo Kelas" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-white leading-tight">Private Message</h3>

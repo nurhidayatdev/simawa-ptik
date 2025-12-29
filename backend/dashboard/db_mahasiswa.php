@@ -75,9 +75,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6c27dc" />
-    <link rel="icon" href="img/icon.png" />
-    <title>Kelas PTIK C 2024 - Teknik Informatika dan Komputer</title>
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../img/main/icon.png" />
+    <title>Data Mahasiswa - PTIK C 2024</title>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,7 +106,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
-                <img src="../../img/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
             </div>
             <!-- Mobile Menu Button dengan z-index yang sesuai -->

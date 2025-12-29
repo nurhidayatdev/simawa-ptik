@@ -13,30 +13,10 @@ while ($r = mysqli_fetch_assoc($result)) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#6c27dc" />
-  <link rel="icon" href="img/icon.png" />
-  <title>Kelas PTIK C 2024 - Teknik Informatika dan Komputer</title>
-  <meta name="title" content="PTIK C 24" />
-  <meta name="description" content="© 2024 ProtechnotyClass24" />
-  <meta property="og:type" content="website" />
-  <meta
-    property="og:url"
-    content="https://ptikc24.vercel.app/.html" />
-  <meta
-    property="og:title"
-    content="PTIK C 24" />
-  <meta property="og:description" content="© 2024 ProtechnotyClass24" />
-  <meta property="og:image" content="https://iili.io/FpUOxUb.md.png" />
-
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta
-    property="twitter:url"
-    content="https://ptikc24.vercel.app/.html" />
-  <meta
-    property="twitter:title"
-    content="Jadwal Mata Kuliah Kelas PTIK C" />
-  <meta property="twitter:description" content="© 2024 ProtechnotyClass24" />
-  <meta property="twitter:image" content="https://iili.io/FpUOxUb.md.png" />
+  <meta name="theme-color" content="#1e1b4b" />
+  <link rel="icon" href="../backend/img/main/icon.png" />
+  <title>Mahasiswa - Kelas PTIK C 2024</title>
+ 
 
   <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
   <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
@@ -52,7 +32,7 @@ while ($r = mysqli_fetch_assoc($result)) {
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center">
-                <img src="../img/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../backend/img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <div>
                     <h1 class="text-lg font-bold">PTIK C 2024</h1>
                     <p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>

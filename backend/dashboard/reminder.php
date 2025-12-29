@@ -210,18 +210,36 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Reminder - PTIK C</title>
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../img/main/icon.png" />
+    <title>Reminder - PTIK C 2024</title>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        /* Tambahan CSS untuk mobile menu */
+        @media (max-width: 768px) {
+            .mobile-menu-open {
+                transform: translateX(0) !important;
+            }
+        }
+    </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
-    
-    <!-- Header -->
-    <header class="bg-indigo-950 fixed w-full top-0 z-50">
+
+<body class="bg-slate-100">
+    <!-- Header dengan z-index lebih tinggi -->
+    <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
-                <img src="../../img/logo.png" alt="Logo" class="h-10 w-10 mr-3">
+                <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <span class="text-xl font-bold text-white">Telegram Reminder</span>
             </div>
             <a href="dashboard.php" class="text-white hover:text-slate-300 text-sm">

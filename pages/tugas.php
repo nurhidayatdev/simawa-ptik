@@ -36,9 +36,9 @@ $query_matkul = mysqli_query($koneksi, "
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6c27dc" />
-    <link rel="icon" href="../img/icon.png" />
-    <title>Tugas Kuliah - Kelas PTIK C 2024</title>
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../backend/img/main/icon.png" />
+    <title>Tugas Mata Kuliah - Kelas PTIK C 2024</title>
     <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -52,7 +52,7 @@ $query_matkul = mysqli_query($koneksi, "
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center">
-                <img src="../img/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../backend/img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <div>
                     <h1 class="text-lg font-bold">PTIK C 2024</h1>
                     <p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>

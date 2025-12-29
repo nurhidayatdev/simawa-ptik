@@ -54,9 +54,9 @@ $_SESSION['foto']          = $data['foto'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6c27dc" />
-    <link rel="icon" href="img/icon.png" />
-    <title>Kelas PTIK C 2024 - Teknik Informatika dan Komputer</title>
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../img/main/icon.png" />
+    <title>Login - Kelas PTIK C 2024</title>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
