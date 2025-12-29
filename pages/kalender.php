@@ -122,10 +122,10 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
     </header>
 
     <!-- spacer to avoid content hidden under fixed header -->
-    <div class="h-20"></div>
+    <div class="h-10"></div>
 
     <main class="flex-grow">
-        <section class="py-12">
+        <section class="py-12 p-6">
             <div class="container mx-auto px-4">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <h2 class="text-3xl font-bold text-gray-800">Kalender Akademik</h2>
@@ -150,9 +150,9 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-indigo-900">
                                 <tr>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider w-16">No</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Kegiatan</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-2 py-4 text-left text-xs font-bold text-white uppercase tracking-wider w-16">No</th>
+                                    <th class="px-2 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Kegiatan</th>
+                                    <th class="px-2 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Tanggal</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-200">
@@ -164,9 +164,9 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
                                         $rowClass = ($id++ % 2 == 0) ? 'bg-slate-50' : 'bg-white';
                                     ?>
                                         <tr class="<?= $rowClass ?> hover:bg-indigo-50 transition-colors">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><?= $no++ ?></td>
-                                            <td class="px-6 py-4 text-sm font-semibold text-gray-800"><?= htmlspecialchars($event['kegiatan']) ?></td>
-                                            <td class="px-6 py-4 text-sm text-gray-600 italic">
+                                            <td class="px-2 py-2 whitespace-nowrap text-sm text-gray-600 text-center"><?= $no++ ?></td>
+                                            <td class="px-2 py-2 text-sm font-semibold text-gray-800"><?= htmlspecialchars($event['kegiatan']) ?></td>
+                                            <td class="px-2 py-2 text-sm text-gray-600 italic">
                                                 <div class="flex items-center gap-2">
                                                     <i class="far fa-calendar-alt text-indigo-600 text-xs"></i>
                                                     <span><?= date('d M Y', strtotime($event['tanggal_mulai'])) ?></span>
@@ -196,10 +196,77 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
 
     <!-- Footer -->
     <footer class="bg-indigo-950 text-white py-4 mt-auto">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-xs">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
+		<div class="container mx-auto px-4">
+			<div class="grid md:grid-cols-4 gap-8">
+				<div>
+					<h3 class="text-lg font-bold mb-4">PTIK C 2024</h3>
+					<p class="mb-4 text-xs">Jurusan Teknik Informatika dan Komputer</p>
+					<p class="text-xs">Fakultas Teknik</p>
+					<p class="text-xs">Universitas Negeri Makassar</p>
+				</div>
+
+				<div>
+					<h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+					<ul class="space-y-1">
+						<li><a href="../index.php" class="hover:text-indigo-200 transition text-xs">Beranda</a></li>
+						<li><a href="mahasiswa.php" class="hover:text-indigo-200 transition text-xs">Mahasiswa</a></li>
+						<li><a href="akademik.php" class="hover:text-indigo-200 transition text-xs">Akademik</a></li>
+						<li><a href="galeri.php" class="hover:text-indigo-200 transition text-xs">Galeri</a></li>
+					</ul>
+				</div>
+
+				<div>
+					<h3 class="text-lg font-bold mb-4">Kontak</h3>
+					<p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
+					<p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
+					<div class="flex space-x-4 mt-4 text-xs">
+						<a href="https://www.instagram.com/ptikc_24" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-instagram text-sm"></i></a>
+						<a href="#" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-facebook text-sm"></i></a>
+						<a href="#" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-twitter text-sm"></i></a>
+					</div>
+				</div>
+                <div>
+                <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
+                
+                <form action="" method="POST" class="space-y-2">
+                    <textarea 
+                        name="pesan_anonim" 
+                        rows="3" 
+                        maxlength="300"
+                        class="w-full p-3 rounded-lg bg-indigo-900/50 border border-indigo-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300/50"
+                        placeholder="Tulis pesan rahasia atau saran di sini..."
+                        required></textarea>
+                    <button 
+                        type="submit" 
+                        name="kirim_pesan"
+                        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                        <i class="fas fa-paper-plane text-xs"></i>
+                        <span>Kirim Sekarang</span>
+                    </button>
+                </form>
+
+                <?php
+                // Logika PHP untuk simpan pesan ke database
+                if (isset($_POST['kirim_pesan'])) {
+                    $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
+                    if (!empty($pesan)) {
+                        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
+                        if (mysqli_query($koneksi, $query_pesan)) {
+                            echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                        }
+                    }
+                }
+                ?>
+            </div>
         </div>
-    </footer>
+				</div>
+			</div>
+
+			<div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs">
+				<p>© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
+			</div>
+		</div>
+	</footer>
 
     <script>
         const menuToggle = document.getElementById('menuToggle');

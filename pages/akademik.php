@@ -102,8 +102,8 @@ $query = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DESC");
     <!-- spacer to avoid content hidden under fixed header -->
     <div class="h-10"></div>
 
-	<main class="flex-grow">
-		<section class="py-12">
+	<main class="flex-grow ">
+		<section class="py-12 p-6">
 			<div class="container mx-auto px-4">
 				<h2 class="text-3xl font-bold mb-6 text-gray-800">Berita & Informasi Akademik</h2>
 
@@ -117,8 +117,8 @@ $query = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DESC");
 						
 						<div class="p-4">
 							<h3 class="font-semibold text-lg mb-2"><?php echo $data['judul']; ?></h3>
-							<p class="text-sm text-gray-600 mb-3"><?php echo $data['deskripsi']; ?></p>
-							<a href="<?php echo $data['link']; ?>" target="_blank" class="text-indigo-700 font-medium">Baca lebih lanjut →</a>
+							<p class="text-xs text-gray-600 mb-3"><?php echo $data['deskripsi']; ?></p>
+							<a href="<?php echo $data['link']; ?>" target="_blank" class="text-indigo-700 font-medium text-sm">Baca lebih lanjut →</a>
 						</div>
 					</article>
 <?php 

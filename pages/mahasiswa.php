@@ -130,57 +130,11 @@ while ($r = mysqli_fetch_assoc($result)) {
     <div class="h-10"></div>
 
 
-  <div class="container mx-auto p-6">
+  <div class="container mx-auto p-6 mt-4">
     <h1 class="text-2xl font-bold mb-4 text-center text-indigo-950">Mahasiswa</h1>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
       <input id="searchInput" type="search" placeholder="Cari nama, NIM, panggilan, atau bio..." class="w-full sm:w-1/2 px-4 py-2 rounded-full border border-slate-200 shadow-sm" />
-      <div class="flex items-center">
-        <button id="viewTableBtn" class="px-4 py-2 rounded-full bg-indigo-900 text-white text-sm shadow mr-2">Tabel</button>
-        <button id="viewCardBtn" class="px-4 py-2 rounded-full bg-white border border-slate-200 text-sm shadow">Kartu</button>
-      </div>
-    </div>
-
-    <!-- Table view -->
-    <div id="tableView" class="overflow-x-auto hidden">
-      <table class="min-w-full divide-y divide-slate-200">
-        <thead class="bg-indigo-900">
-          <tr>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Foto</th>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">NIM</th>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Lengkap</th>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Panggilan</th>
-            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Bio</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-slate-200">
-          <?php
-          $no = 1;
-          $id = 1;
-          foreach ($rows as $row) :
-            $searchText = strtolower($row['nim'].' '.$row['nama_lengkap'].' '.$row['nama_panggilan'].' '.$row['bio']);
-          ?>
-            <tr data-search="<?php echo htmlspecialchars($searchText, ENT_QUOTES); ?>" class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-              <td class="px-3 py-2 whitespace-nowrap text-xs">
-                <?php if (!empty($row['foto'])): ?>
-                  <img src="../backend/img/profile/<?php echo htmlspecialchars($row['foto']); ?>" class="img-fluid rounded" style="max-width:25px; height:auto;" />
-                <?php else: ?>
-                  <span class="text-muted">Belum ada gambar</span>
-                <?php endif; ?>
-              </td>
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_panggilan']; ?></td>
-
-              <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['bio']; ?></td>
-
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
     </div>
 
     <!-- Card view (hidden by default) -->
@@ -202,12 +156,16 @@ while ($r = mysqli_fetch_assoc($result)) {
               </div>
             </div>
             <div class="pt-14 sm:pt-16 pb-6 px-4 sm:px-6 text-center">
-              <div class="inline-block px-3 py-1 bg-slate-50 rounded-full mb-2">
-                <span class="text-xs font-bold text-slate-700"><?php echo htmlspecialchars($row['nama_panggilan'] ?? ''); ?></span>
-              </div>
+              
               <h4 class="text-lg sm:text-sm font-bold text-slate-900 mb-1"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
-              <p class="text-xs text-slate-500 mb-1">NIM: <?php echo htmlspecialchars($row['nim'] ?? ''); ?></p>
-              <p class="text-xs sm:text-xs text-slate-600"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
+  
+              <p class="text-xs sm:text-xs text-slate-600 mb-2"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
+              <?php if (!empty($row['instagram'])): ?>
+                <a href="https://instagram.com/<?php echo ltrim(htmlspecialchars($row['instagram']), '@'); ?>" target="_blank" class="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm">
+                  <i class="fab fa-instagram"></i>
+                  <span><?php echo htmlspecialchars($row['instagram']); ?></span>
+                </a>
+              <?php endif; ?>
             </div>
           </div>
         <?php endforeach; ?>
@@ -304,47 +262,12 @@ while ($r = mysqli_fetch_assoc($result)) {
         menuIcon.classList.add('fa-xmark');
       }
     });
-    // View toggle: remember choice in localStorage
-    const viewTableBtn = document.getElementById('viewTableBtn');
-    const viewCardBtn = document.getElementById('viewCardBtn');
-    const tableView = document.getElementById('tableView');
-    const cardView = document.getElementById('cardView');
 
-    function setView(view) {
-      if (view === 'card') {
-        tableView.classList.add('hidden');
-        cardView.classList.remove('hidden');
-        viewCardBtn.classList.add('bg-indigo-900', 'text-white');
-        viewCardBtn.classList.remove('bg-white');
-        viewTableBtn.classList.remove('bg-indigo-900', 'text-white');
-        viewTableBtn.classList.add('bg-white');
-      } else {
-        cardView.classList.add('hidden');
-        tableView.classList.remove('hidden');
-        viewTableBtn.classList.add('bg-indigo-900', 'text-white');
-        viewTableBtn.classList.remove('bg-white');
-        viewCardBtn.classList.remove('bg-indigo-900', 'text-white');
-        viewCardBtn.classList.add('bg-white');
-      }
-      localStorage.setItem('mahasiswaView', view);
-    }
-
-    viewTableBtn.addEventListener('click', () => setView('table'));
-    viewCardBtn.addEventListener('click', () => setView('card'));
-
-    // initialize from localStorage (default to 'card')
-    const initial = localStorage.getItem('mahasiswaView') || 'card';
-    setView(initial);
 
     // Search/filter functionality
     const searchInput = document.getElementById('searchInput');
     function applyFilter(q) {
       const ql = q.trim().toLowerCase();
-      // filter table rows
-      document.querySelectorAll('#tableView tbody tr').forEach(tr => {
-        const s = (tr.dataset.search || '').toLowerCase();
-        if (!ql || s.indexOf(ql) !== -1) tr.classList.remove('hidden'); else tr.classList.add('hidden');
-      });
       // filter cards
       document.querySelectorAll('#cardView [data-search]').forEach(card => {
         const s = (card.dataset.search || '').toLowerCase();

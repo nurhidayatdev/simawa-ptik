@@ -22,6 +22,8 @@ if (isset($_POST['tambah'])) {
             $email = $_POST['email'];
             $nim = $_POST['nim'];
             $bio = $_POST['bio'];
+            $jenis_kelamin = $_POST['jenis_kelamin'];
+            $instagram = $_POST['instagram'];
             $foto = '';
             if (!empty($_FILES['foto']['name'])) {
                 $target_dir = "../img/profile/";
@@ -29,8 +31,8 @@ if (isset($_POST['tambah'])) {
                 $target_file = $target_dir . $foto;
                 move_uploaded_file($_FILES["foto"]["tmp_name"], $target_file);
             }
-            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, foto)
-                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$foto')");
+            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, foto)
+                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram','$foto')");
             $redirect = "../dashboard/db_mahasiswa.php";
 
             break;
@@ -218,72 +220,83 @@ if (isset($_POST['tambah'])) {
 
         case 'galeri':
             $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
-            $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
             $tanggal_kegiatan = $_POST['tanggal_kegiatan'];
             
-            mysqli_query($koneksi, "INSERT INTO galeri (judul, deskripsi, tanggal_kegiatan) VALUES ('$judul', '$deskripsi', '$tanggal_kegiatan')");
+            mysqli_query($koneksi, "INSERT INTO galeri (judul, tanggal_kegiatan) VALUES ('$judul', '$tanggal_kegiatan')");
             $galeri_id = mysqli_insert_id($koneksi);
             
             if (!empty($_FILES['fotos']['name'][0])) {
-                $target_dir = "../img/gallery/";
+                $target_dir = __DIR__ . "/../img/gallery/"; // Absolute path for safety
                 if (!is_dir($target_dir)) {
                     mkdir($target_dir, 0777, true);
                 }
                 
                 foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
+                    if (empty($tmp_name)) continue;
+
                     $file_name = $_FILES['fotos']['name'][$key];
-                    $ext_orig = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                    $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
                     $basename = preg_replace('/[^a-zA-Z0-9_]/', '_', pathinfo($file_name, PATHINFO_FILENAME));
-                    $new_file_name_base = time() . "_" . $key . "_" . $basename;
+                    $new_base = time() . "_" . uniqid() . "_" . $basename;
                     
-                    $temp_final_name = $new_file_name_base . "." . $ext_orig;
-                    $target_dir_abs = __DIR__ . "/../img/gallery/";
-                    $dest_path = $target_dir_abs . $temp_final_name;
-                    
-                    if (move_uploaded_file($tmp_name, $dest_path)) {
-                        $db_path = "img/gallery/" . $temp_final_name; // default
+                    // Always save as jpg for consistent compression
+                    $final_name = $new_base . ".jpg";
+                    $final_path = $target_dir . $final_name;
+                    $db_path = "img/gallery/" . $final_name;
+
+                    // Try to compress/resize
+                    $processed = false;
+                    if (function_exists('gd_info')) {
+                        $src = null;
+                        if ($ext == 'jpg' || $ext == 'jpeg') $src = @imagecreatefromjpeg($tmp_name);
+                        elseif ($ext == 'png') $src = @imagecreatefrompng($tmp_name);
+                        elseif ($ext == 'webp') $src = @imagecreatefromwebp($tmp_name);
                         
-                        if (function_exists('imagecreatefromstring')) {
-                            $src = null;
-                            if ($ext_orig == 'jpg' || $ext_orig == 'jpeg') $src = @imagecreatefromjpeg($dest_path);
-                            elseif ($ext_orig == 'png') $src = @imagecreatefrompng($dest_path);
-                            elseif ($ext_orig == 'webp') $src = @imagecreatefromwebp($dest_path);
+                        if ($src) {
+                            $width = imagesx($src);
+                            $height = imagesy($src);
                             
-                            if (!$src) {
-                                $img_data = @file_get_contents($dest_path);
-                                if ($img_data) $src = @imagecreatefromstring($img_data);
+                            // Max width 1024 for size reduction
+                            $max_width = 1024;
+                            if ($width > $max_width) {
+                                $new_width = $max_width;
+                                $new_height = floor($height * ($max_width / $width));
+                            } else {
+                                $new_width = $width;
+                                $new_height = $height;
                             }
 
-                            if ($src) {
-                                $w = imagesx($src);
-                                $h = imagesy($src);
-                                
-                                // Set target width (e.g., 1280)
-                                $target_w = ($w > 1280) ? 1280 : $w;
-                                $target_h = ($w > 1280) ? floor($h * (1280 / $w)) : $h;
-                                
-                                $dst = imagecreatetruecolor($target_w, $target_h);
-                                if ($ext_orig == 'png' || $ext_orig == 'webp') {
-                                    imagealphablending($dst, false);
-                                    imagesavealpha($dst, true);
-                                }
-                                
-                                imagecopyresampled($dst, $src, 0, 0, 0, 0, $target_w, $target_h, $w, $h);
-                                
-                                if (function_exists('imagewebp')) {
-                                    $webp_name = $new_file_name_base . ".webp";
-                                    $webp_path = $target_dir_abs . $webp_name;
-                                    if (imagewebp($dst, $webp_path, 80)) {
-                                        @unlink($dest_path);
-                                        $db_path = "img/gallery/" . $webp_name;
-                                    }
-                                }
-                                imagedestroy($src);
-                                imagedestroy($dst);
+                            $dst = imagecreatetruecolor($new_width, $new_height);
+                            
+                            // Fill white background for transparency (since we output JPG)
+                            $white = imagecolorallocate($dst, 255, 255, 255);
+                            imagefill($dst, 0, 0, $white);
+                            
+                            imagecopyresampled($dst, $src, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+                            
+                            // Save as JPG with 75% quality
+                            if (imagejpeg($dst, $final_path, 75)) {
+                                $processed = true;
                             }
+                            
+                            imagedestroy($src);
+                            imagedestroy($dst);
                         }
-                        mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
                     }
+
+                    // Fallback: just move the file if processing failed (and keep original name/ext if needed, or fail)
+                    if (!$processed) {
+                        // If we couldn't process, just move uploaded file as is
+                        $final_name_fallback = $new_base . "." . $ext;
+                        $final_path_fallback = $target_dir . $final_name_fallback;
+                        if (move_uploaded_file($tmp_name, $final_path_fallback)) {
+                             $db_path = "img/gallery/" . $final_name_fallback;
+                        } else {
+                            continue; // Skip failed uploads
+                        }
+                    }
+
+                    mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
                 }
             }
             $redirect = "../dashboard/db_galeri.php";
@@ -521,6 +534,20 @@ if (isset($_POST['tambah'])) {
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
                             </div>
                             <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                                <select name="jenis_kelamin"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Instagram</label>
+                                <input type="text" name="instagram" placeholder="@username"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                            </div>
+                            <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Biodata</label>
                                 <input type="text" name="bio"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
@@ -741,11 +768,6 @@ if (isset($_POST['tambah'])) {
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Kegiatan</label>
                                 <input type="date" name="tanggal_kegiatan" required
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
-                                <textarea name="deskripsi" rows="3" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></textarea>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Foto-foto (Bisa pilih banyak)</label>

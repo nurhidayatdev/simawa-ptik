@@ -126,12 +126,13 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
     <div class="h-10"></div>
 
 
-  <div class="container mx-auto p-6">
+  <div class="container mx-auto py-6 mt-4 px-12">
     <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Matakuliah PTIK</h1>
     <!-- Rest of the content remains the same -->
-    <div class="overflow-x-auto">
-      <?php for ($s = 1; $s <= 8; $s++): ?>
+     <?php for ($s = 1; $s <= 8; $s++): ?>
                 <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-200">
                         <thead class="bg-indigo-900">
@@ -152,17 +153,18 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
                                 $found = true;
                             ?>
                                 <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= $no++; ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-800 text-center"><?= $no++; ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
                                 </tr>
                             <?php } ?>
                         </tbody>
                     </table>
                 </div>
-            <?php endfor; ?>
+            
     </div>
+    <?php endfor; ?>
   </div>
 
   <!-- Footer -->

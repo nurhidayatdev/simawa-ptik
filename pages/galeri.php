@@ -107,7 +107,7 @@ include '../koneksi.php';
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					<?php
-					$query_galeri = "SELECT * FROM galeri ORDER BY created_at DESC";
+					$query_galeri = "SELECT * FROM galeri ORDER BY tanggal_kegiatan DESC";
 					$result_galeri = mysqli_query($koneksi, $query_galeri);
 
 					if (mysqli_num_rows($result_galeri) > 0) {
@@ -141,7 +141,6 @@ include '../koneksi.php';
 								</div>
 								<div class="p-4">
 									<h3 class="font-semibold text-lg mb-1"><?= $row['judul'] ?></h3>
-									<p class="text-sm text-gray-600 mb-3"><?= $row['deskripsi'] ?></p>
 									<p class="text-[10px] text-gray-400"><i class="far fa-calendar-alt mr-1"></i><?= date('d M Y', strtotime($row['tanggal_kegiatan'])) ?></p>
 								</div>
 							</div>

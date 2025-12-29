@@ -50,6 +50,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nim']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_panggilan']) . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['jenis_kelamin'] ?? '-') . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">';
+        if (!empty($row['instagram'])) {
+            echo '<a href="https://instagram.com/' . ltrim(htmlspecialchars($row['instagram']), '@') . '" target="_blank" class="text-pink-600 hover:text-pink-800"><i class="fab fa-instagram mr-1"></i>' . htmlspecialchars($row['instagram']) . '</a>';
+        } else {
+            echo '-';
+        }
+        echo '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['bio']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
         echo '<a href="../crud/edit.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
@@ -271,6 +279,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Nama Panggilan</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                Jenis Kelamin</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                Instagram</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Bio</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Actions</th>
@@ -296,7 +308,16 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_panggilan']; ?></td>
-
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jenis_kelamin'] ?? '-'; ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+                                    <?php if (!empty($row['instagram'])): ?>
+                                        <a href="https://instagram.com/<?= ltrim(htmlspecialchars($row['instagram']), '@') ?>" target="_blank" class="text-pink-600 hover:text-pink-800">
+                                            <i class="fab fa-instagram mr-1"></i><?= htmlspecialchars($row['instagram']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        -
+                                    <?php endif; ?>
+                                </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['bio']; ?></td>
 
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">

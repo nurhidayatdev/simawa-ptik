@@ -134,9 +134,10 @@ ORDER BY jm.hari, jm.jam_mulai");
     <div class="h-10"></div>
 
 
-  <div class="container mx-auto p-6">
+  <div class="container mx-auto py-6 mt-4 px-6">
     <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Jadwal Mata Kuliah</h1>
     <!-- Rest of the content remains the same -->
+     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-indigo-900">
@@ -185,6 +186,7 @@ ORDER BY jm.hari, jm.jam_mulai");
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                </div>
     </div>
   </div>
 

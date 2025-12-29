@@ -126,8 +126,8 @@ $result = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
     <div class="h-10"></div>
 
 
-  <div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-8 text-center text-indigo-950">Daftar Dosen Pengampu</h1>
+  <div class="container mx-auto p-6 mt-4">
+    <h1 class="text-2xl font-bold mb-8 text-center text-indigo-950">Daftar Dosen JTIK</h1>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <?php
@@ -139,7 +139,6 @@ $result = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
           </div>
           <div class="flex flex-col">
             <span class="text-sm font-semibold text-slate-800 group-hover:text-indigo-900 transition-colors uppercase"><?php echo htmlspecialchars($row['nama_dosen']); ?></span>
-            <span class="text-[10px] text-slate-500 italic">Dosen Pengampu PTIK C 2024</span>
           </div>
         </div>
       <?php endwhile; ?>

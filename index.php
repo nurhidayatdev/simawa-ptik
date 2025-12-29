@@ -306,54 +306,7 @@ include 'koneksi.php';
         </div>
     </section>
 
-    <!-- Gallery Slider -->
-    <section class="py-12 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Galeri Kelas</h2>
 
-            <div class="relative max-w-4xl mx-auto">
-                <div class="overflow-hidden rounded-lg shadow-xl">
-                    <div id="slider" class="slider flex transition-transform duration-500 ease-in-out">
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-1.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-2.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-3.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-4.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-5.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-6.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                        <div class="w-full flex-shrink-0">
-                            <img src="img/img-7.jpg" alt="ptikc24" class="w-full h-auto">
-                        </div>
-                    </div>
-                </div>
-
-                <button id="prev" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100">
-                    <i class="fas fa-chevron-left text-indigo-800"></i>
-                </button>
-                <button id="next" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100">
-                    <i class="fas fa-chevron-right text-indigo-800"></i>
-                </button>
-
-                <div class="flex justify-center mt-4 space-x-2">
-                    <button class="indicator w-3 h-3 rounded-full bg-indigo-300"></button>
-                    <button class="indicator w-3 h-3 rounded-full bg-indigo-300"></button>
-                    <button class="indicator w-3 h-3 rounded-full bg-indigo-300"></button>
-                    <button class="indicator w-3 h-3 rounded-full bg-indigo-300"></button>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Footer -->
     <footer class="bg-indigo-950 text-white py-4 mt-auto">

@@ -19,12 +19,11 @@ if (!empty($search)) {
         $koneksi,
         "SELECT * FROM galeri 
          WHERE judul LIKE ? 
-         OR deskripsi LIKE ? 
          ORDER BY created_at DESC"
     );
 
     $like = "%$search%";
-    mysqli_stmt_bind_param($stmt, "ss", $like, $like);
+    mysqli_stmt_bind_param($stmt, "s", $like);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
@@ -40,7 +39,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['judul']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['deskripsi']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('d M Y', strtotime($row['tanggal_kegiatan'])) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
         $gal_id = $row['id'];
@@ -187,7 +185,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         <tr>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Judul</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Deskripsi</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Tanggal</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Foto</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Actions</th>
@@ -201,7 +198,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['judul']); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['deskripsi']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('d M Y', strtotime($row['tanggal_kegiatan'])); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                     <?php 
