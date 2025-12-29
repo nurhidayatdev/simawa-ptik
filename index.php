@@ -322,10 +322,10 @@ include 'koneksi.php';
 				<div>
 					<h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
 					<ul class="space-y-1">
-						<li><a href="#" class="hover:text-indigo-200 transition text-xs">Beranda</a></li>
-						<li><a href="pages/mahasiswa.php" class="hover:text-indigo-200 transition text-xs">Mahasiswa</a></li>
-						<li><a href="pages/akademik.php" class="hover:text-indigo-200 transition text-xs">Akademik</a></li>
-						<li><a href="pages/galeri.php" class="hover:text-indigo-200 transition text-xs">Galeri</a></li>
+						<li><a href="pages/kalender.php" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
+						<li><a href="pages/matakuliah.php" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
+						<li><a href="pages/jadwal.php" class="hover:text-indigo-200 transition text-xs">Jadwal Mata Kuliah</a></li>
+						<li><a href="pages/tugas.php" class="hover:text-indigo-200 transition text-xs">Tugas Mata Kuliah</a></li>
 					</ul>
 				</div>
 
@@ -333,11 +333,10 @@ include 'koneksi.php';
 					<h3 class="text-lg font-bold mb-4">Kontak</h3>
 					<p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
 					<p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
-					<div class="flex space-x-4 mt-4 text-xs">
-						<a href="https://www.instagram.com/ptikc_24" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-instagram text-sm"></i></a>
-						<a href="#" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-facebook text-sm"></i></a>
-						<a href="#" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-twitter text-sm"></i></a>
-					</div>
+                    <a href="https://www.instagram.com/ptikc_24">
+                        <p class="mb-2 text-xs"><i class="fab fa-instagram mr-2 text-sm"></i></i> @ptikc_24</p>
+                    </a>
+					
 				</div>
                 <div>
                 <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>

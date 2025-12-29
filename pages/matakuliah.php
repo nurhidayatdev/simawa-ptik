@@ -181,10 +181,10 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
 				<div>
 					<h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
 					<ul class="space-y-1">
-						<li><a href="../index.php" class="hover:text-indigo-200 transition text-xs">Beranda</a></li>
-						<li><a href="mahasiswa.php" class="hover:text-indigo-200 transition text-xs">Mahasiswa</a></li>
-						<li><a href="akademik.php" class="hover:text-indigo-200 transition text-xs">Akademik</a></li>
-						<li><a href="galeri.php" class="hover:text-indigo-200 transition text-xs">Galeri</a></li>
+						<li><a href="kalender.php" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
+						<li><a href="matakuliah.php" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
+						<li><a href="jadwal.php" class="hover:text-indigo-200 transition text-xs">Jadwal Mata Kuliah</a></li>
+						<li><a href="tugas.php" class="hover:text-indigo-200 transition text-xs">Tugas Mata Kuliah</a></li>
 					</ul>
 				</div>
 
@@ -192,11 +192,9 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
 					<h3 class="text-lg font-bold mb-4">Kontak</h3>
 					<p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
 					<p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
-					<div class="flex space-x-4 mt-4 text-xs">
-						<a href="https://www.instagram.com/ptikc_24" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-instagram text-sm"></i></a>
-						<a href="#" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-facebook text-sm"></i></a>
-						<a href="#" class="hover:text-indigo-200 transition text-xs"><i class="fab fa-twitter text-sm"></i></a>
-					</div>
+                    <a href="https://www.instagram.com/ptikc_24">
+                        <p class="mb-2 text-xs"><i class="fab fa-instagram mr-2 text-sm"></i></i> @ptikc_24</p>
+                    </a>
 				</div>
                 <div>
                 <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
