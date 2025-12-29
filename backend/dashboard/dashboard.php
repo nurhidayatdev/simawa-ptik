@@ -60,9 +60,9 @@ $q_recent_berita = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DE
 $q_gal_photos = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM galeri_foto");
 $gallery_photos_count = mysqli_fetch_assoc($q_gal_photos)['cnt'] ?? 0;
 
-// Tebak Kata Leaderboard
-$q_tebak_kata = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, s.current_streak, s.total_games 
-    FROM tebak_kata_stats s 
+// Kuis Harian Leaderboard
+$q_kuis_harian = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, s.current_streak, s.total_games 
+    FROM kuis_harian_stats s 
     JOIN mahasiswa m ON s.user_id = m.user_id 
     ORDER BY s.current_streak DESC, s.total_games DESC 
     LIMIT 5");
@@ -222,9 +222,9 @@ function getFireColor($streak) {
                             <span class="text-xs">Pesan Anonim</span>
                         </a>
 
-                        <a href="tebak_kata.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                        <a href="kuis_harian.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
                             <i class="fa fa-gamepad w-5 h-5 mr-4"></i>
-                            <span class="text-xs">Tebak Kata</span>
+                            <span class="text-xs">Kuis Harian</span>
                         </a>
 
 <?php if ($role === 'Administrator Utama'): ?>
@@ -330,17 +330,17 @@ function getFireColor($streak) {
                     </div>
                 </div>
 
-                <!-- Tebak Kata Leaderboard -->
+                <!-- Kuis Harian Leaderboard -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fa fa-fire text-orange-500"></i>
-                        Tebak Kata Leaderboard
+                        Kuis Harian Leaderboard
                     </h3>
                     <div class="space-y-2">
                         <?php 
                         $rank = 1;
-                        if (mysqli_num_rows($q_tebak_kata) > 0): 
-                            while($tk = mysqli_fetch_assoc($q_tebak_kata)): 
+                        if (mysqli_num_rows($q_kuis_harian) > 0): 
+                            while($tk = mysqli_fetch_assoc($q_kuis_harian)): 
                                 $fireColor = getFireColor($tk['current_streak']);
                         ?>
                         <div class="flex items-center gap-3 p-2 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition">
@@ -362,7 +362,7 @@ function getFireColor($streak) {
                         <?php endif; ?>
                     </div>
                     <div class="mt-4 text-center">
-                        <a href="tebak_kata.php" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">Main Sekarang <i class="fa fa-arrow-right ml-1"></i></a>
+                        <a href="kuis_harian.php" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest">Main Sekarang <i class="fa fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
 

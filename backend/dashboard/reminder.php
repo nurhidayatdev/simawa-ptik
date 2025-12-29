@@ -164,12 +164,12 @@ if (isset($_POST['action'])) {
         }
     }
     
-    // TEBAK KATA STREAK REMINDER
+    // KUIS HARIAN STREAK REMINDER
     elseif ($action === 'streak') {
         $today = date('Y-m-d');
         // Get users who have streak > 0 and haven't completed today
         $query = "SELECT m.nama_panggilan, s.current_streak
-                  FROM tebak_kata_stats s 
+                  FROM kuis_harian_stats s 
                   JOIN mahasiswa m ON s.user_id = m.user_id 
                   WHERE s.current_streak > 0 
                   AND (s.last_played_date IS NULL OR s.last_played_date != '$today' OR DATE(s.last_completed_at) != '$today')
@@ -177,7 +177,7 @@ if (isset($_POST['action'])) {
         $result = mysqli_query($koneksi, $query);
         
         if ($result && mysqli_num_rows($result) > 0) {
-            $message = "🔥 *REMINDER TEBAK KATA* 🔥\n\nStreakmu akan hilang jika tidak main hari ini!\n\n";
+            $message = "🔥 *REMINDER KUIS HARIAN* 🔥\n\nStreakmu akan hilang jika tidak main hari ini!\n\n";
             $no = 1;
             while ($row = mysqli_fetch_assoc($result)) {
                 $message .= $no . ". " . $row['nama_panggilan'] . " (🔥" . $row['current_streak'] . ")\n";
@@ -203,7 +203,7 @@ if (isset($_POST['action'])) {
 $now_date = date('Y-m-d');
 $now_time = date('H:i:s');
 $tugas_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas WHERE status='belum' AND (deadline_tanggal > '$now_date' OR (deadline_tanggal = '$now_date' AND deadline_pukul > '$now_time'))"))['cnt'] ?? 0;
-$streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tebak_kata_stats WHERE current_streak > 0 AND (last_played_date IS NULL OR last_played_date != '$now_date' OR DATE(last_completed_at) != '$now_date')"))['cnt'] ?? 0;
+$streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM kuis_harian_stats WHERE current_streak > 0 AND (last_played_date IS NULL OR last_played_date != '$now_date' OR DATE(last_completed_at) != '$now_date')"))['cnt'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -314,7 +314,7 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
                 </div>
             </form>
 
-            <!-- Streak Tebak Kata -->
+            <!-- Streak Kuis Harian -->
             <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="streak">
                 <div class="flex items-start gap-4">
@@ -325,7 +325,7 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Streak Tebak Kata</h3>
+                        <h3 class="font-bold text-slate-800">Streak Kuis Harian</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
                         <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim

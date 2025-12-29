@@ -204,9 +204,9 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
                             <span class="text-xs">Pesan Anonim</span>
                         </a>
 
-                        <a href="tebak_kata.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
+                        <a href="kuis_harian.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
                             <i class="fa fa-gamepad w-5 h-5 mr-4"></i>
-                            <span class="text-xs">Tebak Kata</span>
+                            <span class="text-xs">Kuis Harian</span>
                         </a>
 
                         <a href="db_users.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">

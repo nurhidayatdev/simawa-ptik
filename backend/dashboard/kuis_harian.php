@@ -15,21 +15,21 @@ $user_info = $koneksi->query("SELECT nama_panggilan, foto FROM mahasiswa WHERE u
 $nama_panggilan = $user_info['nama_panggilan'] ?? 'User';
 $foto = $user_info['foto'] ?? 'default.png';
 
-$stmt = $koneksi->prepare("SELECT * FROM tebak_kata_stats WHERE user_id = ?");
+$stmt = $koneksi->prepare("SELECT * FROM kuis_harian_stats WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $stats = $stmt->get_result()->fetch_assoc();
 
 if (!$stats) {
-    $koneksi->query("INSERT INTO tebak_kata_stats (user_id) VALUES ($user_id)");
-    $stats = $koneksi->query("SELECT * FROM tebak_kata_stats WHERE user_id = $user_id")->fetch_assoc();
+    $koneksi->query("INSERT INTO kuis_harian_stats (user_id) VALUES ($user_id)");
+    $stats = $koneksi->query("SELECT * FROM kuis_harian_stats WHERE user_id = $user_id")->fetch_assoc();
 }
 
 $streak_broken = false;
 if ($stats['last_played_date'] !== null && $stats['last_played_date'] !== $today && $stats['last_played_date'] !== $yesterday) {
     $streak_broken = true;
     if ($stats['current_streak'] > 0) {
-        $koneksi->query("UPDATE tebak_kata_stats SET current_streak = 0 WHERE user_id = $user_id");
+        $koneksi->query("UPDATE kuis_harian_stats SET current_streak = 0 WHERE user_id = $user_id");
         $stats['current_streak'] = 0;
     }
 }
@@ -38,7 +38,7 @@ $current_week = date('W-Y');
 $last_recovery_week = $stats['last_recovery_used_at'] ? date('W-Y', strtotime($stats['last_recovery_used_at'])) : null;
 $can_recover = ($last_recovery_week !== $current_week) && $streak_broken && $stats['max_streak'] > 0;
 
-$q_soal = $koneksi->prepare("SELECT * FROM tebak_kata_soal WHERE tanggal = ? LIMIT 1");
+$q_soal = $koneksi->prepare("SELECT * FROM kuis_harian_soal WHERE tanggal = ? LIMIT 1");
 $q_soal->bind_param("s", $today);
 $q_soal->execute();
 $soal = $q_soal->get_result()->fetch_assoc();
@@ -48,7 +48,7 @@ $already_played = ($stats['last_played_date'] === $today && $stats['last_complet
 
 // Fetch ALL leaderboard for expand
 $q_leaderboard = $koneksi->query("SELECT m.nama_panggilan, m.foto, s.user_id, s.current_streak, s.max_streak, s.total_games 
-    FROM tebak_kata_stats s 
+    FROM kuis_harian_stats s 
     JOIN mahasiswa m ON s.user_id = m.user_id 
     ORDER BY s.current_streak DESC, s.total_games DESC 
     LIMIT 50");
@@ -82,7 +82,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit_answer') {
         if ($current_streak > $max_streak) $max_streak = $current_streak;
         $now = date('Y-m-d H:i:s');
 
-        $upd = $koneksi->prepare("UPDATE tebak_kata_stats SET current_streak=?, max_streak=?, total_games=?, last_completed_at=?, last_played_date=? WHERE user_id=?");
+        $upd = $koneksi->prepare("UPDATE kuis_harian_stats SET current_streak=?, max_streak=?, total_games=?, last_completed_at=?, last_played_date=? WHERE user_id=?");
         $upd->bind_param("iiissi", $current_streak, $max_streak, $total_games, $now, $today, $user_id);
         $upd->execute();
 
@@ -97,7 +97,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'use_recovery') {
     header('Content-Type: application/json');
     if ($can_recover) {
         $now = date('Y-m-d H:i:s');
-        $koneksi->query("UPDATE tebak_kata_stats SET current_streak = 1, last_recovery_used_at = '$now', last_played_date = '$yesterday' WHERE user_id = $user_id");
+        $koneksi->query("UPDATE kuis_harian_stats SET current_streak = 1, last_recovery_used_at = '$now', last_played_date = '$yesterday' WHERE user_id = $user_id");
         echo json_encode(['status' => 'success']);
     } else {
         echo json_encode(['status' => 'failed']);
@@ -129,7 +129,7 @@ $fireInfo = getFireIcon($stats['current_streak'], $already_played);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tebak Kata - PTIK C</title>
+    <title>Kuis Harian - PTIK C</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -156,7 +156,7 @@ $fireInfo = getFireIcon($stats['current_streak'], $already_played);
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
                 <i class="fa fa-quote-right text-white text-sm"></i>
             </div>
-            <h1 class="text-base font-bold tracking-tight">TebakKata</h1>
+            <h1 class="text-base font-bold tracking-tight">KuisHarian</h1>
         </div>
         <a href="dashboard.php" class="px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg text-xs font-medium border border-slate-700">
             <i class="fa fa-arrow-left mr-1"></i> Dashboard
@@ -306,16 +306,15 @@ $fireInfo = getFireIcon($stats['current_streak'], $already_played);
         function isNewMilestone(s){return[3,10,30,50,100,200,500,1000].includes(s);}
         
         
-        
 
         function triggerConfetti(){const d=3000,e=Date.now()+d,f={startVelocity:30,spread:360,ticks:60,zIndex:10000};const i=setInterval(()=>{const t=e-Date.now();if(t<=0)return clearInterval(i);const p=50*(t/d);confetti({...f,particleCount:p,origin:{x:Math.random()*0.2+0.1,y:Math.random()-0.2},colors:['#ff9500','#ffd700','#ff6600','#ff00ff','#00ffff']});confetti({...f,particleCount:p,origin:{x:Math.random()*0.2+0.7,y:Math.random()-0.2},colors:['#ff9500','#ffd700','#ff6600','#ff00ff','#00ffff']});},250);}
 
         function showMilestonePopup(streak){const m=getMilestone(streak);const isM=isNewMilestone(streak);if(isM)triggerConfetti();
             Swal.fire({html:`<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../../img/profile/default.png'"></div><div class="text-sm font-bold text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-white mb-1">Streak ${streak}!</div><div class="text-slate-400 text-xs">Luar biasa!</div></div>`,showConfirmButton:true,confirmButtonText:'OK',confirmButtonColor:'#6366f1',background:'#1e293b',color:'#fff',allowOutsideClick:false}).then(()=>location.reload());}
 
-        function submitAnswer(e){e.preventDefault();const i=document.getElementById('answer'),b=e.target.querySelector('button'),o=b.innerHTML;b.disabled=true;b.innerHTML='<i class="fa fa-spinner fa-spin"></i>';const f=new FormData();f.append('action','submit_answer');f.append('answer',i.value);fetch('tebak_kata.php',{method:'POST',body:f}).then(r=>r.json()).then(d=>{b.disabled=false;b.innerHTML=o;if(d.status==='success')showMilestonePopup(d.new_streak);else if(d.status==='already_played')location.reload();else{Swal.fire({title:'Salah',text:'Coba lagi!',icon:'error',background:'#1e293b',color:'#fff',confirmButtonColor:'#ef4444'});i.value='';i.focus();}}).catch(()=>{b.disabled=false;b.innerHTML=o;Swal.fire('Error','Koneksi bermasalah','error');});}
+        function submitAnswer(e){e.preventDefault();const i=document.getElementById('answer'),b=e.target.querySelector('button'),o=b.innerHTML;b.disabled=true;b.innerHTML='<i class="fa fa-spinner fa-spin"></i>';const f=new FormData();f.append('action','submit_answer');f.append('answer',i.value);fetch('kuis_harian.php',{method:'POST',body:f}).then(r=>r.json()).then(d=>{b.disabled=false;b.innerHTML=o;if(d.status==='success')showMilestonePopup(d.new_streak);else if(d.status==='already_played')location.reload();else{Swal.fire({title:'Salah',text:'Coba lagi!',icon:'error',background:'#1e293b',color:'#fff',confirmButtonColor:'#ef4444'});i.value='';i.focus();}}).catch(()=>{b.disabled=false;b.innerHTML=o;Swal.fire('Error','Koneksi bermasalah','error');});}
         
-        function useRecovery(){Swal.fire({title:'Pulihkan?',html:'<p class="text-xs">1x/minggu</p>',icon:'question',showCancelButton:true,confirmButtonText:'Ya',confirmButtonColor:'#ea580c',background:'#1e293b',color:'#fff'}).then(r=>{if(r.isConfirmed){const f=new FormData();f.append('action','use_recovery');fetch('tebak_kata.php',{method:'POST',body:f}).then(r=>r.json()).then(d=>{if(d.status==='success')Swal.fire({title:'Berhasil!',icon:'success',background:'#1e293b',color:'#fff'}).then(()=>location.reload());else Swal.fire('Gagal','','error');});}});}
+        function useRecovery(){Swal.fire({title:'Pulihkan?',html:'<p class="text-xs">1x/minggu</p>',icon:'question',showCancelButton:true,confirmButtonText:'Ya',confirmButtonColor:'#ea580c',background:'#1e293b',color:'#fff'}).then(r=>{if(r.isConfirmed){const f=new FormData();f.append('action','use_recovery');fetch('kuis_harian.php',{method:'POST',body:f}).then(r=>r.json()).then(d=>{if(d.status==='success')Swal.fire({title:'Berhasil!',icon:'success',background:'#1e293b',color:'#fff'}).then(()=>location.reload());else Swal.fire('Gagal','','error');});}});}
     </script>
 </body>
 </html>
