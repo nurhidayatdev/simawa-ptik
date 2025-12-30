@@ -231,6 +231,106 @@ if (isset($_POST['action'])) {
             }
         }
     }
+    
+    // KRS REMINDER
+    elseif ($action === 'krs') {
+        $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+        $periode = mysqli_fetch_assoc($q_periode);
+        $periode_id = $periode['id'] ?? 0;
+
+        $q_belum = "SELECT m.nama_lengkap 
+                    FROM mahasiswa m 
+                    LEFT JOIN (SELECT DISTINCT mahasiswa_id FROM krs WHERE periode_id = $periode_id) k ON m.id = k.mahasiswa_id 
+                    WHERE k.mahasiswa_id IS NULL 
+                    ORDER BY m.nim ASC";
+        $res_belum = mysqli_query($koneksi, $q_belum);
+        
+        if ($res_belum && mysqli_num_rows($res_belum) > 0) {
+            $message = "📝 *PENGINGAT PENGISIAN KRS*\n\nMahasiswa berikut *BELUM* mengisi KRS untuk periode aktif:\n\n";
+            $no = 1;
+            while ($row = mysqli_fetch_assoc($res_belum)) {
+                $message .= $no . ". " . $row['nama_lengkap'] . "\n";
+                $no++;
+            }
+            $message .= "\n_Harap segera mengisi KRS di sistem!_ 🚀";
+            $res = sendTelegramMessage($telegram_token, $telegram_chat_id, $message);
+            $response_msg = $res['success'] ? "Reminder KRS berhasil dikirim ke " . ($no-1) . " mahasiswa!" : "Gagal: " . ($res['error'] ?? '');
+            $response_type = $res['success'] ? 'success' : 'error';
+        } else {
+            $response_msg = "Semua mahasiswa sudah mengisi KRS.";
+            $response_type = 'info';
+        }
+    }
+    
+    // KELOMPOK REMINDER
+    elseif ($action === 'kelompok') {
+        $matkul_id = mysqli_real_escape_string($koneksi, $_POST['matkul_id']);
+        $dosen = mysqli_real_escape_string($koneksi, $_POST['dosen']);
+        $keterangan = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
+        
+        $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+        $periode = mysqli_fetch_assoc($q_periode);
+        $periode_id = $periode['id'] ?? 0;
+
+        // Get matkul name
+        $q_mk = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = $matkul_id");
+        $mk_name = mysqli_fetch_assoc($q_mk)['nama_matkul'] ?? 'Mata Kuliah';
+
+        // Get groups and members
+        $q_groups = "SELECT kelompok_no, anggota 
+                     FROM kelompok 
+                     WHERE matkul_id = '$matkul_id' 
+                     AND dosen = '$dosen' 
+                     AND keterangan = '$keterangan' 
+                     AND periode_id = '$periode_id' 
+                     ORDER BY kelompok_no ASC";
+        $res_groups = mysqli_query($koneksi, $q_groups);
+        
+        if ($res_groups && mysqli_num_rows($res_groups) > 0) {
+            $groups_data = [];
+            $all_nims = [];
+            while ($row = mysqli_fetch_assoc($res_groups)) {
+                $nims = array_filter(array_map('trim', explode(',', $row['anggota'])));
+                foreach ($nims as $nim) $all_nims[$nim] = true;
+                $groups_data[] = [
+                    'no' => $row['kelompok_no'],
+                    'nims' => $nims
+                ];
+            }
+
+            // Map NIM to Name
+            $student_names = [];
+            if (!empty($all_nims)) {
+                $nim_list = "'" . implode("','", array_map(function($n) use ($koneksi) { return mysqli_real_escape_string($koneksi, $n); }, array_keys($all_nims))) . "'";
+                $res_names = mysqli_query($koneksi, "SELECT nim, nama_lengkap FROM mahasiswa WHERE nim IN ($nim_list)");
+                while ($rn = mysqli_fetch_assoc($res_names)) {
+                    $student_names[$rn['nim']] = $rn['nama_lengkap'];
+                }
+            }
+
+            $message = "👥 *DAFTAR KELOMPOK BARU* 👥\n";
+            $message .= "📘 *Matkul:* {$mk_name}\n";
+            $message .= "👨‍🏫 *Dosen:* {$dosen}\n";
+            if (!empty($keterangan)) $message .= "📝 *Ket:* {$keterangan}\n";
+            $message .= "\n";
+            
+            foreach ($groups_data as $g) {
+                $message .= "*Kelompok {$g['no']}:*\n";
+                foreach ($g['nims'] as $nim) {
+                    $nama = $student_names[$nim] ?? "Mahasiswa ($nim)";
+                    $message .= "• {$nama}\n";
+                }
+                $message .= "\n";
+            }
+            
+            $res = sendTelegramMessage($telegram_token, $telegram_chat_id, $message);
+            $response_msg = $res['success'] ? "Daftar kelompok berhasil dikirim!" : "Gagal: " . ($res['error'] ?? '');
+            $response_type = $res['success'] ? 'success' : 'error';
+        } else {
+            $response_msg = "Data kelompok tidak ditemukan.";
+            $response_type = 'error';
+        }
+    }
 }
 
 // Counts for display
@@ -238,6 +338,27 @@ $now_date = date('Y-m-d');
 $now_time = date('H:i:s');
 $tugas_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas WHERE status='belum' AND (deadline_tanggal > '$now_date' OR (deadline_tanggal = '$now_date' AND deadline_pukul > '$now_time'))"))['cnt'] ?? 0;
 $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM kuis_harian_stats WHERE current_streak > 0 AND (last_played_date IS NULL OR last_played_date != '$now_date' OR DATE(last_completed_at) != '$now_date')"))['cnt'] ?? 0;
+
+$q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$p_id = mysqli_fetch_assoc($q_p)['id'] ?? 0;
+$krs_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM mahasiswa m LEFT JOIN (SELECT DISTINCT mahasiswa_id FROM krs WHERE periode_id = $p_id) k ON m.id = k.mahasiswa_id WHERE k.mahasiswa_id IS NULL"))['cnt'] ?? 0;
+
+// Fetch unique group sets
+$q_sets = mysqli_query($koneksi, "
+    SELECT DISTINCT 
+        k.matkul_id, 
+        mk.nama_matkul, 
+        k.dosen, 
+        k.keterangan 
+    FROM kelompok k 
+    JOIN mata_kuliah mk ON k.matkul_id = mk.id 
+    WHERE k.periode_id = $p_id
+    ORDER BY mk.nama_matkul ASC, k.dosen ASC
+");
+$group_sets = [];
+while ($row = mysqli_fetch_assoc($q_sets)) {
+    $group_sets[] = $row;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -254,6 +375,8 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -274,25 +397,145 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
                 <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
-                <span class="text-xl font-bold text-white">Telegram Reminder</span>
+                <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
             </div>
-            <a href="dashboard.php" class="text-white hover:text-slate-300 text-sm">
-                <i class="fa fa-arrow-left mr-1"></i> Dashboard
-            </a>
+            <!-- Mobile Menu Button dengan z-index yang sesuai -->
+            <button id="mobile-menu-button" class="text-slate-100 hover:text-indigo-950 lg:hidden p-2 rounded-lg hover:bg-gray-100">
+                <i class="fa fa-bars w-6 h-6"></i>
+            </button>
+            <div class="hidden lg:flex items-center space-x-4">
+                <div class="relative">
+                    <button id="profile-button" class="flex items-center space-x-2">
+                        <span class="text-white"><?php echo htmlspecialchars($nama_lengkap); ?></span>
+                        <img src="../img/profile/<?php echo htmlspecialchars($foto); ?>" alt="Profile" class="w-8 h-8 rounded-full">
+                    </button>
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                        <a href="profile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
+                        <a href="../../index.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Logout</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main class="pt-20 p-6 max-w-4xl mx-auto">
-        
-        <?php if ($response_msg): ?>
-        <div class="mb-6 p-4 rounded-lg <?= $response_type === 'success' ? 'bg-green-100 border border-green-400 text-green-800' : ($response_type === 'error' ? 'bg-red-100 border border-red-400 text-red-800' : 'bg-blue-100 border border-blue-400 text-blue-800') ?>">
-            <i class="fa <?= $response_type === 'success' ? 'fa-check-circle' : ($response_type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') ?> mr-2"></i>
-            <?= htmlspecialchars($response_msg) ?>
+    <!-- Sidebar dengan z-index di bawah header -->
+    <aside id="sidebar"
+        class="fixed left-0 top-0 h-screen w-48 bg-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out z-40">
+        <!-- Tambahan padding top agar tidak tertutup header -->
+        <div class="pt-16">
+            <nav class="mt-4 h-[calc(100vh-4rem)] overflow-y-auto pb-10">
+                <div class="px-4 space-y-2">
+                    <!-- Dashboard Menu -->
+                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
+                        <i class="fa fa-home w-4 h-4 mr-4"></i>
+                        <span class="text-xs">Beranda</span>
+                    </a>
+
+                    <!-- Components Menu -->
+                    <div class="space-y-1">
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akademik</p>
+                            <div class="space-y-1">
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-600"></i>
+                                        <span class="text-xs font-medium">Master</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="db_mahasiswa.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mahasiswa</a>
+                                    <a href="db_dosen.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Dosen</a>
+                                    <a href="db_matkul.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mata Kuliah</a>
+                                    <a href="db_berita.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Berita & Info</a>
+                                    <a href="db_kalender.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kalender</a>
+                                </div>
+
+                                <a href="db_jadwal.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Jadwal Kuliah</span>
+                                </a>
+                                <a href="db_absensi.php?matkul_id=33&pertemuan=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-calendar-check w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Absensi</span>
+                                </a>
+                                <a href="db_tugas.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Tugas Kuliah</span>
+                                </a>
+                                <a href="db_kelompok.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Kelompok</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Keuangan & Galeri</p>
+                            <div class="space-y-1">
+                                <a href="db_kas.php?minggu_ke=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-wallet w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Kas Mingguan</span>
+                                </a>
+                                <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Galeri Kelas</span>
+                                </a>
+                                <a href="db_pesan.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-comment-dots w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Pesan Anonim</span>
+                                </a>
+                                <a href="kuis_harian.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-gamepad w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Kuis Harian</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <?php if ($role === 'Administrator Utama'): ?>
+                            <div>
+                                <p class="px-4 text-[10px] font-semibold text-red-400 uppercase tracking-wider mb-2">Administrator</p>
+                                <div class="space-y-1">
+                                    <a href="db_users.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-user-shield w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Manajemen User</span>
+                                    </a>
+                                    <a href="db_periode.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-clock w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Periode Akademik</span>
+                                    </a>
+                                    <a href="reminder.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-paper-plane w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Reminder Telegram</span>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
+                            <div class="space-y-1">
+                                <a href="profile.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-user-circle w-5 h-5 mr-3 text-slate-600"></i>
+                                    <span class="text-xs font-medium">Profile Saya</span>
+                                </a>
+                                <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
+                                    <span class="text-xs font-medium">Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
         </div>
-        <?php endif; ?>
+    </aside>
+
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+        
         
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
-            <div class="flex items-center gap-3 mb-4">
+            <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
                     <i class="fab fa-telegram text-white text-2xl"></i>
                 </div>
@@ -315,7 +558,27 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800">Jadwal Besok</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Kirim jadwal kuliah untuk hari besok</p>
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                            <i class="fab fa-telegram mr-1"></i> Kirim
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- KRS Reminder -->
+            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+                <input type="hidden" name="action" value="krs">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                        <i class="fa fa-university text-xl"></i>
+                        <?php if ($krs_count > 0): ?>
+                        <span class="absolute -top-1 -right-1 bg-purple-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $krs_count ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-slate-800">Reminder KRS</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan mahasiswa yang belum mengisi KRS</p>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
                         </button>
                     </div>
@@ -335,7 +598,27 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800">Tugas Aktif</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Kirim rekap tugas yang belum dikumpulkan</p>
-                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
+                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                            <i class="fab fa-telegram mr-1"></i> Kirim
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Streak Kuis Harian -->
+            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+                <input type="hidden" name="action" value="streak">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-red-100 text-red-50 text-red-500 rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                        <i class="fa fa-fire text-xl"></i>
+                        <?php if ($streak_count > 0): ?>
+                        <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-slate-800">Streak Kuis Harian</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
+                        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
                         </button>
                     </div>
@@ -353,53 +636,135 @@ $streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cn
                         <h3 class="font-bold text-slate-800">Kas Mingguan</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pengingat kas belum lunas</p>
                         <div class="flex gap-2 mb-3">
-                            <select name="minggu_ke" class="flex-grow text-sm border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-green-500">
+                            <select name="minggu_ke" class="flex-grow text-xs border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-green-500">
                                 <?php for ($i = 1; $i <= 16; $i++): ?>
                                 <option value="<?= $i ?>">Minggu <?= $i ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
             </form>
 
-            <!-- Streak Kuis Harian -->
+            
+
+            
+
+            <!-- Kelompok Reminder -->
             <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
-                <input type="hidden" name="action" value="streak">
+                <input type="hidden" name="action" value="kelompok">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-red-100 text-red-500 rounded-lg flex items-center justify-center flex-shrink-0 relative">
-                        <i class="fa fa-fire text-xl"></i>
-                        <?php if ($streak_count > 0): ?>
-                        <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>
-                        <?php endif; ?>
+                    <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fa fa-users text-xl"></i>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Streak Kuis Harian</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
-                        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
+                        <h3 class="font-bold text-slate-800">Daftar Kelompok</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pembagian kelompok mahasiswa</p>
+                        
+                        <div class="mb-3">
+                            <select name="group_set" required class="w-full text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-teal-500" onchange="updateGroupFields(this)">
+                                <option value="">-- Pilih Matkul & Dosen --</option>
+                                <?php foreach ($group_sets as $s): ?>
+                                    <option value="<?= $s['matkul_id'] ?>|<?= htmlspecialchars($s['dosen']) ?>|<?= htmlspecialchars($s['keterangan']) ?>">
+                                        <?= htmlspecialchars($s['nama_matkul']) ?> - <?= htmlspecialchars($s['dosen']) ?> (<?= htmlspecialchars($s['keterangan']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="hidden" name="matkul_id" id="field_matkul_id">
+                            <input type="hidden" name="dosen" id="field_dosen">
+                            <input type="hidden" name="keterangan" id="field_keterangan">
+                        </div>
+
+                        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
             </form>
 
-        </div>
-
-        <div class="mt-6 bg-slate-50 rounded-xl border border-slate-200 p-4">
-            <div class="flex items-center gap-2 text-slate-600 text-sm">
-                <i class="fa fa-info-circle text-slate-400"></i>
-                <span>Reminder akan dikirim ke grup Telegram PTIK C secara langsung.</span>
-            </div>
         </div>
 
     </main>
 
-    <footer class="text-xs text-slate-500 text-center py-4 mt-8">
-        © 2025 PTIK C - Teknik Informatika dan Komputer FT UNM
-    </footer>
+    <footer class="text-xs text-indigo-900 text-center my-4">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
 
+    <script>
+// Mobile menu toggle dengan perbaikan
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            sidebar.classList.toggle('-translate-x-full');
+            sidebar.classList.toggle('mobile-menu-open');
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth < 768) { // Only on mobile
+                if (!sidebar.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebar.classList.remove('mobile-menu-open');
+                }
+            }
+        });
+
+        // Submenu toggles
+        const submenuButtons = document.querySelectorAll('.submenu-button');
+
+        submenuButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const submenu = button.nextElementSibling;
+                const arrow = button.querySelector('svg:last-child');
+
+                submenu.classList.toggle('hidden');
+                arrow.classList.toggle('rotate-180');
+            });
+        });
+
+        // Profile dropdown
+        const profileButton = document.getElementById('profile-button');
+        const profileDropdown = document.getElementById('profile-dropdown');
+
+        if (profileButton && profileDropdown) {
+            profileButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileButton.contains(e.target)) {
+                    profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        function updateGroupFields(select) {
+            const val = select.value;
+            if (val) {
+                const parts = val.split('|');
+                document.getElementById('field_matkul_id').value = parts[0];
+                document.getElementById('field_dosen').value = parts[1];
+                document.getElementById('field_keterangan').value = parts[2];
+            } else {
+                document.getElementById('field_matkul_id').value = '';
+                document.getElementById('field_dosen').value = '';
+                document.getElementById('field_keterangan').value = '';
+            }
+        }
+
+        // Response Message with SweetAlert
+        <?php if ($response_msg): ?>
+            Swal.fire({
+                icon: '<?= $response_type === "success" ? "success" : ($response_type === "error" ? "error" : "info") ?>',
+                title: '<?= $response_type === "success" ? "Berhasil!" : ($response_type === "error" ? "Gagal!" : "Informasi") ?>',
+                text: '<?= addslashes($response_msg) ?>',
+                confirmButtonColor: '#3730a3'
+            });
+        <?php endif; ?>
+    </script>
 </body>
 </html>
