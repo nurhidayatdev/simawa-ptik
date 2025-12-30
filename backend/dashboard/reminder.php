@@ -546,24 +546,9 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            <!-- Jadwal -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
-                <input type="hidden" name="action" value="jadwal">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i class="fa fa-calendar-alt text-xl"></i>
-                    </div>
-                    <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Jadwal Besok</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim jadwal kuliah untuk hari besok</p>
-                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
-                        </button>
-                    </div>
-                </div>
-            </form>
+            
 
             <!-- KRS Reminder -->
             <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
@@ -576,7 +561,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Reminder KRS</h3>
+                        <h3 class="font-bold text-slate-800 text-md">Reminder KRS</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan mahasiswa yang belum mengisi KRS</p>
                         <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
@@ -596,7 +581,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Tugas Aktif</h3>
+                        <h3 class="font-bold text-slate-800 text-md">Tugas Aktif</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Kirim rekap tugas yang belum dikumpulkan</p>
                         <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
@@ -616,9 +601,26 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Streak Kuis Harian</h3>
+                        <h3 class="font-bold text-slate-800 text-md">Streak Kuis Harian</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
                         <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                            <i class="fab fa-telegram mr-1"></i> Kirim
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Jadwal -->
+            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+                <input type="hidden" name="action" value="jadwal">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fa fa-calendar-alt text-xl"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-slate-800 text-md">Jadwal Besok</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan jadwal kuliah untuk hari besok</p>
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-telegram mr-1"></i> Kirim
                         </button>
                     </div>
@@ -633,7 +635,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <i class="fa fa-wallet text-xl"></i>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Kas Mingguan</h3>
+                        <h3 class="font-bold text-slate-800 text-md">Kas Mingguan</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pengingat kas belum lunas</p>
                         <div class="flex gap-2 mb-3">
                             <select name="minggu_ke" class="flex-grow text-xs border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-green-500">
@@ -662,7 +664,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     </div>
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800">Daftar Kelompok</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pembagian kelompok mahasiswa</p>
+                        <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pembagian kelompok</p>
                         
                         <div class="mb-3">
                             <select name="group_set" required class="w-full text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-teal-500" onchange="updateGroupFields(this)">
@@ -686,10 +688,10 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
         </div>
-
+<footer class="text-xs text-indigo-900 text-center mt-6">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
     </main>
 
-    <footer class="text-xs text-indigo-900 text-center my-4">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
+    
 
     <script>
 // Mobile menu toggle dengan perbaikan
