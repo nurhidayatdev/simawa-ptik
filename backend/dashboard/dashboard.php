@@ -54,13 +54,22 @@ foreach ($tables as $table => $link) {
     }
 }
 
-// Task Status Distribution
-$q_task_stat = mysqli_query($koneksi, "SELECT status, COUNT(*) as cnt FROM tugas WHERE periode_id = '$periode_id' GROUP BY status");
-$task_stats = ['belum' => 0, 'selesai' => 0];
-while ($row = mysqli_fetch_assoc($q_task_stat)) {
-    if (isset($task_stats[$row['status']])) {
-        $task_stats[$row['status']] = $row['cnt'];
-    }
+// Task Status per Mata Kuliah
+$q_task_matkul = mysqli_query($koneksi, "SELECT mk.nama_matkul, 
+    SUM(CASE WHEN t.status = 'selesai' THEN 1 ELSE 0 END) as selesai,
+    SUM(CASE WHEN t.status = 'belum' THEN 1 ELSE 0 END) as belum
+    FROM tugas t 
+    JOIN mata_kuliah mk ON t.matkul_id = mk.id 
+    WHERE t.periode_id = '$periode_id' 
+    GROUP BY t.matkul_id
+    ORDER BY (sum(CASE WHEN t.status = 'selesai' THEN 1 ELSE 0 END) + sum(CASE WHEN t.status = 'belum' THEN 1 ELSE 0 END)) DESC");
+$task_matkul_labels = [];
+$task_matkul_selesai = [];
+$task_matkul_belum = [];
+while ($row = mysqli_fetch_assoc($q_task_matkul)) {
+    $task_matkul_labels[] = $row['nama_matkul'];
+    $task_matkul_selesai[] = (int)$row['selesai'];
+    $task_matkul_belum[] = (int)$row['belum'];
 }
 
 // Recent Messages (Anonymous)
@@ -98,8 +107,10 @@ $sch_tomorrow = [];
 while ($r = mysqli_fetch_assoc($q_sch_tomorrow)) $sch_tomorrow[] = $r;
 
 // Closest Task
-$q_closest = mysqli_query($koneksi, "SELECT mk.nama_matkul, t.deadline_tanggal, t.deadline_pukul FROM tugas t JOIN mata_kuliah mk ON t.matkul_id = mk.id WHERE t.status = 'belum' AND t.periode_id = '$periode_id' ORDER BY t.deadline_tanggal ASC, t.deadline_pukul ASC LIMIT 1");
-$closest_task = mysqli_fetch_assoc($q_closest);
+$q_closest = mysqli_query($koneksi, "SELECT mk.nama_matkul, t.deadline_tanggal, t.deadline_pukul FROM tugas t JOIN mata_kuliah mk ON t.matkul_id = mk.id WHERE t.status = 'belum' AND t.periode_id = '$periode_id' ORDER BY t.deadline_tanggal ASC, t.deadline_pukul ASC LIMIT 2");
+$closest_tasks = [];
+while ($r = mysqli_fetch_assoc($q_closest)) $closest_tasks[] = $r;
+$closest_task = $closest_tasks[0] ?? null; // Keep this for backward compatibility if needed, but we'll use $closest_tasks
 
 // Finance
 $q_kas_total = mysqli_query($koneksi, "SELECT SUM(nominal) as total FROM kas WHERE status = 'Lunas' AND periode_id = '$periode_id'");
@@ -109,6 +120,45 @@ $arus_in = mysqli_fetch_assoc($q_arus_in)['total'] ?? 0;
 $q_arus_out = mysqli_query($koneksi, "SELECT SUM(jumlah) as total FROM arus_kas WHERE tipe = 'keluar'");
 $arus_out = mysqli_fetch_assoc($q_arus_out)['total'] ?? 0;
 $saldo_sekarang = ($kas_total + $arus_in) - $arus_out;
+
+// Statistik Pembayaran Kas
+$q_kas_stats = mysqli_query($koneksi, "SELECT 
+    COUNT(*) as total,
+    SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
+    FROM kas 
+    WHERE periode_id = '$periode_id'");
+$kas_stats_data = mysqli_fetch_assoc($q_kas_stats);
+$total_k = (int)($kas_stats_data['total'] ?? 0);
+$lunas_k = (int)($kas_stats_data['lunas'] ?? 0);
+$belum_k = $total_k - $lunas_k;
+$persen_lunas = $total_k > 0 ? round(($lunas_k / $total_k) * 100) : 0;
+
+// Kalender Akademik untuk Slider
+$today_date = date('Y-m-d');
+$academic_events = [];
+
+// 1. Ambil 1 kegiatan sedang berlangsung (prioritas utama untuk slot pertama)
+$q_ongoing = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE tanggal_mulai <= '$today_date' AND tanggal_selesai >= '$today_date' ORDER BY tanggal_selesai ASC LIMIT 1");
+$ongoing_event = mysqli_fetch_assoc($q_ongoing);
+
+if ($ongoing_event) {
+    $ongoing_event['status_event'] = 'Sedang Berlangsung';
+    $academic_events[] = $ongoing_event;
+    
+    // Slot kedua: ambil 1 kegiatan akan datang
+    $q_upcoming = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE tanggal_mulai > '$today_date' ORDER BY tanggal_mulai ASC LIMIT 1");
+    if ($r = mysqli_fetch_assoc($q_upcoming)) {
+        $r['status_event'] = 'Akan Datang';
+        $academic_events[] = $r;
+    }
+} else {
+    // Jika tidak ada yang berlangsung, ambil 2 kegiatan akan datang terdekat
+    $q_upcoming = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE tanggal_mulai > '$today_date' ORDER BY tanggal_mulai ASC LIMIT 2");
+    while ($r = mysqli_fetch_assoc($q_upcoming)) {
+        $r['status_event'] = 'Akan Datang';
+        $academic_events[] = $r;
+    }
+}
 
 // --- DATA VISUALISASI LANJUTAN ---
 
@@ -120,26 +170,42 @@ while ($row = mysqli_fetch_assoc($q_gender)) {
 }
 
 // 2. Statistik Absensi (Periode Aktif)
-$q_absensi = mysqli_query($koneksi, "SELECT status, COUNT(*) as cnt FROM absensi WHERE periode_id = '$periode_id' GROUP BY status");
+$abs_matkul = $_GET['abs_matkul'] ?? '';
+$abs_pertemuan = $_GET['abs_pertemuan'] ?? '';
+
+$abs_where = "WHERE periode_id = '$periode_id'";
+if ($abs_matkul !== '') $abs_where .= " AND matkul_id = '$abs_matkul'";
+if ($abs_pertemuan !== '') $abs_where .= " AND pertemuan = '$abs_pertemuan'";
+
+$q_absensi = mysqli_query($koneksi, "SELECT status, COUNT(*) as cnt FROM absensi $abs_where GROUP BY status");
 $absensi_stats = ['Hadir' => 0, 'Izin' => 0, 'Sakit' => 0, 'Alpha' => 0];
 while ($row = mysqli_fetch_assoc($q_absensi)) {
     if (isset($absensi_stats[$row['status']])) $absensi_stats[$row['status']] = (int)$row['cnt'];
 }
 
-// 3. Filter Rentang Tanggal (KAS & PESAN)
-$start_date = $_GET['start_date'] ?? date('Y-m-d', strtotime('-30 days'));
-$end_date = $_GET['end_date'] ?? date('Y-m-d');
+// Ambil daftar matkul & pertemuan untuk filter absensi
+$q_abs_matkuls = mysqli_query($koneksi, "SELECT DISTINCT a.matkul_id, mk.nama_matkul FROM absensi a JOIN mata_kuliah mk ON a.matkul_id = mk.id WHERE a.periode_id = '$periode_id' ORDER BY mk.nama_matkul");
+$abs_matkuls = [];
+while ($r = mysqli_fetch_assoc($q_abs_matkuls)) $abs_matkuls[] = $r;
+
+$q_abs_pertemuans = mysqli_query($koneksi, "SELECT DISTINCT pertemuan FROM absensi WHERE periode_id = '$periode_id' ORDER BY pertemuan ASC");
+$abs_pertemuans = [];
+while ($r = mysqli_fetch_assoc($q_abs_pertemuans)) $abs_pertemuans[] = (int)$r['pertemuan'];
+
+// 3. Filter Rentang Tanggal (KAS)
+$kas_start = $_GET['kas_start'] ?? date('Y-m-d', strtotime('-30 days'));
+$kas_end = $_GET['kas_end'] ?? date('Y-m-d');
 
 // 4. Data Arus Kas (Line Chart)
 $kas_history = [];
-$current = strtotime($start_date);
-$last = strtotime($end_date);
+$current = strtotime($kas_start);
+$last = strtotime($kas_end);
 $temp_saldo = 0;
 
-// Hitung saldo awal sebelum start_date
-$q_saldo_awal_kas = mysqli_query($koneksi, "SELECT SUM(nominal) as total FROM kas WHERE status = 'Lunas' AND periode_id = '$periode_id' AND (tanggal_bayar < '$start_date' OR tanggal_bayar IS NULL)");
-$q_saldo_awal_in = mysqli_query($koneksi, "SELECT SUM(jumlah) as total FROM arus_kas WHERE tipe = 'masuk' AND tanggal < '$start_date'");
-$q_saldo_awal_out = mysqli_query($koneksi, "SELECT SUM(jumlah) as total FROM arus_kas WHERE tipe = 'keluar' AND tanggal < '$start_date'");
+// Hitung saldo awal sebelum kas_start
+$q_saldo_awal_kas = mysqli_query($koneksi, "SELECT SUM(nominal) as total FROM kas WHERE status = 'Lunas' AND periode_id = '$periode_id' AND (tanggal_bayar < '$kas_start' OR tanggal_bayar IS NULL)");
+$q_saldo_awal_in = mysqli_query($koneksi, "SELECT SUM(jumlah) as total FROM arus_kas WHERE tipe = 'masuk' AND tanggal < '$kas_start'");
+$q_saldo_awal_out = mysqli_query($koneksi, "SELECT SUM(jumlah) as total FROM arus_kas WHERE tipe = 'keluar' AND tanggal < '$kas_start'");
 $temp_saldo = (mysqli_fetch_assoc($q_saldo_awal_kas)['total'] ?? 0) + (mysqli_fetch_assoc($q_saldo_awal_in)['total'] ?? 0) - (mysqli_fetch_assoc($q_saldo_awal_out)['total'] ?? 0);
 
 while ($current <= $last) {
@@ -165,9 +231,14 @@ while ($current <= $last) {
     $current = strtotime("+1 day", $current);
 }
 
-// 5. Data Pesan Anonim (Bar Chart)
+// 5. Filter Rentang Tanggal (PESAN)
+$pesan_start = $_GET['pesan_start'] ?? date('Y-m-d', strtotime('-30 days'));
+$pesan_end = $_GET['pesan_end'] ?? date('Y-m-d');
+
+// 6. Data Pesan Anonim (Bar Chart)
 $pesan_history = [];
-$current = strtotime($start_date);
+$current = strtotime($pesan_start);
+$last = strtotime($pesan_end);
 while ($current <= $last) {
     $date = date('Y-m-d', $current);
     $q_pesan_count = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM pesan WHERE DATE(tanggal) = '$date'");
@@ -201,7 +272,7 @@ function getFireColor($streak)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
-    <title>Dashboard Ringkasan - PTIK C</title>
+    <title>Dashboard - PTIK C 24</title>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -459,9 +530,15 @@ function getFireColor($streak)
                                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kuliah Hari Ini (<?= $today_indo ?>)</div>
                                 <div class="text-sm font-bold text-slate-700">
                                     <?php if (empty($sch_today)): ?>
-                                        <span class="text-slate-400 italic font-normal">Tidak ada jadwal kuliah hari ini.</span>
+                                        <span class="text-slate-400 italic font-normal lowercase">Tidak ada jadwal kuliah hari ini.</span>
                                     <?php else: ?>
-                                        <?= count($sch_today) ?> Mata Kuliah • <?= $sch_today[0]['nama_matkul'] ?><?= count($sch_today) > 1 ? '...' : '' ?>
+                                        <div class="flex flex-col <?= count($sch_today) > 1 ? 'gap-0' : '' ?>">
+                                            <?php foreach ($sch_today as $s): ?>
+                                                <div class="<?= count($sch_today) > 1 ? 'text-[11px] leading-tight' : 'text-sm' ?> font-bold text-slate-700 truncate">
+                                                    • <?= $s['nama_matkul'] ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -469,9 +546,15 @@ function getFireColor($streak)
                                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Besok (<?= $tomorrow_indo ?>)</div>
                                 <div class="text-sm font-bold text-slate-700">
                                     <?php if (empty($sch_tomorrow)): ?>
-                                        <span class="text-slate-400 italic font-normal">Tidak ada jadwal.</span>
+                                        <span class="text-slate-400 italic font-normal lowercase">Tidak ada jadwal.</span>
                                     <?php else: ?>
-                                        <?= count($sch_tomorrow) ?> Mata Kuliah • <?= $sch_tomorrow[0]['nama_matkul'] ?>
+                                        <div class="flex flex-col <?= count($sch_tomorrow) > 1 ? 'gap-0' : '' ?>">
+                                            <?php foreach ($sch_tomorrow as $s): ?>
+                                                <div class="<?= count($sch_tomorrow) > 1 ? 'text-[11px] leading-tight' : 'text-sm' ?> font-bold text-slate-700 truncate">
+                                                    • <?= $s['nama_matkul'] ?>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -483,35 +566,77 @@ function getFireColor($streak)
                         <div class="h-16 w-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shrink-0">
                             <i class="fa fa-hourglass-half text-2xl"></i>
                         </div>
-                        <div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Deadline Terdekat</div>
-                            <?php if ($closest_task): ?>
-                                <div class="text-sm font-bold text-slate-700 mb-1"><?= $closest_task['nama_matkul'] ?></div>
-                                <div class="flex items-center gap-2">
-                                    <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-bold uppercase">
-                                        <?= date('d M Y', strtotime($closest_task['deadline_tanggal'])) ?> • <?= date('H:i', strtotime($closest_task['deadline_pukul'])) ?>
-                                    </span>
-                                </div>
+                        <div class="flex-grow grid grid-cols-1 <?= count($closest_tasks) > 1 ? 'md:grid-cols-2' : '' ?> gap-4">
+                            <?php if (!empty($closest_tasks)): ?>
+                                <?php foreach ($closest_tasks as $index => $task): ?>
+                                    <div class="<?= $index === 1 ? 'hidden md:block border-l border-slate-100 pl-4' : '' ?>">
+                                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                            <?= $index === 0 ? 'Deadline Terdekat' : 'Deadline Berikutnya' ?>
+                                        </div>
+                                        <div class="text-sm font-bold text-slate-700 mb-1 truncate"><?= $task['nama_matkul'] ?></div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-bold uppercase whitespace-nowrap">
+                                                <?= date('d M Y', strtotime($task['deadline_tanggal'])) ?> • <?= date('H:i', strtotime($task['deadline_pukul'])) ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                                <div class="text-sm text-slate-400 italic">Semua tugas telah selesai dikerjakan! ✨</div>
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Deadline Terdekat</div>
+                                    <div class="text-sm text-slate-400 italic">Semua tugas telah selesai dikerjakan! ✨</div>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
 
-                    <!-- Slide 3: Keuangan -->
+                    <!-- Slide 3: Distribusi Gender -->
                     <div class="min-w-full p-4 flex items-center gap-6">
-                        <div class="h-16 w-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 shrink-0">
-                            <i class="fa fa-wallet text-2xl"></i>
+                        <div class="h-16 w-16 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-600 shrink-0">
+                            <i class="fa fa-venus-mars text-2xl"></i>
                         </div>
                         <div class="flex-grow grid grid-cols-2 gap-4">
                             <div>
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Saldo Kas Kelas</div>
-                                <div class="text-lg font-bold text-green-600">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mahasiswa Laki-laki</div>
+                                <div class="text-lg font-bold text-indigo-600"><?= number_format($gender_data['Laki-laki']) ?> <span class="text-xs font-normal text-slate-400">Orang</span></div>
                             </div>
                             <div class="border-l border-slate-100 pl-4">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Pengeluaran</div>
-                                <div class="text-lg font-bold text-red-500">Rp <?= number_format($arus_out, 0, ',', '.') ?></div>
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mahasiswa Perempuan</div>
+                                <div class="text-lg font-bold text-pink-500"><?= number_format($gender_data['Perempuan']) ?> <span class="text-xs font-normal text-slate-400">Orang</span></div>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4: Kalender Akademik -->
+                    <div class="min-w-full p-4 flex items-center gap-6">
+                        <div class="h-16 w-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                            <i class="fa fa-calendar-alt text-2xl"></i>
+                        </div>
+                        <div class="flex-grow grid grid-cols-1 <?= count($academic_events) > 1 ? 'md:grid-cols-2' : '' ?> gap-4">
+                            <?php if (!empty($academic_events)): ?>
+                                <?php foreach ($academic_events as $index => $event): ?>
+                                    <div class="<?= $index === 1 ? 'hidden md:block border-l border-slate-100 pl-4' : '' ?>">
+                                        <div class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">
+                                            <?= $event['status_event'] ?>
+                                        </div>
+                                        <?php 
+                                            // Perkecil font jika teks terlalu panjang (> 30 karakter)
+                                            $fontClass = (strlen($event['kegiatan']) > 30) ? 'text-[11px]' : 'text-sm';
+                                        ?>
+                                        <div class="<?= $fontClass ?> font-bold text-slate-700 mb-1" title="<?= htmlspecialchars($event['kegiatan']) ?>">
+                                            <?= htmlspecialchars($event['kegiatan']) ?>
+                                        </div>
+                                        <div class="text-[10px] text-slate-500 font-medium">
+                                            <?= date('d M', strtotime($event['tanggal_mulai'])) ?> - <?= date('d M Y', strtotime($event['tanggal_selesai'])) ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kalender Akademik</div>
+                                    <div class="text-sm text-slate-400 italic">Tidak ada agenda akademik terdekat.</div>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -522,7 +647,7 @@ function getFireColor($streak)
                     <div class="h-1.5 w-4 rounded-full bg-indigo-500 indicator" data-index="0"></div>
                     <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="1"></div>
                     <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="2"></div>
-                  
+                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="3"></div>
                 </div>
             </div>
 
@@ -530,19 +655,51 @@ function getFireColor($streak)
             <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
                 <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     <i class="fa fa-user-friends text-indigo-500"></i>
-                    Demografi & Sosial
+                    Pusat Aktivitas
                 </h2>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Gender Distribution Chart -->
+                <!-- Finance Summary Card -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex justify-between items-center">
-                        <span><i class="fa fa-venus-mars text-pink-500 mr-2"></i>Distribusi Gender</span>
-                        <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-normal">Total: <?= number_format($counts['mahasiswa']) ?></span>
+                        <span><i class="fa fa-wallet text-green-500 mr-2"></i>Status Keuangan</span>
+                        <span class="text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-700 font-bold">Saldo Aktif</span>
                     </h3>
-                    <div class="relative h-64">
-                        <canvas id="genderChart"></canvas>
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Saldo Sekarang</div>
+                            <div class="text-2xl font-black text-slate-800">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                                <div class="text-[9px] text-indigo-400 uppercase font-bold mb-1">Dari Setoran Kas</div>
+                                <div class="text-xs font-black text-indigo-700">Rp <?= number_format($kas_total, 0, ',', '.') ?></div>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <div class="text-[9px] text-blue-400 uppercase font-bold mb-1">Pemasukan Lain</div>
+                                <div class="text-xs font-black text-blue-700">Rp <?= number_format($arus_in, 0, ',', '.') ?></div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-red-50 rounded-lg border border-red-100">
+                            <div class="flex justify-between items-center">
+                                <div class="text-[9px] text-red-400 uppercase font-bold">Total Pengeluaran</div>
+                                <div class="text-xs font-black text-red-700">Rp <?= number_format($arus_out, 0, ',', '.') ?></div>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-slate-100">
+                            <div class="flex justify-between items-end mb-1">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Persentase Bayar Kas</div>
+                                <div class="text-xs font-black text-indigo-600"><?= $persen_lunas ?>%</div>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-indigo-500 h-full rounded-full" style="width: <?= $persen_lunas ?>%"></div>
+                            </div>
+                            <div class="flex justify-between mt-1 text-[9px] font-medium">
+                                <span class="text-green-600">Lunas: <?= $lunas_k ?></span>
+                                <span class="text-slate-400">Belum: <?= $belum_k ?></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -615,11 +772,11 @@ function getFireColor($streak)
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Task Completion Chart -->
+                <!-- Task Distribution per Subject -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa fa-chart-pie text-indigo-500"></i>
-                        Status Tugas
+                        <i class="fa fa-tasks text-indigo-500"></i>
+                        Distribusi Tugas per Matkul
                     </h3>
                     <div class="relative h-64">
                         <canvas id="taskStatusChart"></canvas>
@@ -628,10 +785,26 @@ function getFireColor($streak)
 
                 <!-- Attendance Statistics -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa fa-user-check text-green-500"></i>
-                        Statistik Absensi
-                    </h3>
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa fa-user-check text-green-500"></i>
+                            Statistik Absensi
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <select name="abs_matkul" form="vizFilters" onchange="this.form.submit()" class="text-[10px] border-slate-200 rounded p-1 focus:ring-indigo-500">
+                                <option value="">Semua Matkul</option>
+                                <?php foreach ($abs_matkuls as $m): ?>
+                                    <option value="<?= $m['matkul_id'] ?>" <?= $abs_matkul == $m['matkul_id'] ? 'selected' : '' ?>><?= htmlspecialchars($m['nama_matkul']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <select name="abs_pertemuan" form="vizFilters" onchange="this.form.submit()" class="text-[10px] border-slate-200 rounded p-1 focus:ring-indigo-500">
+                                <option value="">Semua Pertemuan</option>
+                                <?php foreach ($abs_pertemuans as $p): ?>
+                                    <option value="<?= $p ?>" <?= $abs_pertemuan == $p ? 'selected' : '' ?>>Ke-<?= $p ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
                     <div class="relative h-64">
                         <canvas id="attendanceChart"></canvas>
                     </div>
@@ -639,34 +812,30 @@ function getFireColor($streak)
             </div>
 
             <!-- --- SECTION 3: TREN & ANALITIK --- -->
-            <div class="mt-12 border-b border-slate-200 pb-2 mb-6 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+            <form id="vizFilters" method="GET" class="hidden">
+                <?php if (isset($_GET['periode_id'])): ?><input type="hidden" name="periode_id" value="<?= $_GET['periode_id'] ?>"><?php endif; ?>
+            </form>
+            <div class="mt-12 border-b border-slate-200 pb-2 mb-6">
                 <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     <i class="fa fa-chart-line text-green-600"></i>
                     Tren & Analitik
                 </h2>
-
-                <!-- Date Filter -->
-                <form id="filterForm" method="GET" class="flex items-center gap-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-                    <div class="flex items-center gap-1.5 px-2">
-                        <i class="fa fa-calendar-alt text-slate-400 text-xs"></i>
-                        <input type="date" name="start_date" value="<?= $start_date ?>" class="text-[11px] font-bold text-slate-600 border-none focus:ring-0 p-0 w-24">
-                        <span class="text-slate-300">-</span>
-                        <input type="date" name="end_date" value="<?= $end_date ?>" class="text-[11px] font-bold text-slate-600 border-none focus:ring-0 p-0 w-24">
-                    </div>
-                    <button type="submit" class="bg-indigo-600 text-white p-1.5 rounded-md hover:bg-indigo-800 transition">
-                        <i class="fa fa-sync-alt text-xs"></i>
-                    </button>
-                    <?php if (isset($_GET['periode_id'])): ?><input type="hidden" name="periode_id" value="<?= $_GET['periode_id'] ?>"><?php endif; ?>
-                </form>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
                 <!-- Financial Trend Line Chart -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex justify-between items-center">
-                        <span><i class="fa fa-wallet text-green-500 mr-2"></i>Tren Arus Kas</span>
-                        <span class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded border border-green-100">Total Saldo Aktif</span>
-                    </h3>
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa fa-wallet text-green-500"></i>
+                            Tren Arus Kas
+                        </h3>
+                        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded border border-slate-200">
+                            <input type="date" name="kas_start" value="<?= $kas_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
+                            <span class="text-slate-300 text-[10px]">-</span>
+                            <input type="date" name="kas_end" value="<?= $kas_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
+                        </div>
+                    </div>
                     <div class="relative h-72">
                         <canvas id="financeChart"></canvas>
                     </div>
@@ -674,22 +843,29 @@ function getFireColor($streak)
 
                 <!-- Message Volume Bar Chart -->
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa fa-chart-bar text-purple-500"></i>
-                        Volume Pesan Anonim
-                    </h3>
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa fa-chart-bar text-purple-500"></i>
+                            Volume Pesan Anonim
+                        </h3>
+                        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded border border-slate-200">
+                            <input type="date" name="pesan_start" value="<?= $pesan_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
+                            <span class="text-slate-300 text-[10px]">-</span>
+                            <input type="date" name="pesan_end" value="<?= $pesan_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
+                        </div>
+                    </div>
                     <div class="relative h-72">
                         <canvas id="messageChart"></canvas>
                     </div>
                 </div>
             </div>
-            <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
+            <footer class="text-xs text-indigo-900 text-center mb-0 pb-0">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
     </main>
 
     <script>
         // Info Slider Logic
         let currentSlide = 0;
-        const totalSlides = 3;
+        const totalSlides = 4;
         const slider = document.getElementById('infoSlider');
         const indicators = document.querySelectorAll('.indicator');
 
@@ -797,20 +973,28 @@ function getFireColor($streak)
         setInterval(updateClock, 1000);
         updateClock(); // initial call
 
-        // Task Status Chart
+        // Task Status per Matkul Chart
         const taskCtx = document.getElementById('taskStatusChart').getContext('2d');
         new Chart(taskCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
-                labels: ['Belum Selesai', 'Selesai'],
+                labels: <?= json_encode($task_matkul_labels) ?>,
                 datasets: [{
-                    data: [<?= $task_stats['belum'] ?>, <?= $task_stats['selesai'] ?>],
-                    backgroundColor: ['#f59e0b', '#10b981'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
+                        label: 'Selesai',
+                        data: <?= json_encode($task_matkul_selesai) ?>,
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Belum Selesai',
+                        data: <?= json_encode($task_matkul_belum) ?>,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 4
+                    }
+                ]
             },
             options: {
+                indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -818,45 +1002,25 @@ function getFireColor($streak)
                         position: 'bottom',
                         labels: {
                             usePointStyle: true,
-                            padding: 20,
-                            font: {
-                                size: 10
-                            }
+                            font: { size: 9 }
                         }
                     }
                 },
-                cutout: '70%'
-            }
-        });
-
-        // Gender Chart
-        const genderCtx = document.getElementById('genderChart').getContext('2d');
-        new Chart(genderCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Laki-laki', 'Perempuan'],
-                datasets: [{
-                    data: [<?= $gender_data['Laki-laki'] ?>, <?= $gender_data['Perempuan'] ?>],
-                    backgroundColor: ['#6366f1', '#ec4899'],
-                    hoverOffset: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            font: {
-                                size: 10
-                            }
-                        }
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 9 }, precision: 0 }
+                    },
+                    y: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 9 } }
                     }
                 }
             }
         });
+
 
         // Attendance Chart
         const attendCtx = document.getElementById('attendanceChart').getContext('2d');
