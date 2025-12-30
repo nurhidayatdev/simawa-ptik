@@ -37,6 +37,17 @@ if (isset($_POST['tambah'])) {
 
             break;
 
+        case 'periode':
+            $tahun_periode = $_POST['tahun_periode'];
+            $semester_nama = $_POST['semester_nama'];
+            $semester_ke = $_POST['semester_ke'];
+            $status = $_POST['status'];
+            mysqli_query($koneksi, "INSERT INTO periode (tahun_periode, semester_nama, semester_ke, status)
+                VALUES ('$tahun_periode','$semester_nama','$semester_ke','$status')");
+            $redirect = "../dashboard/db_periode.php";
+
+            break;
+
         case 'mata_kuliah':
             $kode_matkul = $_POST['kode_matkul'];
             $nama_matkul = $_POST['nama_matkul'];
@@ -57,12 +68,12 @@ if (isset($_POST['tambah'])) {
             $ruangan = $_POST['ruangan'];
             $dosen_pengampu_id = $_POST['dosen_pengampu_id'];
             $dosen_mitra_id = $_POST['dosen_mitra_id'];
-            
+
             // Get active periode_id
             $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
             $periode = mysqli_fetch_assoc($q_periode);
             $periode_id = $periode['id'] ?? 0;
-            
+
             mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_ke, jam_mulai, jam_selesai, ruangan, dosen_pengampu_id, dosen_mitra_id, periode_id)
                 VALUES ('$matkul_id', '$hari', '$jam_ke', '$jam_mulai', '$jam_selesai', '$ruangan', '$dosen_pengampu_id', '$dosen_mitra_id', '$periode_id')");
             $redirect = "../dashboard/db_jadwal.php";
@@ -79,7 +90,7 @@ if (isset($_POST['tambah'])) {
 
             break;
 
-            case 'dosen':
+        case 'dosen':
             $nama_dosen = $_POST['nama_dosen'];
             $no_hp = $_POST['no_hp'];
             mysqli_query($koneksi, "INSERT INTO dosen (nama_dosen, no_hp)
@@ -88,13 +99,13 @@ if (isset($_POST['tambah'])) {
 
             break;
 
-            case 'tugas':
+        case 'tugas':
             $matkul_id = $_POST['matkul_id'];
             $deadline_tanggal = $_POST['deadline_tanggal'];
             $deadline_pukul = $_POST['deadline_pukul'];
             $deskripsi = $_POST['deskripsi'];
             $link_kirim = $_POST['link_kirim'];
-            
+
             // Handle file upload
             $file_tugas = '';
             if (!empty($_FILES['file_tugas']['name'])) {
@@ -107,26 +118,26 @@ if (isset($_POST['tambah'])) {
                 $target_file = $target_dir . $file_tugas;
                 move_uploaded_file($_FILES["file_tugas"]["tmp_name"], $target_file);
             }
-            
+
             // Get active periode_id
             $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
             $periode = mysqli_fetch_assoc($q_periode);
             $periode_id = $periode['id'] ?? 0;
-            
+
             // Get nama mata kuliah untuk notifikasi
             $q_matkul = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = '$matkul_id'");
             $matkul_data = mysqli_fetch_assoc($q_matkul);
             $nama_matkul = $matkul_data['nama_matkul'] ?? 'Unknown';
-            
+
             mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id)
                 VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
-            
+
             // =====================
             // TELEGRAM NOTIFICATION
             // =====================
             $telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
             $telegram_chat_id = "-1003577478223";
-            
+
             // Format pesan
             $message = "📚 *TUGAS BARU DITAMBAHKAN!*\n\n";
             $message .= "📖 *Mata Kuliah:* " . $nama_matkul . "\n";
@@ -136,7 +147,7 @@ if (isset($_POST['tambah'])) {
                 $message .= "🔗 *Link Kirim:* " . $link_kirim . "\n";
             }
             $message .= "\n_Segera kerjakan tugasmu!_ 💪";
-            
+
             // Kirim ke Telegram (Resilient DNS Bypass Method)
             $tg_ip = "149.154.167.220";
             $telegram_url = "https://{$tg_ip}/bot{$telegram_token}/sendMessage";
@@ -145,7 +156,7 @@ if (isset($_POST['tambah'])) {
                 'text' => $message,
                 'parse_mode' => 'Markdown'
             ];
-            
+
             // Try Method 1: CURL (DNS Bypass)
             $sent = false;
             if (function_exists('curl_init')) {
@@ -165,15 +176,15 @@ if (isset($_POST['tambah'])) {
                 curl_close($ch);
                 if ($info['http_code'] == 200) $sent = true;
             }
-            
+
             // Try Method 2: FGC (Fallback DNS Bypass)
             if (!$sent && ini_get('allow_url_fopen')) {
                 $opts = [
                     'http' => [
                         'method' => 'POST',
                         'header' => "Content-Type: application/x-www-form-urlencoded\r\n" .
-                                   "Host: api.telegram.org\r\n" . 
-                                   "User-Agent: PTIKC24_Bot/1.0\r\n",
+                            "Host: api.telegram.org\r\n" .
+                            "User-Agent: PTIKC24_Bot/1.0\r\n",
                         'content' => http_build_query($telegram_data),
                         'timeout' => 15
                     ],
@@ -183,17 +194,17 @@ if (isset($_POST['tambah'])) {
                 $res_fgc = @file_get_contents($telegram_url, false, $ctx);
                 if ($res_fgc !== FALSE) $sent = true;
             }
-            
+
             $redirect = "../dashboard/db_tugas.php";
 
             break;
-            case 'tugas':
+        case 'tugas':
             $matkul_id = $_POST['matkul_id'];
             $deadline_tanggal = $_POST['deadline_tanggal'];
             $deadline_pukul = $_POST['deadline_pukul'];
             $deskripsi = $_POST['deskripsi'];
             $link_kirim = $_POST['link_kirim'];
-            
+
             // Handle file upload
             $file_tugas = '';
             if (!empty($_FILES['file_tugas']['name'])) {
@@ -206,12 +217,12 @@ if (isset($_POST['tambah'])) {
                 $target_file = $target_dir . $file_tugas;
                 move_uploaded_file($_FILES["file_tugas"]["tmp_name"], $target_file);
             }
-            
+
             // Get active periode_id
             $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
             $periode = mysqli_fetch_assoc($q_periode);
             $periode_id = $periode['id'] ?? 0;
-            
+
             mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id)
                 VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
             $redirect = "../dashboard/db_tugas.php";
@@ -221,16 +232,16 @@ if (isset($_POST['tambah'])) {
         case 'galeri':
             $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
             $tanggal_kegiatan = $_POST['tanggal_kegiatan'];
-            
+
             mysqli_query($koneksi, "INSERT INTO galeri (judul, tanggal_kegiatan) VALUES ('$judul', '$tanggal_kegiatan')");
             $galeri_id = mysqli_insert_id($koneksi);
-            
+
             if (!empty($_FILES['fotos']['name'][0])) {
                 $target_dir = __DIR__ . "/../img/gallery/"; // Absolute path for safety
                 if (!is_dir($target_dir)) {
                     mkdir($target_dir, 0777, true);
                 }
-                
+
                 foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
                     if (empty($tmp_name)) continue;
 
@@ -238,7 +249,7 @@ if (isset($_POST['tambah'])) {
                     $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
                     $basename = preg_replace('/[^a-zA-Z0-9_]/', '_', pathinfo($file_name, PATHINFO_FILENAME));
                     $new_base = time() . "_" . uniqid() . "_" . $basename;
-                    
+
                     // Always save as jpg for consistent compression
                     $final_name = $new_base . ".jpg";
                     $final_path = $target_dir . $final_name;
@@ -251,11 +262,11 @@ if (isset($_POST['tambah'])) {
                         if ($ext == 'jpg' || $ext == 'jpeg') $src = @imagecreatefromjpeg($tmp_name);
                         elseif ($ext == 'png') $src = @imagecreatefrompng($tmp_name);
                         elseif ($ext == 'webp') $src = @imagecreatefromwebp($tmp_name);
-                        
+
                         if ($src) {
                             $width = imagesx($src);
                             $height = imagesy($src);
-                            
+
                             // Max width 1024 for size reduction
                             $max_width = 1024;
                             if ($width > $max_width) {
@@ -267,18 +278,18 @@ if (isset($_POST['tambah'])) {
                             }
 
                             $dst = imagecreatetruecolor($new_width, $new_height);
-                            
+
                             // Fill white background for transparency (since we output JPG)
                             $white = imagecolorallocate($dst, 255, 255, 255);
                             imagefill($dst, 0, 0, $white);
-                            
+
                             imagecopyresampled($dst, $src, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-                            
+
                             // Save as JPG with 75% quality
                             if (imagejpeg($dst, $final_path, 75)) {
                                 $processed = true;
                             }
-                            
+
                             imagedestroy($src);
                             imagedestroy($dst);
                         }
@@ -290,7 +301,7 @@ if (isset($_POST['tambah'])) {
                         $final_name_fallback = $new_base . "." . $ext;
                         $final_path_fallback = $target_dir . $final_name_fallback;
                         if (move_uploaded_file($tmp_name, $final_path_fallback)) {
-                             $db_path = "img/gallery/" . $final_name_fallback;
+                            $db_path = "img/gallery/" . $final_name_fallback;
                         } else {
                             continue; // Skip failed uploads
                         }
@@ -306,7 +317,7 @@ if (isset($_POST['tambah'])) {
             $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
             $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
             $link = mysqli_real_escape_string($koneksi, $_POST['link']);
-            
+
             mysqli_query($koneksi, "INSERT INTO akademik (judul, deskripsi, link) VALUES ('$judul', '$deskripsi', '$link')");
             $redirect = "../dashboard/db_berita.php";
             break;
@@ -327,8 +338,9 @@ if (isset($_POST['tambah'])) {
     <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Dashboard - SD Inpres Maccini Sombala 1</title>
+    <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
+    <title>Tambah Data - PTIK C 2024</title>
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
     <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
@@ -362,9 +374,9 @@ if (isset($_POST['tambah'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#6c27dc" />
-    <link rel="icon" href="img/icon.png" />
-    <title>Kelas PTIK C 2024 - Teknik Informatika dan Komputer</title>
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../img/main/icon.png" />
+    <title>Tambah - PTIK C 2024</title>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -386,16 +398,16 @@ if (isset($_POST['tambah'])) {
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-slate-100">
     <!-- Header dengan z-index lebih tinggi -->
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
-                <img src="../../img/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
             </div>
             <!-- Mobile Menu Button dengan z-index yang sesuai -->
-            <button id="mobile-menu-button" class="text-slate-100 hover:text-indigo-950 lg:hidden p-2 rounded-lg hover:bg-gray-100">
+            <button id="mobile-menu-button" class="text-slate-100 hover:text-indigo-950 lg:hidden p-2 rounded-lg hover:bg-indigo-100">
                 <i class="fa fa-bars w-6 h-5"></i>
             </button>
             <div class="hidden lg:flex items-center space-x-4">
@@ -405,8 +417,8 @@ if (isset($_POST['tambah'])) {
                         <img src="../img/profile/<?= htmlspecialchars($foto) ?>" alt="Profile" class="w-8 h-8 rounded-full">
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                        <a href="profile.php" class="block px-4 py-2 text-xs hover:bg-gray-100">Profile</a>
-                        <a href="../../index.php" class="block px-4 py-2 text-xs hover:bg-gray-100">Logout</a>
+                        <a href="../dashboard/profile.php" class="block px-4 py-2 text-xs hover:bg-indigo-100">Profile</a>
+                        <a href="../../index.php" class="block px-4 py-2 text-xs hover:bg-indigo-100">Logout</a>
                     </div>
                 </div>
             </div>
@@ -417,87 +429,108 @@ if (isset($_POST['tambah'])) {
         class="fixed left-0 top-0 h-screen w-48 bg-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out z-40">
         <!-- Tambahan padding top agar tidak tertutup header -->
         <div class="pt-16">
-            <nav class="mt-6">
+            <nav class="mt-4 h-[calc(100vh-4rem)] overflow-y-auto pb-10">
                 <div class="px-4 space-y-2">
                     <!-- Dashboard Menu -->
-                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
-                                <i class="fa fa-home w-4 h-4 mr-4"></i>
+                    <a href="../dashboard/dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
+                        <i class="fa fa-home w-4 h-4 mr-4"></i>
                         <span class="text-xs">Beranda</span>
                     </a>
 
                     <!-- Components Menu -->
-                    <div class="space-y-2">
+                    <div class="space-y-1">
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akademik</p>
+                            <div class="space-y-1">
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-600"></i>
+                                        <span class="text-xs font-medium">Master</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="../dashboard/db_mahasiswa.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mahasiswa</a>
+                                    <a href="../dashboard/db_dosen.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Dosen</a>
+                                    <a href="../dashboard/db_matkul.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mata Kuliah</a>
+                                    <a href="../dashboard/db_berita.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Berita & Info</a>
+                                    <a href="../dashboard/db_kalender.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kalender</a>
+                                </div>
 
-                        <button
-                            class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-slate-100 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fa fa-list w-5 h-5 mr-4"></i>
-                                <span class="text-xs">Akademik</span>
+                                <a href="../dashboard/db_jadwal.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Jadwal Kuliah</span>
+                                </a>
+                                <a href="../dashboard/db_absensi.php?matkul_id=33&pertemuan=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-calendar-check w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Absensi</span>
+                                </a>
+                                <a href="../dashboard/db_tugas.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Tugas Kuliah</span>
+                                </a>
+                                <a href="../dashboard/db_kelompok.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Kelompok</span>
+                                </a>
                             </div>
-                            <i class="fa fa-chevron-down submenu-arrow w-4 h-4 transition-transform duration-200"></i>
-                        </button>
-
-                        <div class="submenu pl-8 space-y-1 hidden overflow-y-auto max-h-52">
-                            <a href="db_mahasiswa.php"
-                                class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Mahasiswa</a>
-
-                                <a href="db_dosen.php"
-                                class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Dosen</a>
-
-                            <a href="db_matkul.php"
-                                class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Mata Kuliah</a>
-
-                            <a href="db_jadwal.php"
-                                class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Jadwal</a>
-
-                                <a href="db_tugas.php"
-                                class="block px-4 py-2 text-xs text-slate-800 hover:bg-slate-100 rounded-lg">Tugas</a>
-
-                            
                         </div>
 
-                        <button
-                            class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fa fa-calendar w-5 h-5 mr-4"></i>
-                                <a href="db_absensi.php?matkul_id=33&pertemuan=1">
-                                    <span class="text-xs">Absensi</span>
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Keuangan & Galeri</p>
+                            <div class="space-y-1">
+                                <a href="../dashboard/db_kas.php?minggu_ke=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-wallet w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Kas Mingguan</span>
+                                </a>
+                                <a href="../dashboard/db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Galeri Kelas</span>
+                                </a>
+                                <a href="../dashboard/db_pesan.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-comment-dots w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Pesan Anonim</span>
+                                </a>
+                                <a href="../dashboard/kuis_harian.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-gamepad w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Kuis Harian</span>
                                 </a>
                             </div>
-                        </button>
+                        </div>
 
-                        <button
-                            class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fa fa-wallet w-5 h-5 mr-4"></i>
-                                <a href="db_kas.php?minggu_ke=1">
-                                    <span class="text-xs">Kas Mingguan</span>
-                                </a>
+                        <?php if ($role === 'Administrator Utama'): ?>
+                            <div>
+                                <p class="px-4 text-[10px] font-semibold text-red-400 uppercase tracking-wider mb-2">Administrator</p>
+                                <div class="space-y-1">
+                                    <a href="../dashboard/db_users.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-user-shield w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Manajemen User</span>
+                                    </a>
+                                    <a href="../dashboard/db_periode.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-clock w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Periode Akademik</span>
+                                    </a>
+                                    <a href="../dashboard/reminder.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-paper-plane w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Reminder Telegram</span>
+                                    </a>
+                                </div>
                             </div>
-                        </button>
+                        <?php endif; ?>
 
-                        
-
-                        <button
-                            class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fa fa-users w-5 h-5 mr-4"></i>
-                                <a href="db_kelompok.php">
-                                    <span class="text-xs">Kelompok</span>
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
+                            <div class="space-y-1">
+                                <a href="../dashboard/profile.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-user-circle w-5 h-5 mr-3 text-slate-600"></i>
+                                    <span class="text-xs font-medium">Profile Saya</span>
+                                </a>
+                                <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
+                                    <span class="text-xs font-medium">Logout</span>
                                 </a>
                             </div>
-                        </button>
-<?php if ($role === 'Administrator Utama'): ?>
-                        <button
-                            class="flex items-center justify-between w-full px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fa fa-user w-5 h-5 mr-4"></i>
-                                <a href="db_users.php">
-                                    <span class="text-xs">Users</span>
-                                </a>
-                            </div>
-                        </button>
-<?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -505,57 +538,95 @@ if (isset($_POST['tambah'])) {
     </aside>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-gray-200 p-6 flex-grow w-full">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
 
 
             <form class="space-y-6" method="POST" enctype="multipart/form-data">
-                <div class="border-b border-gray-200 pb-6">
+                <div class="border-b border-slate-200 pb-6">
                     <?php if ($tabel === 'mahasiswa'): ?>
                         <h3 class="text-xl font-bold mb-6">Mahasiswa</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Lengkap</label>
                                 <input type="text" name="nama_lengkap"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Panggilan</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Panggilan</label>
                                 <input type="text" name="nama_panggilan"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Email</label>
                                 <input type="email" name="email"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">NIM</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">NIM</label>
                                 <input type="number" name="nim"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jenis Kelamin</label>
                                 <select name="jenis_kelamin"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Instagram</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Instagram</label>
                                 <input type="text" name="instagram" placeholder="@username"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Biodata</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Biodata</label>
                                 <input type="text" name="bio"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Foto</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Foto</label>
                                 <input type="file" name="foto" accept="image/*"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+
+                    <?php elseif ($tabel === 'periode'): ?>
+                        <h3 class="text-xl font-bold mb-6">Tambah Periode</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Tahun Periode</label>
+                                <input type="text" name="tahun_periode"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Semester Nama</label>
+                                <select name="status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required>
+                                    <option value="">-- Pilih Semester Nama --</option>
+                                    <option value="Ganjil">Ganjil</option>
+                                    <option value="Genap">Genap</option>
+                                    <option value="Antara">Antara</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Semester Ke</label>
+                                <select name="semester_ke" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required">
+                    <option value="">-- Semester Ke --</option>
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                        <option value="<?= $i ?>"><?= $i ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
+                                <select name="status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required>
+                                    <option value="">-- Pilih Status --</option>
+                                    <option value="aktif">aktif</option>
+                                    <option value="non-aktif">non-aktif</option>
+                                </select>
                             </div>
                         </div>
 
@@ -563,24 +634,34 @@ if (isset($_POST['tambah'])) {
                         <h3 class="text-xl font-bold mb-6">Mata Kuliah</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Kode Mata Kuliah</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Kode Mata Kuliah</label>
                                 <input type="text" name="kode_matkul"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Mata Kuliah</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Mata Kuliah</label>
                                 <input type="text" name="nama_matkul"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Semester</label>
-                                <input type="number" name="semester"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Semester</label>
+                                <select name="semester" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required">
+                    <option value="">-- Semester --</option>
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                        <option value="<?= $i ?>"><?= $i ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">SKS</label>
-                                <input type="number" name="sks"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">SKS</label>
+                                <select name="sks" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required>
+                                    <option value="">-- Pilih SKS --</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="6">6</option>
+                                </select>
                             </div>
                         </div>
 
@@ -588,8 +669,8 @@ if (isset($_POST['tambah'])) {
                         <h3 class="text-xl font-bold mb-6">Jadwal Mata Kuliah</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Mata Kuliah</label>
-                                <select name="matkul_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Mata Kuliah</label>
+                                <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Mata Kuliah --</option>
                                     <?php
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
@@ -605,8 +686,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Hari</label>
-                                <select name="hari" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Hari</label>
+                                <select name="hari" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Hari --</option>
                                     <option value="Senin">Senin</option>
                                     <option value="Selasa">Selasa</option>
@@ -616,29 +697,29 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Ruangan</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Ruangan</label>
                                 <input type="text" name="ruangan"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Jam Ke</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Ke</label>
                                 <input type="text" name="jam_ke"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Jam Mulai</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai</label>
                                 <input type="time" name="jam_mulai"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Jam Selesai</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai</label>
                                 <input type="time" name="jam_selesai"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
 
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Dosen Pengampu</label>
-                                <select name="dosen_pengampu_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Dosen Pengampu</label>
+                                <select name="dosen_pengampu_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Dosen Pengampu --</option>
                                     <?php
                                     $query_dp = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
@@ -649,8 +730,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Dosen Mitra</label>
-                                <select name="dosen_mitra_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Dosen Mitra</label>
+                                <select name="dosen_mitra_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Dosen Mitra --</option>
                                     <?php
                                     $query_dm = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
@@ -658,30 +739,30 @@ if (isset($_POST['tambah'])) {
                                         echo "<option value='{$dm['id']}'>{$dm['nama_dosen']}</option>";
                                     }
                                     ?>
-                                    </select>
+                                </select>
                             </div>
                         </div>
 
-                        <?php elseif ($tabel === 'dosen'): ?>
+                    <?php elseif ($tabel === 'dosen'): ?>
                         <h3 class="text-xl font-bold mb-6">Edit Dosen</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Dosen</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Dosen</label>
                                 <input type="text" name="nama_dosen" value="<?= $data['nama_dosen']; ?>"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">No HP</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">No HP</label>
                                 <input type="text" name="no_hp" value="<?= $data['no_hp']; ?>"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>
-                        <?php elseif ($tabel === 'tugas'): ?>
+                    <?php elseif ($tabel === 'tugas'): ?>
                         <h3 class="text-xl font-bold mb-6">Tambah Tugas</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Mata Kuliah</label>
-                                <select name="matkul_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Mata Kuliah</label>
+                                <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Mata Kuliah --</option>
                                     <?php
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
@@ -697,29 +778,29 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Deadline Tanggal</label>
-                                <input type="date" name="deadline_tanggal" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Deadline Tanggal</label>
+                                <input type="date" name="deadline_tanggal"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Deadline Pukul</label>
-                                <input type="time" name="deadline_pukul" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Deadline Pukul</label>
+                                <input type="time" name="deadline_pukul"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
-                                <input type="text" name="deskripsi" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Deskripsi</label>
+                                <input type="text" name="deskripsi"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">File Tugas</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">File Tugas</label>
                                 <input type="file" name="file_tugas" accept="file/*"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Link Kirim</label>
-                                <input type="text" name="link_kirim" 
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Link Kirim</label>
+                                <input type="text" name="link_kirim"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>
 
@@ -727,8 +808,8 @@ if (isset($_POST['tambah'])) {
                         <h3 class="text-xl font-bold mb-6">Users</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Kode Mata Kuliah</label>
-                                <select name="id" class="form-select" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Kode Mata Kuliah</label>
+                                <select name="id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Mahasiswa --</option>
                                     <?php
                                     $query_mhs = mysqli_query($koneksi, "SELECT * FROM mahasiswa ORDER BY nim ASC");
@@ -739,13 +820,13 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Password</label>
                                 <input type="password" name="password"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Role</label>
-                                <select name="role" class="form-control" required>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Role</label>
+                                <select name="role" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Role/Peran --</option>
                                     <option value="Administrator Utama">Administrator Utama</option>
                                     <option value="Ketua Tingkat">Ketua Tingkat</option>
@@ -760,47 +841,47 @@ if (isset($_POST['tambah'])) {
                         <h3 class="text-xl font-bold mb-6">Galeri Kegiatan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Judul Kegiatan</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Judul Kegiatan</label>
                                 <input type="text" name="judul" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Kegiatan</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Kegiatan</label>
                                 <input type="date" name="tanggal_kegiatan" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Foto-foto (Bisa pilih banyak)</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Foto-foto (Bisa pilih banyak)</label>
                                 <input type="file" name="fotos[]" multiple accept="image/*" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'akademik'): ?>
                         <h3 class="text-xl font-bold mb-6">Berita & Informasi Akademik</h3>
                         <div class="grid grid-cols-1 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Judul Berita</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Judul Berita</label>
                                 <input type="text" name="judul" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Deskripsi</label>
                                 <textarea name="deskripsi" rows="3" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></textarea>
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Link (Opsional)</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Link (Opsional)</label>
                                 <input type="text" name="link"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'kalender_akademik'): ?>
                         <h3 class="text-xl font-bold mb-6">Tambah Agenda Kalender Akademik</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Periode</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Periode</label>
                                 <select name="periode_id" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                                     <option value="">-- Pilih Periode --</option>
                                     <?php
                                     $q_per = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY id DESC");
@@ -811,19 +892,19 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Nama Kegiatan</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Kegiatan</label>
                                 <textarea name="kegiatan" rows="2" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></textarea>
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Mulai</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Mulai</label>
                                 <input type="date" name="tanggal_mulai" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Selesai</label>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Selesai</label>
                                 <input type="date" name="tanggal_selesai" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>
                     <?php endif; ?>
@@ -832,9 +913,9 @@ if (isset($_POST['tambah'])) {
                 <!-- Form Actions -->
                 <div class="flex justify-end space-x-4">
                     <button type="button"
-                        class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                        class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-xs">Cancel</button>
                     <button type="submit" name="tambah"
-                        class="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">Submit</button>
+                        class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
                 </div>
             </form>
         </div>

@@ -1,5 +1,13 @@
 <?php
+session_start();
 include '../../koneksi.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../../index.php");
+    exit;
+}
+$role = $_SESSION['role'];
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -32,13 +40,28 @@ include '../../koneksi.php';
                     Aspirasi dan pesan rahasia dari mahasiswa kelas PTIK C 2024.
                 </p>
             </div>
-            <a href="../../index.php" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
-                <div class="absolute inset-0 w-3 bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
+            <div class="flex flex-row gap-4">
+                <?php if ($role === 'Administrator Utama'): ?>
+                <a href="pesan.php" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
+                <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
+                <span class="relative flex items-center gap-2">
+                    <i class="fas fa-home transition-transform group-hover:-translate-x-1"></i>
+                    Database Pesan
+                </span>
+                
+            </a>
+            <?php endif; ?>
+<a href="dashboard.php" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
+                <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
                 <span class="relative flex items-center gap-2">
                     <i class="fas fa-home transition-transform group-hover:-translate-x-1"></i>
                     Kembali ke Beranda
                 </span>
+                
             </a>
+            
+            </div>
+            
         </div>
 
         <!-- Grid Pesan -->

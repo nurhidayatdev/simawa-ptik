@@ -16,6 +16,18 @@ if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_
     echo "<!DOCTYPE html>
     <html>
     <head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta name='theme-color' content='#1e1b4b' />
+    <link rel='icon' href='../img/main/icon.png' />
+    <title>Edit Kelompok - PTIK C 2024</title>
+    <link rel='icon' href='../img/main/icon.png' />
+  <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+    <style>
+        body { font-family: 'Poppins', sans-serif !important; }
+    </style>
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     </head>
     <body>
@@ -49,28 +61,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $groups = json_decode($groups_json, true);
 
     if ($mata_kuliah_id && is_array($groups)) {
+        $dosen_name = mysqli_real_escape_string($koneksi, $_POST['dosen'] ?? '');
+        $keterangan = mysqli_real_escape_string($koneksi, $_POST['keterangan'] ?? '');
+
         // Get matkul name for notification
         $q_mk = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = $mata_kuliah_id");
         $mk_data = mysqli_fetch_assoc($q_mk);
         $nama_matkul = $mk_data['nama_matkul'] ?? 'Mata Kuliah';
 
-        // Remove existing groups for this mata kuliah and period
-        $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ? AND periode_id = ?");
-        mysqli_stmt_bind_param($stmt, 'ii', $mata_kuliah_id, $periode_id);
+        // Remove existing groups for this specific set
+        $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ?");
+        mysqli_stmt_bind_param($stmt, 'iiss', $mata_kuliah_id, $periode_id, $dosen_name, $keterangan);
         mysqli_stmt_execute($stmt);
 
         // Insert new groups
-        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id) VALUES (?, ?, ?, ?)");
+        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id, dosen, keterangan) VALUES (?, ?, ?, ?, ?, ?)");
         $message_groups = "";
-        
+
         foreach ($groups as $no => $anggotaArr) {
-            $anggotaStr = implode(',', array_map(function($s){ return $s['nim']; }, $anggotaArr));
+            $anggotaStr = implode(',', array_map(function ($s) {
+                return $s['nim'];
+            }, $anggotaArr));
             $kel_no = $no + 1;
-            mysqli_stmt_bind_param($insert, 'iisi', $mata_kuliah_id, $kel_no, $anggotaStr, $periode_id);
+            mysqli_stmt_bind_param($insert, 'iisiss', $mata_kuliah_id, $kel_no, $anggotaStr, $periode_id, $dosen_name, $keterangan);
             mysqli_stmt_execute($insert);
 
             // Format message for Telegram
-            $namesArr = array_map(function($s){ return "• " . $s['nama_lengkap']; }, $anggotaArr);
+            $namesArr = array_map(function ($s) {
+                return "• " . $s['nama_lengkap'];
+            }, $anggotaArr);
             $message_groups .= "👥 *Kelompok {$kel_no}*\n" . implode("\n", $namesArr) . "\n\n";
         }
 
@@ -81,8 +100,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $telegram_chat_id = "-1003577478223";
 
         $message = "✏️ *PEMBARUAN DATA KELOMPOK*\n\n";
-        $message .= "📘 *Mata Kuliah:* " . $nama_matkul . "\n\n";
-        $message .= $message_groups;
+        $message .= "📘 *Mata Kuliah:* " . $nama_matkul . "\n";
+        $message .= "👨‍🏫 *Dosen:* " . $dosen_name . "\n";
+        if (!empty($keterangan)) {
+            $message .= "📝 *Keterangan:* " . $keterangan . "\n";
+        }
+        $message .= "\n" . $message_groups;
         $message .= "_Data kelompok telah diperbarui oleh Admin._ ⚠️";
 
         $tg_ip = "149.154.167.220";
@@ -109,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
 
         $_SESSION['success'] = "Kelompok berhasil diperbarui dan notifikasi telah dikirim ke Telegram.";
-        header("Location: db_kelompok.php?matkul_id=$mata_kuliah_id");
+        header("Location: db_kelompok.php?matkul_id=$mata_kuliah_id&dosen=" . urlencode($dosen_name) . "&keterangan=" . urlencode($keterangan));
         exit;
     }
 }
@@ -122,10 +145,13 @@ $matkuls = mysqli_query($koneksi, "SELECT DISTINCT jm.matkul_id AS id, mk.nama_m
 
 // Determine selected matkul
 $selected_matkul = intval($_GET['matkul_id'] ?? 0);
+$selected_dosen = $_GET['dosen'] ?? '';
+$selected_keterangan = $_GET['keterangan'] ?? '';
+
 $students = [];
 $existing_groups = [];
 
-if ($selected_matkul) {
+if ($selected_matkul && !empty($selected_dosen)) {
     // Load students
     $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
@@ -136,13 +162,15 @@ if ($selected_matkul) {
     }
 
     // Load existing groups
-    $stmt_g = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? ORDER BY kelompok_no");
-    mysqli_stmt_bind_param($stmt_g, 'ii', $selected_matkul, $periode_id);
+    $stmt_g = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ? ORDER BY kelompok_no");
+    mysqli_stmt_bind_param($stmt_g, 'iiss', $selected_matkul, $periode_id, $selected_dosen, $selected_keterangan);
     mysqli_stmt_execute($stmt_g);
     $res_g = mysqli_stmt_get_result($stmt_g);
-    
+
     $student_map = [];
-    foreach ($students as $s) { $student_map[$s['nim']] = $s['nama_lengkap']; }
+    foreach ($students as $s) {
+        $student_map[$s['nim']] = $s['nama_lengkap'];
+    }
 
     while ($r = mysqli_fetch_assoc($res_g)) {
         $nims = explode(',', $r['anggota']);
@@ -156,6 +184,7 @@ if ($selected_matkul) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -182,6 +211,7 @@ if ($selected_matkul) {
         }
     </style>
 </head>
+
 <body class="bg-slate-100">
     <header class="bg-indigo-950 fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
@@ -197,18 +227,122 @@ if ($selected_matkul) {
         </div>
     </header>
 
-    <aside id="sidebar" class="fixed left-0 top-0 h-screen w-48 bg-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200 z-40">
-        <div class="pt-16 mt-6 px-4">
-            <a href="db_kelompok.php" class="flex items-center px-4 py-2 text-slate-800 hover:bg-gray-100 rounded-lg">
-                <i class="fa fa-arrow-left mr-4"></i><span class="text-xs">Kembali</span>
-            </a>
+    <aside id="sidebar"
+        class="fixed left-0 top-0 h-screen w-48 bg-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out z-40">
+        <!-- Tambahan padding top agar tidak tertutup header -->
+        <div class="pt-16">
+            <nav class="mt-4 h-[calc(100vh-4rem)] overflow-y-auto pb-10">
+                <div class="px-4 space-y-2">
+                    <!-- Dashboard Menu -->
+                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
+                        <i class="fa fa-home w-4 h-4 mr-4"></i>
+                        <span class="text-xs">Beranda</span>
+                    </a>
+
+                    <!-- Components Menu -->
+                    <div class="space-y-1">
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akademik</p>
+                            <div class="space-y-1">
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-600"></i>
+                                        <span class="text-xs font-medium">Master</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="db_mahasiswa.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mahasiswa</a>
+                                    <a href="db_dosen.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Dosen</a>
+                                    <a href="db_matkul.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mata Kuliah</a>
+                                    <a href="db_berita.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Berita & Info</a>
+                                    <a href="db_kalender.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kalender</a>
+                                </div>
+
+                                <a href="db_jadwal.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Jadwal Kuliah</span>
+                                </a>
+                                <a href="db_absensi.php?matkul_id=33&pertemuan=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-calendar-check w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Absensi</span>
+                                </a>
+                                <a href="db_tugas.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Tugas Kuliah</span>
+                                </a>
+                                <a href="db_kelompok.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Kelompok</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Keuangan & Galeri</p>
+                            <div class="space-y-1">
+                                <a href="db_kas.php?minggu_ke=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-wallet w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Kas Mingguan</span>
+                                </a>
+                                <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Galeri Kelas</span>
+                                </a>
+                                <a href="db_pesan.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-comment-dots w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Pesan Anonim</span>
+                                </a>
+                                <a href="kuis_harian.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-gamepad w-5 h-5 mr-3 text-emerald-600"></i>
+                                    <span class="text-xs font-medium">Kuis Harian</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <?php if ($role === 'Administrator Utama'): ?>
+                            <div>
+                                <p class="px-4 text-[10px] font-semibold text-red-400 uppercase tracking-wider mb-2">Administrator</p>
+                                <div class="space-y-1">
+                                    <a href="db_users.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-user-shield w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Manajemen User</span>
+                                    </a>
+                                    <a href="db_periode.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-clock w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Periode Akademik</span>
+                                    </a>
+                                    <a href="reminder.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                        <i class="fa fa-paper-plane w-5 h-5 mr-3"></i>
+                                        <span class="text-xs font-medium">Reminder Telegram</span>
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
+                            <div class="space-y-1">
+                                <a href="profile.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-user-circle w-5 h-5 mr-3 text-slate-600"></i>
+                                    <span class="text-xs font-medium">Profile Saya</span>
+                                </a>
+                                <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
+                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
+                                    <span class="text-xs font-medium">Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
         </div>
     </aside>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow">
             <h3 class="text-xl font-bold text-slate-800 mb-6">Edit Kelompok Terdaftar</h3>
-            
+
             <div class="flex flex-wrap items-end gap-4 mb-4">
                 <form id="selectForm" method="GET" class="flex-1 min-w-[200px]">
                     <label class="text-xs block mb-1">Mata Kuliah</label>
@@ -223,8 +357,10 @@ if ($selected_matkul) {
                 <form id="kelompokForm" method="POST" class="flex flex-wrap items-end gap-2">
                     <input type="hidden" name="action" value="save">
                     <input type="hidden" name="mata_kuliah_id" value="<?= $selected_matkul ?>">
+                    <input type="hidden" name="dosen" value="<?= htmlspecialchars($selected_dosen) ?>">
+                    <input type="hidden" name="keterangan" value="<?= htmlspecialchars($selected_keterangan) ?>">
                     <input type="hidden" name="groups_json" id="groups_json">
-                    
+
                     <div>
                         <label class="text-xs block mb-1">Orang per Kelompok</label>
                         <input id="per_group" type="number" min="1" max="15" value="3" class="w-full px-3 py-2 border rounded text-xs" />
@@ -239,98 +375,116 @@ if ($selected_matkul) {
         </div>
     </main>
 
-<script>
-const students = <?= json_encode($students) ?>;
-const existingGroups = <?= json_encode($existing_groups) ?>;
-let currentGroups = [];
+    <script>
+        const students = <?= json_encode($students) ?>;
+        const existingGroups = <?= json_encode($existing_groups) ?>;
+        let currentGroups = [];
 
-window.addEventListener('DOMContentLoaded', () => {
-    if (existingGroups && existingGroups.length > 0) {
-        renderEditable(existingGroups);
-    }
-});
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-function renderEditable(groups) {
-    currentGroups = groups;
-    const container = document.getElementById('groupsContainer');
-    container.innerHTML = '';
-
-    const used = {};
-    currentGroups.forEach(g => g.forEach(s => { if (s && s.nim) used[s.nim] = true; }));
-    const available = students.filter(s => !used[s.nim]);
-
-    groups.forEach((g, idx) => {
-        const div = document.createElement('div');
-        div.className = 'p-4 border rounded bg-slate-50 w-56 flex flex-col';
-        div.innerHTML = `<h4 class="font-semibold mb-2">Kelompok ${idx+1}</h4>`;
-        
-        const ul = document.createElement('ul');
-        ul.className = 'list-disc pl-5 text-xs mb-2';
-        g.forEach((s, si) => {
-            const li = document.createElement('li');
-            li.className = 'flex justify-between items-center mb-1';
-            li.innerHTML = `<span>${s.nama_lengkap}</span><button type="button" class="text-red-500 ml-2" onclick="removeMember(${idx}, ${si})"><i class="fa fa-times"></i></button>`;
-            ul.appendChild(li);
+        window.addEventListener('DOMContentLoaded', () => {
+            if (existingGroups && existingGroups.length > 0) {
+                renderEditable(existingGroups);
+            }
         });
-        div.appendChild(ul);
 
-        const select = document.createElement('select');
-        select.className = 'w-full px-2 py-1 border rounded text-[10px] mb-1';
-        select.innerHTML = '<option value="">+ Tambah Anggota</option>';
-        available.forEach(s => { select.innerHTML += `<option value="${s.nim}">${s.nama_lengkap}</option>`; });
-        select.onchange = () => { if(select.value) { addMember(idx, select.value); } };
-        div.appendChild(select);
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
 
-        container.appendChild(div);
-    });
-    document.getElementById('groups_json').value = JSON.stringify(currentGroups);
-}
+        function renderEditable(groups) {
+            currentGroups = groups;
+            const container = document.getElementById('groupsContainer');
+            container.innerHTML = '';
 
-function removeMember(gIdx, mIdx) {
-    currentGroups[gIdx].splice(mIdx, 1);
-    renderEditable(currentGroups);
-}
+            const used = {};
+            currentGroups.forEach(g => g.forEach(s => {
+                if (s && s.nim) used[s.nim] = true;
+            }));
+            const available = students.filter(s => !used[s.nim]);
 
-function addMember(gIdx, nim) {
-    const s = students.find(x => x.nim === nim);
-    if(s) {
-        currentGroups[gIdx].push(s);
-        renderEditable(currentGroups);
-    }
-}
+            groups.forEach((g, idx) => {
+                const div = document.createElement('div');
+                div.className = 'p-4 border rounded bg-slate-50 w-56 flex flex-col';
+                div.innerHTML = `<h4 class="font-semibold mb-2">Kelompok ${idx+1}</h4>`;
 
-document.getElementById('acakBtn').onclick = () => {
-    const per = parseInt(document.getElementById('per_group').value) || 1;
-    const copy = [...students]; shuffleArray(copy);
-    const groups = [];
-    for (let i = 0; i < copy.length; i += per) { groups.push(copy.slice(i, i + per)); }
-    renderEditable(groups);
-};
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc pl-5 text-xs mb-2';
+                g.forEach((s, si) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex justify-between items-center mb-1';
+                    li.innerHTML = `<span>${s.nama_lengkap}</span><button type="button" class="text-red-500 ml-2" onclick="removeMember(${idx}, ${si})"><i class="fa fa-times"></i></button>`;
+                    ul.appendChild(li);
+                });
+                div.appendChild(ul);
 
-document.getElementById('manualBtn').onclick = () => {
-    const per = parseInt(document.getElementById('per_group').value) || 1;
-    const n = Math.ceil(students.length / per) || 1;
-    const groups = Array.from({length: n}, () => []);
-    renderEditable(groups);
-};
+                const select = document.createElement('select');
+                select.className = 'w-full px-2 py-1 border rounded text-[10px] mb-1';
+                select.innerHTML = '<option value="">+ Tambah Anggota</option>';
+                available.forEach(s => {
+                    select.innerHTML += `<option value="${s.nim}">${s.nama_lengkap}</option>`;
+                });
+                select.onchange = () => {
+                    if (select.value) {
+                        addMember(idx, select.value);
+                    }
+                };
+                div.appendChild(select);
 
-document.getElementById('kelompokForm').onsubmit = (e) => {
-    if(!document.getElementById('groups_json').value || JSON.parse(document.getElementById('groups_json').value).length === 0) {
-        e.preventDefault(); alert('Kelompok belum diatur!');
-    }
-};
+                container.appendChild(div);
+            });
+            document.getElementById('groups_json').value = JSON.stringify(currentGroups);
+        }
 
-// Sidebar/Mobile logic inherited
-const mobileBtn = document.getElementById('mobile-menu-button');
-const side = document.getElementById('sidebar');
-mobileBtn.onclick = () => { side.classList.toggle('-translate-x-full'); side.classList.toggle('mobile-menu-open'); };
-</script>
+        function removeMember(gIdx, mIdx) {
+            currentGroups[gIdx].splice(mIdx, 1);
+            renderEditable(currentGroups);
+        }
+
+        function addMember(gIdx, nim) {
+            const s = students.find(x => x.nim === nim);
+            if (s) {
+                currentGroups[gIdx].push(s);
+                renderEditable(currentGroups);
+            }
+        }
+
+        document.getElementById('acakBtn').onclick = () => {
+            const per = parseInt(document.getElementById('per_group').value) || 1;
+            const copy = [...students];
+            shuffleArray(copy);
+            const groups = [];
+            for (let i = 0; i < copy.length; i += per) {
+                groups.push(copy.slice(i, i + per));
+            }
+            renderEditable(groups);
+        };
+
+        document.getElementById('manualBtn').onclick = () => {
+            const per = parseInt(document.getElementById('per_group').value) || 1;
+            const n = Math.ceil(students.length / per) || 1;
+            const groups = Array.from({
+                length: n
+            }, () => []);
+            renderEditable(groups);
+        };
+
+        document.getElementById('kelompokForm').onsubmit = (e) => {
+            if (!document.getElementById('groups_json').value || JSON.parse(document.getElementById('groups_json').value).length === 0) {
+                e.preventDefault();
+                alert('Kelompok belum diatur!');
+            }
+        };
+
+        // Sidebar/Mobile logic inherited
+        const mobileBtn = document.getElementById('mobile-menu-button');
+        const side = document.getElementById('sidebar');
+        mobileBtn.onclick = () => {
+            side.classList.toggle('-translate-x-full');
+            side.classList.toggle('mobile-menu-open');
+        };
+    </script>
 </body>
+
 </html>
