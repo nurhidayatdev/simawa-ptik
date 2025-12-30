@@ -80,14 +80,14 @@ if (isset($_POST['simpan_kas'])) {
             $exists = mysqli_num_rows($res) > 0;
             $existing = $exists ? mysqli_fetch_assoc($res) : null;
 
-            // Determine tanggal to save: if posted non-empty use it, else keep existing if exists, else NULL
+            // Determine tanggal to save
             $tanggal_to_save = null;
-            if ($posted_tanggal !== '') {
+            if ($status_safe === 'Belum') {
+                $tanggal_to_save = null;
+            } elseif ($posted_tanggal !== '') {
                 $tanggal_to_save = mysqli_real_escape_string($koneksi, $posted_tanggal);
             } elseif ($exists && !empty($existing['tanggal_bayar'])) {
                 $tanggal_to_save = $existing['tanggal_bayar'];
-            } else {
-                $tanggal_to_save = null;
             }
 
             if ($exists) {
@@ -102,7 +102,7 @@ if (isset($_POST['simpan_kas'])) {
                 if ($tanggal_to_save !== null) {
                     mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$tanggal_to_save', '$periode_id')");
                 } else {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$periode_id')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', NULL, '$periode_id')");
                 }
             }
         }
@@ -378,7 +378,7 @@ if (isset($_POST['simpan_kas'])) {
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                             <?php $status_current = $row['status'] ?? 'Belum'; ?>
                                             <select name="status[<?= $row['mahasiswa_id'] ?>]"
-                                                class="border p-1 rounded">
+                                                class="border p-1 rounded status-select" data-mhs-id="<?= $row['mahasiswa_id'] ?>">
                                                     <option value="Lunas" <?= $status_current == 'Lunas' ? 'selected' : '' ?>>Lunas</option>
                                                     <option value="Belum" <?= $status_current == 'Belum' ? 'selected' : '' ?>>Belum</option>
                                                 </select>
@@ -386,7 +386,11 @@ if (isset($_POST['simpan_kas'])) {
 
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                             <?php $tanggal_current = $row['tanggal_bayar'] ?? ''; ?>
-                                            <input type="date" name="tanggal[<?= $row['mahasiswa_id'] ?>]" value="<?= htmlspecialchars($tanggal_current) ?>" class="border p-1 rounded text-xs">
+                                            <input type="date" name="tanggal[<?= $row['mahasiswa_id'] ?>]" 
+                                                id="tanggal_<?= $row['mahasiswa_id'] ?>"
+                                                value="<?= htmlspecialchars($tanggal_current) ?>" 
+                                                class="border p-1 rounded text-xs date-input"
+                                                <?= ($status_current == 'Belum') ? 'disabled' : '' ?>>
                                         </td>
 
 
@@ -460,6 +464,34 @@ if (isset($_POST['simpan_kas'])) {
         }
 
         // no-op: filter handled by GET form onchange submit
+        
+        // Handle Status vs Date Automation
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const mhsId = this.getAttribute('data-mhs-id');
+                const dateInput = document.getElementById('tanggal_' + mhsId);
+                
+                if (this.value === 'Lunas') {
+                    dateInput.disabled = false;
+                    // Hanya set tanggal hari ini jika input masih kosong
+                    if (!dateInput.value) {
+                        const today = ScriptGetToday(); 
+                        dateInput.value = today;
+                    }
+                } else {
+                    dateInput.value = '';
+                    dateInput.disabled = true;
+                }
+            });
+        });
+
+        function ScriptGetToday() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
     </script>
 </body>
 
