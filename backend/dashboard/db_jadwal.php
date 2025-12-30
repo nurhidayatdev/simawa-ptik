@@ -291,7 +291,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
                             <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                             <a href="../crud/kirim_jadwal.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Telegram" onclick="return confirm('Kirim jadwal besok ke Telegram?');">
-                                <i class="fa-brands fa-telegram"></i>
+                                <i class="fa fa-paper-plane"></i>
                             </a>
                             <?php endif; ?>
 

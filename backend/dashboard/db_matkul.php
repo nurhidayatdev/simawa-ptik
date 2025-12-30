@@ -12,25 +12,26 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
-$search = $_GET['search'] ?? '';
+$semester_filter = $_GET['semester'] ?? '';
 
-if (!empty($search)) {
-    $stmt = mysqli_prepare(
-        $koneksi,
-        "SELECT * FROM mata_kuliah 
-         WHERE kode_matkul LIKE ? 
-         OR nama_matkul LIKE ? 
-         OR semester LIKE ?
-         OR sks LIKE ?
-         ORDER BY semester ASC"
-    );
+$query = "SELECT * FROM mata_kuliah WHERE 1=1";
+if (!empty($semester_filter)) {
+    $query .= " AND semester = ?";
+}
+$query .= " ORDER BY semester ASC, nama_matkul ASC";
 
-    $like = "%$search%";
-    mysqli_stmt_bind_param($stmt, "ssii", $like, $like, $like, $like);
+$stmt = mysqli_prepare($koneksi, $query);
+if (!empty($semester_filter)) {
+    mysqli_stmt_bind_param($stmt, "i", $semester_filter);
     mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+    $res = mysqli_stmt_get_result($stmt);
 } else {
-    $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester ASC");
+    $res = mysqli_query($koneksi, $query);
+}
+
+$matkul_data = [];
+while ($row = mysqli_fetch_assoc($res)) {
+    $matkul_data[] = $row;
 }
 
 
@@ -207,15 +208,22 @@ if (!empty($search)) {
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
-            <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Mata Kuliah</h3>
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto md:w-auto">
                     <form method="GET" class="w-full">
-                        <div class="flex flex-row gap-2 items-center">
+                        <div class="flex flex-row gap-2 w-full items-center">
+                            <select name="semester" onchange="this.form.submit()" 
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs  bg-white">
+                                <option value="">Semua Semester</option>
+                                <?php for($i=1; $i<=8; $i++): ?>
+                                    <option value="<?= $i ?>" <?= $semester_filter == $i ? 'selected' : '' ?>>Semester <?= $i ?></option>
+                                <?php endfor; ?>
+                            </select>
 
-
-                            <a href="../crud/tambah.php?tabel=mata_kuliah" class="basis-1/5 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
+                            <a href="../crud/tambah.php?tabel=mata_kuliah" 
+                                class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center " 
+                                title="Tambah">
                                 <i class="fa fa-plus"></i>
                             </a>
                         </div>
@@ -223,7 +231,16 @@ if (!empty($search)) {
                 </div>
             </div>
 
-            <?php for ($s = 1; $s <= 8; $s++): ?>
+            <?php 
+            $start_s = !empty($semester_filter) ? (int)$semester_filter : 1;
+            $end_s = !empty($semester_filter) ? (int)$semester_filter : 8;
+            for ($s = $start_s; $s <= $end_s; $s++): 
+                $semester_rows = array_filter($matkul_data, function($m) use ($s) {
+                    return (int)$m['semester'] === $s;
+                });
+                
+                if (empty($semester_rows) && !empty($semester_filter)) continue;
+            ?>
                 <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-200">
@@ -241,10 +258,10 @@ if (!empty($search)) {
                             <?php
                             $no = 1;
                             $id = 1;
-                            $found = false;
-                            foreach ($result as $m) {
-                                if ((int)$m['semester'] !== $s) continue;
-                                $found = true;
+                            if (empty($semester_rows)) {
+                                echo '<tr><td colspan="5" class="px-3 py-4 text-center text-xs text-slate-500 italic">Tidak ada data untuk semester ini</td></tr>';
+                            } else {
+                                foreach ($semester_rows as $m) {
                             ?>
                                 <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= $no++; ?></td>
@@ -262,7 +279,7 @@ if (!empty($search)) {
 
                                     </td>
                                 </tr>
-                            <?php } ?>
+                            <?php } } ?>
                         </tbody>
                     </table>
                 </div>

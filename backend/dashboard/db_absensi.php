@@ -320,13 +320,15 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         
 
-                        <a href="?export=csv&matkul_id=<?= urlencode($_GET['matkul_id'] ?? '') ?>&pertemuan=<?= $_GET['pertemuan'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class=" bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center">Export CSV</a>
                         
-                        <a href="absensi.php?matkul_id=<?= $_GET['matkul_id']; ?>&pertemuan=<?= $_GET['pertemuan']; ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                        <div class="flex flex-row gap-2 items-center">
+                        <a href="absensi.php?matkul_id=<?= $_GET['matkul_id']; ?>&pertemuan=<?= $_GET['pertemuan']; ?>" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
                            
                                 Absensi
                           
                         </a>
+                        <a href="?export=csv&matkul_id=<?= urlencode($_GET['matkul_id'] ?? '') ?>&pertemuan=<?= $_GET['pertemuan'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
+                    </div>
                     </form>
                 </div>
 <?php endif; ?>

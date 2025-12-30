@@ -221,29 +221,33 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h3 class="text-xl font-bold text-slate-800">Data Absensi</h3>
+                <h3 class="text-xl font-bold text-slate-800">Data Kas Mingguan</h3>
                 <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        
+                        <div class="flex flex-row gap-2 items-center">
 
-                        <a href="arus_kas.php" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center w-full">Arus Kas</a>
                         
-                            <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class=" bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Bayar Kas</a>
+                            
+                            <a href="arus_kas.php" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center w-full">Detail Kas</a>
+                        
+                            <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="whitespace-nowrap bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Input Kas</a>
                             
                             <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
-                            <a href="../crud/kirim_reminder_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?>" class=" bg-sky-600 text-white px-3 py-2 rounded-lg hover:bg-sky-800 text-center text-xs flex items-center justify-center w-full">Kirim Reminder</a>
+                            <a href="../crud/kirim_reminder_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?>" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center"><i class="fa fa-paper-plane"></i></a>
                             <?php endif; ?>
 
-                            <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center">Export CSV</a>
+                            <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
+
                             
                     </form>
-                
+                </div>
             </div>
             <?php endif; ?>
         </div>
 
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <form method="GET" class="grid grid-cols-2 gap-4 mb-6">
+            
             <select name="minggu_ke" required onchange="this.form.submit()" class="border rounded px-4 py-2 text-xs">
                 <option value="">-- Pilih Minggu --</option>
                 <?php for ($i = 1; $i <= 16; $i++): ?>

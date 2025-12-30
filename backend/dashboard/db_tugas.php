@@ -260,7 +260,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
 							<select name="status" id="statusFilter" onchange="this.form.submit()" 
-								class="basis-1/5 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-[10px]">
+								class="basis-1/5 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
 								<option value="belum" <?= ($status_filter == 'belum') ? 'selected' : '' ?>>Belum Selesai</option>
 								<option value="selesai" <?= ($status_filter == 'selesai') ? 'selected' : '' ?>>Selesai</option>
 							</select>
@@ -270,12 +270,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								name="search"
 								value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
 								placeholder="Cari Mata Kuliah / Deskripsi..."
-								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-[10px]">
+								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
 
-							<a href="../crud/kirim_reminder.php" class="basis-1/5 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
+							<a href="../crud/kirim_reminder.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
 								<i class="fa fa-paper-plane"></i>
 							</a>
-							<a href="../crud/tambah.php?tabel=tugas" class="basis-1/5 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
+							<a href="../crud/tambah.php?tabel=tugas" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
 								<i class="fa fa-plus"></i>
 							</a>
 						</div>
