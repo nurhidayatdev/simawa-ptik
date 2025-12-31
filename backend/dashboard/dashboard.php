@@ -77,10 +77,13 @@ $q_recent_pesan = mysqli_query($koneksi, "SELECT * FROM pesan ORDER BY tanggal D
 
 
 // Kuis Harian Leaderboard
-$q_kuis_harian = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, s.current_streak, s.total_games 
+$yesterday_date = date('Y-m-d', strtotime('-1 day'));
+$q_kuis_harian = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, 
+    IF(s.last_played_date >= '$yesterday_date', s.current_streak, 0) AS current_streak, 
+    s.total_games 
     FROM kuis_harian_stats s 
     JOIN mahasiswa m ON s.user_id = m.user_id 
-    ORDER BY s.current_streak DESC, s.total_games DESC 
+    ORDER BY current_streak DESC, s.total_games DESC 
     LIMIT 5");
 
 // --- DATA UNTUK SLIDER ---
@@ -251,12 +254,11 @@ while ($current <= $last) {
 
 function getFireColor($streak)
 {
-    if ($streak >= 1000) return '#ff0000';
-    if ($streak >= 500) return '#ff00ff';
-    if ($streak >= 200) return '#00ffff';
-    if ($streak >= 100) return '#ffd700';
-    if ($streak >= 50) return '#ff6600';
-    if ($streak >= 30) return '#9966ff';
+    if ($streak >= 500) return '#ff0000';
+    if ($streak >= 200) return '#ff00ff';
+    if ($streak >= 100) return '#00ffff';
+    if ($streak >= 50) return '#ffd700';
+    if ($streak >= 30) return '#ff6600';
     if ($streak >= 10) return '#3399ff';
     if ($streak >= 3) return '#ff9500';
     return null;
