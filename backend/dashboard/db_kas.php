@@ -226,12 +226,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <div class="flex flex-row gap-2 items-center">
-
                         
                             
                             <a href="arus_kas.php" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center w-full">Detail Kas</a>
                         
-                            <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="whitespace-nowrap bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Input Kas</a>
+                            <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="whitespace-nowrap bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Input Minggu</a>
+
+                            <a href="kas_individu.php" class="whitespace-nowrap bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center w-full">Input Individu</a>
                             
                             <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
                             <a href="../crud/kirim_reminder_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?>" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center"><i class="fa fa-paper-plane"></i></a>
@@ -312,6 +313,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                                 Status</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Tanggal Bayar</th>
+                            <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
+                                Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
@@ -338,6 +341,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                                 }
                                 ?>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $tanggal; ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-center text-xs">
+                                    <a href="kas_individu.php?mahasiswa_id=<?= $row['mahasiswa_id'] ?>" class="text-indigo-600 hover:text-indigo-900" title="Input Individu">
+                                        <i class="fa fa-user-edit"></i>
+                                    </a>
+                                </td>
 
 
                             </tr>

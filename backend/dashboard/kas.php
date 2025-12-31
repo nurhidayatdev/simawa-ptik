@@ -289,7 +289,8 @@ if (isset($_POST['simpan_kas'])) {
                 <h3 class="text-xl font-bold text-slate-800">Bayar Kas</h3>
                 <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-<a href="db_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Kembali</a>
+                        <a href="kas_individu.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Input Individu</a>
+                        <a href="db_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-xs text-center">Kembali</a>
                     </form>
                 </div>
                 
