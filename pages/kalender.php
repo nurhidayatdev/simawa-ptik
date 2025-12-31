@@ -10,7 +10,7 @@ $active_id = $active_period['id'] ?? 0;
 $periode_id = $_GET['periode_id'] ?? $active_id;
 
 // Fetch periods for dropdown
-$periods = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY id DESC");
+$periods = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY semester_ke DESC");
 
 // Fetch calendar events
 $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_id = '$periode_id' ORDER BY tanggal_mulai ASC");

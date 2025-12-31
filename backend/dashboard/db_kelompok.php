@@ -208,7 +208,7 @@ if ($selected_matkul) {
                             </div>
                         </div>
 
-                        <?php if ($role === 'Administrator Utama'): ?>
+                        <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                             <div>
                                 <p class="px-4 text-[10px] font-semibold text-red-400 uppercase tracking-wider mb-2">Administrator</p>
                                 <div class="space-y-1">

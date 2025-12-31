@@ -33,7 +33,6 @@ FROM jadwal_matkul jm
 JOIN mata_kuliah mk ON jm.matkul_id = mk.id
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id 
-LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id 
          WHERE (jm.hari LIKE ? 
          OR mk.nama_matkul LIKE ?)
          AND jm.periode_id = ?
@@ -74,10 +73,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['sks']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['dosen_pengampu']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['dosen_mitra']) . '</td>';
+        if ($role === 'Administrator Utama' || $role === 'Sekretaris'):
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
         echo '<a href="../crud/edit.php?tabel=jadwal_matkul&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
         echo '<a href="../crud/hapus.php?tabel=jadwal_matkul&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus jadwal ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
         echo '</td>';
+        endif;
         echo '</tr>';
     }
     exit;
@@ -293,11 +294,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <a href="../crud/kirim_jadwal.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Telegram" onclick="return confirm('Kirim jadwal besok ke Telegram?');">
                                 <i class="fa fa-paper-plane"></i>
                             </a>
-                            <?php endif; ?>
+                          
 
                             <a href="../crud/tambah.php?tabel=jadwal_matkul" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
                                 <i class="fa fa-plus"></i>
                             </a>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>
@@ -328,8 +330,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 Dosen Pengampu</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Dosen Mitra</th>
+<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Actions</th>
+                                <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
@@ -350,12 +354,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['sks']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['dosen_mitra']; ?></td>
+                                <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                     <a href="../crud/edit.php?tabel=jadwal_matkul&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
 
                                     <a href="../crud/hapus.php?tabel=jadwal_matkul&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus jadwal ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
 
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>

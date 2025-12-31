@@ -37,10 +37,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_dosen']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['no_hp']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-blue-600">';
+         if (!empty($row['no_hp'])): 
+                                            echo '<a href="https://wa.me/' . htmlspecialchars($row['no_hp']) . '" target="_blank" class="hover:underline">Chat WhatsApp →</a>';
+                                        else: 
+                                            echo '<span class="text-gray-400">-</span>';
+                                        endif; 
+                                    echo '</td>';
+        if ($role === 'Administrator Utama'):
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
         echo '<a href="../crud/edit.php?tabel=dosen&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
         echo '<a href="../crud/hapus.php?tabel=dosen&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus data dosen ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
         echo '</td>';
+        endif;
         echo '</tr>';
     }
     exit;
@@ -222,10 +231,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
                             <input id="searchInput" type="text" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" placeholder="Cari Nama..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-
+<?php if ($role === 'Administrator Utama'): ?>
                             <a href="../crud/tambah.php?tabel=dosen" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
                                 <i class="fa fa-plus"></i>
                             </a>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>
@@ -238,7 +248,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Dosen</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No HP</th>
+                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Hubungi</th>
+                            <?php if ($role === 'Administrator Utama'): ?>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Actions</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
@@ -250,10 +263,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo $no++; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo htmlspecialchars($row['nama_dosen']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo htmlspecialchars($row['no_hp']); ?></td>
+                                <td class="px-3 py-2 text-xs text-blue-600">
+                                        <?php if (!empty($row['no_hp'])): ?>
+                                            <a href="https://wa.me/<?php echo htmlspecialchars($row['no_hp']); ?>" target="_blank" class="hover:underline">Chat WhatsApp →</a>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                <?php if ($role === 'Administrator Utama'): ?>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                     <a href="../crud/edit.php?tabel=dosen&id=<?php echo $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
                                     <a href="../crud/hapus.php?tabel=dosen&id=<?php echo $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus data dosen ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>

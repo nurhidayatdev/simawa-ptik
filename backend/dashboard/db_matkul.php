@@ -220,12 +220,13 @@ while ($row = mysqli_fetch_assoc($res)) {
                                     <option value="<?= $i ?>" <?= $semester_filter == $i ? 'selected' : '' ?>>Semester <?= $i ?></option>
                                 <?php endfor; ?>
                             </select>
-
+<?php if ($role === 'Administrator Utama'): ?>
                             <a href="../crud/tambah.php?tabel=mata_kuliah" 
                                 class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center " 
                                 title="Tambah">
                                 <i class="fa fa-plus"></i>
                             </a>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>
@@ -250,8 +251,10 @@ while ($row = mysqli_fetch_assoc($res)) {
                                 <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Kode</th>
                                 <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Mata Kuliah</th>
                                 <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">SKS</th>
+                                <?php if ($role === 'Administrator Utama'): ?>
                                 <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
                                     Actions</th>
+                                    <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-200">
@@ -268,6 +271,7 @@ while ($row = mysqli_fetch_assoc($res)) {
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
+                                    <?php if ($role === 'Administrator Utama'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 text-center">
                                         <a href="../crud/edit.php?tabel=mata_kuliah&id=<?= $m['id']; ?>" title="Edit">
                                             <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
@@ -278,6 +282,7 @@ while ($row = mysqli_fetch_assoc($res)) {
                                         </a>
 
                                     </td>
+                                    <?php endif; ?>
                                 </tr>
                             <?php } } ?>
                         </tbody>

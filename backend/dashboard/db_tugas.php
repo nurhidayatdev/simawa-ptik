@@ -71,10 +71,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		}
 		$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
 		echo '<td class="px-3 py-2 whitespace-nowrap text-xs"><span class="px-2 py-1 rounded-full border ' . $statusColor . '">' . ucfirst($row['status']) . '</span></td>';
+		if ($role === 'Administrator Utama' || $role === 'Sekretaris'):
 		echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
 		echo '<a href="../crud/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
 		echo '<a href="../crud/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus tugas ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
 		echo '</td>';
+		endif;
 		echo '</tr>';
 	}
 	exit;
@@ -255,7 +257,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			<!-- Modified this section for better mobile responsiveness -->
 			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
 				<h3 class="text-xl font-bold text-slate-800">Data Tugas</h3>
-				<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+				
 				<div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
@@ -271,17 +273,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
 								placeholder="Cari Mata Kuliah / Deskripsi..."
 								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-
+<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
 							<a href="../crud/kirim_reminder.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
 								<i class="fa fa-paper-plane"></i>
 							</a>
 							<a href="../crud/tambah.php?tabel=tugas" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
 								<i class="fa fa-plus"></i>
 							</a>
+							<?php endif; ?>
 						</div>
 					</form>
 				</div>
-				<?php endif; ?>
+				
 			</div>
 
 			<div class="overflow-x-auto">
@@ -302,8 +305,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								Link Kirim</th>
 							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Status</th>
+								<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
 							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Actions</th>
+								<?php endif; ?>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-slate-200">
@@ -327,13 +332,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 									?>
 									<span class="px-2 py-1 rounded-full border <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
 								</td>
-
+<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
 								<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
 									<a href="../crud/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
 
 									<a href="../crud/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus tugas ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
 
 								</td>
+								<?php endif; ?>
 							</tr>
 						<?php endwhile; ?>
 					</tbody>

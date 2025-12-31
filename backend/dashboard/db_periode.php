@@ -60,7 +60,7 @@ if (!empty($search)) {
         "SELECT * FROM periode 
          WHERE tahun_periode LIKE ? 
          OR semester_nama LIKE ?
-         ORDER BY id DESC"
+         ORDER BY semester_ke DESC"
     );
 
     $like = "%$search%";
@@ -68,7 +68,7 @@ if (!empty($search)) {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
-    $result = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY id DESC");
+    $result = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY semester_ke DESC");
 }
 
 // If this is an AJAX live-search request, return only the table rows

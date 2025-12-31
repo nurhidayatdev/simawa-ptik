@@ -59,10 +59,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
         echo '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['bio']) . '</td>';
+         if ($role === 'Administrator Utama'):
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
+       
         echo '<a href="../crud/edit.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
         echo '<a href="../crud/hapus.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus mahasiswa ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
         echo '</td>';
+        endif;
         echo '</tr>';
     }
     exit;
@@ -256,10 +259,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
                                 placeholder="Cari NIM / Nama..."
                                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-
+<?php if ($role === 'Administrator Utama'): ?>
                             <a href="../crud/tambah.php?tabel=mahasiswa" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
                                 <i class="fa fa-plus"></i>
                             </a>
+                            <?php endif; ?>
                         </div>
                     </form>
                 </div>
@@ -286,8 +290,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 Instagram</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Bio</th>
+                                <?php if ($role === 'Administrator Utama'): ?>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Actions</th>
+                                <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
@@ -321,7 +327,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['bio']; ?></td>
-
+<?php if ($role === 'Administrator Utama'): ?>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                     <a href="../crud/edit.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Edit">
                                         <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
@@ -332,6 +338,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     </a>
 
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
