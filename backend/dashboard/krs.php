@@ -303,8 +303,8 @@ while ($row = mysqli_fetch_assoc($krs)) {
                 <?php endfor; ?>
 
                 <button type="submit"
-                    class="mt-4 px-4 py-2 bg-indigo-800 text-white rounded hover:bg-indigo-950 text-xs">
-                    Simpan KRS
+                    class="mt-6 px-4 py-2 bg-indigo-800 text-white rounded hover:bg-indigo-950 text-xs">
+                    <i class="fa fa-save"></i> Simpan KRS
                 </button>
             </form>
 

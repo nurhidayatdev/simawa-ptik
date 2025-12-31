@@ -125,14 +125,29 @@ $arus_out = mysqli_fetch_assoc($q_arus_out)['total'] ?? 0;
 $saldo_sekarang = ($kas_total + $arus_in) - $arus_out;
 
 // Statistik Pembayaran Kas
-$q_kas_stats = mysqli_query($koneksi, "SELECT 
-    COUNT(*) as total,
-    SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
-    FROM kas 
-    WHERE periode_id = '$periode_id'");
+$filter_minggu_kas = $_GET['kas_minggu'] ?? '';
+if (!empty($filter_minggu_kas)) {
+    $q_kas_stats = mysqli_query($koneksi, "SELECT 
+        (SELECT COUNT(*) FROM mahasiswa) as total,
+        SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
+        FROM kas 
+        WHERE periode_id = '$periode_id' AND minggu_ke = '$filter_minggu_kas'");
+} else {
+    $q_kas_stats = mysqli_query($koneksi, "SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
+        FROM kas 
+        WHERE periode_id = '$periode_id'");
+}
 $kas_stats_data = mysqli_fetch_assoc($q_kas_stats);
 $total_k = (int)($kas_stats_data['total'] ?? 0);
 $lunas_k = (int)($kas_stats_data['lunas'] ?? 0);
+
+// Jika filter minggu aktif, totalnya adalah jumlah mahasiswa
+if (!empty($filter_minggu_kas)) {
+    $total_k = $counts['mahasiswa'] ?? $total_k;
+}
+
 $belum_k = $total_k - $lunas_k;
 $persen_lunas = $total_k > 0 ? round(($lunas_k / $total_k) * 100) : 0;
 
@@ -669,9 +684,9 @@ function getFireColor($streak)
                         <span class="text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-700 font-bold">Saldo Aktif</span>
                     </h3>
                     <div class="space-y-4">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="bg-slate-50 p-3 px-4 rounded-xl border border-slate-100">
                             <div class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Saldo Sekarang</div>
-                            <div class="text-2xl font-black text-slate-800">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
+                            <div class="text-xl font-black text-slate-800">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
                             <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
@@ -689,9 +704,17 @@ function getFireColor($streak)
                                 <div class="text-xs font-black text-red-700">Rp <?= number_format($arus_out, 0, ',', '.') ?></div>
                             </div>
                         </div>
-                        <div class="pt-2 border-t border-slate-100">
-                            <div class="flex justify-between items-end mb-1">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Persentase Bayar Kas</div>
+                        <div>
+                            <div class="flex justify-between items-end">
+                                <div class="flex flex-col">
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Persentase Bayar Kas</div>
+                                    <select name="kas_minggu" form="vizFilters" onchange="this.form.submit()" class="text-[9px] border-none bg-indigo-50 text-indigo-700 font-bold p-0 focus:ring-0 cursor-pointer rounded mb-1">
+                                        <option value="">Semua Minggu</option>
+                                        <?php for ($i = 1; $i <= 16; $i++): ?>
+                                            <option value="<?= $i ?>" <?= $filter_minggu_kas == $i ? 'selected' : '' ?>>Minggu <?= $i ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
                                 <div class="text-xs font-black text-indigo-600"><?= $persen_lunas ?>%</div>
                             </div>
                             <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
