@@ -269,7 +269,7 @@ while ($row = mysqli_fetch_assoc($res)) {
                                 <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= $no++; ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
                                     <?php if ($role === 'Administrator Utama'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 text-center">

@@ -66,13 +66,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['hari']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['jam_ke']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('H.i', strtotime($row['jam_mulai'])) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('H.i', strtotime($row['jam_selesai'])) . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('H.i', strtotime($row['jam_mulai'])) . ' - ' . date('H.i', strtotime($row['jam_selesai'])) .'</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['ruangan']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_matkul']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_matkul']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['sks']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['dosen_pengampu']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['dosen_mitra']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['dosen_pengampu']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['dosen_mitra']) . '</td>';
         if ($role === 'Administrator Utama' || $role === 'Sekretaris'):
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
         echo '<a href="../crud/edit.php?tabel=jadwal_matkul&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
@@ -315,11 +314,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Hari</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Jam Ke</th>
+                                Jam</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Jam Mulai</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Jam Selesai</th>
+                                Pukul</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Ruangan</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
@@ -347,13 +344,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['hari']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_ke']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_mulai'])); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
+                                
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['ruangan']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_matkul']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_matkul']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['sks']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['dosen_mitra']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['dosen_mitra']; ?></td>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                     <a href="../crud/edit.php?tabel=jadwal_matkul&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>

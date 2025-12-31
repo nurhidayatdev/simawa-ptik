@@ -323,8 +323,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
 
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['status']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+									<?php
+									$statusColor = ($row['status'] === 'Lunas') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+									?>
+									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
+								</td>
                                 <?php
                                 $tanggal = '-';
                                 if (!empty($row['tanggal_bayar']) && $row['tanggal_bayar'] !== '0000-00-00') {

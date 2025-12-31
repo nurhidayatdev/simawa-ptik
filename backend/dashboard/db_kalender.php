@@ -278,10 +278,10 @@ if ($role === 'Administrator Utama'):
                         ?>
                                 <tr class="<?= $rowClass ?>">
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++ ?></td>
-                                    <td class="px-3 py-2 text-xs font-semibold text-slate-800"><?= htmlspecialchars($row['kegiatan']) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-600"><?= date('d/m/Y', strtotime($row['tanggal_mulai'])) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-600"><?= date('d/m/Y', strtotime($row['tanggal_selesai'])) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-600"><?= htmlspecialchars($row['tahun_periode']) ?> - <?= htmlspecialchars($row['semester_nama']) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['kegiatan']) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= date('d/m/Y', strtotime($row['tanggal_mulai'])) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= date('d/m/Y', strtotime($row['tanggal_selesai'])) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['tahun_periode']) ?> - <?= htmlspecialchars($row['semester_nama']) ?></td>
                                     <?php if ($role === 'Administrator Utama'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
                                         <a href="../crud/edit.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">

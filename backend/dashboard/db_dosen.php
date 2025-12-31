@@ -35,7 +35,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_dosen']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_dosen']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['no_hp']) . '</td>';
         echo '<td class="px-3 py-2 text-xs text-blue-600">';
          if (!empty($row['no_hp'])): 
@@ -261,7 +261,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo $no++; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo htmlspecialchars($row['nama_dosen']); ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?php echo htmlspecialchars($row['nama_dosen']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo htmlspecialchars($row['no_hp']); ?></td>
                                 <td class="px-3 py-2 text-xs text-blue-600">
                                         <?php if (!empty($row['no_hp'])): ?>

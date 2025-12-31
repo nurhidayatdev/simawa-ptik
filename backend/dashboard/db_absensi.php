@@ -433,8 +433,20 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
 
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['status']; ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+									
+									<?php
+$jkStatus = match ($row['status']) {
+    'Hadir' => 'bg-emerald-100 text-emerald-800 border-emerald-200', // Hijau
+    'Izin'  => 'bg-amber-100 text-amber-800 border-amber-200',     // Kuning/Oranye
+    'Sakit' => 'bg-sky-100 text-sky-800 border-sky-200',           // Biru
+    'Alpha' => 'bg-rose-100 text-rose-800 border-rose-200'
+};
+?>
+									
+									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $jkStatus ?>"><?= ucfirst($row['status']) ?></span>
+								</td>
 
 
                                 </tr>

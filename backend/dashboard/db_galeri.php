@@ -38,7 +38,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['judul']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['judul']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('d M Y', strtotime($row['tanggal_kegiatan'])) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
         $gal_id = $row['id'];
@@ -266,7 +266,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['judul']); ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['judul']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('d M Y', strtotime($row['tanggal_kegiatan'])); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                     <?php 

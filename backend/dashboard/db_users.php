@@ -97,10 +97,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['email']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">**********</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['role']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['role']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
         echo '<a href="../crud/edit.php?tabel=users&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
         echo '<a href="../crud/hapus.php?tabel=users&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus user ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
@@ -333,11 +333,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                 
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['nama_lengkap']); ?></td>
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['email']); ?></td>
 
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">**********</td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['role']); ?></td>
+                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['role']); ?></td>
 
                                         <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                             <a href="../crud/edit.php?tabel=users&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>

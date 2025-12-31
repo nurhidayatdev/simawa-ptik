@@ -268,9 +268,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         ?>
                                 <tr class="<?= $rowClass ?>">
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++ ?></td>
-                                    <td class="px-3 py-2 text-xs font-semibold text-slate-800"><?= htmlspecialchars($row['judul']) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-600">
-                                        <?= strlen($row['deskripsi']) > 100 ? htmlspecialchars(substr($row['deskripsi'], 0, 100)) . '...' : htmlspecialchars($row['deskripsi']) ?>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['judul']) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800">
+                                        <?= strlen($row['deskripsi']) > 120 ? htmlspecialchars(substr($row['deskripsi'], 0, 120)) . '...' : htmlspecialchars($row['deskripsi']) ?>
                                     </td>
                                     <td class="px-3 py-2 text-xs text-blue-600">
                                         <?php if (!empty($row['link'])): ?>

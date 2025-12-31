@@ -410,7 +410,7 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
 
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
                                     <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                         <select name="status[<?= $row['mahasiswa_id'] ?>]"
                                             class="border p-1 rounded">
@@ -428,7 +428,7 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
                 
                 </table>
                 <button type="submit"
-                        class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs mb-4 mt-4">
+                        class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs mb-4 mt-6">
                         Simpan Absensi
                     </button>
                 </form>

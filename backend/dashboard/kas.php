@@ -374,7 +374,7 @@ if (isset($_POST['simpan_kas'])) {
 
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
+                                        <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                             <?php $status_current = $row['status'] ?? 'Belum'; ?>
                                             <select name="status[<?= $row['mahasiswa_id'] ?>]"

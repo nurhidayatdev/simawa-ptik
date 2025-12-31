@@ -48,7 +48,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
         echo '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nim']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['nama_panggilan']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['jenis_kelamin'] ?? '-') . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">';
@@ -58,7 +58,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             echo '-';
         }
         echo '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['bio']) . '</td>';
+        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['bio']) . '</td>';
          if ($role === 'Administrator Utama'):
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
        
@@ -314,19 +314,24 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_panggilan']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jenis_kelamin'] ?? '-'; ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+									<?php
+									$jkColor = ($row['jenis_kelamin'] === 'Laki-laki') ? 'bg-sky-100 text-sky-800 border-sky-200' : 'bg-pink-100 text-pink-800 border-pink-200';
+									?>
+									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $jkColor ?>"><?= ucfirst($row['jenis_kelamin']) ?></span>
+								</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                     <?php if (!empty($row['instagram'])): ?>
-                                        <a href="https://instagram.com/<?= ltrim(htmlspecialchars($row['instagram']), '@') ?>" target="_blank" class="text-pink-600 hover:text-pink-800">
+                                        <a href="https://instagram.com/<?= ltrim(htmlspecialchars($row['instagram']), '@') ?>" target="_blank" class="text-purple-400 hover:text-purple-800">
                                             <i class="fab fa-instagram mr-1"></i><?= htmlspecialchars($row['instagram']); ?>
                                         </a>
                                     <?php else: ?>
                                         -
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['bio']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['bio']; ?></td>
 <?php if ($role === 'Administrator Utama'): ?>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                     <a href="../crud/edit.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Edit">

@@ -321,7 +321,7 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
                                             <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
                                                 <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++ ?></td>
                                                 <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $krs['kode_matkul'] ?></td>
-                                                <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $krs['nama_matkul'] ?></td>
+                                                <td class="px-6 py-2 text-xs text-slate-800"><?= $krs['nama_matkul'] ?></td>
                                                 <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $krs['sks'] ?></td>
                                             </tr>
                                         <?php endwhile; ?>

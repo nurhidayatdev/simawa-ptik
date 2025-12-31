@@ -288,7 +288,7 @@ while ($row = mysqli_fetch_assoc($krs)) {
                                             <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" <?= in_array($m['id'], $diambil) ? 'checked' : '' ?>>
                                         </td>
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
                                     </tr>
                                 <?php } ?>
