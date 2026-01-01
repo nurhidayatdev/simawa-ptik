@@ -272,10 +272,9 @@ if (isset($_POST['update'])) {
             mysqli_query($koneksi, "UPDATE jadwal_matkul SET 
                     matkul_id='{$_POST['matkul_id']}',
                     hari='{$_POST['hari']}',
-                    jam_ke='{$_POST['jam_ke']}',
-                    jam_mulai='{$_POST['jam_mulai']}',
-                    jam_selesai='{$_POST['jam_selesai']}',
-                    ruangan='{$_POST['ruangan']}',
+                    jam_mulai_ke='{$_POST['jam_mulai_ke']}',
+                    jam_selesai_ke='{$_POST['jam_selesai_ke']}',
+                    ruangan_id='{$_POST['ruangan_id']}',
                     dosen_pengampu_id='{$_POST['dosen_pengampu_id']}',
                     dosen_mitra_id='{$_POST['dosen_mitra_id']}'
                     WHERE id='$id'");
@@ -880,23 +879,45 @@ if (isset($_POST['update'])) {
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-slate-700 mb-1">Ruangan</label>
-                                        <input type="text" name="ruangan" value="<?= $data['ruangan']; ?>"
-                                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                        <select name="ruangan_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                            <option value="">-- Pilih Ruangan --</option>
+                                            <?php
+                                            $query_ruang = mysqli_query($koneksi, "SELECT * FROM ruangan ORDER BY nama_ruangan ASC");
+                                            while ($r = mysqli_fetch_assoc($query_ruang)) {
+                                                $selected = ($data['ruangan_id'] == $r['id']) ? 'selected' : '';
+                                                echo "<option value='{$r['id']}' $selected>{$r['nama_ruangan']}</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Jam Ke</label>
-                                        <input type="text" name="jam_ke" value="<?= $data['jam_ke']; ?>"
-                                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai Ke</label>
+                                        <select name="jam_mulai_ke" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                            <option value="">-- Pilih Jam Mulai --</option>
+                                            <?php
+                                            $query_jk = mysqli_query($koneksi, "SELECT * FROM jam_kuliah ORDER BY jam_mulai ASC");
+                                            $jam_kuliah_data = [];
+                                            while ($jk = mysqli_fetch_assoc($query_jk)) {
+                                                $jam_kuliah_data[] = $jk;
+                                                $selected = ($data['jam_mulai_ke'] == $jk['jam_ke']) ? 'selected' : '';
+                                                $display = "Ke-{$jk['jam_ke']} (" . date('H:i', strtotime($jk['jam_mulai'])) . " - " . date('H:i', strtotime($jk['jam_selesai'])) . ")";
+                                                echo "<option value='{$jk['jam_ke']}' $selected>$display</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai</label>
-                                        <input type="time" name="jam_mulai" value="<?= $data['jam_mulai']; ?>"
-                                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai</label>
-                                        <input type="time" name="jam_selesai" value="<?= $data['jam_selesai']; ?>"
-                                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                        <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai Ke</label>
+                                        <select name="jam_selesai_ke" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                            <option value="">-- Pilih Jam Selesai --</option>
+                                            <?php
+                                            foreach ($jam_kuliah_data as $jk) {
+                                                $selected = ($data['jam_selesai_ke'] == $jk['jam_ke']) ? 'selected' : '';
+                                                $display = "Ke-{$jk['jam_ke']} (" . date('H:i', strtotime($jk['jam_mulai'])) . " - " . date('H:i', strtotime($jk['jam_selesai'])) . ")";
+                                                echo "<option value='{$jk['jam_ke']}' $selected>$display</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
 
                                     <div>

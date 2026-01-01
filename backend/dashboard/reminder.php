@@ -119,12 +119,15 @@ if (isset($_POST['action'])) {
         $periode = mysqli_fetch_assoc($q_periode);
         $periode_id = $periode['id'] ?? 0;
         
-        $query = "SELECT jm.jam_mulai, jm.jam_selesai, jm.ruangan, mk.nama_matkul, dp.nama_dosen AS dosen_pengampu
+        $query = "SELECT jk_start.jam_mulai, jk_end.jam_selesai, r.nama_ruangan AS ruangan, mk.nama_matkul, dp.nama_dosen AS dosen_pengampu
                   FROM jadwal_matkul jm
                   JOIN mata_kuliah mk ON jm.matkul_id = mk.id
+                  LEFT JOIN ruangan r ON jm.ruangan_id = r.id
+                  LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
+                  LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
                   LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
                   WHERE jm.periode_id = $periode_id AND jm.hari = '$tomorrow_ind'
-                  ORDER BY jm.jam_mulai ASC";
+                  ORDER BY jk_start.jam_mulai ASC";
         $result = mysqli_query($koneksi, $query);
         
         if ($result && mysqli_num_rows($result) > 0) {

@@ -100,12 +100,13 @@ $today_indo = $days_indo[date('l')];
 $tomorrow_indo = $days_indo[date('l', strtotime('+1 day'))];
 
 // Schedule Today
-$q_sch_today = mysqli_query($koneksi, "SELECT mk.nama_matkul, jm.jam_mulai, jm.jam_selesai, jm.ruangan FROM jadwal_matkul jm JOIN mata_kuliah mk ON jm.matkul_id = mk.id WHERE jm.hari = '$today_indo' AND jm.periode_id = '$periode_id' ORDER BY jm.jam_mulai ASC");
+// Schedule Today
+$q_sch_today = mysqli_query($koneksi, "SELECT mk.nama_matkul, jk_start.jam_mulai, jk_end.jam_selesai, r.nama_ruangan AS ruangan FROM jadwal_matkul jm JOIN mata_kuliah mk ON jm.matkul_id = mk.id LEFT JOIN ruangan r ON jm.ruangan_id = r.id LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke WHERE jm.hari = '$today_indo' AND jm.periode_id = '$periode_id' ORDER BY jk_start.jam_mulai ASC");
 $sch_today = [];
 while ($r = mysqli_fetch_assoc($q_sch_today)) $sch_today[] = $r;
 
 // Schedule Tomorrow
-$q_sch_tomorrow = mysqli_query($koneksi, "SELECT mk.nama_matkul, jm.jam_mulai, jm.jam_selesai, jm.ruangan FROM jadwal_matkul jm JOIN mata_kuliah mk ON jm.matkul_id = mk.id WHERE jm.hari = '$tomorrow_indo' AND jm.periode_id = '$periode_id' ORDER BY jm.jam_mulai ASC");
+$q_sch_tomorrow = mysqli_query($koneksi, "SELECT mk.nama_matkul, jk_start.jam_mulai, jk_end.jam_selesai, r.nama_ruangan AS ruangan FROM jadwal_matkul jm JOIN mata_kuliah mk ON jm.matkul_id = mk.id LEFT JOIN ruangan r ON jm.ruangan_id = r.id LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke WHERE jm.hari = '$tomorrow_indo' AND jm.periode_id = '$periode_id' ORDER BY jk_start.jam_mulai ASC");
 $sch_tomorrow = [];
 while ($r = mysqli_fetch_assoc($q_sch_tomorrow)) $sch_tomorrow[] = $r;
 
@@ -354,14 +355,10 @@ function getFireColor($streak)
                     <!-- Dashboard Menu -->
                     <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
                         <i class="fa fa-home w-4 h-4 mr-4"></i>
-                        <span class="text-xs">Beranda</span>
+                        <span class="text-xs font-medium">Beranda</span>
                     </a>
 
-                    <a href="misi.php" class="flex items-center px-4 py-2 text-slate-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-transparent hover:border-indigo-100">
-                        <i class="fa fa-trophy w-4 h-4 mr-4 text-orange-500"></i>
-                        <span class="text-xs font-semibold">Pusat Misi</span>
-                        <span class="ml-auto bg-orange-100 text-orange-600 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Baru</span>
-                    </a>
+                    
 
                     <!-- Components Menu -->
                     <div class="space-y-1">
@@ -399,16 +396,17 @@ function getFireColor($streak)
                                     <i class="fa fa-users w-5 h-5 mr-3 text-indigo-600"></i>
                                     <span class="text-xs font-medium">Kelompok</span>
                                 </a>
+                                <a href="db_kas.php?minggu_ke=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-wallet w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Keuangan</span>
+                                </a>
                             </div>
                         </div>
 
                         <div>
-                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Keuangan & Galeri</p>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Aktivitas</p>
                             <div class="space-y-1">
-                                <a href="db_kas.php?minggu_ke=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-wallet w-5 h-5 mr-3 text-emerald-600"></i>
-                                    <span class="text-xs font-medium">Kas Mingguan</span>
-                                </a>
+                                
                                 <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Galeri Kelas</span>
@@ -448,9 +446,13 @@ function getFireColor($streak)
                             <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
                             <div class="space-y-1">
                                 <a href="profile.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-user-circle w-5 h-5 mr-3 text-slate-600"></i>
+                                    <i class="fa fa-user-circle w-5 h-5 mr-3 text-orange-500"></i>
                                     <span class="text-xs font-medium">Profile Saya</span>
                                 </a>
+                                <a href="misi.php" class="flex items-center px-4 py-2 text-slate-800 rounded-lg hover:bg-slate-100">
+                        <i class="fa fa-trophy w-4 h-4 mr-4 text-orange-500"></i>
+                        <span class="text-xs font-medium">Pusat Misi</span>
+                    </a>
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
                                     <span class="text-xs font-medium">Logout</span>

@@ -163,7 +163,7 @@ $role = $_SESSION['role'];
                     <div class="relative z-10">
                         <div class="flex items-center space-x-3 mb-4">
                             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center p-1.5 shadow-lg">
-                                <img src="../img/logo.png" alt="Logo" class="w-full h-full object-contain opacity-90">
+                                <img src="../img/main/logo.png" alt="Logo" class="w-full h-full object-contain opacity-90">
                             </div>
                             <div>
                                 <h4 class="text-sm font-bold text-white">PTIK C 2024</h4>

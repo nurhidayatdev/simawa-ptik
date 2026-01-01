@@ -26,17 +26,22 @@ if (!empty($search)) {
     $stmt = mysqli_prepare(
         $koneksi,
         "SELECT 
-    jm.id, jm.matkul_id, jm.hari, jm.jam_ke, jm.jam_mulai, jm.jam_selesai, jm.ruangan, mk.nama_matkul, mk.sks,
+    jm.id, jm.matkul_id, jm.hari, jm.jam_mulai_ke, jm.jam_selesai_ke, 
+    jk_start.jam_mulai, jk_end.jam_selesai,
+    r.nama_ruangan AS ruangan, mk.nama_matkul, mk.sks,
     dp.nama_dosen AS dosen_pengampu,
     dm.nama_dosen AS dosen_mitra
 FROM jadwal_matkul jm
 JOIN mata_kuliah mk ON jm.matkul_id = mk.id
+LEFT JOIN ruangan r ON jm.ruangan_id = r.id
+LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
+LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id 
          WHERE (jm.hari LIKE ? 
          OR mk.nama_matkul LIKE ?)
          AND jm.periode_id = ?
-         ORDER BY jm.hari, jm.jam_mulai"
+         ORDER BY jm.hari, jk_start.jam_mulai"
     );
 
     $like = "%$search%";
@@ -45,15 +50,20 @@ LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
     $result = mysqli_stmt_get_result($stmt);
 } else {
     $result = mysqli_query($koneksi, "SELECT 
-    jm.id, jm.matkul_id, jm.hari, jm.jam_ke, jm.jam_mulai, jm.jam_selesai, jm.ruangan, mk.nama_matkul, mk.sks,
+    jm.id, jm.matkul_id, jm.hari, jm.jam_mulai_ke, jm.jam_selesai_ke,
+    jk_start.jam_mulai, jk_end.jam_selesai,
+    r.nama_ruangan AS ruangan, mk.nama_matkul, mk.sks,
     dp.nama_dosen AS dosen_pengampu,
     dm.nama_dosen AS dosen_mitra
 FROM jadwal_matkul jm
 JOIN mata_kuliah mk ON jm.matkul_id = mk.id
+LEFT JOIN ruangan r ON jm.ruangan_id = r.id
+LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
+LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
 WHERE jm.periode_id = $periode_id
-ORDER BY jm.hari, jm.jam_mulai");
+ORDER BY jm.hari, jk_start.jam_mulai");
 }
 
 // If AJAX live-search request, return table rows only
@@ -65,7 +75,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['hari']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['jam_ke']) . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['jam_mulai_ke']) . '-' . htmlspecialchars($row['jam_selesai_ke']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('H.i', strtotime($row['jam_mulai'])) . ' - ' . date('H.i', strtotime($row['jam_selesai'])) .'</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['ruangan']) . '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_matkul']) . '</td>';
@@ -343,7 +353,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
 
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['hari']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_ke']; ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_mulai_ke'] . '-' . $row['jam_selesai_ke']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
                                 
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['ruangan']; ?></td>

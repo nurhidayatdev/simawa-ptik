@@ -62,10 +62,9 @@ if (isset($_POST['tambah'])) {
         case 'jadwal_matkul':
             $matkul_id = $_POST['matkul_id'];
             $hari = $_POST['hari'];
-            $jam_ke = $_POST['jam_ke'];
-            $jam_mulai = $_POST['jam_mulai'];
-            $jam_selesai = $_POST['jam_selesai'];
-            $ruangan = $_POST['ruangan'];
+            $jam_mulai_ke = $_POST['jam_mulai_ke'];
+            $jam_selesai_ke = $_POST['jam_selesai_ke'];
+            $ruangan_id = $_POST['ruangan_id'];
             $dosen_pengampu_id = $_POST['dosen_pengampu_id'];
             $dosen_mitra_id = $_POST['dosen_mitra_id'];
 
@@ -74,8 +73,8 @@ if (isset($_POST['tambah'])) {
             $periode = mysqli_fetch_assoc($q_periode);
             $periode_id = $periode['id'] ?? 0;
 
-            mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_ke, jam_mulai, jam_selesai, ruangan, dosen_pengampu_id, dosen_mitra_id, periode_id)
-                VALUES ('$matkul_id', '$hari', '$jam_ke', '$jam_mulai', '$jam_selesai', '$ruangan', '$dosen_pengampu_id', '$dosen_mitra_id', '$periode_id')");
+            mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_mulai_ke, jam_selesai_ke, ruangan_id, dosen_pengampu_id, dosen_mitra_id, periode_id)
+                VALUES ('$matkul_id', '$hari', '$jam_mulai_ke', '$jam_selesai_ke', '$ruangan_id', '$dosen_pengampu_id', '$dosen_mitra_id', '$periode_id')");
             $redirect = "../dashboard/db_jadwal.php";
 
             break;
@@ -668,16 +667,22 @@ if (isset($_POST['tambah'])) {
                     <?php elseif ($tabel === 'jadwal_matkul'): ?>
                         <h3 class="text-xl font-bold mb-6">Jadwal Mata Kuliah</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                            <div class="col-span-2">
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Mata Kuliah</label>
                                 <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
                                     <option value="">-- Pilih Mata Kuliah --</option>
                                     <?php
+                                    // Get active periode_id
+                                    $q_per_add = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+                                    $per_add = mysqli_fetch_assoc($q_per_add);
+                                    $pid_add = $per_add['id'] ?? 0;
+
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
                                         mk.id AS matkul_id,
                                         mk.nama_matkul
                                         FROM krs k
                                         JOIN mata_kuliah mk ON k.matkul_id = mk.id
+                                        WHERE mk.id NOT IN (SELECT matkul_id FROM jadwal_matkul WHERE periode_id = '$pid_add')
                                         ORDER BY mk.nama_matkul ASC");
                                     while ($mk = mysqli_fetch_assoc($query_mk)) {
                                         echo "<option value='{$mk['matkul_id']}'>{$mk['nama_matkul']}</option>";
@@ -698,23 +703,43 @@ if (isset($_POST['tambah'])) {
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Ruangan</label>
-                                <input type="text" name="ruangan"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                <select name="ruangan_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                    <option value="">-- Pilih Ruangan --</option>
+                                    <?php
+                                    $query_ruang = mysqli_query($koneksi, "SELECT * FROM ruangan ORDER BY nama_ruangan ASC");
+                                    while ($r = mysqli_fetch_assoc($query_ruang)) {
+                                        echo "<option value='{$r['id']}'>{$r['nama_ruangan']}</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Ke</label>
-                                <input type="text" name="jam_ke"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai Ke</label>
+                                <select name="jam_mulai_ke" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                    <option value="">-- Pilih Jam Mulai --</option>
+                                    <?php
+                                    $query_jk = mysqli_query($koneksi, "SELECT * FROM jam_kuliah ORDER BY jam_mulai ASC");
+                                    // Store for second dropdown to avoid re-querying if possible, or just re-query/reset pointer
+                                    $jam_kuliah_data = [];
+                                    while ($jk = mysqli_fetch_assoc($query_jk)) {
+                                        $jam_kuliah_data[] = $jk;
+                                        $display = "Ke-{$jk['jam_ke']} (" . date('H:i', strtotime($jk['jam_mulai'])) . " - " . date('H:i', strtotime($jk['jam_selesai'])) . ")";
+                                        echo "<option value='{$jk['jam_ke']}'>$display</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai</label>
-                                <input type="time" name="jam_mulai"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai</label>
-                                <input type="time" name="jam_selesai"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai Ke</label>
+                                <select name="jam_selesai_ke" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                    <option value="">-- Pilih Jam Selesai --</option>
+                                    <?php
+                                    foreach ($jam_kuliah_data as $jk) {
+                                        $display = "Ke-{$jk['jam_ke']} (" . date('H:i', strtotime($jk['jam_mulai'])) . " - " . date('H:i', strtotime($jk['jam_selesai'])) . ")";
+                                        echo "<option value='{$jk['jam_ke']}'>$display</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
 
                             <div>

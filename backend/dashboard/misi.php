@@ -339,7 +339,7 @@ $missions = [
                         ?>
                             <div class="group relative flex flex-col items-center">
                                 <!-- Badge Circle -->
-                                <div class="relative w-20 h-20 md:w-24 md:h-24 transition-transform duration-300 transform group-hover:-translate-y-2 group-hover:scale-105 cursor-pointer">
+                                <div class="relative w-14 h-14 md:w-16 md:h-16 transition-transform duration-300 transform group-hover:-translate-y-2 group-hover:scale-105 cursor-pointer">
                                     <!-- Glow Effect behind -->
                                     <div class="absolute inset-0 bg-gradient-to-br <?= $bg_grad ?> rounded-full blur-md opacity-40 group-hover:opacity-75 transition-opacity"></div>
                                     
@@ -350,10 +350,10 @@ $missions = [
                                             <!-- Shine Animation -->
                                             <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-150%] skew-x-12 group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out"></div>
                                             
-                                            <i class="fa <?= $cat['icon'] ?> text-2xl md:text-3xl text-white mb-1 drop-shadow-md relative z-10"></i>
+                                            <i class="fa <?= $cat['icon'] ?> text-lg md:text-2xl text-white mb-1 drop-shadow-md relative z-10"></i>
                                             
                                             <!-- Tiny stars for aesthetic -->
-                                            <div class="flex gap-0.5 mt-1 relative z-10">
+                                            <div class="flex gap-0.5 mt-0.5 relative z-10">
                                                  <i class="fa fa-star text-[6px] text-yellow-300"></i>
                                                  <i class="fa fa-star text-[6px] text-yellow-300"></i>
                                                  <i class="fa fa-star text-[6px] text-yellow-300"></i>
