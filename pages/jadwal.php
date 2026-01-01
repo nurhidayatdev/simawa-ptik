@@ -122,7 +122,7 @@ ORDER BY jm.hari, jk_start.jam_mulai");
   <div class="container mx-auto py-6 mt-4 px-6">
     <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Jadwal Mata Kuliah</h1>
     <!-- Rest of the content remains the same -->
-    <div class="mb-4 lg:hidden flex justify-end">
+    <div class="mb-4 md:hidden flex justify-end">
         <button id="toggleViewBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-md hover:bg-indigo-700 transition">
             <i class="fas fa-eye mr-2"></i>Lihat Semua
         </button>
@@ -133,11 +133,11 @@ ORDER BY jm.hari, jk_start.jam_mulai");
       <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-indigo-900">
                         <tr>
-                            <th class="toggle-col hidden lg:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
+                            <th class="toggle-col hidden md:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
                                 No</th>
                             <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
                                 Hari</th>
-                            <th class="toggle-col hidden lg:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
+                            <th class="toggle-col hidden md:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
                                 Jam</th>
                             <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
                                 Pukul</th>
@@ -145,11 +145,11 @@ ORDER BY jm.hari, jk_start.jam_mulai");
                                 Ruangan</th>
                             <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
                                 Mata Kuliah</th>
-                            <th class="toggle-col hidden lg:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
+                            <th class="toggle-col hidden md:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider" >
                                 SKS</th>
-                            <th class="toggle-col hidden lg:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
+                            <th class="toggle-col hidden md:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
                                 Dosen Pengampu</th>
-                            <th class="toggle-col hidden lg:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
+                            <th class="toggle-col hidden md:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
                                 Dosen Mitra</th>
                         </tr>
                         
@@ -161,17 +161,17 @@ ORDER BY jm.hari, jk_start.jam_mulai");
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
 
-                                <td class="toggle-col hidden lg:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
 
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['hari']; ?></td>
-                                <td class="toggle-col hidden lg:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
                                 
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['ruangan']; ?></td>
                                 <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_matkul']; ?></td>
-                                <td class="toggle-col hidden lg:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['sks']; ?></td>
-                                <td class="toggle-col hidden lg:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>
-                                <td class="toggle-col hidden lg:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_mitra']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['sks']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_mitra']; ?></td>
                                 
                             </tr>
                         <?php endwhile; ?>
