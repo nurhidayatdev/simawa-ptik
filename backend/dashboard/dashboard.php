@@ -406,6 +406,19 @@ function getFireColor($streak)
                         <div>
                             <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Aktivitas</p>
                             <div class="space-y-1">
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-wand-magic-sparkles w-5 h-5 mr-3 text-emerald-600"></i>
+                                        <span class="text-xs font-medium">Hiburan</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="misi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pusat Misi</a>
+                                    <a href="kuis_harian.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
+                                    <a href="db_pesan.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pesan Anonim</a>
+                                    
+                                </div>
 
                             <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-calendar w-5 h-5 mr-3 text-emerald-600"></i>
@@ -416,14 +429,7 @@ function getFireColor($streak)
                                     <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Galeri Kelas</span>
                                 </a>
-                                <a href="db_pesan.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-comment-dots w-5 h-5 mr-3 text-emerald-600"></i>
-                                    <span class="text-xs font-medium">Pesan Anonim</span>
-                                </a>
-                                <a href="kuis_harian.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-gamepad w-5 h-5 mr-3 text-emerald-600"></i>
-                                    <span class="text-xs font-medium">Kuis Harian</span>
-                                </a>
+                            
                             </div>
                         </div>
 
@@ -448,16 +454,22 @@ function getFireColor($streak)
                         <?php endif; ?>
 
                         <div>
-                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Akun</p>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Pengaturan</p>
                             <div class="space-y-1">
-                                <a href="profile.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-user-circle w-5 h-5 mr-3 text-orange-500"></i>
-                                    <span class="text-xs font-medium">Profile Saya</span>
-                                </a>
-                                <a href="misi.php" class="flex items-center px-4 py-2 text-slate-800 rounded-lg hover:bg-slate-100">
-                        <i class="fa fa-trophy w-4 h-4 mr-4 text-orange-500"></i>
-                        <span class="text-xs font-medium">Pusat Misi</span>
-                    </a>
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-user w-5 h-5 mr-3 text-red-600"></i>
+                                        <span class="text-xs font-medium">Akun</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="profile.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Profile Saya</a>
+                                    <a href="krs.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
+                                    
+                                </div>
+                              
+                 
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
                                     <span class="text-xs font-medium">Logout</span>
