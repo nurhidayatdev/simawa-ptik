@@ -240,7 +240,9 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                             <a href="kas_individu.php" class="whitespace-nowrap bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center w-full">Input Individu</a>
                             
                             <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
-                            <a href="../crud/kirim_reminder_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?>" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center"><i class="fa fa-paper-plane"></i></a>
+                            <button type="button" onclick="confirmReminderKas('<?= $_GET['minggu_ke'] ?>')" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Reminder Telegram">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
                             <?php endif; ?>
 
                             <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
@@ -447,6 +449,39 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
             });
             <?php unset($_SESSION['info']); ?>
         <?php endif; ?>
+
+        // SweetAlert for Success GET Parameter
+        <?php if (isset($_GET['success'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data kas mingguan telah berhasil diperbarui.',
+                confirmButtonColor: '#3730a3'
+            }).then(() => {
+                // Remove parameter from URL
+                const url = new URL(window.location);
+                url.searchParams.delete('success');
+                window.history.replaceState({}, document.title, url);
+            });
+        <?php endif; ?>
+
+        // SweetAlert Confirmation for Telegram Reminder
+        function confirmReminderKas(minggu) {
+            Swal.fire({
+                title: 'Kirim Reminder Kas?',
+                text: "Daftar mahasiswa yang belum lunas minggu ini akan dikirim ke grup.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Kirim!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../crud/kirim_reminder_kas.php?minggu_ke=' + minggu;
+                }
+            });
+        }
     </script>
 </body>
 

@@ -129,6 +129,8 @@ if (isset($_POST['simpan_kas'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -401,8 +403,8 @@ if (isset($_POST['simpan_kas'])) {
 
                         </table>
                         <div class="flex items-center justify-end mb-4 mt-4">
-                                    <button type="submit" name="simpan_kas" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs">
-                                        Simpan Kas
+                                    <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
+                                        <i class="fa fa-save mr-1"></i> Simpan Kas
                                     </button>
                                 </div>
                     </form>
@@ -492,6 +494,31 @@ if (isset($_POST['simpan_kas'])) {
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        // SweetAlert for Saving Kas
+        function confirmSaveKas() {
+            Swal.fire({
+                title: 'Simpan Data Kas?',
+                text: "Pastikan status pembayaran dan tanggal sudah benar.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3730a3',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create hidden input to satisfy the PHP isset($_POST['simpan_kas'])
+                    const form = document.querySelector('form[method="POST"]');
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'simpan_kas';
+                    hiddenInput.value = '1';
+                    form.appendChild(hiddenInput);
+                    form.submit();
+                }
+            });
         }
     </script>
 </body>

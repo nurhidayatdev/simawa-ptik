@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
     }
     // redirect agar tidak double submit
-    header("Location: absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan");
+    header("Location: absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan&sukses=1");
     exit;
 }
 
@@ -132,6 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -427,9 +429,9 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
                         </tbody>
                 
                 </table>
-                <button type="submit"
-                        class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs mb-4 mt-6">
-                        Simpan Absensi
+                <button type="button" onclick="confirmSaveAbsensi()"
+                        class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs mb-4 mt-6 shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
+                        <i class="fa fa-save mr-1"></i> Simpan Absensi
                     </button>
                 </form>
             </div>
@@ -489,6 +491,39 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
                 }
             });
         }
+
+        // SweetAlert for Saving Absensi
+        function confirmSaveAbsensi() {
+            Swal.fire({
+                title: 'Simpan Absensi?',
+                text: "Pastikan data kehadiran sudah sesuai.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3730a3',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.querySelector('form[method="POST"]').submit();
+                }
+            });
+        }
+
+        // Show Success Alert
+        <?php if (isset($_GET['sukses'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Data absensi telah berhasil disimpan.',
+                confirmButtonColor: '#3730a3'
+            }).then(() => {
+                // Remove parameter from URL
+                const url = new URL(window.location);
+                url.searchParams.delete('sukses');
+                window.history.replaceState({}, document.title, url);
+            });
+        <?php endif; ?>
     </script>
 </body>
 

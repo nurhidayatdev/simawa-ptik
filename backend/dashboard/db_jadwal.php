@@ -110,6 +110,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -265,26 +267,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <!-- Modified this section for better mobile responsiveness -->
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-xs flex justify-between items-center">
-                    <span><?= $_SESSION['success']; unset($_SESSION['success']); ?></span>
-                    <button onclick="this.parentElement.remove()" class="text-green-700 font-bold">&times;</button>
-                </div>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-xs flex justify-between items-center">
-                    <span><?= $_SESSION['error']; unset($_SESSION['error']); ?></span>
-                    <button onclick="this.parentElement.remove()" class="text-red-700 font-bold">&times;</button>
-                </div>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['info'])): ?>
-                <div class="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg text-xs flex justify-between items-center">
-                    <span><?= $_SESSION['info']; unset($_SESSION['info']); ?></span>
-                    <button onclick="this.parentElement.remove()" class="text-blue-700 font-bold">&times;</button>
-                </div>
-            <?php endif; ?>
+            <!-- Session Alerts handled by SweetAlert -->
 
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Jadwal Mata Kuliah</h3>
@@ -300,9 +283,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 class="flex-grow px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
 
                             <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
-                            <a href="../crud/kirim_jadwal.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Telegram" onclick="return confirm('Kirim jadwal besok ke Telegram?');">
+                            <button type="button" onclick="confirmTelegram()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Telegram">
                                 <i class="fa fa-paper-plane"></i>
-                            </a>
+                            </button>
                           
 
                             <a href="../crud/tambah.php?tabel=jadwal_matkul" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
@@ -450,6 +433,55 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 }, 250);
             });
         })();
+
+        // SweetAlert Confirmation for Telegram
+        function confirmTelegram() {
+            Swal.fire({
+                title: 'Kirim Telegram?',
+                text: "Jadwal kuliah besok akan dikirim ke grup.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Kirim!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../crud/kirim_jadwal.php';
+                }
+            });
+        }
+
+        // Show Session Alerts with SweetAlert
+        <?php if (isset($_SESSION['success'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '<?= addslashes($_SESSION['success']) ?>',
+                confirmButtonColor: '#3085d6'
+            });
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: '<?= addslashes($_SESSION['error']) ?>',
+                confirmButtonColor: '#d33'
+            });
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['info'])): ?>
+            Swal.fire({
+                icon: 'info',
+                title: 'Informasi',
+                text: '<?= addslashes($_SESSION['info']) ?>',
+                confirmButtonColor: '#3085d6'
+            });
+            <?php unset($_SESSION['info']); ?>
+        <?php endif; ?>
     </script>
 </body>
 

@@ -40,26 +40,32 @@ $role = $_SESSION['role'];
                     Aspirasi dan pesan rahasia dari mahasiswa kelas PTIK C 2024.
                 </p>
             </div>
-            <div class="flex flex-row gap-4">
+            <div class="flex flex-row flex-wrap items-center justify-end gap-3 md:gap-4 w-full">
+                <a href="../../pages/pesan.php" class="group relative px-6 py-3 rounded-lg bg-indigo-600 border border-indigo-400/30 text-white text-sm font-medium hover:bg-indigo-500 transition-all overflow-hidden shadow-lg shadow-indigo-500/20">
+                    <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
+                    <span class="relative flex items-center gap-2">
+                        <i class="fas fa-paper-plane transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></i>
+                        Kirim Pesan
+                    </span>
+                </a>
+
                 <?php if ($role === 'Administrator Utama'): ?>
                 <a href="pesan.php" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
-                <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
-                <span class="relative flex items-center gap-2">
-                    <i class="fas fa-home transition-transform group-hover:-translate-x-1"></i>
-                    Database Pesan
-                </span>
-                
-            </a>
-            <?php endif; ?>
-<a href="dashboard.php" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
-                <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
-                <span class="relative flex items-center gap-2">
-                    <i class="fas fa-home transition-transform group-hover:-translate-x-1"></i>
-                    Kembali ke Beranda
-                </span>
-                
-            </a>
-            
+                    <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
+                    <span class="relative flex items-center gap-2">
+                        <i class="fas fa-database transition-transform group-hover:scale-110"></i>
+                        Database
+                    </span>
+                </a>
+                <?php endif; ?>
+
+                <a href="dashboard.php" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
+                    <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
+                    <span class="relative flex items-center gap-2">
+                        <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
+                        Kembali
+                    </span>
+                </a>
             </div>
             
         </div>
@@ -248,6 +254,13 @@ $role = $_SESSION['role'];
             }
         });
     </script>
+
+    <!-- Footer -->
+    <div class="mt-12 mb-8 text-center relative z-10">
+        <p class="text-[10px] text-gray-500">
+            &copy; 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. <br>All rights reserved.
+        </p>
+    </div>
 
     <style>
         @keyframes shine {

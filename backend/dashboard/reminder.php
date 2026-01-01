@@ -13,7 +13,6 @@ $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
 if ($_SESSION['role'] !== 'Administrator Utama') {
-    // Kita tetap butuh HTML dikit untuk menjalankan JS
     echo "<!DOCTYPE html>
     <html>
     <head>
@@ -102,12 +101,11 @@ function sendTelegramMessage($token, $chat_id, $message) {
     return ['success' => false, 'error' => 'All methods failed'];
 }
 
-$response_msg = '';
-$response_type = '';
-
-// Handle Actions
+// Handle Actions (PRG Pattern)
 if (isset($_POST['action'])) {
     $action = $_POST['action'];
+    $response_msg = '';
+    $response_type = '';
     
     // JADWAL REMINDER
     if ($action === 'jadwal') {
@@ -334,7 +332,13 @@ if (isset($_POST['action'])) {
             $response_type = 'error';
         }
     }
+
+    $_SESSION['reminder_msg'] = $response_msg;
+    $_SESSION['reminder_type'] = $response_type;
+    header("Location: reminder.php");
+    exit;
 }
+
 
 // Counts for display
 $now_date = date('Y-m-d');
@@ -762,13 +766,17 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         }
 
         // Response Message with SweetAlert
-        <?php if ($response_msg): ?>
+        <?php if (isset($_SESSION['reminder_msg'])): ?>
             Swal.fire({
-                icon: '<?= $response_type === "success" ? "success" : ($response_type === "error" ? "error" : "info") ?>',
-                title: '<?= $response_type === "success" ? "Berhasil!" : ($response_type === "error" ? "Gagal!" : "Informasi") ?>',
-                text: '<?= addslashes($response_msg) ?>',
+                icon: '<?= $_SESSION['reminder_type'] === "success" ? "success" : ($_SESSION['reminder_type'] === "error" ? "error" : "info") ?>',
+                title: '<?= $_SESSION['reminder_type'] === "success" ? "Berhasil!" : ($_SESSION['reminder_type'] === "error" ? "Gagal!" : "Informasi") ?>',
+                text: '<?= addslashes($_SESSION['reminder_msg']) ?>',
                 confirmButtonColor: '#3730a3'
             });
+            <?php 
+            unset($_SESSION['reminder_msg']);
+            unset($_SESSION['reminder_type']);
+            ?>
         <?php endif; ?>
     </script>
 </body>

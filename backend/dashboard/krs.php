@@ -98,6 +98,8 @@ while ($row = mysqli_fetch_assoc($krs)) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -256,11 +258,7 @@ while ($row = mysqli_fetch_assoc($krs)) {
 
             <h3 class="text-2xl font-bold mb-4">Kartu Rencana Studi (KRS)</h3>
 
-            <?php if (isset($_GET['sukses'])): ?>
-                <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
-                    KRS berhasil disimpan
-                </div>
-            <?php endif; ?>
+            <!-- Success logic handled by SweetAlert -->
 
             <form method="POST">
 
@@ -302,9 +300,9 @@ while ($row = mysqli_fetch_assoc($krs)) {
                     </div>
                 <?php endfor; ?>
 
-                <button type="submit"
-                    class="mt-6 px-4 py-2 bg-indigo-800 text-white rounded hover:bg-indigo-950 text-xs">
-                    <i class="fa fa-save"></i> Simpan KRS
+                <button type="button" onclick="confirmSaveKRS()"
+                    class="mt-6 px-4 py-2 bg-indigo-800 text-white rounded hover:bg-indigo-950 text-xs shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
+                    <i class="fa fa-save mr-1"></i> Simpan KRS
                 </button>
             </form>
 
@@ -363,6 +361,36 @@ while ($row = mysqli_fetch_assoc($krs)) {
                 }
             });
         }
+
+        // SweetAlert for Saving KRS
+        function confirmSaveKRS() {
+            Swal.fire({
+                title: 'Simpan KRS?',
+                text: "Pastikan mata kuliah yang dipilih sudah benar.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3730a3',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.querySelector('form').submit();
+                }
+            });
+        }
+
+        // Show Success Alert
+        <?php if (isset($_GET['sukses'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Kartu Rencana Studi Anda telah berhasil diperbarui.',
+                confirmButtonColor: '#3730a3'
+            }).then(() => {
+                window.location.href = 'profile.php';
+            });
+        <?php endif; ?>
     </script>
 </body>
 

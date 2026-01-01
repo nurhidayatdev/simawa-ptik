@@ -157,6 +157,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .rotate-180 {
             transform: rotate(180deg);
@@ -327,7 +329,9 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                                 Absensi
                           
                         </a>
-                        <a href="?export=csv&matkul_id=<?= urlencode($_GET['matkul_id'] ?? '') ?>&pertemuan=<?= $_GET['pertemuan'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
+                        <button type="button" onclick="confirmExport()" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Export to CSV">
+                            <i class="fas fa-file-csv"></i>
+                        </button>
                     </div>
                     </form>
                 </div>
@@ -513,6 +517,38 @@ $jkStatus = match ($row['status']) {
             document.addEventListener('click', (e) => {
                 if (!profileButton.contains(e.target)) {
                     profileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        // SweetAlert for Export CSV
+        function confirmExport() {
+            const matkulId = "<?= $_GET['matkul_id'] ?? '' ?>";
+            const pertemuan = "<?= $_GET['pertemuan'] ?? '' ?>";
+            const filter = "<?= $_GET['filter'] ?? 'all' ?>";
+
+            if (!matkulId || !pertemuan) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Silakan pilih mata kuliah dan pertemuan terlebih dahulu.',
+                    confirmButtonColor: '#3730a3'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Export ke CSV?',
+                text: "Data absensi akan diunduh dalam format CSV.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Unduh!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `?export=csv&matkul_id=${matkulId}&pertemuan=${pertemuan}&filter=${filter}`;
                 }
             });
         }

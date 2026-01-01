@@ -99,6 +99,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<!-- SweetAlert2 -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<style>
 		.rotate-180 {
 			transform: rotate(180deg);
@@ -279,9 +281,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								placeholder="Cari Mata Kuliah / Deskripsi..."
 								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
 							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
-								<a href="../crud/kirim_reminder.php" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
+								<button type="button" onclick="confirmReminderTelegram()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
 									<i class="fa fa-paper-plane"></i>
-								</a>
+								</button>
 								<a href="../crud/tambah.php?tabel=tugas" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
 									<i class="fa fa-plus"></i>
 								</a>
@@ -442,6 +444,24 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			input.addEventListener('input', performSearch);
 			statusSelect.addEventListener('change', performSearch);
 		})();
+
+		// SweetAlert Confirmation for Telegram Reminder
+		function confirmReminderTelegram() {
+			Swal.fire({
+				title: 'Kirim Reminder Telegram?',
+				text: "Mata kuliah yang belum dikumpulkan akan dikirim ke grup.",
+				icon: 'question',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Ya, Kirim!',
+				cancelButtonText: 'Batal'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					window.location.href = '../crud/kirim_reminder.php';
+				}
+			});
+		}
 
 		// SweetAlert2 Session Messages
 		<?php if (isset($_SESSION['success'])): ?>

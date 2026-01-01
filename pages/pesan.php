@@ -1,5 +1,25 @@
 <?php
+session_start();
 include '../koneksi.php';
+
+if (isset($_POST['kirim_pesan'])) {
+    $pesan_raw = $_POST['pesan_anonim'];
+    $pesan_db = mysqli_real_escape_string($koneksi, $pesan_raw);
+    
+    if (!empty($pesan_raw)) {
+        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan_db')";
+        if (mysqli_query($koneksi, $query_pesan)) {
+            // Kirim notifikasi Telegram (gunakan pesan raw agar \r\n tidak muncul)
+            include '../backend/crud/kirim_pesan_telegram.php';
+            sendTelegramPesan($pesan_raw);
+            $_SESSION['pesan_status'] = 'success';
+        } else {
+            $_SESSION['pesan_status'] = 'error';
+        }
+    }
+    header("Location: pesan.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -73,34 +93,31 @@ include '../koneksi.php';
                 </form>
 
                 <?php
-                if (isset($_POST['kirim_pesan'])) {
-                    $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
-                    if (!empty($pesan)) {
-                        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
-                        if (mysqli_query($koneksi, $query_pesan)) {
-                            echo "
-                            <div class='mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-start space-x-3 animate-fade-in-up transition-all'>
-                                <div class='flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center mt-0.5'>
-                                    <i class='fas fa-check text-xs text-emerald-400'></i>
-                                </div>
-                                <div>
-                                    <h4 class='text-sm font-semibold text-emerald-400'>Berhasil Terkirim!</h4>
-                                    <p class='text-xs text-emerald-200 mt-1'>Pesan Anda telah kami terima secara anonim. Terima kasih atas masukannya.</p>
-                                </div>
-                            </div>";
-                        } else {
-                             echo "
-                            <div class='mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start space-x-3 animate-fade-in-up transition-all'>
-                                <div class='flex-shrink-0 w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center mt-0.5'>
-                                    <i class='fas fa-times text-xs text-red-400'></i>
-                                </div>
-                                <div>
-                                    <h4 class='text-sm font-semibold text-red-400'>Gagal Mengirim</h4>
-                                    <p class='text-xs text-red-200 mt-1'>Terjadi kesalahan saat menyimpan pesan. Silakan coba lagi.</p>
-                                </div>
-                            </div>";
-                        }
+                if (isset($_SESSION['pesan_status'])) {
+                    if ($_SESSION['pesan_status'] == 'success') {
+                        echo "
+                        <div class='mt-4 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-start space-x-3 animate-fade-in-up transition-all'>
+                            <div class='flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center mt-0.5'>
+                                <i class='fas fa-check text-xs text-emerald-400'></i>
+                            </div>
+                            <div>
+                                <h4 class='text-sm font-semibold text-emerald-400'>Berhasil Terkirim!</h4>
+                                <p class='text-xs text-emerald-200 mt-1'>Pesan Anda telah kami terima secara anonim. Terima kasih atas masukannya.</p>
+                            </div>
+                        </div>";
+                    } elseif ($_SESSION['pesan_status'] == 'error') {
+                        echo "
+                        <div class='mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start space-x-3 animate-fade-in-up transition-all'>
+                            <div class='flex-shrink-0 w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center mt-0.5'>
+                                <i class='fas fa-times text-xs text-red-400'></i>
+                            </div>
+                            <div>
+                                <h4 class='text-sm font-semibold text-red-400'>Gagal Mengirim</h4>
+                                <p class='text-xs text-red-200 mt-1'>Terjadi kesalahan saat menyimpan pesan. Silakan coba lagi.</p>
+                            </div>
+                        </div>";
                     }
+                    unset($_SESSION['pesan_status']);
                 }
                 ?>
             </div>

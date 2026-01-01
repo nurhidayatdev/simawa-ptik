@@ -433,32 +433,13 @@ function getFireColor($streak)
                             </div>
                         </div>
 
-                        <?php if ($role === 'Administrator Utama'): ?>
-                            <div>
-                                <p class="px-4 text-[10px] font-semibold text-red-400 uppercase tracking-wider mb-2">Administrator</p>
-                                <div class="space-y-1">
-                                    <a href="db_users.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
-                                        <i class="fa fa-user-shield w-5 h-5 mr-3"></i>
-                                        <span class="text-xs font-medium">Manajemen User</span>
-                                    </a>
-                                    <a href="db_periode.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
-                                        <i class="fa fa-clock w-5 h-5 mr-3"></i>
-                                        <span class="text-xs font-medium">Periode Akademik</span>
-                                    </a>
-                                    <a href="reminder.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
-                                        <i class="fa fa-paper-plane w-5 h-5 mr-3"></i>
-                                        <span class="text-xs font-medium">Reminder Telegram</span>
-                                    </a>
-                                </div>
-                            </div>
-                        <?php endif; ?>
 
                         <div>
                             <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Pengaturan</p>
                             <div class="space-y-1">
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-user w-5 h-5 mr-3 text-red-600"></i>
+                                        <i class="fa fa-user w-5 h-5 mr-3 text-slate-800"></i>
                                         <span class="text-xs font-medium">Akun</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -468,7 +449,20 @@ function getFireColor($streak)
                                     <a href="krs.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
                                     
                                 </div>
-                              
+<?php if ($role === 'Administrator Utama'): ?>
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
+                                        <span class="text-xs font-medium">Website</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
+                                    <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
+                                    <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
+                                </div>
+                              <?php endif; ?>
                  
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
