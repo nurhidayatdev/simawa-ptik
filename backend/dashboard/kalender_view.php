@@ -17,8 +17,14 @@ $month = isset($_GET['month']) ? intval($_GET['month']) : intval(date('m'));
 $year = isset($_GET['year']) ? intval($_GET['year']) : intval(date('Y'));
 
 // Validate month/year
-if ($month < 1) { $month = 12; $year--; }
-if ($month > 12) { $month = 1; $year++; }
+if ($month < 1) {
+    $month = 12;
+    $year--;
+}
+if ($month > 12) {
+    $month = 1;
+    $year++;
+}
 
 // Get active period
 $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
@@ -53,7 +59,8 @@ while ($row = mysqli_fetch_assoc($q_lecture)) {
 }
 
 // Helper function to check if a date is within lecture periods
-function isLectureDay($timestamp, $ranges) {
+function isLectureDay($timestamp, $ranges)
+{
     foreach ($ranges as $range) {
         if ($timestamp >= $range['start'] && $timestamp <= $range['end']) {
             return true;
@@ -89,7 +96,7 @@ for ($d = 1; $d <= $days_in_month; $d++) {
     $date_ts = mktime(0, 0, 0, $month, $d, $year);
     $day_of_week = date('w', $date_ts);
     $date_key = sprintf('%04d-%02d-%02d', $year, $month, $d);
-    
+
     // Only add jadwal if date is within lecture periods
     if (isset($jadwal_by_day[$day_of_week]) && isLectureDay($date_ts, $lecture_ranges)) {
         foreach ($jadwal_by_day[$day_of_week] as $j) {
@@ -140,16 +147,23 @@ while ($row = mysqli_fetch_assoc($q_tugas)) {
 // Navigation URLs
 $prev_month = $month - 1;
 $prev_year = $year;
-if ($prev_month < 1) { $prev_month = 12; $prev_year--; }
+if ($prev_month < 1) {
+    $prev_month = 12;
+    $prev_year--;
+}
 
 $next_month = $month + 1;
 $next_year = $year;
-if ($next_month > 12) { $next_month = 1; $next_year++; }
+if ($next_month > 12) {
+    $next_month = 1;
+    $next_year++;
+}
 
 $today = date('Y-m-d');
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -160,22 +174,63 @@ $today = date('Y-m-d');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
-        .event-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-        .event-jadwal { background: #6366f1; }
-        .event-kalender { background: #10b981; }
-        .event-tugas { background: #f59e0b; }
-        .event-tugas-done { background: #22c55e; }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .event-jadwal {
+            background: #6366f1;
+        }
+
+        .event-kalender {
+            background: #10b981;
+        }
+
+        .event-tugas {
+            background: #f59e0b;
+        }
+
+        .event-tugas-done {
+            background: #22c55e;
+        }
+
         /* Mobile-only: show dots in a row */
         @media (max-width: 640px) {
-            .calendar-cell { min-height: 60px !important; padding: 4px !important; }
-            .event-text { display: none; }
-            .event-row { flex-wrap: wrap; gap: 3px; }
-            .event-dot { width: 8px; height: 8px; }
+            .calendar-cell {
+                min-height: 60px !important;
+                padding: 4px !important;
+            }
+
+            .event-text {
+                display: none;
+            }
+
+            .event-row {
+                flex-wrap: wrap;
+                gap: 3px;
+            }
+
+            .event-dot {
+                width: 8px;
+                height: 8px;
+            }
         }
     </style>
 </head>
+
 <body class="bg-slate-100">
     <!-- Header -->
     <header class="bg-indigo-950 fixed w-full top-0 z-50">
@@ -216,7 +271,7 @@ $today = date('Y-m-d');
                         <span class="text-xs font-medium">Beranda</span>
                     </a>
 
-                    
+
 
                     <!-- Components Menu -->
                     <div class="space-y-1">
@@ -275,19 +330,19 @@ $today = date('Y-m-d');
                                     <a href="misi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pusat Misi</a>
                                     <a href="kuis_harian.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
                                     <a href="db_pesan.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pesan Anonim</a>
-                                    
+
                                 </div>
 
-                            <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-calendar w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Kalender</span>
                                 </a>
-                                
+
                                 <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Galeri Kelas</span>
                                 </a>
-                            
+
                             </div>
                         </div>
 
@@ -305,23 +360,23 @@ $today = date('Y-m-d');
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="profile.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Profile Saya</a>
                                     <a href="krs.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
-                                    
+
                                 </div>
-<?php if ($role === 'Administrator Utama'): ?>
-                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <div class="flex items-center">
-                                        <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
-                                        <span class="text-xs font-medium">Website</span>
+                                <?php if ($role === 'Administrator Utama'): ?>
+                                    <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
+                                            <span class="text-xs font-medium">Website</span>
+                                        </div>
+                                        <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                    </button>
+                                    <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                        <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
+                                        <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
+                                        <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
                                     </div>
-                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                                </button>
-                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                    <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
-                                    <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
-                                    <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
-                                </div>
-                              <?php endif; ?>
-                 
+                                <?php endif; ?>
+
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
                                     <span class="text-xs font-medium">Logout</span>
@@ -342,7 +397,7 @@ $today = date('Y-m-d');
                     <h1 class="text-2xl font-bold text-slate-800">Kalender Kelas</h1>
                     <p class="text-slate-500 text-sm mt-1">Jadwal kuliah, kalender akademik, dan deadline tugas</p>
                 </div>
-                
+
                 <!-- Month Navigation -->
                 <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
                     <a href="?month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
@@ -367,7 +422,7 @@ $today = date('Y-m-d');
                     <span class="event-dot event-jadwal"></span>
                     <span class="text-slate-600">Jadwal Kuliah</span>
                 </div>
-                
+
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-tugas"></span>
                     <span class="text-slate-600">Deadline Tugas</span>
@@ -390,34 +445,34 @@ $today = date('Y-m-d');
                     for ($i = 0; $i < $start_day; $i++): ?>
                         <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
                     <?php endfor; ?>
-                    
-                    <?php for ($d = 1; $d <= $days_in_month; $d++): 
+
+                    <?php for ($d = 1; $d <= $days_in_month; $d++):
                         $date_key = sprintf('%04d-%02d-%02d', $year, $month, $d);
                         $is_today = ($date_key === $today);
                         $day_events = $events[$date_key] ?? [];
                         $has_events = !empty($day_events);
                     ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 min-h-[60px] sm:min-h-[80px] md:min-h-[100px] <?= $is_today ? 'bg-indigo-50 ring-2 ring-indigo-400 ring-inset' : '' ?> <?= $has_events ? 'cursor-pointer hover:bg-slate-50 transition-colors' : '' ?>" 
-                             <?php if ($has_events): ?>
-                             onclick="showDatePopup('<?= $date_key ?>', <?= $d ?>)"
-                             <?php endif; ?>>
+                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 min-h-[60px] sm:min-h-[80px] md:min-h-[100px] <?= $is_today ? 'bg-indigo-50 ring-2 ring-indigo-400 ring-inset' : '' ?> <?= $has_events ? 'cursor-pointer hover:bg-slate-50 transition-colors' : '' ?>"
+                            <?php if ($has_events): ?>
+                            onclick="showDatePopup('<?= $date_key ?>', <?= $d ?>)"
+                            <?php endif; ?>>
                             <div class="flex justify-between items-start mb-1">
                                 <span class="text-xs sm:text-sm font-bold <?= $is_today ? 'text-indigo-700' : 'text-slate-700' ?>"><?= $d ?></span>
                                 <?php if ($is_today): ?>
                                     <span class="hidden sm:inline text-[8px] bg-indigo-600 text-white px-1 rounded">HARI INI</span>
                                 <?php endif; ?>
                             </div>
-                            
+
                             <!-- Events - Mobile: dots only, Desktop: dots + text -->
                             <div class="event-row flex sm:flex-col sm:space-y-1 overflow-hidden max-h-[40px] sm:max-h-[60px] md:max-h-[80px]">
-                                <?php 
+                                <?php
                                 $event_counts = ['jadwal' => 0, 'kalender' => 0, 'tugas' => 0, 'ultah' => 0];
                                 $shown = 0;
-                                foreach ($day_events as $evt): 
+                                foreach ($day_events as $evt):
                                     $event_counts[$evt['type']]++;
                                     if ($shown >= 4) continue;
                                     $shown++;
-                                    
+
                                     $dot_class = 'event-' . $evt['type'];
                                     if ($evt['type'] === 'tugas' && isset($evt['status']) && $evt['status'] === 'selesai') {
                                         $dot_class = 'event-tugas-done';
@@ -428,15 +483,15 @@ $today = date('Y-m-d');
                                         <span class="event-text truncate hidden sm:inline"><?= htmlspecialchars(mb_strimwidth($evt['title'], 0, 12, '..')) ?></span>
                                     </div>
                                 <?php endforeach; ?>
-                                
+
                                 <?php if (count($day_events) > 3): ?>
                                     <div class="event-text text-[9px] text-slate-400 italic hidden sm:block">+<?= count($day_events) - 3 ?> lainnya</div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     <?php endfor; ?>
-                    
-                    <?php 
+
+                    <?php
                     // Fill remaining cells
                     $total_cells = $start_day + $days_in_month;
                     $remaining = (7 - ($total_cells % 7)) % 7;
@@ -455,7 +510,7 @@ $today = date('Y-m-d');
                         Kalender Akademik
                     </h3>
                     <div class="space-y-2 max-h-[300px] overflow-y-auto">
-                        <?php 
+                        <?php
                         // Collect kalender events
                         $kalender_list = [];
                         foreach ($events as $date => $day_events) {
@@ -489,7 +544,7 @@ $today = date('Y-m-d');
                         Jadwal Kuliah
                     </h3>
                     <div class="space-y-2 max-h-[300px] overflow-y-auto">
-                        <?php 
+                        <?php
                         // Get jadwal from events (already filtered by lecture days)
                         $jadwal_list = [];
                         foreach ($events as $date => $day_events) {
@@ -524,7 +579,7 @@ $today = date('Y-m-d');
                     </div>
                 </div>
 
-                
+
 
                 <!-- Deadline Tugas -->
                 <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
@@ -533,7 +588,7 @@ $today = date('Y-m-d');
                         Deadline Tugas
                     </h3>
                     <div class="space-y-2 max-h-[300px] overflow-y-auto">
-                        <?php 
+                        <?php
                         // Collect tugas events
                         $tugas_list = [];
                         foreach ($events as $date => $day_events) {
@@ -549,9 +604,9 @@ $today = date('Y-m-d');
                             }
                         }
                         if (!empty($tugas_list)):
-                            foreach ($tugas_list as $t): 
+                            foreach ($tugas_list as $t):
                                 $is_done = ($t['status'] === 'selesai');
-                            ?>
+                        ?>
                                 <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs <?= $is_done ? 'opacity-60' : '' ?>">
                                     <span class="font-bold text-amber-700 w-16"><?= date('d M', strtotime($t['date'])) ?></span>
                                     <span class="flex-1 text-slate-700 <?= $is_done ? 'line-through' : '' ?>"><?= htmlspecialchars($t['title']) ?></span>
@@ -575,7 +630,7 @@ $today = date('Y-m-d');
             © 2025 Kelas PTIK C - FT UNM.
         </footer>
     </main>
-    
+
     <!-- Date Popup Modal -->
     <div id="dateModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
@@ -597,31 +652,39 @@ $today = date('Y-m-d');
         // Events data from PHP
         const eventsData = <?= json_encode($events) ?>;
         const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        
+
         function showDatePopup(dateKey, day) {
             const modal = document.getElementById('dateModal');
             const title = document.getElementById('modalTitle');
             const content = document.getElementById('modalContent');
-            
+
             const dateParts = dateKey.split('-');
             const monthName = monthNames[parseInt(dateParts[1])];
             title.textContent = `Agenda ${day} ${monthName} ${dateParts[0]}`;
-            
+
             const dayEvents = eventsData[dateKey] || [];
-            
+
             if (dayEvents.length === 0) {
                 content.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Tidak ada agenda.</p>';
             } else {
                 let html = '<div class="space-y-3">';
                 dayEvents.forEach(evt => {
                     let dotClass = 'event-' + evt.type;
-                    let typeLabel = {'jadwal': 'Jadwal Kuliah', 'kalender': 'Kalender Akademik', 'tugas': 'Deadline Tugas'}[evt.type] || '';
-                    let bgClass = {'jadwal': 'bg-indigo-50 border-indigo-200', 'kalender': 'bg-emerald-50 border-emerald-200', 'tugas': 'bg-amber-50 border-amber-200'}[evt.type] || 'bg-slate-50';
-                    
+                    let typeLabel = {
+                        'jadwal': 'Jadwal Kuliah',
+                        'kalender': 'Kalender Akademik',
+                        'tugas': 'Deadline Tugas'
+                    } [evt.type] || '';
+                    let bgClass = {
+                        'jadwal': 'bg-indigo-50 border-indigo-200',
+                        'kalender': 'bg-emerald-50 border-emerald-200',
+                        'tugas': 'bg-amber-50 border-amber-200'
+                    } [evt.type] || 'bg-slate-50';
+
                     if (evt.type === 'tugas' && evt.status === 'selesai') {
                         dotClass = 'event-tugas-done';
                     }
-                    
+
                     html += `
                         <div class="p-3 rounded-lg border ${bgClass}">
                             <div class="flex items-start gap-3">
@@ -639,22 +702,22 @@ $today = date('Y-m-d');
                 html += '</div>';
                 content.innerHTML = html;
             }
-            
+
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
-        
+
         function closeDatePopup() {
             const modal = document.getElementById('dateModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
-        
+
         // Close modal on backdrop click
         document.getElementById('dateModal').addEventListener('click', function(e) {
             if (e.target === this) closeDatePopup();
         });
-        
+
         // Close modal on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeDatePopup();
@@ -673,10 +736,25 @@ $today = date('Y-m-d');
         });
         const profileButton = document.getElementById('profile-button');
         const profileDropdown = document.getElementById('profile-dropdown');
-        if(profileButton && profileDropdown){
-            profileButton.addEventListener('click', (e)=>{ e.stopPropagation(); profileDropdown.classList.toggle('hidden'); });
-            document.addEventListener('click', ()=> profileDropdown.classList.add('hidden'));
+        if (profileButton && profileDropdown) {
+            profileButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => profileDropdown.classList.add('hidden'));
         }
+
+        // Submenu toggles
+        const submenuButtons = document.querySelectorAll('.submenu-button');
+        submenuButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const submenu = button.nextElementSibling;
+                const arrow = button.querySelector('.submenu-arrow');
+                submenu.classList.toggle('hidden');
+                if (arrow) arrow.classList.toggle('rotate-180');
+            });
+        });
     </script>
 </body>
+
 </html>

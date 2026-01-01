@@ -41,7 +41,7 @@ $res_absensi = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHE
 $count_absensi = mysqli_fetch_assoc($res_absensi)['total'] ?? 0;
 
 // 4. Misi Profil
-$profil_lengkap = (!empty($mhs['foto']) && !empty($mhs['bio']) && !empty($mhs['nama_panggilan'])) ? 1 : 0;
+$profil_lengkap = (!empty($mhs['foto']) && $mhs['foto'] !== 'Yaya.png' && !empty($mhs['instagram']) && !empty($mhs['bio'])) ? 1 : 0;
 
 // 5. Misi KRS (Jumlah mata kuliah yang diambil di semester ini)
 $res_krs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM krs WHERE mahasiswa_id = '$mhs_id' AND periode_id = '$periode_id'");
@@ -94,23 +94,21 @@ $missions = [
         'icon' => 'fa-user-check',
         'color' => 'purple',
         'levels' => [
-            ['name' => 'Profil Lengkap', 'target' => 1, 'current' => $profil_lengkap, 'desc' => 'Lengkapi foto, bio, & nama panggilan'],
             ['name' => 'KRS Terisi', 'target' => 1, 'current' => ($count_krs > 0 ? 1 : 0), 'desc' => 'Selesaikan pengisian KRS semester ini'],
+            ['name' => 'Profil Lengkap', 'target' => 1, 'current' => $profil_lengkap, 'desc' => 'Lengkapi foto (bukan default), instagram & bio'],
             ['name' => 'Si Paling Kelompok', 'target' => 9, 'current' => $count_kelompok, 'desc' => 'Terjalin dalam 9 kelompok mata kuliah']
-        ]
-    ],
-    [
-        'category' => 'Spesial',
-        'title' => 'Lencana Legenda',
-        'icon' => 'fa-crown',
-        'color' => 'yellow',
-        'levels' => [
-            ['name' => 'Mahasiswa Aktif', 'target' => 3, 'current' => ($count_kas >= 8 ? 1 : 0) + ($count_absensi >= 10 ? 1 : 0) + ($count_kelompok >= 5 ? 1 : 0), 'desc' => 'Capai 3 syarat: Kas 8 minggu, Hadir 10x, 5 Kelompok'],
-            ['name' => 'Sang Legenda', 'target' => 3, 'current' => ($count_kas >= 16 ? 1 : 0) + ($count_absensi >= 25 ? 1 : 0) + ($count_kelompok >= 9 ? 1 : 0), 'desc' => 'Capai 3 syarat: Kas Lunas, Hadir 25x, 9 Kelompok']
         ]
     ]
 ];
 
+// Mapping warna ke CSS filter untuk logo
+$color_filters = [
+    'emerald' => 'brightness(0) saturate(100%) invert(65%) sepia(16%) saturate(3065%) hue-rotate(116deg) brightness(101%) contrast(86%)',
+    'blue'    => 'brightness(0) saturate(100%) invert(51%) sepia(85%) saturate(2394%) hue-rotate(201deg) brightness(99%) contrast(94%)',
+    'orange'  => 'brightness(0) saturate(100%) invert(62%) sepia(77%) saturate(3143%) hue-rotate(352deg) brightness(101%) contrast(96%)',
+    'purple'  => 'brightness(0) saturate(100%) invert(43%) sepia(72%) saturate(3085%) hue-rotate(244deg) brightness(102%) contrast(95%)',
+    'yellow'  => 'brightness(0) saturate(100%) invert(91%) sepia(96%) saturate(1313%) hue-rotate(359deg) brightness(101%) contrast(101%)'
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,17 +126,33 @@ $missions = [
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
         .glass {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .mission-card:hover { transform: translateY(-5px); }
-        .status-badge { transition: all 0.3s ease; }
-        .locked { opacity: 0.5; filter: grayscale(1); }
-        .completed { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)); }
+
+        .mission-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+
+        .locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .completed {
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        }
     </style>
 </head>
 
@@ -180,7 +194,7 @@ $missions = [
                         <span class="text-xs font-medium">Beranda</span>
                     </a>
 
-                    
+
 
                     <!-- Components Menu -->
                     <div class="space-y-1">
@@ -239,19 +253,19 @@ $missions = [
                                     <a href="misi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pusat Misi</a>
                                     <a href="kuis_harian.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
                                     <a href="db_pesan.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pesan Anonim</a>
-                                    
+
                                 </div>
 
-                            <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-calendar w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Kalender</span>
                                 </a>
-                                
+
                                 <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Galeri Kelas</span>
                                 </a>
-                            
+
                             </div>
                         </div>
 
@@ -269,23 +283,23 @@ $missions = [
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="profile.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Profile Saya</a>
                                     <a href="krs.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
-                                    
+
                                 </div>
-<?php if ($role === 'Administrator Utama'): ?>
-                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <div class="flex items-center">
-                                        <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
-                                        <span class="text-xs font-medium">Website</span>
+                                <?php if ($role === 'Administrator Utama'): ?>
+                                    <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
+                                            <span class="text-xs font-medium">Website</span>
+                                        </div>
+                                        <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                    </button>
+                                    <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                        <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
+                                        <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
+                                        <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
                                     </div>
-                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                                </button>
-                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                    <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
-                                    <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
-                                    <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
-                                </div>
-                              <?php endif; ?>
-                 
+                                <?php endif; ?>
+
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
                                     <span class="text-xs font-medium">Logout</span>
@@ -305,6 +319,8 @@ $missions = [
                 <p class="text-slate-500 text-sm mt-1">Selesaikan misi untuk mendapatkan lencana prestisius!</p>
             </div>
 
+
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <?php foreach ($missions as $cat): ?>
                     <div class="glass p-6 rounded-2xl shadow-xl transition-all mission-card">
@@ -319,15 +335,19 @@ $missions = [
                         </div>
 
                         <div class="space-y-6">
-                            <?php foreach ($cat['levels'] as $level): 
+                            <?php foreach ($cat['levels'] as $level):
                                 $progress = min(100, ($level['current'] / $level['target']) * 100);
                                 $is_completed = ($level['current'] >= $level['target']);
                             ?>
                                 <div class="bg-white/50 p-4 rounded-xl border border-white/80 shadow-sm">
                                     <div class="flex justify-between items-start mb-2">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full flex items-center justify-center <?= $is_completed ? 'bg-yellow-100 text-yellow-600 completed' : 'bg-slate-100 text-slate-400 locked' ?>">
-                                                <i class="fa <?= $is_completed ? 'fa-medal' : 'fa-lock' ?> text-lg"></i>
+                                            <div class="w-10 h-10 rounded-full flex items-center justify-center <?= $is_completed ? 'bg-' . $cat['color'] . '-100 completed' : 'bg-slate-100 text-slate-400 locked' ?>">
+                                                <?php if ($is_completed): ?>
+                                                    <img src="../img/main/logo.png" class="w-6 h-6 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
+                                                <?php else: ?>
+                                                    <i class="fa fa-lock text-lg"></i>
+                                                <?php endif; ?>
                                             </div>
                                             <div>
                                                 <h4 class="font-bold text-sm text-slate-700"><?= $level['name'] ?></h4>
@@ -338,7 +358,7 @@ $missions = [
                                             <span class="text-xs font-black text-slate-700"><?= $level['current'] ?> / <?= $level['target'] ?></span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mt-3 shadow-inner">
                                         <div class="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-<?= $cat['color'] ?>-400 to-<?= $cat['color'] ?>-600" style="width: <?= $progress ?>%"></div>
                                     </div>
@@ -354,7 +374,7 @@ $missions = [
                     </div>
                 <?php endforeach; ?>
             </div>
-            
+
             <div class="mt-12 p-8 rounded-3xl border border-indigo-900/50 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white overflow-hidden relative shadow-2xl">
                 <div class="relative z-10">
                     <h2 class="text-2xl font-black mb-2 flex items-center gap-3">
@@ -362,9 +382,9 @@ $missions = [
                         Koleksi Lencana Kamu
                     </h2>
                     <p class="text-indigo-200 text-sm mb-6">Berikut adalah lencana eksklusif yang telah kamu kumpulkan melalui kerja kerasmu!</p>
-                    
+
                     <div class="flex flex-wrap justify-center gap-6 md:gap-8">
-                        <?php 
+                        <?php
                         $any_badge = false;
                         $badge_gradients = [
                             'emerald' => 'from-emerald-400 to-emerald-600',
@@ -374,61 +394,61 @@ $missions = [
                             'purple'  => 'from-purple-400 to-purple-600',
                             'yellow'  => 'from-yellow-400 to-yellow-600'
                         ];
-                        
+
                         foreach ($missions as $cat):
                             $bg_grad = $badge_gradients[$cat['color']] ?? 'from-slate-400 to-slate-600';
-                            
-                            foreach ($cat['levels'] as $level):
+
+                            foreach ($cat['levels'] as $l_idx => $level):
                                 if ($level['current'] >= $level['target']):
                                     $any_badge = true;
                         ?>
-                            <div class="group relative flex flex-col items-center">
-                                <!-- Badge Circle -->
-                                <div class="relative w-14 h-14 md:w-16 md:h-16 transition-transform duration-300 transform group-hover:-translate-y-2 group-hover:scale-105 cursor-pointer">
-                                    <!-- Glow Effect behind -->
-                                    <div class="absolute inset-0 bg-gradient-to-br <?= $bg_grad ?> rounded-full blur-md opacity-40 group-hover:opacity-75 transition-opacity"></div>
-                                    
-                                    <!-- Main Badge Body -->
-                                    <div class="relative w-full h-full rounded-full bg-gradient-to-br <?= $bg_grad ?> p-[2px] shadow-xl">
-                                        <div class="w-full h-full rounded-full bg-slate-900/90 backdrop-blur-sm flex flex-col items-center justify-center border border-white/10 relative overflow-hidden">
-                                            
-                                            <!-- Shine Animation -->
-                                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-150%] skew-x-12 group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out"></div>
-                                            
-                                            <i class="fa <?= $cat['icon'] ?> text-lg md:text-2xl text-white mb-1 drop-shadow-md relative z-10"></i>
-                                            
-                                            <!-- Tiny stars for aesthetic -->
-                                            <div class="flex gap-0.5 mt-0.5 relative z-10">
-                                                 <i class="fa fa-star text-[6px] text-yellow-300"></i>
-                                                 <i class="fa fa-star text-[6px] text-yellow-300"></i>
-                                                 <i class="fa fa-star text-[6px] text-yellow-300"></i>
+                                    <div class="group relative flex flex-col items-center">
+                                        <!-- Badge Circle -->
+                                        <div class="relative w-14 h-14 md:w-16 md:h-16 transition-transform duration-300 transform group-hover:-translate-y-2 group-hover:scale-105 cursor-pointer">
+                                            <!-- Glow Effect behind -->
+                                            <div class="absolute inset-0 bg-gradient-to-br <?= $bg_grad ?> rounded-full blur-md opacity-40 group-hover:opacity-75 transition-opacity"></div>
+
+                                            <!-- Main Badge Body -->
+                                            <div class="relative w-full h-full rounded-full bg-gradient-to-br <?= $bg_grad ?> p-[2px] shadow-xl">
+                                                <div class="w-full h-full rounded-full bg-slate-900/90 backdrop-blur-sm flex flex-col items-center justify-center border border-white/10 relative overflow-hidden">
+
+                                                    <!-- Shine Animation -->
+                                                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-x-[-150%] skew-x-12 group-hover:translate-x-[150%] transition-transform duration-1000 ease-in-out"></div>
+
+                                                    <i class="fa <?= $cat['icon'] ?> text-lg md:text-2xl text-white mb-1 drop-shadow-md relative z-10"></i>
+
+                                                    <!-- Tiny Logos for rank indicator -->
+                                                    <div class="flex gap-0.5 mt-0.5 relative z-10">
+                                                        <?php for ($s = 0; $s <= $l_idx; $s++): ?>
+                                                            <img src="../img/main/logo.png" class="w-2.5 h-2.5 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
+                                                        <?php endfor; ?>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- Label -->
+                                        <div class="mt-3 text-center">
+                                            <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/90 bg-white/10 px-3 py-1 rounded-full border border-white/5 shadow-sm group-hover:bg-white/20 transition-colors">
+                                                <?= $level['name'] ?>
+                                            </span>
+                                        </div>
+
+                                        <!-- Detailed Tooltip -->
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform translate-y-2 group-hover:translate-y-0 w-max max-w-[150px] text-center z-50 border border-white/10">
+                                            <p class="font-bold text-<?= $cat['color'] ?>-400 mb-0.5"><?= $cat['category'] ?></p>
+                                            <p class="text-[10px] text-slate-300 leading-tight"><?= $level['desc'] ?></p>
+                                            <!-- Arrow -->
+                                            <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <!-- Label -->
-                                <div class="mt-3 text-center">
-                                    <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/90 bg-white/10 px-3 py-1 rounded-full border border-white/5 shadow-sm group-hover:bg-white/20 transition-colors">
-                                        <?= $level['name'] ?>
-                                    </span>
-                                </div>
-
-                                <!-- Detailed Tooltip -->
-                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform translate-y-2 group-hover:translate-y-0 w-max max-w-[150px] text-center z-50 border border-white/10">
-                                    <p class="font-bold text-<?= $cat['color'] ?>-400 mb-0.5"><?= $cat['category'] ?></p>
-                                    <p class="text-[10px] text-slate-300 leading-tight"><?= $level['desc'] ?></p>
-                                    <!-- Arrow -->
-                                    <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-                                </div>
-                            </div>
-                        <?php 
+                            <?php
                                 endif;
                             endforeach;
-                        endforeach; 
-                        
+                        endforeach;
+
                         if (!$any_badge):
-                        ?>
+                            ?>
                             <div class="w-full text-center py-8 bg-white/5 rounded-2xl border border-white/10 flex flex-col items-center justify-center dashed-border">
                                 <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mb-3">
                                     <i class="fa fa-lock text-white/30 text-2xl"></i>
@@ -445,9 +465,7 @@ $missions = [
             </div>
         </div>
 
-        <footer class="text-[10px] text-indigo-950/50 text-center py-10 mt-auto">
-            © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. Didesain dengan penuh dedikasi.
-        </footer>
+        <footer class="text-xs text-indigo-900 text-center mt-8 pb-2">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
     </main>
 
     <script>
@@ -475,6 +493,18 @@ $missions = [
             });
             document.addEventListener('click', () => profileDropdown.classList.add('hidden'));
         }
+
+        // Submenu toggles
+        const submenuButtons = document.querySelectorAll('.submenu-button');
+        submenuButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const submenu = button.nextElementSibling;
+                const arrow = button.querySelector('.submenu-arrow');
+                submenu.classList.toggle('hidden');
+                if (arrow) arrow.classList.toggle('rotate-180');
+            });
+        });
     </script>
 </body>
+
 </html>
