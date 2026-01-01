@@ -104,7 +104,7 @@ $query = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DESC");
 
 	<main class="flex-grow ">
 		<section class="py-12 p-6">
-			<div class="container mx-auto px-4">
+			<div class="container mx-auto">
 				<h2 class="text-3xl font-bold mb-6 text-gray-800">Berita & Informasi Akademik</h2>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

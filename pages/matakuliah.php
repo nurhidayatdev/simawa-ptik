@@ -106,7 +106,7 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
     <div class="h-10"></div>
 
 
-  <div class="container mx-auto py-6 mt-4 px-12">
+  <div class="container mx-auto py-6 mt-4 p-6">
     <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Matakuliah PTIK</h1>
     <!-- Rest of the content remains the same -->
      <?php for ($s = 1; $s <= 8; $s++): ?>

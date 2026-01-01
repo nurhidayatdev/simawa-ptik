@@ -133,7 +133,7 @@ $query_matkul = mysqli_query($koneksi, "
 
     <main class="flex-grow">
         <section class="py-12 p-6">
-            <div class="container mx-auto px-4">
+            <div class="container mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-800">Tugas Kuliah</h2>
