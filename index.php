@@ -105,7 +105,7 @@ include 'koneksi.php';
     <!-- Hero Section (diperbaiki: tinggi responsif, konten tersentral, overlay) -->
     <section class="relative text-white overflow-hidden" style="min-height: 100vh;">
         <div class="absolute inset-0 bg-center bg-cover brightness-50"
-            style="background-image: url('backend/img/main/img-1.jpg'); z-index: 0;">
+            style="background-image: url('backend/img/main/img-1.jpeg'); z-index: 0;">
         </div>
 
         <div class="absolute inset-0 bg-black/30" style="z-index: 1;"></div>
@@ -151,7 +151,7 @@ include 'koneksi.php';
                 </div>
 
                 <div class="flex justify-center">
-                    <img src="img/img-1.jpg" alt="Foto bersama kelas PTIK C Angkatan 2024" class="rounded-lg shadow-lg">
+                    <img src="backend/img/main/img-2.jpeg" alt="Foto bersama kelas PTIK C Angkatan 2024" class="rounded-lg shadow-lg">
                 </div>
             </div>
         </div>

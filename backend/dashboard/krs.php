@@ -319,10 +319,13 @@ while ($row = mysqli_fetch_assoc($krs)) {
                     </div>
                 <?php endfor; ?>
 
-                <button type="button" onclick="confirmSaveKRS()"
-                    class="mt-6 px-4 py-2 bg-indigo-800 text-white rounded hover:bg-indigo-950 text-xs shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
-                    <i class="fa fa-save mr-1"></i> Simpan KRS
-                </button>
+                <div class="mt-8 pt-5 border-t border-slate-200 flex flex-col items-center">
+                    <p class="text-[10px] text-slate-500 mb-4 italic">Pastikan mata kuliah yang dipilih sudah sesuai sebelum melakukan penyimpanan.</p>
+                    <button type="button" onclick="confirmSaveKRS()"
+                        class="px-6 py-2.5 bg-indigo-800 text-white rounded-lg hover:bg-indigo-950 text-xs font-semibold shadow-lg shadow-indigo-900/20 transition-all active:scale-95 flex items-center">
+                        <i class="fa fa-save mr-2"></i> Simpan KRS
+                    </button>
+                </div>
             </form>
 
         </div>

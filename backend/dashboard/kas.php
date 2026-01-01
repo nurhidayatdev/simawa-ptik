@@ -421,9 +421,10 @@ if (isset($_POST['simpan_kas'])) {
                             </tbody>
 
                         </table>
-                        <div class="flex items-center justify-end mb-4 mt-4">
-                                    <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-4 py-2 text-xs shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
-                                        <i class="fa fa-save mr-1"></i> Simpan Kas
+                                <div class="mt-8 pt-5 border-t border-slate-200 flex flex-col items-center">
+                                    <p class="text-[10px] text-slate-500 mb-4 italic">Pastikan status pembayaran dan tanggal bayar sudah benar.</p>
+                                    <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-6 py-2.5 text-xs font-semibold shadow-lg shadow-indigo-900/20 transition-all active:scale-95 flex items-center">
+                                        <i class="fa fa-save mr-2"></i> Simpan Kas
                                     </button>
                                 </div>
                     </form>
