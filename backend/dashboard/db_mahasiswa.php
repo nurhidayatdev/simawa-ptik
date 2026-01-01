@@ -144,6 +144,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         <span class="text-xs">Beranda</span>
                     </a>
 
+                    <a href="misi.php" class="flex items-center px-4 py-2 text-slate-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-transparent hover:border-indigo-100">
+                        <i class="fa fa-trophy w-4 h-4 mr-4 text-orange-500"></i>
+                        <span class="text-xs font-semibold">Pusat Misi</span>
+                    </a>
+
                     <!-- Components Menu -->
                     <div class="space-y-1">
                         <div>

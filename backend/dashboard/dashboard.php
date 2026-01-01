@@ -151,6 +151,7 @@ if (!empty($filter_minggu_kas)) {
 $belum_k = $total_k - $lunas_k;
 $persen_lunas = $total_k > 0 ? round(($lunas_k / $total_k) * 100) : 0;
 
+
 // Kalender Akademik untuk Slider
 $today_date = date('Y-m-d');
 $academic_events = [];
@@ -354,6 +355,12 @@ function getFireColor($streak)
                     <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
                         <i class="fa fa-home w-4 h-4 mr-4"></i>
                         <span class="text-xs">Beranda</span>
+                    </a>
+
+                    <a href="misi.php" class="flex items-center px-4 py-2 text-slate-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-transparent hover:border-indigo-100">
+                        <i class="fa fa-trophy w-4 h-4 mr-4 text-orange-500"></i>
+                        <span class="text-xs font-semibold">Pusat Misi</span>
+                        <span class="ml-auto bg-orange-100 text-orange-600 text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tighter">Baru</span>
                     </a>
 
                     <!-- Components Menu -->
@@ -667,6 +674,8 @@ function getFireColor($streak)
                     <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="3"></div>
                 </div>
             </div>
+
+
 
             <!-- --- SECTION 1: DEMOGRAFI & SOSIAL --- -->
             <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
