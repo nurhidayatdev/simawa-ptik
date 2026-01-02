@@ -66,11 +66,7 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
                             <i class="fas fa-graduation-cap mr-2"></i>Akademik
                         </a>
                     </li>
-                    <li>
-                        <a href="kalender.php" class="flex items-center hover:text-indigo-200 transition text-sm text-indigo-200">
-                            <i class="fas fa-calendar-alt mr-2"></i>Kalender
-                        </a>
-                    </li>
+                    
                     <li>
                         <a href="galeri.php" class="flex items-center hover:text-indigo-200 transition text-sm">
                             <i class="fas fa-images mr-2"></i>Galeri
@@ -102,11 +98,7 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
                         <i class="fas fa-graduation-cap w-5"></i><span>Akademik</span>
                     </a>
                 </li>
-                <li>
-                    <a href="kalender.php" class="flex items-center space-x-3 hover:text-indigo-200 transition text-sm py-2 text-indigo-200">
-                        <i class="fas fa-calendar-alt w-5"></i><span>Kalender</span>
-                    </a>
-                </li>
+               
                 <li>
                     <a href="galeri.php" class="flex items-center space-x-3 hover:text-indigo-200 transition text-sm py-2">
                         <i class="fas fa-images w-5"></i><span>Galeri</span>
