@@ -123,7 +123,7 @@ if (isset($_POST['update'])) {
                 }
             }
 
-           
+
 
             mysqli_query($koneksi, "UPDATE mahasiswa SET 
                     nama_lengkap='{$_POST['nama_lengkap']}',
@@ -137,8 +137,8 @@ if (isset($_POST['update'])) {
             $redirect = "../dashboard/db_mahasiswa.php";
             break;
 
- case 'periode':
-             mysqli_query($koneksi, "UPDATE periode SET 
+        case 'periode':
+            mysqli_query($koneksi, "UPDATE periode SET 
                     tahun_periode='{$_POST['tahun_periode']}',
                     semester_nama='{$_POST['semester_nama']}',
                     semester_ke='{$_POST['semester_ke']}',
@@ -406,6 +406,18 @@ if (isset($_POST['update'])) {
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Edit Data - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link rel='icon' href='../img/main/icon.png' />
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -444,6 +456,18 @@ if (isset($_POST['update'])) {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Edit - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -182,6 +182,18 @@ $today = date('Y-m-d');
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../backend/img/main/icon.png" />
     <title>Akademik - Kelas PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">

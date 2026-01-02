@@ -59,12 +59,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
         echo '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['bio']) . '</td>';
-         if ($role === 'Administrator Utama'):
-        echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
-       
-        echo '<a href="../crud/edit.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
-        echo '<a href="../crud/hapus.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus mahasiswa ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
-        echo '</td>';
+        if ($role === 'Administrator Utama'):
+            echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
+
+            echo '<a href="../crud/edit.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
+            echo '<a href="../crud/hapus.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus mahasiswa ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+            echo '</td>';
         endif;
         echo '</tr>';
     }
@@ -81,6 +81,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Data Mahasiswa - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -312,10 +324,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
                                 placeholder="Cari NIM / Nama..."
                                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-<?php if ($role === 'Administrator Utama'): ?>
-                            <a href="../crud/tambah.php?tabel=mahasiswa" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
-                                <i class="fa fa-plus"></i>
-                            </a>
+                            <?php if ($role === 'Administrator Utama'): ?>
+                                <a href="../crud/tambah.php?tabel=mahasiswa" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
+                                    <i class="fa fa-plus"></i>
+                                </a>
                             <?php endif; ?>
                         </div>
                     </form>
@@ -343,10 +355,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 Instagram</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Bio</th>
-                                <?php if ($role === 'Administrator Utama'): ?>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                Actions</th>
-                                <?php endif; ?>
+                            <?php if ($role === 'Administrator Utama'): ?>
+                                <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                    Actions</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
@@ -370,11 +382,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nama_panggilan']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-									<?php
-									$jkColor = ($row['jenis_kelamin'] === 'Laki-laki') ? 'bg-sky-100 text-sky-800 border-sky-200' : 'bg-pink-100 text-pink-800 border-pink-200';
-									?>
-									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $jkColor ?>"><?= ucfirst($row['jenis_kelamin']) ?></span>
-								</td>
+                                    <?php
+                                    $jkColor = ($row['jenis_kelamin'] === 'Laki-laki') ? 'bg-sky-100 text-sky-800 border-sky-200' : 'bg-pink-100 text-pink-800 border-pink-200';
+                                    ?>
+                                    <span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $jkColor ?>"><?= ucfirst($row['jenis_kelamin']) ?></span>
+                                </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                     <?php if (!empty($row['instagram'])): ?>
                                         <a href="https://instagram.com/<?= ltrim(htmlspecialchars($row['instagram']), '@') ?>" target="_blank" class="text-purple-400 hover:text-purple-800">
@@ -385,17 +397,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-3 py-2 text-xs text-slate-800"><?= $row['bio']; ?></td>
-<?php if ($role === 'Administrator Utama'): ?>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
-                                    <a href="../crud/edit.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Edit">
-                                        <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
-                                    </a>
+                                <?php if ($role === 'Administrator Utama'): ?>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
+                                        <a href="../crud/edit.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Edit">
+                                            <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
+                                        </a>
 
-                                    <a href="../crud/hapus.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Hapus">
-                                        <i class="fa fa-trash text-red-600 hover:text-red-900"></i>
-                                    </a>
+                                        <a href="../crud/hapus.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Hapus">
+                                            <i class="fa fa-trash text-red-600 hover:text-red-900"></i>
+                                        </a>
 
-                                </td>
+                                    </td>
                                 <?php endif; ?>
                             </tr>
                         <?php endwhile; ?>
@@ -404,8 +416,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             </div>
         </div>
         <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
-      © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
-    </footer>
+            © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
+        </footer>
     </main>
     <script>
         // Mobile menu toggle dengan perbaikan
@@ -459,16 +471,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
 
         // Live search via AJAX: update table rows without leaving input focus
-        (function(){
+        (function() {
             const input = document.getElementById('searchInput');
             if (!input) return;
             let timer = null;
-            input.addEventListener('input', function(){
+            input.addEventListener('input', function() {
                 clearTimeout(timer);
                 timer = setTimeout(() => {
                     const q = encodeURIComponent(input.value || '');
                     const url = window.location.pathname + '?search=' + q + '&ajax=1';
-                    fetch(url, { credentials: 'same-origin' })
+                    fetch(url, {
+                            credentials: 'same-origin'
+                        })
                         .then(r => r.text())
                         .then(html => {
                             const tbody = document.querySelector('table tbody');

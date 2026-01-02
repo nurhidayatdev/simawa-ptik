@@ -22,6 +22,18 @@ if ($_SESSION['role'] !== 'Administrator Utama') {
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Data Periode - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link rel='icon' href='../img/main/icon.png' />
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -82,12 +94,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['tahun_periode']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['semester_nama']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($row['semester_ke']) . '</td>';
-        
+
         // Status badge
-        $statusClass = ($row['status'] == 'aktif') 
-            ? 'bg-green-100 text-green-800 border-green-200' 
+        $statusClass = ($row['status'] == 'aktif')
+            ? 'bg-green-100 text-green-800 border-green-200'
             : 'bg-red-100 text-red-800 border-red-200';
-            
+
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
         echo '<span class="px-2 py-1 rounded-full border ' . $statusClass . '">' . htmlspecialchars(ucfirst($row['status'])) . '</span>';
         echo '</td>';
@@ -111,6 +123,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Data Periode - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,7 +160,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <body class="bg-slate-100">
     <!-- Header dengan z-index lebih tinggi -->
-   <header class="bg-indigo-950  fixed w-full top-0 z-50">
+    <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
                 <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
@@ -381,11 +405,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['tahun_periode']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['semester_nama']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['semester_ke']); ?></td>
-                                
+
                                 <td class="px-3 py-2 whitespace-nowrap text-xs">
-                                    <?php 
-                                    $statusClass = ($row['status'] == 'aktif') 
-                                        ? 'bg-green-100 text-green-800 border-green-200' 
+                                    <?php
+                                    $statusClass = ($row['status'] == 'aktif')
+                                        ? 'bg-green-100 text-green-800 border-green-200'
                                         : 'bg-red-100 text-red-800 border-red-200';
                                     ?>
                                     <span class="px-2 py-1 rounded-full border <?= $statusClass ?>">
@@ -410,8 +434,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             </div>
         </div>
         <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
-      © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
-    </footer>
+            © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
+        </footer>
     </main>
     <script>
         // Mobile menu toggle dengan perbaikan
@@ -465,16 +489,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
 
         // Live search via AJAX: update table rows without leaving input focus
-        (function(){
+        (function() {
             const input = document.getElementById('searchInput');
             if (!input) return;
             let timer = null;
-            input.addEventListener('input', function(){
+            input.addEventListener('input', function() {
                 clearTimeout(timer);
                 timer = setTimeout(() => {
                     const q = encodeURIComponent(input.value || '');
                     const url = window.location.pathname + '?search=' + q + '&ajax=1';
-                    fetch(url, { credentials: 'same-origin' })
+                    fetch(url, {
+                            credentials: 'same-origin'
+                        })
                         .then(r => r.text())
                         .then(html => {
                             const tbody = document.querySelector('table tbody');

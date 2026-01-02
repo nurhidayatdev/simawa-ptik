@@ -19,6 +19,18 @@ if ($role === 'Mahasiswa' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Kas Individu - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     </head>
     <body>
@@ -50,14 +62,14 @@ $mahasiswa_id_selected = $_GET['mahasiswa_id'] ?? '';
 // Handle Update
 if (isset($_POST['update_kas_individu'])) {
     $m_id = mysqli_real_escape_string($koneksi, $_POST['mahasiswa_id']);
-    
+
     if (!empty($_POST['status']) && is_array($_POST['status'])) {
         foreach ($_POST['status'] as $minggu => $status) {
             $status_safe = mysqli_real_escape_string($koneksi, $status);
             $minggu_safe = mysqli_real_escape_string($koneksi, $minggu);
-            
+
             $posted_tanggal = $_POST['tanggal'][$minggu] ?? '';
-            
+
             // Check existence
             $res = mysqli_query($koneksi, "SELECT status, tanggal_bayar FROM kas WHERE mahasiswa_id='$m_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
             $exists = mysqli_num_rows($res) > 0;
@@ -105,6 +117,18 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Kas Individu - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -113,10 +137,18 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .rotate-180 { transform: rotate(180deg); }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
         @media (max-width: 768px) {
-            .mobile-menu-open { transform: translateX(0) !important; }
+            .mobile-menu-open {
+                transform: translateX(0) !important;
+            }
         }
     </style>
 </head>
@@ -325,7 +357,7 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
                     <label class="block text-xs font-medium text-slate-700 mb-1">Pilih Mahasiswa</label>
                     <select name="mahasiswa_id" onchange="this.form.submit()" class="w-full border p-2 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 outline-none">
                         <option value="">-- Pilih Mahasiswa --</option>
-                        <?php while($m = mysqli_fetch_assoc($all_mhs)): ?>
+                        <?php while ($m = mysqli_fetch_assoc($all_mhs)): ?>
                             <option value="<?= $m['id'] ?>" <?= ($mahasiswa_id_selected == $m['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($m['nim']) ?> - <?= htmlspecialchars($m['nama_lengkap']) ?>
                             </option>
@@ -334,7 +366,7 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
                 </div>
             </form>
 
-            <?php if ($mahasiswa_id_selected): 
+            <?php if ($mahasiswa_id_selected):
                 $m_id_safe = mysqli_real_escape_string($koneksi, $mahasiswa_id_selected);
                 $q_mhs_info = mysqli_query($koneksi, "SELECT * FROM mahasiswa WHERE id = '$m_id_safe'");
                 $mhs_info = mysqli_fetch_assoc($q_mhs_info);
@@ -373,7 +405,7 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
                                     $kas_data = mysqli_fetch_assoc($q_kas);
                                     $status_curr = $kas_data['status'] ?? 'Belum';
                                     $tgl_curr = $kas_data['tanggal_bayar'] ?? '';
-                                    ?>
+                                ?>
                                     <tr class="<?= ($i % 2 == 0) ? 'bg-slate-50' : 'bg-white' ?> hover:bg-indigo-50">
                                         <td class="px-4 py-3 whitespace-nowrap text-xs font-medium text-slate-800 text-center">
                                             Minggu <?= $i ?>
@@ -482,4 +514,5 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
         <?php endif; ?>
     </script>
 </body>
+
 </html>

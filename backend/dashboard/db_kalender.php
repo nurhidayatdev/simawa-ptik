@@ -48,12 +48,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             echo '<td class="px-3 py-2 text-xs text-slate-600">' . date('d/m/Y', strtotime($row['tanggal_mulai'])) . '</td>';
             echo '<td class="px-3 py-2 text-xs text-slate-600">' . date('d/m/Y', strtotime($row['tanggal_selesai'])) . '</td>';
             echo '<td class="px-3 py-2 text-xs text-slate-600">' . htmlspecialchars($row['tahun_periode']) . ' - ' . htmlspecialchars($row['semester_nama']) . '</td>';
-            if ($role === 'Administrator Utama'): 
+            if ($role === 'Administrator Utama'):
                 echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">';
                 echo '<a href="../crud/edit.php?tabel=kalender_akademik&id=' . $row['id'] . '" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3"><i class="fa fa-edit"></i></a>';
                 echo '<a href="../crud/hapus.php?tabel=kalender_akademik&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus agenda ini?\');" class="text-red-600 hover:text-red-900"><i class="fa fa-trash"></i></a>';
                 echo '</td>';
-            endif; 
+            endif;
             echo '</tr>';
         }
     } else {
@@ -70,7 +70,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
-    <title>Data Kalender - PTIK C 2024</title>
+    <title>Data Kalender Akademik - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,7 +106,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <body class="bg-slate-100">
     <!-- Header dengan z-index lebih tinggi -->
-   <header class="bg-indigo-950  fixed w-full top-0 z-50">
+    <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
                 <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
@@ -295,9 +307,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 <div class="flex flex-row gap-2 items-center w-full sm:w-auto">
                     <form action="" method="GET" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
                         <label for="periode" class="text-[10px] font-medium text-slate-500">Periode:</label>
-                        <select name="periode_id" id="periode" onchange="this.form.submit()" 
+                        <select name="periode_id" id="periode" onchange="this.form.submit()"
                             class="bg-transparent border-none text-xs focus:outline-none focus:ring-0 p-0 pr-6">
-                            <?php while($p = mysqli_fetch_assoc($periods_res)): ?>
+                            <?php while ($p = mysqli_fetch_assoc($periods_res)): ?>
                                 <option value="<?= $p['id'] ?>" <?= ($periode_id == $p['id']) ? 'selected' : '' ?>>
                                     <?= $p['tahun_periode'] ?> - <?= $p['semester_nama'] ?>
                                 </option>
@@ -305,9 +317,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         </select>
                     </form>
                     <?php if ($role === 'Administrator Utama'): ?>
-                    <a href="../crud/tambah.php?tabel=kalender_akademik" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center transition-colors" title="Tambah">
-                        <i class="fa fa-plus"></i>
-                    </a>
+                        <a href="../crud/tambah.php?tabel=kalender_akademik" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center transition-colors" title="Tambah">
+                            <i class="fa fa-plus"></i>
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -322,7 +334,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Selesai</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Periode</th>
                             <?php if ($role === 'Administrator Utama'): ?>
-                            <th class="px-3 py-3 text-xs font-bold text-white uppercase tracking-wider text-center">Actions</th>
+                                <th class="px-3 py-3 text-xs font-bold text-white uppercase tracking-wider text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
@@ -341,14 +353,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <td class="px-3 py-2 text-xs text-slate-800"><?= date('d/m/Y', strtotime($row['tanggal_selesai'])) ?></td>
                                     <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['tahun_periode']) ?> - <?= htmlspecialchars($row['semester_nama']) ?></td>
                                     <?php if ($role === 'Administrator Utama'): ?>
-                                    <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
-                                        <a href="../crud/edit.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a href="../crud/hapus.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Hapus" onclick="return confirm('Hapus agenda ini?');" class="text-red-600 hover:text-red-900">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
+                                            <a href="../crud/edit.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="../crud/hapus.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Hapus" onclick="return confirm('Hapus agenda ini?');" class="text-red-600 hover:text-red-900">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </td>
                                     <?php endif; ?>
                                 </tr>
                         <?php
@@ -408,8 +420,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 }
             });
         }
-
-
     </script>
 </body>
 

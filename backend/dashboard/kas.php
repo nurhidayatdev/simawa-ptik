@@ -22,6 +22,18 @@ if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Ketua Tingkat' |
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Kas - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link rel='icon' href='../img/main/icon.png' />
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -122,6 +134,18 @@ if (isset($_POST['simpan_kas'])) {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Kas Mingguan - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -349,7 +373,7 @@ if (isset($_POST['simpan_kas'])) {
                         <a href="db_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-xs text-center">Kembali</a>
                     </form>
                 </div>
-                
+
             </div>
             <form method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <select name="minggu_ke" required onchange="this.form.submit()" class="border p-2 rounded-lg text-xs">
@@ -366,7 +390,7 @@ if (isset($_POST['simpan_kas'])) {
                     <option value="Belum" <?= ($_GET['filter'] ?? '') == 'Belum' ? 'selected' : '' ?>>Belum</option>
                 </select>
 
-                
+
             </form>
 
             <!-- filter links removed; filter dropdown will be next to save button -->
@@ -377,11 +401,12 @@ if (isset($_POST['simpan_kas'])) {
 
 
 
-                <!-- Rest of the content remains the same --><form method="POST">
-                <div class="overflow-x-auto">
-                    
-                                <input type="hidden" name="minggu_ke" value="<?= $minggu ?>">
-                                
+                <!-- Rest of the content remains the same -->
+                <form method="POST">
+                    <div class="overflow-x-auto">
+
+                        <input type="hidden" name="minggu_ke" value="<?= $minggu ?>">
+
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-indigo-900">
                                 <tr>
@@ -436,16 +461,16 @@ if (isset($_POST['simpan_kas'])) {
                                             <?php $status_current = $row['status'] ?? 'Belum'; ?>
                                             <select name="status[<?= $row['mahasiswa_id'] ?>]"
                                                 class="border p-1 rounded status-select" data-mhs-id="<?= $row['mahasiswa_id'] ?>">
-                                                    <option value="Lunas" <?= $status_current == 'Lunas' ? 'selected' : '' ?>>Lunas</option>
-                                                    <option value="Belum" <?= $status_current == 'Belum' ? 'selected' : '' ?>>Belum</option>
-                                                </select>
+                                                <option value="Lunas" <?= $status_current == 'Lunas' ? 'selected' : '' ?>>Lunas</option>
+                                                <option value="Belum" <?= $status_current == 'Belum' ? 'selected' : '' ?>>Belum</option>
+                                            </select>
                                         </td>
 
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                             <?php $tanggal_current = $row['tanggal_bayar'] ?? ''; ?>
-                                            <input type="date" name="tanggal[<?= $row['mahasiswa_id'] ?>]" 
+                                            <input type="date" name="tanggal[<?= $row['mahasiswa_id'] ?>]"
                                                 id="tanggal_<?= $row['mahasiswa_id'] ?>"
-                                                value="<?= htmlspecialchars($tanggal_current) ?>" 
+                                                value="<?= htmlspecialchars($tanggal_current) ?>"
                                                 class="border p-1 rounded text-xs date-input"
                                                 <?= ($status_current == 'Belum') ? 'disabled' : '' ?>>
                                         </td>
@@ -456,19 +481,19 @@ if (isset($_POST['simpan_kas'])) {
                             </tbody>
 
                         </table>
-                                <div class="mt-8 pt-5 border-t border-slate-200 flex flex-col items-center">
-                                    <p class="text-[10px] text-slate-500 mb-4 italic">Pastikan status pembayaran dan tanggal bayar sudah benar.</p>
-                                    <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-6 py-2.5 text-xs font-semibold shadow-lg shadow-indigo-900/20 transition-all active:scale-95 flex items-center">
-                                        <i class="fa fa-save mr-2"></i> Simpan Kas
-                                    </button>
-                                </div>
-                    </form>
-                </div>
-            <?php endif; ?>
+                        <div class="mt-8 pt-5 border-t border-slate-200 flex flex-col items-center">
+                            <p class="text-[10px] text-slate-500 mb-4 italic">Pastikan status pembayaran dan tanggal bayar sudah benar.</p>
+                            <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-6 py-2.5 text-xs font-semibold shadow-lg shadow-indigo-900/20 transition-all active:scale-95 flex items-center">
+                                <i class="fa fa-save mr-2"></i> Simpan Kas
+                            </button>
+                        </div>
+                </form>
         </div>
-        <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
-            © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
-        </footer>
+    <?php endif; ?>
+    </div>
+    <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
+        © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
+    </footer>
     </main>
     <script>
         // Mobile menu toggle dengan perbaikan
@@ -522,18 +547,18 @@ if (isset($_POST['simpan_kas'])) {
         }
 
         // no-op: filter handled by GET form onchange submit
-        
+
         // Handle Status vs Date Automation
         document.querySelectorAll('.status-select').forEach(select => {
             select.addEventListener('change', function() {
                 const mhsId = this.getAttribute('data-mhs-id');
                 const dateInput = document.getElementById('tanggal_' + mhsId);
-                
+
                 if (this.value === 'Lunas') {
                     dateInput.disabled = false;
                     // Hanya set tanggal hari ini jika input masih kosong
                     if (!dateInput.value) {
-                        const today = ScriptGetToday(); 
+                        const today = ScriptGetToday();
                         dateInput.value = today;
                     }
                 } else {

@@ -22,6 +22,18 @@ if ($_SESSION['role'] !== 'Administrator Utama') {
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Data Users - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link rel='icon' href='../img/main/icon.png' />
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -120,6 +132,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Data Users - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -363,9 +387,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <!-- Modified this section for better mobile responsiveness -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Users</h3>
-               <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
                             <input
@@ -398,7 +422,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 Email</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Password</th>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Role</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                                 Actions</th>
@@ -409,31 +433,31 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         $no = 1;
                         $id = 1;
                         while ($row = mysqli_fetch_assoc($result)) : ?>
-                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
+                            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
 
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-                                
-                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['nama_lengkap']); ?></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['email']); ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
 
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">**********</td>
-                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['role']); ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($row['email']); ?></td>
 
-                                        <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
-                                            <a href="../crud/edit.php?tabel=users&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">**********</td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['role']); ?></td>
 
-                                            <a href="../crud/hapus.php?tabel=users&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus user ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
+                                <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
+                                    <a href="../crud/edit.php?tabel=users&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
 
-                                        </td>
-                                    </tr>
+                                    <a href="../crud/hapus.php?tabel=users&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus user ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
+
+                                </td>
+                            </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
         </div>
         <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
-      © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
-    </footer>
+            © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.
+        </footer>
     </main>
     <script>
         // Mobile menu toggle dengan perbaikan
@@ -470,16 +494,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         });
 
         // Live search via AJAX (debounced) - keep focus in input
-        (function(){
+        (function() {
             const input = document.getElementById('searchInput');
             if (!input) return;
             let timer = null;
-            input.addEventListener('input', function(){
+            input.addEventListener('input', function() {
                 clearTimeout(timer);
                 timer = setTimeout(() => {
                     const q = encodeURIComponent(input.value || '');
                     const url = window.location.pathname + '?search=' + q + '&ajax=1';
-                    fetch(url, { credentials: 'same-origin' })
+                    fetch(url, {
+                            credentials: 'same-origin'
+                        })
                         .then(r => r.text())
                         .then(html => {
                             const tbody = document.querySelector('table tbody');

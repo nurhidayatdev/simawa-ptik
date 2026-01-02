@@ -21,6 +21,18 @@ if ($_SESSION['role'] !== 'Administrator Utama') {
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Pesan - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link rel='icon' href='../img/main/icon.png' />
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -57,11 +69,12 @@ date_default_timezone_set('Asia/Makassar');
 $telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
 $telegram_chat_id = "-1003577478223";
 
-function sendTelegramMessage($token, $chat_id, $message) {
+function sendTelegramMessage($token, $chat_id, $message)
+{
     $tg_ip = "149.154.167.220";
     $url_ip = "https://{$tg_ip}/bot{$token}/sendMessage";
     $url_domain = "https://api.telegram.org/bot{$token}/sendMessage";
-    
+
     $data = ['chat_id' => $chat_id, 'text' => $message, 'parse_mode' => 'Markdown', 'disable_web_page_preview' => true];
     $post_data = http_build_query($data);
 
@@ -76,11 +89,14 @@ function sendTelegramMessage($token, $chat_id, $message) {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_TIMEOUT, 20);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Host: api.telegram.org']);
-        
+
         $result = curl_exec($ch);
         $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-        if ($http_code == 200) { curl_close($ch); return ['success' => true, 'method' => 'CURL_IP']; }
+
+        if ($http_code == 200) {
+            curl_close($ch);
+            return ['success' => true, 'method' => 'CURL_IP'];
+        }
 
         curl_setopt($ch, CURLOPT_URL, $url_domain);
         curl_setopt($ch, CURLOPT_HTTPHEADER, []);
@@ -90,14 +106,14 @@ function sendTelegramMessage($token, $chat_id, $message) {
 
         if ($http_code == 200) return ['success' => true, 'method' => 'CURL_DOMAIN'];
     }
-    
+
     if (ini_get('allow_url_fopen')) {
         $options = ['http' => ['method' => 'POST', 'header' => "Content-Type: application/x-www-form-urlencoded\r\nHost: api.telegram.org\r\n", 'content' => $post_data, 'timeout' => 15], 'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]];
         $context = stream_context_create($options);
         $result = @file_get_contents($url_ip, false, $context);
         if ($result !== FALSE) return ['success' => true, 'method' => 'FGC_IP'];
     }
-    
+
     return ['success' => false, 'error' => 'All methods failed'];
 }
 
@@ -106,17 +122,17 @@ if (isset($_POST['action'])) {
     $action = $_POST['action'];
     $response_msg = '';
     $response_type = '';
-    
+
     // JADWAL REMINDER
     if ($action === 'jadwal') {
         $days_map = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
         $tomorrow_eng = date('l', strtotime('+1 day'));
         $tomorrow_ind = $days_map[$tomorrow_eng];
-        
+
         $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
         $periode = mysqli_fetch_assoc($q_periode);
         $periode_id = $periode['id'] ?? 0;
-        
+
         $query = "SELECT jk_start.jam_mulai, jk_end.jam_selesai, r.nama_ruangan AS ruangan, mk.nama_matkul, dp.nama_dosen AS dosen_pengampu
                   FROM jadwal_matkul jm
                   JOIN mata_kuliah mk ON jm.matkul_id = mk.id
@@ -127,7 +143,7 @@ if (isset($_POST['action'])) {
                   WHERE jm.periode_id = $periode_id AND jm.hari = '$tomorrow_ind'
                   ORDER BY jk_start.jam_mulai ASC";
         $result = mysqli_query($koneksi, $query);
-        
+
         if ($result && mysqli_num_rows($result) > 0) {
             $message = "📅 *JADWAL KULIAH BESOK* 📅\nHari: *{$tomorrow_ind}*, " . date('d M Y', strtotime('+1 day')) . "\n\n";
             $no = 1;
@@ -144,7 +160,7 @@ if (isset($_POST['action'])) {
             $response_type = 'info';
         }
     }
-    
+
     // TUGAS REMINDER
     elseif ($action === 'tugas') {
         $now_date = date('Y-m-d');
@@ -154,7 +170,7 @@ if (isset($_POST['action'])) {
                   WHERE t.status = 'belum' AND (t.deadline_tanggal > '$now_date' OR (t.deadline_tanggal = '$now_date' AND t.deadline_pukul > '$now_time'))
                   ORDER BY t.deadline_tanggal ASC, t.deadline_pukul ASC";
         $result = mysqli_query($koneksi, $query);
-        
+
         if ($result && mysqli_num_rows($result) > 0) {
             $message = "🔔 *REKAP TUGAS AKTIF PTIK C* 🔔\n\nDaftar tugas *belum dikumpulkan*:\n\n";
             $no = 1;
@@ -175,13 +191,13 @@ if (isset($_POST['action'])) {
             $response_type = 'info';
         }
     }
-    
+
     // KAS REMINDER
     elseif ($action === 'kas') {
         $minggu_ke = (int)($_POST['minggu_ke'] ?? 1);
         $q_belum = "SELECT m.nama_panggilan FROM kas k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.minggu_ke = '$minggu_ke' AND (k.status IS NULL OR k.status != 'Lunas') ORDER BY m.nim ASC";
         $res_belum = mysqli_query($koneksi, $q_belum);
-        
+
         if ($res_belum && mysqli_num_rows($res_belum) > 0) {
             $message = "💰 *PENGINGAT KAS MINGGUAN*\n📅 *Minggu ke-{$minggu_ke}*\n\nBelum bayar:\n\n";
             $no = 1;
@@ -198,7 +214,7 @@ if (isset($_POST['action'])) {
             $response_type = 'info';
         }
     }
-    
+
     // KUIS HARIAN STREAK REMINDER
     elseif ($action === 'streak') {
         $today = date('Y-m-d');
@@ -210,7 +226,7 @@ if (isset($_POST['action'])) {
                   AND (s.last_played_date IS NULL OR s.last_played_date != '$today' OR DATE(s.last_completed_at) != '$today')
                   ORDER BY s.current_streak DESC";
         $result = mysqli_query($koneksi, $query);
-        
+
         if ($result && mysqli_num_rows($result) > 0) {
             $message = "🔥 *REMINDER KUIS HARIAN* 🔥\n\nStreakmu akan hilang jika tidak main hari ini!\n\n";
             $no = 1;
@@ -220,7 +236,7 @@ if (isset($_POST['action'])) {
             }
             $message .= "\n_Main sekarang untuk jaga streak!_ 🎮";
             $res = sendTelegramMessage($telegram_token, $telegram_chat_id, $message);
-            $response_msg = $res['success'] ? "Reminder streak berhasil dikirim ke " . ($no-1) . " pemain!" : "Gagal: " . ($res['error'] ?? '');
+            $response_msg = $res['success'] ? "Reminder streak berhasil dikirim ke " . ($no - 1) . " pemain!" : "Gagal: " . ($res['error'] ?? '');
             $response_type = $res['success'] ? 'success' : 'error';
         } else {
             if (!$result) {
@@ -232,7 +248,7 @@ if (isset($_POST['action'])) {
             }
         }
     }
-    
+
     // KRS REMINDER
     elseif ($action === 'krs') {
         $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
@@ -245,7 +261,7 @@ if (isset($_POST['action'])) {
                     WHERE k.mahasiswa_id IS NULL 
                     ORDER BY m.nim ASC";
         $res_belum = mysqli_query($koneksi, $q_belum);
-        
+
         if ($res_belum && mysqli_num_rows($res_belum) > 0) {
             $message = "📝 *PENGINGAT PENGISIAN KRS*\n\nMahasiswa berikut *BELUM* mengisi KRS untuk periode aktif:\n\n";
             $no = 1;
@@ -255,20 +271,20 @@ if (isset($_POST['action'])) {
             }
             $message .= "\n_Harap segera mengisi KRS di sistem!_ 🚀";
             $res = sendTelegramMessage($telegram_token, $telegram_chat_id, $message);
-            $response_msg = $res['success'] ? "Reminder KRS berhasil dikirim ke " . ($no-1) . " mahasiswa!" : "Gagal: " . ($res['error'] ?? '');
+            $response_msg = $res['success'] ? "Reminder KRS berhasil dikirim ke " . ($no - 1) . " mahasiswa!" : "Gagal: " . ($res['error'] ?? '');
             $response_type = $res['success'] ? 'success' : 'error';
         } else {
             $response_msg = "Semua mahasiswa sudah mengisi KRS.";
             $response_type = 'info';
         }
     }
-    
+
     // KELOMPOK REMINDER
     elseif ($action === 'kelompok') {
         $matkul_id = mysqli_real_escape_string($koneksi, $_POST['matkul_id']);
         $dosen = mysqli_real_escape_string($koneksi, $_POST['dosen']);
         $keterangan = mysqli_real_escape_string($koneksi, $_POST['keterangan']);
-        
+
         $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
         $periode = mysqli_fetch_assoc($q_periode);
         $periode_id = $periode['id'] ?? 0;
@@ -286,7 +302,7 @@ if (isset($_POST['action'])) {
                      AND periode_id = '$periode_id' 
                      ORDER BY kelompok_no ASC";
         $res_groups = mysqli_query($koneksi, $q_groups);
-        
+
         if ($res_groups && mysqli_num_rows($res_groups) > 0) {
             $groups_data = [];
             $all_nims = [];
@@ -302,7 +318,9 @@ if (isset($_POST['action'])) {
             // Map NIM to Name
             $student_names = [];
             if (!empty($all_nims)) {
-                $nim_list = "'" . implode("','", array_map(function($n) use ($koneksi) { return mysqli_real_escape_string($koneksi, $n); }, array_keys($all_nims))) . "'";
+                $nim_list = "'" . implode("','", array_map(function ($n) use ($koneksi) {
+                    return mysqli_real_escape_string($koneksi, $n);
+                }, array_keys($all_nims))) . "'";
                 $res_names = mysqli_query($koneksi, "SELECT nim, nama_lengkap FROM mahasiswa WHERE nim IN ($nim_list)");
                 while ($rn = mysqli_fetch_assoc($res_names)) {
                     $student_names[$rn['nim']] = $rn['nama_lengkap'];
@@ -314,7 +332,7 @@ if (isset($_POST['action'])) {
             $message .= "👨‍🏫 *Dosen:* {$dosen}\n";
             if (!empty($keterangan)) $message .= "📝 *Ket:* {$keterangan}\n";
             $message .= "\n";
-            
+
             foreach ($groups_data as $g) {
                 $message .= "*Kelompok {$g['no']}:*\n";
                 foreach ($g['nims'] as $nim) {
@@ -323,7 +341,7 @@ if (isset($_POST['action'])) {
                 }
                 $message .= "\n";
             }
-            
+
             $res = sendTelegramMessage($telegram_token, $telegram_chat_id, $message);
             $response_msg = $res['success'] ? "Daftar kelompok berhasil dikirim!" : "Gagal: " . ($res['error'] ?? '');
             $response_type = $res['success'] ? 'success' : 'error';
@@ -369,12 +387,25 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Reminder - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -592,8 +623,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
     </aside>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        
-        
+
+
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -607,8 +638,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            
+
+
 
             <!-- KRS Reminder -->
             <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
@@ -617,7 +648,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-university text-xl"></i>
                         <?php if ($krs_count > 0): ?>
-                        <span class="absolute -top-1 -right-1 bg-purple-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $krs_count ?></span>
+                            <span class="absolute -top-1 -right-1 bg-purple-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $krs_count ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
@@ -637,7 +668,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-tasks text-xl"></i>
                         <?php if ($tugas_count > 0): ?>
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $tugas_count ?></span>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $tugas_count ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
@@ -657,7 +688,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     <div class="w-12 h-12 bg-red-100 text-red-500 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-fire text-xl"></i>
                         <?php if ($streak_count > 0): ?>
-                        <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>
+                            <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
@@ -700,7 +731,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <div class="flex gap-2 mb-3">
                             <select name="minggu_ke" class="flex-grow text-xs border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-green-500">
                                 <?php for ($i = 1; $i <= 16; $i++): ?>
-                                <option value="<?= $i ?>">Minggu <?= $i ?></option>
+                                    <option value="<?= $i ?>">Minggu <?= $i ?></option>
                                 <?php endfor; ?>
                             </select>
                         </div>
@@ -711,9 +742,9 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 </div>
             </form>
 
-            
 
-            
+
+
 
             <!-- Kelompok Reminder -->
             <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
@@ -725,7 +756,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800">Daftar Kelompok</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pembagian kelompok</p>
-                        
+
                         <div class="mb-3">
                             <select name="group_set" required class="w-full text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-teal-500" onchange="updateGroupFields(this)">
                                 <option value="">-- Pilih Matkul & Dosen --</option>
@@ -748,13 +779,13 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
         </div>
-<footer class="text-xs text-indigo-900 text-center mt-6">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
+        <footer class="text-xs text-indigo-900 text-center mt-6">© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</footer>
     </main>
 
-    
+
 
     <script>
-// Mobile menu toggle dengan perbaikan
+        // Mobile menu toggle dengan perbaikan
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const sidebar = document.getElementById('sidebar');
 
@@ -826,11 +857,12 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 text: '<?= addslashes($_SESSION['reminder_msg']) ?>',
                 confirmButtonColor: '#3730a3'
             });
-            <?php 
+            <?php
             unset($_SESSION['reminder_msg']);
             unset($_SESSION['reminder_type']);
             ?>
         <?php endif; ?>
     </script>
 </body>
+
 </html>

@@ -103,6 +103,18 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Dashboard Absensi - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -122,7 +134,7 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
                 transform: translateX(0) !important;
             }
         }
-        
+
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -132,7 +144,7 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
 </head>
 
 <body class="bg-slate-50">
- <header class="bg-indigo-950  fixed w-full top-0 z-50">
+    <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
                 <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
@@ -323,7 +335,7 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
         </div>
     </aside>
 
-   
+
 
     <main class="ml-0 lg:ml-64 pt-24 p-6 min-h-screen">
         <div class="max-w-7xl mx-auto space-y-6">
@@ -463,31 +475,31 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 <?php foreach ($matkuls as $m): ?>
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="text-xs font-bold text-slate-700"><?= htmlspecialchars($m['nama_matkul']) ?></div>
-                                        <div class="text-[10px] text-slate-400 font-medium"><?= $m['total'] ?> Record Terkumpul</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-col items-center gap-1.5 font-mono">
-                                            <?php 
+                                    <tr class="hover:bg-slate-50/80 transition-colors">
+                                        <td class="px-6 py-4">
+                                            <div class="text-xs font-bold text-slate-700"><?= htmlspecialchars($m['nama_matkul']) ?></div>
+                                            <div class="text-[10px] text-slate-400 font-medium"><?= $m['total'] ?> Record Terkumpul</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col items-center gap-1.5 font-mono">
+                                                <?php
                                                 $colorClass = $m['persen_hadir'] >= 90 ? 'text-green-600 bg-green-50' : ($m['persen_hadir'] >= 80 ? 'text-indigo-600 bg-indigo-50' : 'text-rose-600 bg-rose-50');
-                                            ?>
-                                            <span class="px-3 py-1 rounded-full text-sm font-black <?= $colorClass ?>"><?= $m['persen_hadir'] ?>%</span>
-                                            <div class="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                                <div class="h-full <?= str_replace('text', 'bg', explode(' ', $colorClass)[0]) ?>" style="width: <?= $m['persen_hadir'] ?>%"></div>
+                                                ?>
+                                                <span class="px-3 py-1 rounded-full text-sm font-black <?= $colorClass ?>"><?= $m['persen_hadir'] ?>%</span>
+                                                <div class="w-24 h-1 bg-slate-100 rounded-full overflow-hidden">
+                                                    <div class="h-full <?= str_replace('text', 'bg', explode(' ', $colorClass)[0]) ?>" style="width: <?= $m['persen_hadir'] ?>%"></div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold rounded" title="Hadir"><?= $m['hadir'] ?>H</span>
-                                            <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold rounded" title="Izin"><?= $m['izin'] ?>I</span>
-                                            <span class="px-1.5 py-0.5 bg-sky-100 text-sky-700 text-[9px] font-bold rounded" title="Sakit"><?= $m['sakit'] ?>S</span>
-                                            <span class="px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-bold rounded" title="Alpha"><?= $m['alpha'] ?>A</span>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-2">
+                                                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[9px] font-bold rounded" title="Hadir"><?= $m['hadir'] ?>H</span>
+                                                <span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold rounded" title="Izin"><?= $m['izin'] ?>I</span>
+                                                <span class="px-1.5 py-0.5 bg-sky-100 text-sky-700 text-[9px] font-bold rounded" title="Sakit"><?= $m['sakit'] ?>S</span>
+                                                <span class="px-1.5 py-0.5 bg-rose-100 text-rose-700 text-[9px] font-bold rounded" title="Alpha"><?= $m['alpha'] ?>A</span>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -513,19 +525,19 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
                             </div>
                         <?php else: ?>
                             <?php foreach ($top_alphas as $a): ?>
-                            <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex items-center gap-3 hover:bg-white/10 transition-colors group">
-                                <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 shrink-0">
-                                    <img src="../img/profile/<?= htmlspecialchars($a['foto']) ?>" class="w-full h-full object-cover">
+                                <div class="bg-white/5 border border-white/5 rounded-xl p-3 flex items-center gap-3 hover:bg-white/10 transition-colors group">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border border-white/10 shrink-0">
+                                        <img src="../img/profile/<?= htmlspecialchars($a['foto']) ?>" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex-grow min-w-0">
+                                        <p class="text-[11px] font-black text-white truncate"><?= htmlspecialchars($a['nama_lengkap']) ?></p>
+                                        <p class="text-[9px] font-bold text-indigo-300"><?= $a['nim'] ?></p>
+                                    </div>
+                                    <div class="flex flex-col items-end shrink-0">
+                                        <span class="text-lg font-black text-rose-400 group-hover:scale-110 transition-transform"><?= $a['alpha_count'] ?></span>
+                                        <span class="text-[8px] font-bold text-rose-300 uppercase tracking-tighter">Alpha</span>
+                                    </div>
                                 </div>
-                                <div class="flex-grow min-w-0">
-                                    <p class="text-[11px] font-black text-white truncate"><?= htmlspecialchars($a['nama_lengkap']) ?></p>
-                                    <p class="text-[9px] font-bold text-indigo-300"><?= $a['nim'] ?></p>
-                                </div>
-                                <div class="flex flex-col items-end shrink-0">
-                                    <span class="text-lg font-black text-rose-400 group-hover:scale-110 transition-transform"><?= $a['alpha_count'] ?></span>
-                                    <span class="text-[8px] font-bold text-rose-300 uppercase tracking-tighter">Alpha</span>
-                                </div>
-                            </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
@@ -574,18 +586,28 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: false
+                    },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
                         padding: 12,
                         backgroundColor: '#1e1b4b',
-                        titleFont: { size: 10, weight: 'bold' },
-                        bodyFont: { size: 12, weight: 'black' },
+                        titleFont: {
+                            size: 10,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 12,
+                            weight: 'black'
+                        },
                         bodySpacing: 4,
                         displayColors: false,
                         callbacks: {
-                            label: function(context) { return context.parsed.y + '% Kehadiran'; }
+                            label: function(context) {
+                                return context.parsed.y + '% Kehadiran';
+                            }
                         }
                     }
                 },
@@ -593,12 +615,30 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
                     y: {
                         beginAtZero: true,
                         max: 100,
-                        grid: { borderDash: [5, 5], color: '#f1f5f9' },
-                        ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8', callback: v => v + '%' }
+                        grid: {
+                            borderDash: [5, 5],
+                            color: '#f1f5f9'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            color: '#94a3b8',
+                            callback: v => v + '%'
+                        }
                     },
                     x: {
-                        grid: { display: false },
-                        ticks: { font: { size: 10, weight: 'bold' }, color: '#94a3b8' }
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            color: '#94a3b8'
+                        }
                     }
                 }
             }
@@ -626,11 +666,16 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
                 maintainAspectRatio: false,
                 cutout: '75%',
                 plugins: {
-                    legend: { display: false },
+                    legend: {
+                        display: false
+                    },
                     tooltip: {
                         padding: 12,
                         backgroundColor: '#1e1b4b',
-                        bodyFont: { size: 12, weight: 'black' },
+                        bodyFont: {
+                            size: 12,
+                            weight: 'black'
+                        },
                         displayColors: true,
                         boxPadding: 4
                     }
@@ -652,7 +697,7 @@ while ($row = mysqli_fetch_assoc($q_top_alpha)) {
             button.addEventListener('click', () => {
                 const submenu = button.nextElementSibling;
                 const arrow = button.querySelector('.submenu-arrow');
-                
+
                 submenu.classList.toggle('hidden');
                 arrow.classList.toggle('rotate-90');
             });

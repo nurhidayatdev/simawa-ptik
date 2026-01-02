@@ -77,6 +77,18 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Profile - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -336,15 +348,15 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
                                     disabled>
                             </div>
                             <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Bio</label>
-                            <input type="text" name="password" value="<?= htmlspecialchars($data['bio']) ?>"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
-                                disabled>
-                        </div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Bio</label>
+                                <input type="text" name="password" value="<?= htmlspecialchars($data['bio']) ?>"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
+                                    disabled>
+                            </div>
                         </div>
 
                         <!-- Bio Section -->
-                        
+
                         <hr class="my-6">
 
                         <h2 class="text-xl font-bold mb-4 text-slate-800">Kartu Rencana Studi (KRS)</h2>

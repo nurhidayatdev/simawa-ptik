@@ -46,6 +46,18 @@ while ($row = mysqli_fetch_assoc($res)) {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Data Mata Kuliah - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -267,33 +279,33 @@ while ($row = mysqli_fetch_assoc($res)) {
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto md:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 w-full items-center">
-                            <select name="semester" onchange="this.form.submit()" 
+                            <select name="semester" onchange="this.form.submit()"
                                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs  bg-white">
                                 <option value="">Semua Semester</option>
-                                <?php for($i=1; $i<=8; $i++): ?>
+                                <?php for ($i = 1; $i <= 8; $i++): ?>
                                     <option value="<?= $i ?>" <?= $semester_filter == $i ? 'selected' : '' ?>>Semester <?= $i ?></option>
                                 <?php endfor; ?>
                             </select>
-<?php if ($role === 'Administrator Utama'): ?>
-                            <a href="../crud/tambah.php?tabel=mata_kuliah" 
-                                class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center " 
-                                title="Tambah">
-                                <i class="fa fa-plus"></i>
-                            </a>
+                            <?php if ($role === 'Administrator Utama'): ?>
+                                <a href="../crud/tambah.php?tabel=mata_kuliah"
+                                    class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center "
+                                    title="Tambah">
+                                    <i class="fa fa-plus"></i>
+                                </a>
                             <?php endif; ?>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <?php 
+            <?php
             $start_s = !empty($semester_filter) ? (int)$semester_filter : 1;
             $end_s = !empty($semester_filter) ? (int)$semester_filter : 8;
-            for ($s = $start_s; $s <= $end_s; $s++): 
-                $semester_rows = array_filter($matkul_data, function($m) use ($s) {
+            for ($s = $start_s; $s <= $end_s; $s++):
+                $semester_rows = array_filter($matkul_data, function ($m) use ($s) {
                     return (int)$m['semester'] === $s;
                 });
-                
+
                 if (empty($semester_rows) && !empty($semester_filter)) continue;
             ?>
                 <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>
@@ -306,9 +318,9 @@ while ($row = mysqli_fetch_assoc($res)) {
                                 <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Mata Kuliah</th>
                                 <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">SKS</th>
                                 <?php if ($role === 'Administrator Utama'): ?>
-                                <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
-                                    Actions</th>
-                                    <?php endif; ?>
+                                    <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
+                                        Actions</th>
+                                <?php endif; ?>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-200">
@@ -320,25 +332,26 @@ while ($row = mysqli_fetch_assoc($res)) {
                             } else {
                                 foreach ($semester_rows as $m) {
                             ?>
-                                <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= $no++; ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
-                                    <?php if ($role === 'Administrator Utama'): ?>
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 text-center">
-                                        <a href="../crud/edit.php?tabel=mata_kuliah&id=<?= $m['id']; ?>" title="Edit">
-                                            <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
-                                        </a>
+                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= $no++; ?></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
+                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
+                                        <?php if ($role === 'Administrator Utama'): ?>
+                                            <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 text-center">
+                                                <a href="../crud/edit.php?tabel=mata_kuliah&id=<?= $m['id']; ?>" title="Edit">
+                                                    <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
+                                                </a>
 
-                                        <a href="../crud/hapus.php?tabel=mata_kuliah&id=<?= $m['id']; ?>" title="Hapus">
-                                            <i class="fa fa-trash text-red-600 hover:text-red-900"></i>
-                                        </a>
+                                                <a href="../crud/hapus.php?tabel=mata_kuliah&id=<?= $m['id']; ?>" title="Hapus">
+                                                    <i class="fa fa-trash text-red-600 hover:text-red-900"></i>
+                                                </a>
 
-                                    </td>
-                                    <?php endif; ?>
-                                </tr>
-                            <?php } } ?>
+                                            </td>
+                                        <?php endif; ?>
+                                    </tr>
+                            <?php }
+                            } ?>
                         </tbody>
                     </table>
                 </div>

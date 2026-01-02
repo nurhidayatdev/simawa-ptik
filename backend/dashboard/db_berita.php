@@ -43,10 +43,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
             echo '</td>';
             if ($role === 'Administrator Utama'):
-            echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">';
-            echo '<a href="../crud/edit.php?tabel=akademik&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
-            echo '<a href="../crud/hapus.php?tabel=akademik&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus berita ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
-            echo '</td>';
+                echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">';
+                echo '<a href="../crud/edit.php?tabel=akademik&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
+                echo '<a href="../crud/hapus.php?tabel=akademik&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus berita ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+                echo '</td>';
             endif;
             echo '</tr>';
         }
@@ -65,6 +65,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Data Berita - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -88,7 +100,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <body class="bg-slate-100">
     <!-- Header dengan z-index lebih tinggi -->
-   <header class="bg-indigo-950  fixed w-full top-0 z-50">
+    <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
                 <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
@@ -288,12 +300,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
-                            <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Cari berita..." 
+                            <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Cari berita..."
                                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-                                <?php if ($role === 'Administrator Utama'): ?>
-                            <a href="../crud/tambah.php?tabel=akademik" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
-                                <i class="fa fa-plus"></i>
-                            </a>
+                            <?php if ($role === 'Administrator Utama'): ?>
+                                <a href="../crud/tambah.php?tabel=akademik" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
+                                    <i class="fa fa-plus"></i>
+                                </a>
                             <?php endif; ?>
                         </div>
                     </form>
@@ -309,7 +321,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Deskripsi</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Link</th>
                             <?php if ($role === 'Administrator Utama'): ?>
-                            <th class="px-3 py-3 text-xs font-bold text-white uppercase tracking-wider text-center">Actions</th>
+                                <th class="px-3 py-3 text-xs font-bold text-white uppercase tracking-wider text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
@@ -335,14 +347,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                         <?php endif; ?>
                                     </td>
                                     <?php if ($role === 'Administrator Utama'): ?>
-                                    <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
-                                        <a href="../crud/edit.php?tabel=akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a href="../crud/hapus.php?tabel=akademik&id=<?= $row['id'] ?>" title="Hapus" onclick="return confirm('Hapus berita ini?');" class="text-red-600 hover:text-red-900">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
+                                            <a href="../crud/edit.php?tabel=akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="../crud/hapus.php?tabel=akademik&id=<?= $row['id'] ?>" title="Hapus" onclick="return confirm('Hapus berita ini?');" class="text-red-600 hover:text-red-900">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </td>
                                     <?php endif; ?>
                                 </tr>
                         <?php
@@ -404,16 +416,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
 
         // Live search via AJAX: update table rows without leaving input focus
-        (function(){
+        (function() {
             const input = document.getElementById('searchInput');
             if (!input) return;
             let timer = null;
-            input.addEventListener('input', function(){
+            input.addEventListener('input', function() {
                 clearTimeout(timer);
                 timer = setTimeout(() => {
                     const q = encodeURIComponent(input.value || '');
                     const url = window.location.pathname + '?search=' + q + '&ajax=1';
-                    fetch(url, { credentials: 'same-origin' })
+                    fetch(url, {
+                            credentials: 'same-origin'
+                        })
                         .then(r => r.text())
                         .then(html => {
                             const tbody = document.querySelector('table tbody');

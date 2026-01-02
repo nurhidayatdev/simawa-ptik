@@ -340,6 +340,18 @@ if (isset($_POST['tambah'])) {
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Tambah Data - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
     <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
@@ -376,6 +388,18 @@ if (isset($_POST['tambah'])) {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Tambah - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -399,7 +423,7 @@ if (isset($_POST['tambah'])) {
 
 <body class="bg-slate-100">
     <!-- Header dengan z-index lebih tinggi -->
-   <header class="bg-indigo-950  fixed w-full top-0 z-50">
+    <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
                 <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
@@ -666,12 +690,12 @@ if (isset($_POST['tambah'])) {
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Semester Ke</label>
                                 <select name="semester_ke" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required">
-                    <option value="">-- Semester Ke --</option>
-                    <?php for ($i = 1; $i <= 8; $i++): ?>
-                        <option value="<?= $i ?>"><?= $i ?>
-                        </option>
-                    <?php endfor; ?>
-                </select>
+                                    <option value="">-- Semester Ke --</option>
+                                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                                        <option value="<?= $i ?>"><?= $i ?>
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
@@ -699,12 +723,12 @@ if (isset($_POST['tambah'])) {
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Semester</label>
                                 <select name="semester" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required">
-                    <option value="">-- Semester --</option>
-                    <?php for ($i = 1; $i <= 8; $i++): ?>
-                        <option value="<?= $i ?>"><?= $i ?>
-                        </option>
-                    <?php endfor; ?>
-                </select>
+                                    <option value="">-- Semester --</option>
+                                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                                        <option value="<?= $i ?>"><?= $i ?>
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">SKS</label>

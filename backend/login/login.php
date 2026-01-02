@@ -57,6 +57,18 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
   <meta name="theme-color" content="#1e1b4b" />
   <link rel="icon" href="../img/main/icon.png" />
   <title>Login - Kelas PTIK C 2024</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-Q0TXETXV6Y');
+  </script>
   <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
   <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
   <!-- Font Awesome for eye icon -->
@@ -88,7 +100,7 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
   <div class="max-w-md w-full mx-4 z-10">
     <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
       <div class="text-center mb-8">
-        
+
         <h2 class="text-3xl font-bold text-slate-800">Login</h2>
         <p class="text-slate-500 text-sm mt-2">Silakan masuk dengan akun anda.</p>
       </div>

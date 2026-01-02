@@ -64,17 +64,17 @@ if (isset($_POST['acak_jadwal'])) {
         // Tentukan Tim Aktif (Ganjil/Genap)
         $is_odd_week = ($minggu_ke % 2) != 0;
         $split_point = ceil($total_students / 2);
-        
-        $team_active = $is_odd_week 
-            ? array_slice($students, 0, $split_point) 
+
+        $team_active = $is_odd_week
+            ? array_slice($students, 0, $split_point)
             : array_slice($students, $split_point);
-        
+
         $total_active = count($team_active);
         $base_alloc = floor($total_active / $total_classes);
         $extra_alloc = $total_active % $total_classes;
 
         // Tracking penugasan minggu ini
-        $assigned_ids = []; 
+        $assigned_ids = [];
 
         foreach ($schedule_data as $idx => $class) {
             $target = $base_alloc + ($idx < $extra_alloc ? 1 : 0);
@@ -92,7 +92,7 @@ if (isset($_POST['acak_jadwal'])) {
 
                 // Cek KRS
                 $takes_course = isset($krs_map[$m_id]) && in_array($matkul_id, $krs_map[$m_id]);
-                
+
                 if ($takes_course) {
                     // Simpan ke DB
                     $insert = "INSERT INTO piket_proyektor (mahasiswa_id, jadwal_matkul_id, minggu_ke, periode_id) VALUES ('$m_id', '$jadwal_id', '$minggu_ke', '$periode_id')";
@@ -113,19 +113,35 @@ if (isset($_POST['acak_jadwal'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Acak Piket Proyektor - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 </head>
+
 <body class="bg-slate-100">
     <!-- Header -->
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
@@ -325,7 +341,7 @@ if (isset($_POST['acak_jadwal'])) {
                     <h1 class="text-2xl font-bold text-slate-800">Acak Jadwal Piket Proyektor</h1>
                     <p class="text-slate-500 text-sm mt-1">Generate/Randomisasi jadwal penanggung jawab proyektor</p>
                 </div>
-                
+
                 <!-- Week Selector -->
                 <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
                     <a href="?minggu=<?= max(1, $minggu_ke - 1) ?>" class="p-2 hover:bg-white rounded-md transition-colors <?= $minggu_ke <= 1 ? 'opacity-50 pointer-events-none' : '' ?>">
@@ -394,7 +410,7 @@ if (isset($_POST['acak_jadwal'])) {
             © 2025 Kelas PTIK C - FT UNM.
         </footer>
     </main>
-    
+
     <script>
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const sidebar = document.getElementById('sidebar');
@@ -409,10 +425,14 @@ if (isset($_POST['acak_jadwal'])) {
         });
         const profileButton = document.getElementById('profile-button');
         const profileDropdown = document.getElementById('profile-dropdown');
-        if(profileButton && profileDropdown){
-            profileButton.addEventListener('click', (e)=>{ e.stopPropagation(); profileDropdown.classList.toggle('hidden'); });
-            document.addEventListener('click', ()=> profileDropdown.classList.add('hidden'));
+        if (profileButton && profileDropdown) {
+            profileButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => profileDropdown.classList.add('hidden'));
         }
     </script>
 </body>
+
 </html>

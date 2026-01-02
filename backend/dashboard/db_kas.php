@@ -55,6 +55,18 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Data Kas - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -277,34 +289,34 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Kas Mingguan</h3>
                 <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
-                <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <form method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <div class="flex flex-row gap-2 items-center">
-                        
-                            
-                         
-                        
-                            <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="whitespace-nowrap bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Input Minggu</a>
+                    <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <form method="GET" class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <div class="flex flex-row gap-2 items-center">
 
-                            <a href="kas_individu.php" class="whitespace-nowrap bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center w-full">Input Individu</a>
-                            
-                            <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
-                            <button type="button" onclick="confirmReminderKas('<?= $_GET['minggu_ke'] ?>')" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Reminder Telegram">
-                                <i class="fa fa-paper-plane"></i>
-                            </button>
-                            <?php endif; ?>
 
-                            <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
 
-                            
-                    </form>
-                </div>
+
+                                <a href="kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="whitespace-nowrap bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center w-full">Input Minggu</a>
+
+                                <a href="kas_individu.php" class="whitespace-nowrap bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center w-full">Input Individu</a>
+
+                                <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
+                                    <button type="button" onclick="confirmReminderKas('<?= $_GET['minggu_ke'] ?>')" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Reminder Telegram">
+                                        <i class="fa fa-paper-plane"></i>
+                                    </button>
+                                <?php endif; ?>
+
+                                <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
+
+
+                        </form>
+                    </div>
             </div>
-            <?php endif; ?>
+        <?php endif; ?>
         </div>
 
         <form method="GET" class="grid grid-cols-2 gap-4 mb-6">
-            
+
             <select name="minggu_ke" required onchange="this.form.submit()" class="border rounded px-4 py-2 text-xs">
                 <option value="">-- Pilih Minggu --</option>
                 <?php for ($i = 1; $i <= 16; $i++): ?>
@@ -384,11 +396,11 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                                 <td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
                                 <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-									<?php
-									$statusColor = ($row['status'] === 'Lunas') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
-									?>
-									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
-								</td>
+                                    <?php
+                                    $statusColor = ($row['status'] === 'Lunas') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                                    ?>
+                                    <span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
+                                </td>
                                 <?php
                                 $tanggal = '-';
                                 if (!empty($row['tanggal_bayar']) && $row['tanggal_bayar'] !== '0000-00-00') {

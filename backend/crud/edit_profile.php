@@ -89,8 +89,12 @@ if (isset($_POST['update'])) {
                 }
 
                 $__img_destroy = 'imagedestroy';
-                if (function_exists($__img_destroy)) { $__img_destroy($src); }
-                if (function_exists($__img_destroy)) { $__img_destroy($dst); }
+                if (function_exists($__img_destroy)) {
+                    $__img_destroy($src);
+                }
+                if (function_exists($__img_destroy)) {
+                    $__img_destroy($dst);
+                }
             } else {
                 // GD not available: determine extension from mime and save raw bytes
                 $ext = 'jpg';
@@ -102,7 +106,6 @@ if (isset($_POST['update'])) {
                 file_put_contents($dest, $decoded);
             }
         }
-
     } elseif (!empty($_FILES['foto_file']['name'])) {
 
         $nama_file = $_FILES['foto_file']['name'];
@@ -134,9 +137,13 @@ if (isset($_POST['update'])) {
                     } else {
                         imagejpeg($dst, $dest_path, 85);
                     }
-                        $__img_destroy = 'imagedestroy';
-                        if (function_exists($__img_destroy)) { $__img_destroy($src); }
-                        if (function_exists($__img_destroy)) { $__img_destroy($dst); }
+                    $__img_destroy = 'imagedestroy';
+                    if (function_exists($__img_destroy)) {
+                        $__img_destroy($src);
+                    }
+                    if (function_exists($__img_destroy)) {
+                        $__img_destroy($dst);
+                    }
                 }
             }
         } else {
@@ -159,13 +166,13 @@ if (isset($_POST['update'])) {
         WHERE id='$user_id'
     ");
 
-      $redirect = "../dashboard/profile.php";
-           
+    $redirect = "../dashboard/profile.php";
 
-          
 
-        
-    
+
+
+
+
 
     echo "
     <!DOCTYPE html>
@@ -176,6 +183,18 @@ if (isset($_POST['update'])) {
     <meta name='theme-color' content='#1e1b4b' />
     <link rel='icon' href='../img/main/icon.png' />
     <title>Edit Profile - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link rel='icon' href='../img/main/icon.png' />
   <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -203,7 +222,7 @@ if (isset($_POST['update'])) {
     </html>";
     exit;
 }
-  
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -214,6 +233,18 @@ if (isset($_POST['update'])) {
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Edit Profile - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -432,10 +463,10 @@ if (isset($_POST['update'])) {
 
             <form class="space-y-6" method="POST" enctype="multipart/form-data">
                 <div class="border-b border-gray-200 pb-6">
-                    
 
-                    
-                        <h3 class="text-2xl font-bold mb-6">Edit Profile</h3>
+
+
+                    <h3 class="text-2xl font-bold mb-6">Edit Profile</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Nama Lengkap</label>
@@ -462,12 +493,12 @@ if (isset($_POST['update'])) {
                             <input name="bio" value="<?= $data['bio']; ?>" maxlength="35"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></input>
                         </div>
-                        <div >
+                        <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Foto</label>
                             <input type="file" id="foto-input" name="foto_file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
                             <input type="hidden" name="foto_data" id="foto_data">
                             <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto']); ?>">
-                            
+
                             <div class="flex items-center space-x-4 mt-4">
                                 <img id="current-preview" src="../img/profile/<?php echo htmlspecialchars($data['foto']); ?>" class="img-fluid rounded" style="width:120px; height:120px; object-fit:cover;" />
                                 <div>
@@ -502,19 +533,19 @@ if (isset($_POST['update'])) {
                             </div>
                         </div>
                     </div>
-                    
-                    
 
-                  
-                   
+
+
+
+
                 </div>
 
                 <div class="flex justify-end space-x-4">
                     <a href="../dashboard/profile.php">
-<button type="button"
-                        class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-indigo-50 text-xs">Cancel</button>
+                        <button type="button"
+                            class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-indigo-50 text-xs">Cancel</button>
                     </a>
-                    
+
                     <button type="submit" name="update"
                         class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
                 </div>
@@ -579,7 +610,7 @@ if (isset($_POST['update'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         // Image cropper for profile foto
-        (function(){
+        (function() {
             const fotoInput = document.getElementById('foto-input');
             const cropperArea = document.getElementById('cropper-area');
             const cropImage = document.getElementById('crop-image');
@@ -619,41 +650,66 @@ if (isset($_POST['update'])) {
                 };
             });
 
-            zoomIn.addEventListener('click', () => { if (cropper) cropper.zoom(0.1); });
-            zoomOut.addEventListener('click', () => { if (cropper) cropper.zoom(-0.1); });
-            rotL.addEventListener('click', () => { if (cropper) cropper.rotate(-90); });
-            rotR.addEventListener('click', () => { if (cropper) cropper.rotate(90); });
+            zoomIn.addEventListener('click', () => {
+                if (cropper) cropper.zoom(0.1);
+            });
+            zoomOut.addEventListener('click', () => {
+                if (cropper) cropper.zoom(-0.1);
+            });
+            rotL.addEventListener('click', () => {
+                if (cropper) cropper.rotate(-90);
+            });
+            rotR.addEventListener('click', () => {
+                if (cropper) cropper.rotate(90);
+            });
 
             cancelBtn.addEventListener('click', () => {
-                if (cropper) { cropper.destroy(); cropper = null; }
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
                 cropperArea.classList.add('hidden');
                 fotoInput.value = '';
             });
 
             applyBtn.addEventListener('click', () => {
                 if (!cropper) return;
-                const canvas = cropper.getCroppedCanvas({ width: 512, height: 512, imageSmoothingQuality: 'high' });
+                const canvas = cropper.getCroppedCanvas({
+                    width: 512,
+                    height: 512,
+                    imageSmoothingQuality: 'high'
+                });
                 canvas.toBlob((blob) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
                         fotoDataInput.value = reader.result; // base64 data URL
                         currentPreview.src = reader.result;
-                        if (cropper) { cropper.destroy(); cropper = null; }
+                        if (cropper) {
+                            cropper.destroy();
+                            cropper = null;
+                        }
                         cropperArea.classList.add('hidden');
                     };
                     reader.readAsDataURL(blob);
                 }, 'image/webp', 0.8);
             });
 
-            form.addEventListener('submit', function(e){
+            form.addEventListener('submit', function(e) {
                 if (cropper && !fotoDataInput.value) {
                     e.preventDefault();
-                    const canvas = cropper.getCroppedCanvas({ width: 512, height: 512, imageSmoothingQuality: 'high' });
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 512,
+                        height: 512,
+                        imageSmoothingQuality: 'high'
+                    });
                     canvas.toBlob((blob) => {
                         const reader = new FileReader();
                         reader.onloadend = () => {
                             fotoDataInput.value = reader.result;
-                            if (cropper) { cropper.destroy(); cropper = null; }
+                            if (cropper) {
+                                cropper.destroy();
+                                cropper = null;
+                            }
                             cropperArea.classList.add('hidden');
                             form.submit();
                         };

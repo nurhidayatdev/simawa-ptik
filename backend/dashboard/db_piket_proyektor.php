@@ -58,19 +58,35 @@ while ($row = mysqli_fetch_assoc($q_piket)) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="../img/main/icon.png" />
     <title>Jadwal Piket Proyektor - PTIK C 2024</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 </head>
+
 <body class="bg-slate-100">
     <!-- Header -->
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
@@ -271,7 +287,7 @@ while ($row = mysqli_fetch_assoc($q_piket)) {
                     <h1 class="text-2xl font-bold text-slate-800">Jadwal Piket Proyektor</h1>
                     <p class="text-slate-500 text-sm mt-1">Penanggung jawab pengambilan proyektor Admin Kampus</p>
                 </div>
-                
+
                 <!-- Week Selector -->
                 <div class="flex items-center gap-2">
                     <a href="acak_piket_proyektor.php?minggu=<?= $minggu_ke ?>" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
@@ -305,9 +321,12 @@ while ($row = mysqli_fetch_assoc($q_piket)) {
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-200">
                         <?php if (empty($schedule)): ?>
-                            <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">Belum ada jadwal kuliah.</td></tr>
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-slate-500">Belum ada jadwal kuliah.</td>
+                            </tr>
                         <?php else: ?>
-                            <?php $no = 1; foreach ($schedule as $idx => $row): ?>
+                            <?php $no = 1;
+                            foreach ($schedule as $idx => $row): ?>
                                 <tr class="hover:bg-indigo-50/50 transition-colors">
                                     <td class="px-4 py-3 text-xs text-slate-600 font-medium"><?= $no++ ?></td>
                                     <td class="px-4 py-3">
@@ -353,7 +372,7 @@ while ($row = mysqli_fetch_assoc($q_piket)) {
             © 2025 Kelas PTIK C - FT UNM.
         </footer>
     </main>
-    
+
     <script>
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const sidebar = document.getElementById('sidebar');
@@ -368,10 +387,14 @@ while ($row = mysqli_fetch_assoc($q_piket)) {
         });
         const profileButton = document.getElementById('profile-button');
         const profileDropdown = document.getElementById('profile-dropdown');
-        if(profileButton && profileDropdown){
-            profileButton.addEventListener('click', (e)=>{ e.stopPropagation(); profileDropdown.classList.toggle('hidden'); });
-            document.addEventListener('click', ()=> profileDropdown.classList.add('hidden'));
+        if (profileButton && profileDropdown) {
+            profileButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => profileDropdown.classList.add('hidden'));
         }
     </script>
 </body>
+
 </html>
