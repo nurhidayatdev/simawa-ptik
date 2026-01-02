@@ -620,7 +620,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="streak">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-red-100 text-red-50 text-red-500 rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                    <div class="w-12 h-12 bg-red-100 text-red-500 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-fire text-xl"></i>
                         <?php if ($streak_count > 0): ?>
                         <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>

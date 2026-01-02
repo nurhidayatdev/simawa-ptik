@@ -63,8 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $st
         );
         mysqli_stmt_execute($stmt);
-
-        
     }
     // redirect agar tidak double submit
     header("Location: absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan");
@@ -200,7 +198,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
         </div>
     </header>
 
-<!-- Sidebar dengan z-index di bawah header -->
+    <!-- Sidebar dengan z-index di bawah header -->
     <aside id="sidebar"
         class="fixed left-0 top-0 h-screen w-48 bg-white transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out z-40">
         <!-- Tambahan padding top agar tidak tertutup header -->
@@ -213,7 +211,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                         <span class="text-xs font-medium">Beranda</span>
                     </a>
 
-                    
+
 
                     <!-- Components Menu -->
                     <div class="space-y-1">
@@ -238,6 +236,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                                 <a href="db_jadwal.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-600"></i>
                                     <span class="text-xs font-medium">Jadwal Kuliah</span>
+                                </a>
+                                <a href="db_absensi_stats.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-chart-line w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <span class="text-xs font-medium">Dashboard Absen</span>
                                 </a>
                                 <a href="db_absensi.php?matkul_id=33&pertemuan=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-calendar-check w-5 h-5 mr-3 text-indigo-600"></i>
@@ -272,19 +274,19 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                                     <a href="misi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pusat Misi</a>
                                     <a href="kuis_harian.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
                                     <a href="db_pesan.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pesan Anonim</a>
-                                    
+
                                 </div>
 
-                            <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-calendar w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Kalender</span>
                                 </a>
-                                
+
                                 <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
                                     <span class="text-xs font-medium">Galeri Kelas</span>
                                 </a>
-                            
+
                             </div>
                         </div>
 
@@ -302,23 +304,23 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="profile.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Profile Saya</a>
                                     <a href="krs.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
-                                    
+
                                 </div>
-<?php if ($role === 'Administrator Utama'): ?>
-                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <div class="flex items-center">
-                                        <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
-                                        <span class="text-xs font-medium">Website</span>
+                                <?php if ($role === 'Administrator Utama'): ?>
+                                    <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
+                                            <span class="text-xs font-medium">Website</span>
+                                        </div>
+                                        <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                    </button>
+                                    <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                        <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
+                                        <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
+                                        <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
                                     </div>
-                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                                </button>
-                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                    <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
-                                    <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
-                                    <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
-                                </div>
-                              <?php endif; ?>
-                 
+                                <?php endif; ?>
+
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
                                     <span class="text-xs font-medium">Logout</span>
@@ -336,25 +338,23 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Data Absensi</h3>
-<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        
+                <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
 
-                        
-                        <div class="flex flex-row gap-2 items-center">
-                        <a href="absensi.php?matkul_id=<?= $_GET['matkul_id']; ?>&pertemuan=<?= $_GET['pertemuan']; ?>" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
-                           
-                                Absensi
-                          
-                        </a>
-                        <button type="button" onclick="confirmExport()" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Export to CSV">
-                            <i class="fas fa-file-csv"></i>
-                        </button>
+
+
+                            <div class="flex flex-row gap-2 items-center">
+                                <a href="absensi.php?matkul_id=<?= $_GET['matkul_id'] ?? ''; ?>&pertemuan=<?= $_GET['pertemuan'] ?? ''; ?>" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                                    Absensi
+                                </a>
+                                <button type="button" onclick="confirmExport()" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Export to CSV">
+                                    <i class="fas fa-file-csv"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    </form>
-                </div>
-<?php endif; ?>
+                <?php endif; ?>
             </div>
             <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
@@ -380,31 +380,33 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                 </select>
 
                 <label class="sr-only">Filter</label>
-            <select name="filter" onchange="this.form.submit()" class="border rounded px-4 py-2 text-xs">
-                <option value="all" <?= ($_GET['filter'] ?? 'all') == 'all' ? 'selected' : '' ?>>Semua</option>
-                <option value="Hadir" <?= ($_GET['filter'] ?? '') == 'Hadir' ? 'selected' : '' ?>>Hadir</option>
-                <option value="Izin" <?= ($_GET['filter'] ?? '') == 'Izin' ? 'selected' : '' ?>>Izin</option>
-                <option value="Sakit" <?= ($_GET['filter'] ?? '') == 'Sakit' ? 'selected' : '' ?>>Sakit</option>
-                <option value="Alpha" <?= ($_GET['filter'] ?? '') == 'Alpha' ? 'selected' : '' ?>>Alpha</option>
-            </select>
+                <select name="filter" onchange="this.form.submit()" class="border rounded px-4 py-2 text-xs">
+                    <option value="all" <?= ($_GET['filter'] ?? 'all') == 'all' ? 'selected' : '' ?>>Semua</option>
+                    <option value="Hadir" <?= ($_GET['filter'] ?? '') == 'Hadir' ? 'selected' : '' ?>>Hadir</option>
+                    <option value="Izin" <?= ($_GET['filter'] ?? '') == 'Izin' ? 'selected' : '' ?>>Izin</option>
+                    <option value="Sakit" <?= ($_GET['filter'] ?? '') == 'Sakit' ? 'selected' : '' ?>>Sakit</option>
+                    <option value="Alpha" <?= ($_GET['filter'] ?? '') == 'Alpha' ? 'selected' : '' ?>>Alpha</option>
+                </select>
                 <!-- tombol Tampilkan dihapus; pilihan akan auto-submit -->
             </form>
 
-           <?php
-if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
+            <?php
+            $matkul_id = null;
+            $pertemuan = null;
+            if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
 
-    $matkul_id = (int) $_GET['matkul_id'];
-    $pertemuan = (int) $_GET['pertemuan'];
+                $matkul_id = (int) $_GET['matkul_id'];
+                $pertemuan = (int) $_GET['pertemuan'];
 
-    $filter = $_GET['filter'] ?? 'all';
-    $filter = in_array($filter, ['all', 'Hadir', 'Izin', 'Sakit', 'Alpha']) ? $filter : 'all';
+                $filter = $_GET['filter'] ?? 'all';
+                $filter = in_array($filter, ['all', 'Hadir', 'Izin', 'Sakit', 'Alpha']) ? $filter : 'all';
 
-    $where_clause = '';
-    if ($filter !== 'all') {
-        $where_clause = " AND a.status = '$filter'";
-    }
+                $where_clause = '';
+                if ($filter !== 'all') {
+                    $where_clause = " AND a.status = '$filter'";
+                }
 
-    $query = "
+                $query = "
         SELECT DISTINCT
             m.id AS mahasiswa_id,
             m.nim,
@@ -422,68 +424,68 @@ if (isset($_GET['matkul_id'], $_GET['pertemuan'])) :
         ORDER BY m.nim ASC
     ";
 
-    $stmt = mysqli_prepare($koneksi, $query);
-    mysqli_stmt_bind_param($stmt, "iii", $pertemuan, $matkul_id, $periode_id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-?>
+                $stmt = mysqli_prepare($koneksi, $query);
+                mysqli_stmt_bind_param($stmt, "iii", $pertemuan, $matkul_id, $periode_id);
+                mysqli_stmt_execute($stmt);
+                $result = mysqli_stmt_get_result($stmt);
+            ?>
 
 
-            <!-- Rest of the content remains the same -->
-            <div class="overflow-x-auto">
-                <form method="POST">
-                    <input type="hidden" name="matkul_id" value="<?= $matkul_id ?>">
-                    <input type="hidden" name="pertemuan" value="<?= $pertemuan ?>">
-                    <table class="min-w-full divide-y divide-slate-200">
-                        <thead class="bg-indigo-900">
-                            <tr>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                    No</th>
-                                <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                    NIM</th>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                    Nama Lengkap</th>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                    Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-slate-200">
-                            <?php
-                            $no = 1;
-                            $id = 1;
-                            while ($row = mysqli_fetch_assoc($result)) : ?>
-                                <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-                                    <td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-									
-									<?php
-$jkStatus = match ($row['status']) {
-    'Hadir' => 'bg-emerald-100 text-emerald-800 border-emerald-200', // Hijau
-    'Izin'  => 'bg-amber-100 text-amber-800 border-amber-200',     // Kuning/Oranye
-    'Sakit' => 'bg-sky-100 text-sky-800 border-sky-200',           // Biru
-    'Alpha' => 'bg-rose-100 text-rose-800 border-rose-200',
-    default => 'bg-slate-100 text-slate-800 border-slate-200'       // Default/Unknown/NULL
-};
-?>
-									
-									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $jkStatus ?>"><?= ucfirst($row['status']) ?></span>
-								</td>
-
-
+                <!-- Rest of the content remains the same -->
+                <div class="overflow-x-auto">
+                    <form method="POST">
+                        <input type="hidden" name="matkul_id" value="<?= $matkul_id ?>">
+                        <input type="hidden" name="pertemuan" value="<?= $pertemuan ?>">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-indigo-900">
+                                <tr>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                        No</th>
+                                    <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                        NIM</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                        Nama Lengkap</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                                        Status</th>
                                 </tr>
-                            <?php endwhile; ?>
-                        </tbody>
-                
-                </table>
-                </form>
-            </div>
-<?php endif; ?>
-<?php if (!$matkul_id) : ?>
-			<div class="p-3 text-xs text-slate-600">Pilih mata kuliah untuk melihat absensi yang tersimpan</div>
-		<?php endif; ?>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <?php
+                                $no = 1;
+                                $id = 1;
+                                while ($row = mysqli_fetch_assoc($result)) : ?>
+                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
+
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
+                                        <td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
+                                        <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+
+                                            <?php
+                                            $jkStatus = match ($row['status']) {
+                                                'Hadir' => 'bg-emerald-100 text-emerald-800 border-emerald-200', // Hijau
+                                                'Izin'  => 'bg-amber-100 text-amber-800 border-amber-200',     // Kuning/Oranye
+                                                'Sakit' => 'bg-sky-100 text-sky-800 border-sky-200',           // Biru
+                                                'Alpha' => 'bg-rose-100 text-rose-800 border-rose-200',
+                                                default => 'bg-slate-100 text-slate-800 border-slate-200'       // Default/Unknown/NULL
+                                            };
+                                            ?>
+
+                                            <span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $jkStatus ?>"><?= ucfirst($row['status']) ?></span>
+                                        </td>
+
+
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+
+                        </table>
+                    </form>
+                </div>
+            <?php endif; ?>
+            <?php if (!$matkul_id) : ?>
+                <div class="p-3 text-xs text-slate-600">Pilih mata kuliah untuk melihat absensi yang tersimpan</div>
+            <?php endif; ?>
         </div>
         <footer class="text-xs text-indigo-900 text-center mb-0 pb-0 mt-6">
             © 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.

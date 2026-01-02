@@ -121,7 +121,9 @@ while ($row = mysqli_fetch_assoc($q_kalender)) {
     $events[$date_key][] = [
         'type' => 'kalender',
         'title' => $row['kegiatan'],
-        'time' => ''
+        'time' => '',
+        'start' => $row['tanggal_mulai'],
+        'end' => $row['tanggal_selesai']
     ];
 }
 
@@ -518,15 +520,25 @@ $today = date('Y-m-d');
                                 if ($evt['type'] === 'kalender') {
                                     $kalender_list[] = [
                                         'date' => $date,
-                                        'title' => $evt['title']
+                                        'title' => $evt['title'],
+                                        'start' => $evt['start'],
+                                        'end' => $evt['end']
                                     ];
                                 }
                             }
                         }
                         if (!empty($kalender_list)):
-                            foreach ($kalender_list as $k): ?>
+                            foreach ($kalender_list as $k):
+                                $is_range = ($k['start'] !== $k['end']);
+                        ?>
                                 <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs">
-                                    <span class="font-bold text-emerald-700 w-16"><?= date('d M', strtotime($k['date'])) ?></span>
+                                    <div class="font-bold text-emerald-700 min-w-[70px]">
+                                        <?php if ($is_range): ?>
+                                            <?= date('d M', strtotime($k['start'])) ?> - <?= date('d M', strtotime($k['end'])) ?>
+                                        <?php else: ?>
+                                            <?= date('d M', strtotime($k['start'])) ?>
+                                        <?php endif; ?>
+                                    </div>
                                     <span class="flex-1 text-slate-700"><?= htmlspecialchars($k['title']) ?></span>
                                 </div>
                             <?php endforeach;
@@ -653,6 +665,12 @@ $today = date('Y-m-d');
         const eventsData = <?= json_encode($events) ?>;
         const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
+        function formatDateIndo(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return `${d.getDate()} ${monthNames[d.getMonth() + 1]}`;
+        }
+
         function showDatePopup(dateKey, day) {
             const modal = document.getElementById('dateModal');
             const title = document.getElementById('modalTitle');
@@ -692,6 +710,9 @@ $today = date('Y-m-d');
                                 <div class="flex-1">
                                     <div class="text-xs text-slate-500 mb-1">${typeLabel}</div>
                                     <div class="font-semibold text-slate-800">${evt.title}</div>
+                                    ${evt.type === 'kalender' && evt.start && evt.end && evt.start !== evt.end ? 
+                                        `<div class="text-[10px] text-emerald-600 font-bold mt-1"><i class="fa fa-calendar-range mr-1"></i>${formatDateIndo(evt.start)} - ${formatDateIndo(evt.end)}</div>` : ''
+                                    }
                                     ${evt.time ? `<div class="text-sm text-slate-600 mt-1"><i class="fa fa-clock mr-1"></i>${evt.time}</div>` : ''}
                                     ${evt.status === 'selesai' ? '<div class="text-xs text-green-600 mt-1"><i class="fa fa-check-circle mr-1"></i>Selesai</div>' : ''}
                                 </div>

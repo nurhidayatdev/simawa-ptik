@@ -1,5 +1,9 @@
 <?php
 include 'koneksi.php';
+$mhs = mysqli_query($koneksi, "SELECT COUNT(*) FROM mahasiswa");
+$jml = mysqli_fetch_assoc($mhs);
+$sms_aktif = mysqli_query($koneksi, "SELECT semester_ke FROM periode WHERE status = 'aktif'");
+$sms = mysqli_fetch_assoc($sms_aktif);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -140,11 +144,11 @@ include 'koneksi.php';
                     </p>
                     <div class="grid grid-cols-2 gap-4 mt-6">
                         <div class="bg-indigo-100 p-4 rounded-lg text-center">
-                            <p class="text-2xl font-bold text-indigo-800">37</p>
+                            <p class="text-2xl font-bold text-indigo-800"><?= ($jml['COUNT(*)']) ?></p>
                             <p class="text-gray-700">Mahasiswa</p>
                         </div>
                         <div class="bg-indigo-100 p-4 rounded-lg text-center">
-                            <p class="text-2xl font-bold text-indigo-800">3</p>
+                            <p class="text-2xl font-bold text-indigo-800"><?= ($sms['semester_ke']) ?></p>
                             <p class="text-gray-700">Semester</p>
                         </div>
                     </div>
