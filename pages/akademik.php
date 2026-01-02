@@ -312,7 +312,7 @@ $today = date('Y-m-d');
 	<main class="flex-grow ">
 		<section class="py-12 p-6">
 			<div class="container mx-auto">
-				<h2 class="text-3xl font-bold mb-6 text-gray-800">Berita & Informasi Akademik</h2>
+				<h2 class="text-2xl font-bold mb-6 text-gray-800">Berita & Informasi Akademik</h2>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					<!-- sample card -->
@@ -325,7 +325,7 @@ $today = date('Y-m-d');
 						<div class="p-4">
 							<h3 class="font-semibold text-lg mb-2"><?php echo $data['judul']; ?></h3>
 							<p class="text-xs text-gray-600 mb-3"><?php echo $data['deskripsi']; ?></p>
-							<a href="<?php echo $data['link']; ?>" target="_blank" class="text-indigo-700 font-medium text-sm">Baca lebih lanjut →</a>
+							<a href="<?php echo $data['link']; ?>" class="text-indigo-700 font-medium text-sm">Baca lebih lanjut →</a>
 						</div>
 					</article>
 <?php 
@@ -583,9 +583,7 @@ $today = date('Y-m-d');
                 </div>
             </div>
         </div>
-
-       
-                        </section>
+           </section>
 
     <!-- Date Popup Modal -->
     <div id="dateModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4">

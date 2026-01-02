@@ -188,7 +188,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 card-3d hover:shadow-2xl transition-all">
                         <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-24 sm:h-20 relative">
                             <div class="absolute -bottom-10 sm:-bottom-12 left-1/2 -translate-x-1/2">
-                                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
+                                <div class="w-24 h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
                                     <?php if ($ketua && !empty($ketua['foto'])): ?>
                                         <img src="<?php echo htmlspecialchars(foto_path($ketua['foto'])); ?>" alt="<?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?>" class="w-full h-full object-cover">
                                     <?php else: ?>
@@ -224,7 +224,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                         <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 card-3d hover:shadow-2xl transition-all">
                             <div class="bg-gradient-to-br from-slate-600 to-slate-800 h-24 sm:h-20 relative">
                                 <div class="absolute -bottom-10 sm:-bottom-12 left-1/2 -translate-x-1/2">
-                                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
+                                    <div class="w-24 h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -259,7 +259,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                         <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 card-3d hover:shadow-2xl transition-all">
                             <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 h-24 sm:h-20 relative">
                                 <div class="absolute -bottom-10 sm:-bottom-12 left-1/2 -translate-x-1/2">
-                                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
+                                    <div class="w-24 h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>

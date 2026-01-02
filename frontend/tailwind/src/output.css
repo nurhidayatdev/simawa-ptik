@@ -389,6 +389,9 @@
   .inset-0 {
     inset: calc(var(--spacing) * 0);
   }
+  .inset-y-0 {
+    inset-block: calc(var(--spacing) * 0);
+  }
   .-top-1 {
     top: calc(var(--spacing) * -1);
   }
@@ -415,6 +418,9 @@
   }
   .top-10 {
     top: calc(var(--spacing) * 10);
+  }
+  .top-\[-10\%\] {
+    top: -10%;
   }
   .top-full {
     top: 100%;
@@ -452,6 +458,9 @@
   .right-20 {
     right: calc(var(--spacing) * 20);
   }
+  .right-\[-10\%\] {
+    right: -10%;
+  }
   .-bottom-1 {
     bottom: calc(var(--spacing) * -1);
   }
@@ -478,6 +487,9 @@
   }
   .bottom-20 {
     bottom: calc(var(--spacing) * 20);
+  }
+  .bottom-\[-10\%\] {
+    bottom: -10%;
   }
   .bottom-full {
     bottom: 100%;
@@ -509,8 +521,14 @@
   .left-10 {
     left: calc(var(--spacing) * 10);
   }
+  .left-\[-10\%\] {
+    left: -10%;
+  }
   .-z-10 {
     z-index: calc(10 * -1);
+  }
+  .z-0 {
+    z-index: 0;
   }
   .z-10 {
     z-index: 10;
@@ -797,6 +815,9 @@
   .h-\[34px\] {
     height: 34px;
   }
+  .h-\[40\%\] {
+    height: 40%;
+  }
   .h-\[240px\] {
     height: 240px;
   }
@@ -914,6 +935,12 @@
   .w-32 {
     width: calc(var(--spacing) * 32);
   }
+  .w-36 {
+    width: calc(var(--spacing) * 36);
+  }
+  .w-40 {
+    width: calc(var(--spacing) * 40);
+  }
   .w-48 {
     width: calc(var(--spacing) * 48);
   }
@@ -925,6 +952,9 @@
   }
   .w-96 {
     width: calc(var(--spacing) * 96);
+  }
+  .w-\[40\%\] {
+    width: 40%;
   }
   .w-full {
     width: 100%;
@@ -1186,6 +1216,13 @@
       --tw-space-y-reverse: 0;
       margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
       margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .space-y-5 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 5) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 5) * calc(1 - var(--tw-space-y-reverse)));
     }
   }
   .space-y-6 {
@@ -1547,6 +1584,12 @@
     border-color: color-mix(in srgb, #fff 10%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       border-color: color-mix(in oklab, var(--color-white) 10%, transparent);
+    }
+  }
+  .border-white\/20 {
+    border-color: color-mix(in srgb, #fff 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-white) 20%, transparent);
     }
   }
   .border-white\/40 {
@@ -2374,6 +2417,9 @@
   .pr-6 {
     padding-right: calc(var(--spacing) * 6);
   }
+  .pr-10 {
+    padding-right: calc(var(--spacing) * 10);
+  }
   .pb-0 {
     padding-bottom: calc(var(--spacing) * 0);
   }
@@ -2403,6 +2449,9 @@
   }
   .pl-5 {
     padding-left: calc(var(--spacing) * 5);
+  }
+  .pl-10 {
+    padding-left: calc(var(--spacing) * 10);
   }
   .pl-11 {
     padding-left: calc(var(--spacing) * 11);
@@ -3150,6 +3199,10 @@
   }
   .blur-\[80px\] {
     --tw-blur: blur(80px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .blur-\[120px\] {
+    --tw-blur: blur(120px);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .blur-md {
@@ -4007,6 +4060,14 @@
       --tw-ring-color: var(--color-indigo-500);
     }
   }
+  .focus\:ring-indigo-500\/20 {
+    &:focus {
+      --tw-ring-color: color-mix(in srgb, oklch(58.5% 0.233 277.117) 20%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        --tw-ring-color: color-mix(in oklab, var(--color-indigo-500) 20%, transparent);
+      }
+    }
+  }
   .focus\:ring-red-500 {
     &:focus {
       --tw-ring-color: var(--color-red-500);
@@ -4045,6 +4106,11 @@
       --tw-scale-y: 95%;
       --tw-scale-z: 95%;
       scale: var(--tw-scale-x) var(--tw-scale-y);
+    }
+  }
+  .active\:scale-\[0\.98\] {
+    &:active {
+      scale: 0.98;
     }
   }
   .sm\:-bottom-12 {

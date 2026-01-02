@@ -333,12 +333,12 @@ function getFireColor($streak)
             <div class="hidden lg:flex items-center space-x-4">
                 <div class="relative">
                     <button id="profile-button" class="flex items-center space-x-2">
-                        <span class="text-white"><?php echo htmlspecialchars($nama_lengkap); ?></span>
+                        <span class="text-white font-semibold"><?php echo htmlspecialchars($nama_lengkap); ?></span>
                         <img src="../img/profile/<?php echo htmlspecialchars($foto); ?>" alt="Profile" class="w-8 h-8 rounded-full">
                     </button>
-                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                        <a href="profile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
-                        <a href="../../index.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Logout</a>
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg hidden">
+                        <a href="profile.php" class="block px-4 py-2 text-xs hover:bg-gray-100 font-semibold text-indigo-900"><i class="fa fa-user mr-2 text-indigo-900"></i>Profile</a>
+                        <a href="../../index.php" class="block px-4 py-2 text-xs hover:bg-gray-100 font-semibold text-indigo-900"><i class="fa fa-sign-out mr-2 text-indigo-900"></i>Logout</a>
                     </div>
                 </div>
             </div>
@@ -353,7 +353,7 @@ function getFireColor($streak)
             <nav class="mt-4 h-[calc(100vh-4rem)] overflow-y-auto pb-10">
                 <div class="px-4 space-y-2">
                     <!-- Dashboard Menu -->
-                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
+                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-indigo-900  rounded-lg hover:bg-slate-100">
                         <i class="fa fa-home w-4 h-4 mr-4"></i>
                         <span class="text-xs font-medium">Dashboard</span>
                     </a>
@@ -367,7 +367,7 @@ function getFireColor($streak)
                             <div class="space-y-1">
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-600"></i>
+                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-900"></i>
                                         <span class="text-xs font-medium">Master</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -382,20 +382,20 @@ function getFireColor($streak)
                                 </div>
 
                                 <a href="db_jadwal.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Jadwal Kuliah</span>
                                 </a>
 
                                 <a href="db_tugas.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Tugas Kuliah</span>
                                 </a>
                                 <a href="db_kelompok.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Kelompok</span>
                                 </a>
                                 <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-calendar w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-calendar w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Kalender</span>
                                 </a>
 
@@ -407,30 +407,32 @@ function getFireColor($streak)
                             <div class="space-y-1">
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-calendar w-5 h-5 mr-3 text-emerald-600"></i>
+                                        <i class="fa fa-clipboard-list w-5 h-5 mr-3 text-indigo-900"></i>
                                         <span class="text-xs font-medium">Absensi</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
                                 </button>
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="db_absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Absen</a>
+                                    <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                                     <a href="absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Absen</a>
-
+<?php endif; ?>
                                 </div>
 
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-wallet w-5 h-5 mr-3 text-emerald-600"></i>
+                                        <i class="fa fa-wallet w-5 h-5 mr-3 text-indigo-900"></i>
                                         <span class="text-xs font-medium">Keuangan</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
                                 </button>
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="db_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Kas</a>
+                                    <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
                                     <a href="arus_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Arus Kas</a>
                                     <a href="kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Minggu</a>
                                     <a href="kas_individu.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Individu</a>
-
+<?php endif; ?>
                                 </div>
 
 
@@ -445,15 +447,15 @@ function getFireColor($streak)
 
 
                                 <a href="misi.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-trophy w-5 h-5 mr-3 text-yellow-600"></i>
+                                    <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Pusat Misi</span>
                                 </a>
                                 <a href="kuis_harian.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-images w-5 h-5 mr-3 text-yellow-600"></i>
+                                    <i class="fa fa-gamepad w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Kuis Harian</span>
                                 </a>
                                 <a href="db_pesan.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-wand-magic-sparkles w-5 h-5 mr-3 text-yellow-600"></i>
+                                    <i class="fa fa-comments w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Pesan Anonim</span>
                                 </a>
 
@@ -466,7 +468,7 @@ function getFireColor($streak)
                             <div class="space-y-1">
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-user w-5 h-5 mr-3 text-slate-800"></i>
+                                        <i class="fa fa-user w-5 h-5 mr-3 text-indigo-900"></i>
                                         <span class="text-xs font-medium">Akun</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -479,7 +481,7 @@ function getFireColor($streak)
                                 <?php if ($role === 'Administrator Utama'): ?>
                                     <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                         <div class="flex items-center">
-                                            <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
+                                            <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-indigo-900"></i>
                                             <span class="text-xs font-medium">Website</span>
                                         </div>
                                         <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -493,7 +495,7 @@ function getFireColor($streak)
 
 
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
-                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
+                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Logout</span>
                                 </a>
                             </div>
@@ -539,7 +541,7 @@ function getFireColor($streak)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
                 <a href="db_mahasiswa.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
                         <i class="fa fa-user-graduate text-xl"></i>
                     </div>
                     <div>
@@ -551,7 +553,7 @@ function getFireColor($streak)
 
 
                 <a href="db_tugas.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">
+                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
                         <i class="fa fa-tasks text-xl"></i>
                     </div>
                     <div>
@@ -561,7 +563,7 @@ function getFireColor($streak)
                 </a>
 
                 <a href="db_kelompok.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600">
+                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
                         <i class="fa fa-users text-xl"></i>
                     </div>
                     <div>
@@ -571,7 +573,7 @@ function getFireColor($streak)
                 </a>
 
                 <a href="db_jadwal.php" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
                         <i class="fa fa-list-alt text-xl"></i>
                     </div>
                     <div>
@@ -709,7 +711,7 @@ function getFireColor($streak)
 
                 <!-- Slider Indicators -->
                 <div class="absolute bottom-2 right-4 flex gap-1.5">
-                    <div class="h-1.5 w-4 rounded-full bg-indigo-500 indicator" data-index="0"></div>
+                    <div class="h-1.5 w-4 rounded-full bg-indigo-900 indicator" data-index="0"></div>
                     <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="1"></div>
                     <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="2"></div>
                     <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="3"></div>
@@ -721,7 +723,7 @@ function getFireColor($streak)
             <!-- --- SECTION 1: DEMOGRAFI & SOSIAL --- -->
             <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
                 <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fa fa-user-friends text-indigo-500"></i>
+                    <i class="fa fa-user-friends text-indigo-900"></i>
                     Pusat Aktivitas
                 </h2>
             </div>
@@ -841,7 +843,7 @@ function getFireColor($streak)
             <!-- --- SECTION 2: AKADEMIK --- -->
             <div class="mt-12 border-b border-slate-200 pb-2 mb-6">
                 <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fa fa-graduation-cap text-orange-500"></i>
+                    <i class="fa fa-graduation-cap text-indigo-900"></i>
                     Akademik & Tugas
                 </h2>
             </div>
@@ -892,7 +894,7 @@ function getFireColor($streak)
             </form>
             <div class="mt-12 border-b border-slate-200 pb-2 mb-6">
                 <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fa fa-chart-line text-green-600"></i>
+                    <i class="fa fa-chart-line text-indigo-900"></i>
                     Tren & Analitik
                 </h2>
             </div>
@@ -1057,13 +1059,13 @@ function getFireColor($streak)
                 datasets: [{
                         label: 'Selesai',
                         data: <?= json_encode($task_matkul_selesai) ?>,
-                        backgroundColor: '#10b981',
+                        backgroundColor: '#615fff',
                         borderRadius: 4
                     },
                     {
                         label: 'Belum Selesai',
                         data: <?= json_encode($task_matkul_belum) ?>,
-                        backgroundColor: '#f59e0b',
+                        backgroundColor: '#cad5e2',
                         borderRadius: 4
                     }
                 ]
@@ -1121,7 +1123,7 @@ function getFireColor($streak)
                 datasets: [{
                     label: 'Jumlah Absensi',
                     data: [<?= $absensi_stats['Hadir'] ?>, <?= $absensi_stats['Izin'] ?>, <?= $absensi_stats['Sakit'] ?>, <?= $absensi_stats['Alpha'] ?>],
-                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                    backgroundColor: [ '#00bc7d','#51a2ff', '#ffb900', '#ff2056'],
                     borderRadius: 4
                 }]
             },
