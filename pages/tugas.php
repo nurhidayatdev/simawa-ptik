@@ -81,7 +81,7 @@ $query_matkul = mysqli_query($koneksi, "
                             <i class="fas fa-graduation-cap mr-2"></i>Akademik
                         </a>
                     </li>
-                   
+
                     <li>
                         <a href="galeri.php" class="flex items-center hover:text-indigo-200 transition text-sm">
                             <i class="fas fa-images mr-2"></i>Galeri
@@ -113,7 +113,7 @@ $query_matkul = mysqli_query($koneksi, "
                         <i class="fas fa-graduation-cap w-5"></i><span>Akademik</span>
                     </a>
                 </li>
-                
+
                 <li>
                     <a href="galeri.php" class="flex items-center space-x-3 hover:text-indigo-200 transition text-sm py-2">
                         <i class="fas fa-images w-5"></i><span>Galeri</span>
@@ -139,11 +139,11 @@ $query_matkul = mysqli_query($koneksi, "
                         <h2 class="text-3xl font-bold text-gray-800">Tugas Kuliah</h2>
                         <p class="text-xs text-gray-500 mt-1"><?= $active_period['tahun_periode'] ?> - <?= $active_period['semester_nama'] ?></p>
                     </div>
-                    
+
                     <div class="flex gap-2 items-center">
                         <select id="filterMatkul" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block px-3 py-2 shadow-sm">
                             <option value="">Semua Mata Kuliah</option>
-                            <?php while($m = mysqli_fetch_assoc($query_matkul)): ?>
+                            <?php while ($m = mysqli_fetch_assoc($query_matkul)): ?>
                                 <option value="<?= htmlspecialchars($m['nama_matkul']) ?>"><?= htmlspecialchars($m['nama_matkul']) ?></option>
                             <?php endwhile; ?>
                         </select>
@@ -163,7 +163,7 @@ $query_matkul = mysqli_query($koneksi, "
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php if (mysqli_num_rows($query) > 0) : ?>
                         <?php while ($data = mysqli_fetch_assoc($query)) : ?>
-                            <article 
+                            <article
                                 class="task-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition flex flex-col cursor-pointer hover:border-indigo-200"
                                 onclick="openModal(this)"
                                 data-matkul="<?= htmlspecialchars($data['nama_matkul']) ?>"
@@ -171,8 +171,7 @@ $query_matkul = mysqli_query($koneksi, "
                                 data-deadline="<?= date('d M Y', strtotime($data['deadline_tanggal'])) ?> - <?= date('H:i', strtotime($data['deadline_pukul'])) ?>"
                                 data-link="<?= htmlspecialchars($data['link_kirim']) ?>"
                                 data-file="<?= htmlspecialchars($data['file_tugas']) ?>"
-                                data-status="<?= $data['status'] ?>"
-                            >
+                                data-status="<?= $data['status'] ?>">
                                 <div class="p-5 flex-grow">
                                     <div class="flex justify-between items-start mb-4">
                                         <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
@@ -184,10 +183,10 @@ $query_matkul = mysqli_query($koneksi, "
                                             <span class="bg-yellow-50 text-yellow-700 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Aktif</span>
                                         <?php endif; ?>
                                     </div>
-                                    
+
                                     <h3 class="font-bold text-gray-800 mb-2 truncate"><?= htmlspecialchars($data['nama_matkul']) ?></h3>
                                     <div class="text-xs text-gray-600 mb-4 line-clamp-3"><?= nl2br(htmlspecialchars($data['deskripsi'])) ?></div>
-                                    
+
                                     <div class="space-y-2 border-t border-gray-50 pt-2 mt-auto">
                                         <div class="flex items-center text-xs text-gray-500">
                                             <i class="far fa-clock w-5 text-indigo-500"></i>
@@ -214,75 +213,79 @@ $query_matkul = mysqli_query($koneksi, "
 
     <!-- Footer -->
     <footer class="bg-indigo-950 text-white py-4 mt-auto">
-		<div class="container mx-auto px-4">
-			<div class="grid md:grid-cols-4 gap-8">
-				<div>
-					<h3 class="text-lg font-bold mb-4">PTIK C 2024</h3>
-					<p class="mb-4 text-xs">Jurusan Teknik Informatika dan Komputer</p>
-					<p class="text-xs">Fakultas Teknik</p>
-					<p class="text-xs">Universitas Negeri Makassar</p>
-				</div>
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">PTIK C 2024</h3>
+                    <p class="mb-4 text-xs">Jurusan Teknik Informatika dan Komputer</p>
+                    <p class="text-xs">Fakultas Teknik</p>
+                    <p class="text-xs">Universitas Negeri Makassar</p>
+                </div>
 
-				<div>
-					<h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
-					<ul class="space-y-1">
-						<li><a href="kalender.php" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
-						<li><a href="matakuliah.php" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
-						<li><a href="jadwal.php" class="hover:text-indigo-200 transition text-xs">Jadwal Mata Kuliah</a></li>
-						<li><a href="tugas.php" class="hover:text-indigo-200 transition text-xs">Tugas Mata Kuliah</a></li>
-					</ul>
-				</div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+                    <ul class="space-y-1">
+                        <li><a href="kalender.php" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
+                        <li><a href="matakuliah.php" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
+                        <li><a href="jadwal.php" class="hover:text-indigo-200 transition text-xs">Jadwal Mata Kuliah</a></li>
+                        <li><a href="tugas.php" class="hover:text-indigo-200 transition text-xs">Tugas Mata Kuliah</a></li>
+                    </ul>
+                </div>
 
-				<div>
-					<h3 class="text-lg font-bold mb-4">Kontak</h3>
-					<p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
-					<p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Kontak</h3>
+                    <p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
+                    <p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
                     <a href="https://www.instagram.com/ptikc_24">
                         <p class="mb-2 text-xs"><i class="fab fa-instagram mr-2 text-sm"></i></i> @ptikc_24</p>
                     </a>
-				</div>
+                </div>
                 <div>
-                <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
-                
-                <form action="" method="POST" class="space-y-2">
-                    <textarea 
-                        name="pesan_anonim" 
-                        rows="3" 
-                        maxlength="300"
-                        class="w-full p-3 rounded-lg bg-indigo-900/50 border border-indigo-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300/50"
-                        placeholder="Tulis pesan rahasia atau saran di sini..."
-                        required></textarea>
-                    <button 
-                        type="submit" 
-                        name="kirim_pesan"
-                        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
-                        <i class="fas fa-paper-plane text-xs"></i>
-                        <span>Kirim Sekarang</span>
-                    </button>
-                </form>
+                    <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
 
-                <?php
-                // Logika PHP untuk simpan pesan ke database
-                if (isset($_POST['kirim_pesan'])) {
-                    $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
-                    if (!empty($pesan)) {
-                        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
-                        if (mysqli_query($koneksi, $query_pesan)) {
-                            echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                    <form action="" method="POST" class="space-y-2">
+                        <textarea
+                            name="pesan_anonim"
+                            rows="3"
+                            maxlength="300"
+                            class="w-full p-3 rounded-lg bg-indigo-900/50 border border-indigo-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300/50"
+                            placeholder="Tulis pesan rahasia atau saran di sini..."
+                            required></textarea>
+                        <button
+                            type="submit"
+                            name="kirim_pesan"
+                            class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                            <i class="fas fa-paper-plane text-xs"></i>
+                            <span>Kirim Sekarang</span>
+                        </button>
+                    </form>
+
+                    <?php
+                    // Logika PHP untuk simpan pesan ke database
+                    if (isset($_POST['kirim_pesan'])) {
+                        $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
+                        if (!empty($pesan)) {
+                            $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
+                            if (mysqli_query($koneksi, $query_pesan)) {
+                                // Kirim notifikasi ke Telegram
+                                include_once '../backend/crud/kirim_pesan_telegram.php';
+                                sendTelegramPesan($pesan);
+
+                                echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                            }
                         }
                     }
-                }
-                ?>
+                    ?>
+                </div>
             </div>
         </div>
-				</div>
-			</div>
+        </div>
 
-			<div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs">
-				<p>© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
-			</div>
-		</div>
-	</footer>
+        <div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs">
+            <p>© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
+        </div>
+        </div>
+    </footer>
 
     <!-- Task Detail Modal -->
     <div id="taskModal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
@@ -297,7 +300,7 @@ $query_matkul = mysqli_query($koneksi, "
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            
+
             <!-- Modal Body -->
             <div class="p-6 overflow-y-auto">
                 <div class="mb-6">
@@ -315,7 +318,7 @@ $query_matkul = mysqli_query($koneksi, "
                             <p id="modalDeadline" class="text-sm font-semibold text-gray-800"></p>
                         </div>
                     </div>
-                    
+
                     <div id="modalFileContainer" class="flex items-start hidden">
                         <div class="bg-blue-100 p-2 rounded-lg mr-3">
                             <i class="far fa-file-alt text-blue-600 text-sm"></i>
@@ -380,18 +383,18 @@ $query_matkul = mysqli_query($koneksi, "
         // Modal Logic
         const modal = document.getElementById('taskModal');
         const modalContent = document.getElementById('modalContent');
-        
+
         function openModal(element) {
             const data = element.dataset;
-            
+
             // Populate Data
             document.getElementById('modalTitle').textContent = data.matkul;
             document.getElementById('modalDesc').textContent = data.deskripsi;
             document.getElementById('modalDeadline').textContent = data.deadline;
-            
+
             // Status styling
             const statusBadge = document.getElementById('modalStatus');
-            if(data.status === 'selesai') {
+            if (data.status === 'selesai') {
                 statusBadge.textContent = 'Selesai';
                 statusBadge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-gray-100 text-gray-500';
             } else {
@@ -402,7 +405,7 @@ $query_matkul = mysqli_query($koneksi, "
             // File Handling
             const fileContainer = document.getElementById('modalFileContainer');
             const fileLink = document.getElementById('modalFileLink');
-            if(data.file) {
+            if (data.file) {
                 fileContainer.classList.remove('hidden');
                 fileLink.href = '../files/tugas/' + data.file;
             } else {
@@ -412,7 +415,7 @@ $query_matkul = mysqli_query($koneksi, "
             // Action Button Handling
             const actionBtn = document.getElementById('modalActionBtn');
             const noAction = document.getElementById('modalNoAction');
-            if(data.link) {
+            if (data.link) {
                 actionBtn.href = data.link;
                 actionBtn.classList.remove('hidden');
                 noAction.classList.add('hidden');
@@ -433,7 +436,7 @@ $query_matkul = mysqli_query($koneksi, "
         function closeModal() {
             modalContent.classList.remove('scale-100', 'opacity-100');
             modalContent.classList.add('scale-95', 'opacity-0');
-            
+
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
@@ -445,7 +448,7 @@ $query_matkul = mysqli_query($koneksi, "
                 closeModal();
             }
         });
-        
+
         // Close on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !modal.classList.contains('hidden')) {

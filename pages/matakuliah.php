@@ -7,24 +7,24 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1e1b4b" />
-  <link rel="icon" href="../backend/img/main/icon.png" />
-  <title>Kurikulum - Kelas PTIK C 2024</title>
-  
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e1b4b" />
+    <link rel="icon" href="../backend/img/main/icon.png" />
+    <title>Kurikulum - Kelas PTIK C 2024</title>
 
-  <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
-  <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
-  <!-- Header & Navigation -->
-  <header class="bg-indigo-950 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
+    <!-- Header & Navigation -->
+    <header class="bg-indigo-950 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center">
@@ -106,13 +106,13 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
     <div class="h-10"></div>
 
 
-  <div class="container mx-auto py-6 mt-4 p-6">
-    <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Matakuliah PTIK</h1>
-    <!-- Rest of the content remains the same -->
-     <?php for ($s = 1; $s <= 8; $s++): ?>
-                <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      
+    <div class="container mx-auto py-6 mt-4 p-6">
+        <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Matakuliah PTIK</h1>
+        <!-- Rest of the content remains the same -->
+        <?php for ($s = 1; $s <= 8; $s++): ?>
+            <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-200">
                         <thead class="bg-indigo-900">
@@ -142,99 +142,103 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
                         </tbody>
                     </table>
                 </div>
-            
+
+            </div>
+        <?php endfor; ?>
     </div>
-    <?php endfor; ?>
-  </div>
 
-  <!-- Footer -->
-  <footer class="bg-indigo-950 text-white py-4 mt-auto">
-		<div class="container mx-auto px-4">
-			<div class="grid md:grid-cols-4 gap-8">
-				<div>
-					<h3 class="text-lg font-bold mb-4">PTIK C 2024</h3>
-					<p class="mb-4 text-xs">Jurusan Teknik Informatika dan Komputer</p>
-					<p class="text-xs">Fakultas Teknik</p>
-					<p class="text-xs">Universitas Negeri Makassar</p>
-				</div>
+    <!-- Footer -->
+    <footer class="bg-indigo-950 text-white py-4 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">PTIK C 2024</h3>
+                    <p class="mb-4 text-xs">Jurusan Teknik Informatika dan Komputer</p>
+                    <p class="text-xs">Fakultas Teknik</p>
+                    <p class="text-xs">Universitas Negeri Makassar</p>
+                </div>
 
-				<div>
-					<h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
-					<ul class="space-y-1">
-						<li><a href="kalender.php" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
-						<li><a href="matakuliah.php" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
-						<li><a href="jadwal.php" class="hover:text-indigo-200 transition text-xs">Jadwal Mata Kuliah</a></li>
-						<li><a href="tugas.php" class="hover:text-indigo-200 transition text-xs">Tugas Mata Kuliah</a></li>
-					</ul>
-				</div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+                    <ul class="space-y-1">
+                        <li><a href="kalender.php" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
+                        <li><a href="matakuliah.php" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
+                        <li><a href="jadwal.php" class="hover:text-indigo-200 transition text-xs">Jadwal Mata Kuliah</a></li>
+                        <li><a href="tugas.php" class="hover:text-indigo-200 transition text-xs">Tugas Mata Kuliah</a></li>
+                    </ul>
+                </div>
 
-				<div>
-					<h3 class="text-lg font-bold mb-4">Kontak</h3>
-					<p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
-					<p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Kontak</h3>
+                    <p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
+                    <p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
                     <a href="https://www.instagram.com/ptikc_24">
                         <p class="mb-2 text-xs"><i class="fab fa-instagram mr-2 text-sm"></i></i> @ptikc_24</p>
                     </a>
-				</div>
+                </div>
                 <div>
-                <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
-                
-                <form action="" method="POST" class="space-y-2">
-                    <textarea 
-                        name="pesan_anonim" 
-                        rows="3" 
-                        maxlength="300"
-                        class="w-full p-3 rounded-lg bg-indigo-900/50 border border-indigo-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300/50"
-                        placeholder="Tulis pesan rahasia atau saran di sini..."
-                        required></textarea>
-                    <button 
-                        type="submit" 
-                        name="kirim_pesan"
-                        class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
-                        <i class="fas fa-paper-plane text-xs"></i>
-                        <span>Kirim Sekarang</span>
-                    </button>
-                </form>
+                    <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
 
-                <?php
-                // Logika PHP untuk simpan pesan ke database
-                if (isset($_POST['kirim_pesan'])) {
-                    $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
-                    if (!empty($pesan)) {
-                        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
-                        if (mysqli_query($koneksi, $query_pesan)) {
-                            echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                    <form action="" method="POST" class="space-y-2">
+                        <textarea
+                            name="pesan_anonim"
+                            rows="3"
+                            maxlength="300"
+                            class="w-full p-3 rounded-lg bg-indigo-900/50 border border-indigo-800 text-white text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-indigo-300/50"
+                            placeholder="Tulis pesan rahasia atau saran di sini..."
+                            required></textarea>
+                        <button
+                            type="submit"
+                            name="kirim_pesan"
+                            class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                            <i class="fas fa-paper-plane text-xs"></i>
+                            <span>Kirim Sekarang</span>
+                        </button>
+                    </form>
+
+                    <?php
+                    // Logika PHP untuk simpan pesan ke database
+                    if (isset($_POST['kirim_pesan'])) {
+                        $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
+                        if (!empty($pesan)) {
+                            $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
+                            if (mysqli_query($koneksi, $query_pesan)) {
+                                // Kirim notifikasi ke Telegram
+                                include_once '../backend/crud/kirim_pesan_telegram.php';
+                                sendTelegramPesan($pesan);
+
+                                echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                            }
                         }
                     }
-                }
-                ?>
+                    ?>
+                </div>
             </div>
         </div>
-				</div>
-			</div>
+        </div>
 
-			<div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs">
-				<p>© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
-			</div>
-		</div>
-	</footer>
+        <div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs">
+            <p>© 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
+        </div>
+        </div>
+    </footer>
 
-  <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuIcon = menuToggle.querySelector('i');
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = menuToggle.querySelector('i');
 
-    menuToggle.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      if (mobileMenu.classList.contains('hidden')) {
-        menuIcon.classList.remove('fa-xmark');
-        menuIcon.classList.add('fa-bars');
-      } else {
-        menuIcon.classList.remove('fa-bars');
-        menuIcon.classList.add('fa-xmark');
-      }
-    });
-  </script>
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.remove('fa-xmark');
+                menuIcon.classList.add('fa-bars');
+            } else {
+                menuIcon.classList.remove('fa-bars');
+                menuIcon.classList.add('fa-xmark');
+            }
+        });
+    </script>
 </body>
 
 </html>
