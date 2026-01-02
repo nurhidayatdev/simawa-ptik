@@ -26,6 +26,10 @@ if (!$stats) {
     $stats = $koneksi->query("SELECT * FROM kuis_harian_stats WHERE user_id = $user_id")->fetch_assoc();
 }
 
+// Inisialisasi kolom hint jika belum ada di array (untuk BC jika migrate gagal)
+if (!isset($stats['hint_stock'])) $stats['hint_stock'] = 0;
+if (!isset($stats['last_hint_milestone_claimed'])) $stats['last_hint_milestone_claimed'] = 0;
+
 $streak_broken = false;
 if ($stats['last_played_date'] !== null && $stats['last_played_date'] !== $today && $stats['last_played_date'] !== $yesterday) {
     $streak_broken = true;
@@ -52,6 +56,18 @@ $q_leaderboard = $koneksi->query("SELECT m.nama_panggilan, m.foto, s.user_id,
 $leaderboard_data = [];
 while ($row = mysqli_fetch_assoc($q_leaderboard)) {
     $leaderboard_data[] = $row;
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'use_hint') {
+    header('Content-Type: application/json');
+    if ($stats['hint_stock'] > 0 && $has_question) {
+        $jawaban = $soal['jawaban'];
+        $koneksi->query("UPDATE kuis_harian_stats SET hint_stock = hint_stock - 1 WHERE user_id = $user_id");
+        echo json_encode(['status' => 'success', 'jawaban' => $jawaban]);
+    } else {
+        echo json_encode(['status' => 'failed']);
+    }
+    exit;
 }
 
 if (isset($_POST['action']) && $_POST['action'] === 'submit_answer') {
@@ -87,25 +103,47 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit_answer') {
             $current_streak++;
         }
 
-        // Milestone Rewards
-        $milestone_rewards = [500 => 15, 200 => 10, 100 => 7, 50 => 5, 30 => 3, 10 => 1];
+        // Milestone Rewards (Recovery & Hint)
+        $milestone_config = [
+            500 => ['recovery' => 15, 'hint' => 20],
+            200 => ['recovery' => 10, 'hint' => 15],
+            100 => ['recovery' => 7, 'hint' => 10],
+            50  => ['recovery' => 5, 'hint' => 7],
+            30  => ['recovery' => 3, 'hint' => 5],
+            10  => ['recovery' => 1, 'hint' => 3],
+            3   => ['recovery' => 0, 'hint' => 1]
+        ];
+
         $bonus_stock = 0;
-        foreach ($milestone_rewards as $m_val => $m_reward) {
+        $bonus_hint_stock = 0;
+        $new_hint_stock = $stats['hint_stock'];
+        $last_hint_milestone_claimed = $stats['last_hint_milestone_claimed'];
+        $last_milestone_claimed = $stats['last_milestone_claimed'];
+
+        foreach ($milestone_config as $m_val => $rewards) {
             if ($current_streak >= $m_val && $last_milestone_claimed < $m_val) {
-                $bonus_stock += $m_reward;
+                $bonus_stock += $rewards['recovery'];
+                $bonus_hint_stock += $rewards['hint'];
                 $last_milestone_claimed = max($last_milestone_claimed, $m_val);
+                $last_hint_milestone_claimed = max($last_hint_milestone_claimed, $m_val);
             }
         }
         $new_recovery_stock += $bonus_stock;
+        $new_hint_stock += $bonus_hint_stock;
 
         if ($current_streak > $max_streak) $max_streak = $current_streak;
         $now = date('Y-m-d H:i:s');
 
-        $upd = $koneksi->prepare("UPDATE kuis_harian_stats SET current_streak=?, max_streak=?, total_games=?, last_completed_at=?, last_played_date=?, recovery_stock=?, last_milestone_claimed=? WHERE user_id=?");
-        $upd->bind_param("iiissiii", $current_streak, $max_streak, $total_games, $now, $today, $new_recovery_stock, $last_milestone_claimed, $user_id);
+        $upd = $koneksi->prepare("UPDATE kuis_harian_stats SET current_streak=?, max_streak=?, total_games=?, last_completed_at=?, last_played_date=?, recovery_stock=?, last_milestone_claimed=?, hint_stock=?, last_hint_milestone_claimed=? WHERE user_id=?");
+        $upd->bind_param("iiissiiiii", $current_streak, $max_streak, $total_games, $now, $today, $new_recovery_stock, $last_milestone_claimed, $new_hint_stock, $last_hint_milestone_claimed, $user_id);
         $upd->execute();
 
-        echo json_encode(['status' => 'success', 'new_streak' => $current_streak, 'bonus_stock' => $bonus_stock]);
+        echo json_encode([
+            'status' => 'success',
+            'new_streak' => $current_streak,
+            'bonus_stock' => $bonus_stock,
+            'bonus_hint' => $bonus_hint_stock
+        ]);
     } else {
         echo json_encode(['status' => 'wrong']);
     }
@@ -132,7 +170,7 @@ function getFireIcon($streak, $isActive = true)
         100 => ['color' => '#00ffff', 'glow' => '#66ffff', 'label' => 'DIAMOND'],
         50 => ['color' => '#ffd700', 'glow' => '#ffeb3b', 'label' => 'GOLD'],
         30 => ['color' => '#ff6600', 'glow' => '#ff9933', 'label' => 'PLATINUM'],
-        10 => ['color' => '#3399ff', 'glow' => '#66b3ff', 'label' => 'BLUE'],
+        10 => ['color' => '#e5e7eb', 'glow' => '#f3f4f6', 'label' => 'SILVER'],
         3 => ['color' => '#ff9500', 'glow' => '#ffb347', 'label' => 'FIRE']
     ];
     foreach ($milestones as $threshold => $data) {
@@ -248,6 +286,9 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                     <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-indigo-500/30">
                         <i class="fa fa-shield-halved"></i> <?= $stats['recovery_stock'] ?>
                     </span>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-500/30" title="Hint Stock">
+                        <i class="fa fa-lightbulb"></i> <span id="hint-stock-display"><?= $stats['hint_stock'] ?></span>
+                    </span>
                 </div>
             </div>
 
@@ -294,7 +335,12 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         <p class="text-base font-bold text-white leading-snug">"<?= htmlspecialchars($soal['pertanyaan']) ?>"</p>
                     </div>
                     <form id="quizForm" class="space-y-3" onsubmit="submitAnswer(event)">
-                        <input type="text" id="answer" class="w-full bg-slate-900/50 border-2 border-slate-600 text-white text-center text-base font-bold py-3 rounded-lg focus:border-indigo-500 transition placeholder-slate-600 uppercase tracking-wider" placeholder="JAWABAN..." autocomplete="off" required>
+                        <div class="relative">
+                            <input type="text" id="answer" class="w-full bg-slate-900/50 border-2 border-slate-600 text-white text-center text-base font-bold py-3 rounded-lg focus:border-indigo-500 transition placeholder-slate-600 uppercase tracking-widest" placeholder="JAWABAN..." autocomplete="off" required>
+                            <button type="button" onclick="useHint()" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hover:text-amber-300 transition" title="Gunakan Hint (1 Stock)">
+                                <i class="fa fa-lightbulb text-lg"></i>
+                            </button>
+                        </div>
                         <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold py-3 rounded-lg shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm">
                             <span>Jawab</span><i class="fa fa-paper-plane"></i>
                         </button>
@@ -314,7 +360,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 <div class="flex flex-wrap justify-center gap-1.5">
                     <?php
                     $milestones = [3, 10, 30, 50, 100, 200, 500];
-                    $colors = ['#ff9500', '#3399ff', '#ff6600', '#ffd700', '#00ffff', '#ff00ff', '#ff0000'];
+                    $colors = ['#ff9500', '#e5e7eb', '#ff6600', '#ffd700', '#00ffff', '#ff00ff', '#ff0000'];
                     foreach ($milestones as $i => $m):
                         $achieved = $display_streak >= $m;
                     ?>
@@ -374,6 +420,9 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
     <script>
         const USER_NAME = "<?= htmlspecialchars($nama_panggilan) ?>";
         const USER_PHOTO = "../img/profile/<?= htmlspecialchars($foto) ?>";
+        const ANS_LENGTH = <?= $has_question ? strlen($soal['jawaban']) : 0 ?>;
+        let hintStock = <?= (int)$stats['hint_stock'] ?>;
+        let hintsUsed = 0;
         const MILESTONES = {
             500: {
                 label: 'LEGENDARY',
@@ -396,8 +445,8 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 color: '#ff6600'
             },
             10: {
-                label: 'BLUE',
-                color: '#3399ff'
+                label: 'SILVER',
+                color: '#e5e7eb'
             },
             3: {
                 label: 'FIRE',
@@ -454,12 +503,12 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             }, 250);
         }
 
-        function showMilestonePopup(streak, bonus = 0) {
+        function showMilestonePopup(streak, bonus = 0, bonusHint = 0) {
             const m = getMilestone(streak);
             const isM = isNewMilestone(streak);
             if (isM) triggerConfetti();
             Swal.fire({
-                html: `<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../../img/profile/default.png'"></div><div class="text-sm font-bold text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-white mb-1">Streak ${streak}!</div>${bonus > 0 ? `<div class="text-indigo-400 text-xs font-bold mb-1"><i class="fa fa-shield-halved mr-1"></i> +${bonus} Recovery Stock</div>` : ''}<div class="text-slate-400 text-xs">Luar biasa!</div></div>`,
+                html: `<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../../img/profile/default.png'"></div><div class="text-sm font-bold text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-white mb-1">Streak ${streak}!</div><div class="flex flex-col gap-1 items-center mt-2">${bonus > 0 ? `<div class="text-indigo-400 text-[10px] font-bold"><i class="fa fa-shield-halved mr-1"></i> +${bonus} Recovery Stock</div>` : ''}${bonusHint > 0 ? `<div class="text-amber-400 text-[10px] font-bold"><i class="fa fa-lightbulb mr-1"></i> +${bonusHint} Hint Stock</div>` : ''}</div><div class="text-slate-400 text-xs mt-2">Luar biasa!</div></div>`,
                 showConfirmButton: true,
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#6366f1',
@@ -485,7 +534,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             }).then(r => r.json()).then(d => {
                 b.disabled = false;
                 b.innerHTML = o;
-                if (d.status === 'success') showMilestonePopup(d.new_streak, d.bonus_stock);
+                if (d.status === 'success') showMilestonePopup(d.new_streak, d.bonus_stock, d.bonus_hint);
                 else if (d.status === 'already_played') location.reload();
                 else {
                     Swal.fire({
@@ -536,6 +585,76 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             });
         }
 
+        function useHint() {
+            if (hintStock <= 0) {
+                return Swal.fire({
+                    title: 'Stok Habis',
+                    text: 'Capai milestone berikutnya untuk mendapat stok hint.',
+                    icon: 'warning',
+                    background: '#1e293b',
+                    color: '#fff',
+                    confirmButtonColor: '#fbbf24'
+                });
+            }
+
+            if (hintsUsed >= ANS_LENGTH) {
+                return Swal.fire({
+                    title: 'Hint Maksimal',
+                    text: 'Semua huruf sudah terbuka!',
+                    icon: 'info',
+                    background: '#1e293b',
+                    color: '#fff',
+                    confirmButtonColor: '#fbbf24'
+                });
+            }
+
+            Swal.fire({
+                title: 'Gunakan Hint?',
+                html: `<p class="text-xs">Menggunakan 1 Hint Stock untuk membuka huruf berikutnya.<br>Stok Saat Ini: ${hintStock}</p>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Gunakan',
+                confirmButtonColor: '#fbbf24',
+                background: '#1e293b',
+                color: '#fff'
+            }).then(r => {
+                if (r.isConfirmed) {
+                    const f = new FormData();
+                    f.append('action', 'use_hint');
+                    fetch('kuis_harian.php', {
+                        method: 'POST',
+                        body: f
+                    }).then(r => r.json()).then(d => {
+                        if (d.status === 'success') {
+                            hintsUsed++;
+                            hintStock--;
+
+                            // Update display
+                            const display = document.getElementById('hint-stock-display');
+                            if (display) display.innerText = hintStock;
+
+                            const jaw = d.jawaban.toUpperCase();
+                            let revealStr = "";
+                            for (let i = 0; i < jaw.length; i++) {
+                                if (i < hintsUsed) revealStr += jaw[i] + " ";
+                                else revealStr += "_ ";
+                            }
+
+                            Swal.fire({
+                                title: revealStr.trim(),
+                                html: `<p class="text-slate-400 text-xs mt-4">Simpan baik-baik bantuan ini!</p>`,
+                                background: '#1e293b',
+                                color: '#fff',
+                                confirmButtonColor: '#fbbf24'
+                            });
+                        } else {
+                            Swal.fire('Gagal', 'Stok tidak cukup', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
         function showRules() {
             Swal.fire({
                 title: 'Aturan Bermain',
@@ -547,40 +666,46 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         </div>
                         
                         <div class="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20">
-                            <h4 class="text-orange-400 font-bold text-sm mb-1"><i class="fa fa-shield-halved mr-2"></i>Sistem Recovery</h4>
-                            <p class="text-[11px] leading-relaxed">Jika lupa bermain, streak akan terputus. Gunakan <b>Recovery Stock</b> untuk memulihkan streak. Stok didapatkan dari mencapai milestone.</p>
+                            <h4 class="text-orange-400 font-bold text-sm mb-1"><i class="fa fa-shield-halved mr-2"></i>Sistem Recovery & Hint</h4>
+                            <p class="text-[11px] leading-relaxed">Gunakan <b>Recovery Stock</b> untuk memulihkan streak. Gunakan <b>Hint Stock</b> (tombol lampu) untuk membuka satu huruf jawaban sebagai bantuan.</p>
                         </div>
 
                         <div>
                             <h4 class="text-white font-bold text-sm mb-2"><i class="fa fa-fire mr-2"></i>Milestone & Rewards</h4>
                             <div class="grid grid-cols-2 gap-2">
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px]">
-                                    <div class="text-[#ff9500] font-bold">FIRE (3)</div>
-                                    <span class="text-slate-500">No Reward</span>
+                                    <div class="text-[#ff9500] font-bold uppercase">FIRE (3)</div>
+                                    <div class="text-amber-400">+1 Hint Stock</div>
                                 </div>
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px]">
-                                    <div class="text-[#3399ff] font-bold">BLUE (10)</div>
-                                    <span class="text-indigo-400">+1 Recovery Stock</span>
+                                    <div class="text-[#e5e7eb] font-bold uppercase">SILVER (10)</div>
+                                    <div class="text-indigo-400">+1 Recovery Stock</div>
+                                    <div class="text-amber-400">+3 Hint Stock</div>
                                 </div>
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px]">
-                                    <div class="text-[#ff6600] font-bold">PLATINUM (30)</div>
-                                    <span class="text-indigo-400">+3 Recovery Stock</span>
+                                    <div class="text-[#ff6600] font-bold uppercase">PLATINUM (30)</div>
+                                    <div class="text-indigo-400">+3 Recovery Stock</div>
+                                    <div class="text-amber-400">+5 Hint Stock</div>
                                 </div>
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px]">
-                                    <div class="text-[#ffd700] font-bold">GOLD (50)</div>
-                                    <span class="text-indigo-400">+5 Recovery Stock</span>
+                                    <div class="text-[#ffd700] font-bold uppercase">GOLD (50)</div>
+                                    <div class="text-indigo-400">+5 Recovery Stock</div>
+                                    <div class="text-amber-400">+7 Hint Stock</div>
                                 </div>
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px]">
-                                    <div class="text-[#00ffff] font-bold">DIAMOND (100)</div>
-                                    <span class="text-indigo-400">+7 Recovery Stock</span>
+                                    <div class="text-[#00ffff] font-bold uppercase">DIAMOND (100)</div>
+                                    <div class="text-indigo-400">+7 Recovery Stock</div>
+                                    <div class="text-amber-400">+10 Hint Stock</div>
                                 </div>
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px]">
-                                    <div class="text-[#ff00ff] font-bold">EPIC (200)</div>
-                                    <span class="text-indigo-400">+10 Recovery Stock</span>
+                                    <div class="text-[#ff00ff] font-bold uppercase">EPIC (200)</div>
+                                    <div class="text-indigo-400">+10 Recovery Stock</div>
+                                    <div class="text-amber-400">+15 Hint Stock</div>
                                 </div>
                                 <div class="bg-slate-800/50 p-2 rounded border border-slate-700 text-[10px] col-span-2">
-                                    <div class="text-[#ff0000] font-bold">LEGENDARY (500)</div>
-                                    <span class="text-indigo-400">+15 Recovery Stock</span>
+                                    <div class="text-[#ff0000] font-bold uppercase">LEGENDARY (500)</div>
+                                    <div class="text-indigo-400">+15 Recovery Stock</div>
+                                    <div class="text-amber-400">+20 Hint Stock</div>
                                 </div>
                             </div>
                         </div>

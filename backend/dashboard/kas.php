@@ -155,17 +155,17 @@ if (isset($_POST['simpan_kas'])) {
             </div>
             <!-- Mobile Menu Button dengan z-index yang sesuai -->
             <button id="mobile-menu-button" class="text-slate-100 hover:text-indigo-950 lg:hidden p-2 rounded-lg hover:bg-gray-100">
-                <i class="fa fa-bars w-6 h-5"></i>
+                <i class="fa fa-bars w-6 h-6"></i>
             </button>
             <div class="hidden lg:flex items-center space-x-4">
                 <div class="relative">
                     <button id="profile-button" class="flex items-center space-x-2">
-                        <span class="text-white"><?= htmlspecialchars($nama_lengkap) ?></span>
-                        <img src="../img/profile/<?= htmlspecialchars($foto) ?>" alt="Profile" class="w-8 h-8 rounded-full">
+                        <span class="text-white font-semibold"><?php echo htmlspecialchars($nama_lengkap); ?></span>
+                        <img src="../img/profile/<?php echo htmlspecialchars($foto); ?>" alt="Profile" class="w-8 h-8 rounded-full">
                     </button>
-                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                        <a href="profile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
-                        <a href="../../index.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Logout</a>
+                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg hidden">
+                        <a href="profile.php" class="block px-4 py-2 text-xs hover:bg-gray-100 font-semibold text-indigo-900"><i class="fa fa-user mr-2 text-indigo-900"></i>Profile</a>
+                        <a href="../../index.php" class="block px-4 py-2 text-xs hover:bg-gray-100 font-semibold text-indigo-900"><i class="fa fa-sign-out mr-2 text-indigo-900"></i>Logout</a>
                     </div>
                 </div>
             </div>
@@ -180,12 +180,12 @@ if (isset($_POST['simpan_kas'])) {
             <nav class="mt-4 h-[calc(100vh-4rem)] overflow-y-auto pb-10">
                 <div class="px-4 space-y-2">
                     <!-- Dashboard Menu -->
-                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-slate-700  rounded-lg hover:bg-slate-100">
+                    <a href="dashboard.php" class="flex items-center px-4 py-2 text-indigo-900  rounded-lg hover:bg-slate-100">
                         <i class="fa fa-home w-4 h-4 mr-4"></i>
-                        <span class="text-xs font-medium">Beranda</span>
+                        <span class="text-xs font-medium">Dashboard</span>
                     </a>
 
-                    
+
 
                     <!-- Components Menu -->
                     <div class="space-y-1">
@@ -194,7 +194,7 @@ if (isset($_POST['simpan_kas'])) {
                             <div class="space-y-1">
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-600"></i>
+                                        <i class="fa fa-university w-5 h-5 mr-3 text-indigo-900"></i>
                                         <span class="text-xs font-medium">Master</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -205,58 +205,87 @@ if (isset($_POST['simpan_kas'])) {
                                     <a href="db_matkul.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Mata Kuliah</a>
                                     <a href="db_berita.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Berita & Info</a>
                                     <a href="db_kalender.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kalender Akademik</a>
+                                    <a href="db_galeri.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Galeri Kelas</a>
                                 </div>
 
                                 <a href="db_jadwal.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-list-alt w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Jadwal Kuliah</span>
                                 </a>
-                                <a href="db_absensi.php?matkul_id=33&pertemuan=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-calendar-check w-5 h-5 mr-3 text-indigo-600"></i>
-                                    <span class="text-xs font-medium">Absensi</span>
-                                </a>
+
                                 <a href="db_tugas.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Tugas Kuliah</span>
                                 </a>
                                 <a href="db_kelompok.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-600"></i>
+                                    <i class="fa fa-users w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Kelompok</span>
                                 </a>
-                                <a href="db_kas.php?minggu_ke=1" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-wallet w-5 h-5 mr-3 text-indigo-600"></i>
-                                    <span class="text-xs font-medium">Keuangan</span>
+                                <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-calendar w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Kalender</span>
                                 </a>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Administrasi</p>
+                            <div class="space-y-1">
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-clipboard-list w-5 h-5 mr-3 text-indigo-900"></i>
+                                        <span class="text-xs font-medium">Absensi</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="db_absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Absen</a>
+                                    <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                                        <a href="absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Absen</a>
+                                    <?php endif; ?>
+                                </div>
+
+                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <div class="flex items-center">
+                                        <i class="fa fa-wallet w-5 h-5 mr-3 text-indigo-900"></i>
+                                        <span class="text-xs font-medium">Keuangan</span>
+                                    </div>
+                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                </button>
+                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                    <a href="db_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Kas</a>
+                                    <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
+                                        <a href="arus_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Arus Kas</a>
+                                        <a href="kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Minggu</a>
+                                        <a href="kas_individu.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Individu</a>
+                                    <?php endif; ?>
+                                </div>
+
+
                             </div>
                         </div>
 
                         <div>
                             <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Aktivitas</p>
                             <div class="space-y-1">
-                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <div class="flex items-center">
-                                        <i class="fa fa-wand-magic-sparkles w-5 h-5 mr-3 text-emerald-600"></i>
-                                        <span class="text-xs font-medium">Hiburan</span>
-                                    </div>
-                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                                </button>
-                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                    <a href="misi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pusat Misi</a>
-                                    <a href="kuis_harian.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
-                                    <a href="db_pesan.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pesan Anonim</a>
-                                    
-                                </div>
 
-                            <a href="kalender_view.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-calendar w-5 h-5 mr-3 text-emerald-600"></i>
-                                    <span class="text-xs font-medium">Kalender</span>
+
+
+
+                                <a href="misi.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Pusat Misi</span>
                                 </a>
-                                
-                                <a href="db_galeri.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-images w-5 h-5 mr-3 text-emerald-600"></i>
-                                    <span class="text-xs font-medium">Galeri Kelas</span>
+                                <a href="kuis_harian.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-gamepad w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Kuis Harian</span>
                                 </a>
-                            
+                                <a href="db_pesan.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-comments w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Pesan Anonim</span>
+                                </a>
+
                             </div>
                         </div>
 
@@ -266,7 +295,7 @@ if (isset($_POST['simpan_kas'])) {
                             <div class="space-y-1">
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <div class="flex items-center">
-                                        <i class="fa fa-user w-5 h-5 mr-3 text-slate-800"></i>
+                                        <i class="fa fa-user w-5 h-5 mr-3 text-indigo-900"></i>
                                         <span class="text-xs font-medium">Akun</span>
                                     </div>
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -274,25 +303,31 @@ if (isset($_POST['simpan_kas'])) {
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="profile.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Profile Saya</a>
                                     <a href="krs.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
-                                    
+
                                 </div>
-<?php if ($role === 'Administrator Utama'): ?>
-                                <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <div class="flex items-center">
-                                        <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-slate-800"></i>
-                                        <span class="text-xs font-medium">Website</span>
+                                <?php if ($role === 'Administrator Utama'): ?>
+                                    <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fa-solid fa-earth-americas w-5 h-5 mr-3 text-indigo-900"></i>
+                                            <span class="text-xs font-medium">Website</span>
+                                        </div>
+                                        <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
+                                    </button>
+                                    <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
+                                        <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
+                                        <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
+                                        <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
                                     </div>
-                                    <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                                </button>
-                                <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                    <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
-                                    <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
-                                    <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
-                                </div>
-                              <?php endif; ?>
-                 
+                                <?php endif; ?>
+
+
+                                <a href="tentang.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-info-circle w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Tentang Aplikasi</span>
+                                </a>
+
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
-                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-red-600"></i>
+                                    <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-indigo-900"></i>
                                     <span class="text-xs font-medium">Logout</span>
                                 </a>
                             </div>

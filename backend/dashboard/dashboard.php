@@ -276,7 +276,7 @@ function getFireColor($streak)
     if ($streak >= 100) return '#00ffff';
     if ($streak >= 50) return '#ffd700';
     if ($streak >= 30) return '#ff6600';
-    if ($streak >= 10) return '#3399ff';
+    if ($streak >= 10) return '#e5e7eb';
     if ($streak >= 3) return '#ff9500';
     return null;
 }
@@ -415,8 +415,8 @@ function getFireColor($streak)
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="db_absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Absen</a>
                                     <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
-                                    <a href="absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Absen</a>
-<?php endif; ?>
+                                        <a href="absensi.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Absen</a>
+                                    <?php endif; ?>
                                 </div>
 
                                 <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
@@ -429,10 +429,10 @@ function getFireColor($streak)
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="db_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Kas</a>
                                     <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
-                                    <a href="arus_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Arus Kas</a>
-                                    <a href="kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Minggu</a>
-                                    <a href="kas_individu.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Individu</a>
-<?php endif; ?>
+                                        <a href="arus_kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Arus Kas</a>
+                                        <a href="kas.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Minggu</a>
+                                        <a href="kas_individu.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Individu</a>
+                                    <?php endif; ?>
                                 </div>
 
 
@@ -493,6 +493,11 @@ function getFireColor($streak)
                                     </div>
                                 <?php endif; ?>
 
+
+                                <a href="tentang.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-info-circle w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Tentang Aplikasi</span>
+                                </a>
 
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
                                     <i class="fa fa-sign-out-alt w-5 h-5 mr-3 text-indigo-900"></i>
@@ -1123,7 +1128,7 @@ function getFireColor($streak)
                 datasets: [{
                     label: 'Jumlah Absensi',
                     data: [<?= $absensi_stats['Hadir'] ?>, <?= $absensi_stats['Izin'] ?>, <?= $absensi_stats['Sakit'] ?>, <?= $absensi_stats['Alpha'] ?>],
-                    backgroundColor: [ '#00bc7d','#51a2ff', '#ffb900', '#ff2056'],
+                    backgroundColor: ['#00bc7d', '#51a2ff', '#ffb900', '#ff2056'],
                     borderRadius: 4
                 }]
             },
