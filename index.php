@@ -1,5 +1,24 @@
 <?php
 include 'koneksi.php';
+
+// Handle Anonymous Message Form Submission
+if (isset($_POST['kirim_pesan'])) {
+    $pesan_raw = $_POST['pesan_anonim'];
+    $pesan_db = mysqli_real_escape_string($koneksi, $pesan_raw);
+    if (!empty($pesan_raw)) {
+        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan_db')";
+        if (mysqli_query($koneksi, $query_pesan)) {
+            // Kirim notifikasi ke Telegram
+            include_once 'backend/crud/kirim_pesan_telegram.php';
+            sendTelegramPesan($pesan_raw);
+
+            // Redirect to prevent form resubmission
+            header("Location: index.php?status=success#footer_form");
+            exit;
+        }
+    }
+}
+
 $mhs = mysqli_query($koneksi, "SELECT COUNT(*) FROM mahasiswa");
 $jml = mysqli_fetch_assoc($mhs);
 $sms_aktif = mysqli_query($koneksi, "SELECT semester_ke FROM periode WHERE status = 'aktif'");
@@ -13,8 +32,19 @@ $sms = mysqli_fetch_assoc($sms_aktif);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <link rel="icon" href="backend/img/main/icon.png" />
-    <title>Kelas PTIK C 2024 - Teknik Informatika dan Komputer</title>
+    <title>PTIK C 2024 - Teknik Informatika dan Komputer</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
 
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
 
     <link href="frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="frontend/tailwind/src/input.css" rel="stylesheet">
@@ -325,7 +355,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 <div>
                     <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
 
-                    <form action="" method="POST" class="space-y-2">
+                    <form action="" method="POST" class="space-y-2" id="footer_form">
                         <textarea
                             name="pesan_anonim"
                             rows="3"
@@ -343,19 +373,8 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     </form>
 
                     <?php
-                    // Logika PHP untuk simpan pesan ke database
-                    if (isset($_POST['kirim_pesan'])) {
-                        $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
-                        if (!empty($pesan)) {
-                            $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
-                            if (mysqli_query($koneksi, $query_pesan)) {
-                                // Kirim notifikasi ke Telegram
-                                include_once 'backend/crud/kirim_pesan_telegram.php';
-                                sendTelegramPesan($pesan);
-
-                                echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
-                            }
-                        }
+                    if (isset($_GET['status']) && $_GET['status'] == 'success') {
+                        echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
                     }
                     ?>
                 </div>

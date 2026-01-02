@@ -1,6 +1,24 @@
 <?php
 include '../koneksi.php';
 
+// Handle Anonymous Message Form Submission
+if (isset($_POST['kirim_pesan'])) {
+    $pesan_raw = $_POST['pesan_anonim'];
+    $pesan_db = mysqli_real_escape_string($koneksi, $pesan_raw);
+    if (!empty($pesan_raw)) {
+        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan_db')";
+        if (mysqli_query($koneksi, $query_pesan)) {
+            // Kirim notifikasi ke Telegram
+            include_once '../backend/crud/kirim_pesan_telegram.php';
+            sendTelegramPesan($pesan_raw);
+
+            // Redirect to prevent form resubmission
+            header("Location: tugas.php?status=success#footer_form");
+            exit;
+        }
+    }
+}
+
 // Auto-update status based on deadline before fetching
 mysqli_query($koneksi, "UPDATE tugas SET status = 'selesai' WHERE (deadline_tanggal < CURDATE() OR (deadline_tanggal = CURDATE() AND deadline_pukul < CURTIME())) AND status = 'belum'");
 
@@ -243,7 +261,7 @@ $query_matkul = mysqli_query($koneksi, "
                 <div>
                     <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
 
-                    <form action="" method="POST" class="space-y-2">
+                    <form action="" method="POST" class="space-y-2" id="footer_form">
                         <textarea
                             name="pesan_anonim"
                             rows="3"
@@ -261,19 +279,8 @@ $query_matkul = mysqli_query($koneksi, "
                     </form>
 
                     <?php
-                    // Logika PHP untuk simpan pesan ke database
-                    if (isset($_POST['kirim_pesan'])) {
-                        $pesan = mysqli_real_escape_string($koneksi, $_POST['pesan_anonim']);
-                        if (!empty($pesan)) {
-                            $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan')";
-                            if (mysqli_query($koneksi, $query_pesan)) {
-                                // Kirim notifikasi ke Telegram
-                                include_once '../backend/crud/kirim_pesan_telegram.php';
-                                sendTelegramPesan($pesan);
-
-                                echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
-                            }
-                        }
+                    if (isset($_GET['status']) && $_GET['status'] == 'success') {
+                        echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
                     }
                     ?>
                 </div>
@@ -288,7 +295,7 @@ $query_matkul = mysqli_query($koneksi, "
     </footer>
 
     <!-- Task Detail Modal -->
-    <div id="taskModal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+    <div id="taskModal" class="fixed inset-0 bg-black/50 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
             <!-- Modal Header -->
             <div class="p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl">
@@ -319,7 +326,7 @@ $query_matkul = mysqli_query($koneksi, "
                         </div>
                     </div>
 
-                    <div id="modalFileContainer" class="flex items-start hidden">
+                    <div id="modalFileContainer" class="items-start hidden">
                         <div class="bg-blue-100 p-2 rounded-lg mr-3">
                             <i class="far fa-file-alt text-blue-600 text-sm"></i>
                         </div>
@@ -341,7 +348,7 @@ $query_matkul = mysqli_query($koneksi, "
                 <a id="modalActionBtn" href="#" target="_blank" class="px-5 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition flex items-center">
                     <i class="fas fa-paper-plane mr-2"></i> Kirim Tugas
                 </a>
-                <span id="modalNoAction" class="hidden px-4 py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed flex items-center">
+                <span id="modalNoAction" class="hidden px-4 py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed items-center">
                     <i class="fas fa-lock mr-2"></i> Tidak ada link
                 </span>
             </div>
