@@ -34,6 +34,8 @@ while ($row = mysqli_fetch_assoc($res)) {
     $matkul_data[] = $row;
 }
 
+$beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8 => 6];
+
 
 
 ?>
@@ -352,6 +354,13 @@ while ($row = mysqli_fetch_assoc($res)) {
                                     </tr>
                             <?php }
                             } ?>
+                            <tr class="bg-indigo-50 font-bold">
+                                <td colspan="3" class="px-3 py-3 text-xs text-indigo-950 text-right">Jumlah Beban Studi Semester <?= $s ?></td>
+                                <td class="px-3 py-3 whitespace-nowrap text-xs text-indigo-950 text-center"><?= $beban_studi[$s] ?></td>
+                                <?php if ($role === 'Administrator Utama'): ?>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 text-center"></td>
+                                <?php endif; ?>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

@@ -20,6 +20,12 @@ if (isset($_POST['kirim_pesan'])) {
 }
 
 $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester ASC");
+// Fetch all rows into an array because mysqli_result cannot be iterated multiple times without seeking
+$matkul_data = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $matkul_data[] = $row;
+}
+$beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8 => 6];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -28,8 +34,18 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
-    <link rel="icon" href="../backend/img/main/icon.png" />
     <title>Kurikulum - Kelas PTIK C 2024</title>
+    <link rel="icon" href="../backend/img/main/icon.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Poppins", sans-serif;
+        }
+    </style>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
     <script>
@@ -42,14 +58,6 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
 
         gtag('config', 'G-Q0TXETXV6Y');
     </script>
-
-
-    <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="../frontend/tailwind/src/input.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -158,7 +166,7 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
                             $no = 1;
                             $id = 1;
                             $found = false;
-                            foreach ($result as $m) {
+                            foreach ($matkul_data as $m) {
                                 if ((int)$m['semester'] !== $s) continue;
                                 $found = true;
                             ?>
@@ -169,6 +177,10 @@ $result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester AS
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
                                 </tr>
                             <?php } ?>
+                            <tr class="bg-indigo-50 font-bold">
+                                <td colspan="3" class="px-3 py-3 text-sm text-indigo-950 text-right">Jumlah Beban Studi Semester <?= $s ?></td>
+                                <td class="px-3 py-3 whitespace-nowrap text-sm text-indigo-950 text-center"><?= $beban_studi[$s] ?></td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

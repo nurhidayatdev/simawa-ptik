@@ -31,8 +31,18 @@ $sms = mysqli_fetch_assoc($sms_aktif);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
-    <link rel="icon" href="backend/img/main/icon.png" />
     <title>PTIK C 2024 - Teknik Informatika dan Komputer</title>
+    <link rel="icon" href="backend/img/main/icon.webp" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Poppins", sans-serif;
+        }
+    </style>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
     <script>
@@ -45,13 +55,6 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
         gtag('config', 'G-Q0TXETXV6Y');
     </script>
-
-    <link href="frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="frontend/tailwind/src/input.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -59,7 +62,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center">
-                <img src="backend/img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="backend/img/main/logo.webp" alt="Logo PTIK C 2024" class="h-10 w-10 mr-3">
                 <div>
                     <h1 class="text-lg font-bold">PTIK C 2024</h1>
                     <p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>
@@ -139,7 +142,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
     <!-- Hero Section (diperbaiki: tinggi responsif, konten tersentral, overlay) -->
     <section class="relative text-white overflow-hidden" style="min-height: 100vh;">
         <div class="absolute inset-0 bg-center bg-cover brightness-50"
-            style="background-image: url('backend/img/main/img-1.jpeg'); z-index: 0;">
+            style="background-image: url('backend/img/main/img-1.webp'); z-index: 0;">
         </div>
 
         <div class="absolute inset-0 bg-black/30" style="z-index: 1;"></div>
@@ -185,7 +188,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 </div>
 
                 <div class="flex justify-center">
-                    <img src="backend/img/main/img-2.jpeg" alt="Foto bersama kelas PTIK C Angkatan 2024" class="rounded-lg shadow-lg">
+                    <img src="backend/img/main/img-2.webp" alt="Foto bersama kelas PTIK C Angkatan 2024" class="rounded-lg shadow-lg">
                 </div>
             </div>
         </div>
@@ -402,62 +405,6 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 menuIcon.classList.remove('fa-bars');
                 menuIcon.classList.add('fa-xmark');
             }
-        });
-        // Slider functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const slider = document.getElementById('slider');
-            const slides = document.querySelectorAll('#slider > div');
-            const indicators = document.querySelectorAll('.indicator');
-            const prevBtn = document.getElementById('prev');
-            const nextBtn = document.getElementById('next');
-
-            let currentSlide = 0;
-            const slideCount = slides.length;
-
-            // Update slider position
-            function updateSlider() {
-                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
-
-                // Update indicators
-                indicators.forEach((indicator, index) => {
-                    if (index === currentSlide) {
-                        indicator.classList.add('bg-indigo-700');
-                        indicator.classList.remove('bg-indigo-300');
-                    } else {
-                        indicator.classList.remove('bg-indigo-700');
-                        indicator.classList.add('bg-indigo-300');
-                    }
-                });
-            }
-
-            // Next slide
-            nextBtn.addEventListener('click', function() {
-                currentSlide = (currentSlide + 1) % slideCount;
-                updateSlider();
-            });
-
-            // Previous slide
-            prevBtn.addEventListener('click', function() {
-                currentSlide = (currentSlide - 1 + slideCount) % slideCount;
-                updateSlider();
-            });
-
-            // Auto slide every 5 seconds
-            setInterval(function() {
-                currentSlide = (currentSlide + 1) % slideCount;
-                updateSlider();
-            }, 5000);
-
-            // Click on indicator to go to specific slide
-            indicators.forEach((indicator, index) => {
-                indicator.addEventListener('click', function() {
-                    currentSlide = index;
-                    updateSlider();
-                });
-            });
-
-            // Initialize slider
-            updateSlider();
         });
     </script>
 </body>
