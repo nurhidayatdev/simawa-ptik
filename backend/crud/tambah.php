@@ -241,72 +241,19 @@ if (isset($_POST['tambah'])) {
                     mkdir($target_dir, 0777, true);
                 }
 
+                $sanitized_judul = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $judul));
                 foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
                     if (empty($tmp_name)) continue;
 
                     $file_name = $_FILES['fotos']['name'][$key];
                     $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                    $basename = preg_replace('/[^a-zA-Z0-9_]/', '_', pathinfo($file_name, PATHINFO_FILENAME));
-                    $new_base = time() . "_" . uniqid() . "_" . $basename;
+                    $final_name = $sanitized_judul . "_" . time() . "_" . $key . "." . $ext;
+                    $target_file = $target_dir . $final_name;
 
-                    // Always save as jpg for consistent compression
-                    $final_name = $new_base . ".jpg";
-                    $final_path = $target_dir . $final_name;
-                    $db_path = "img/gallery/" . $final_name;
-
-                    // Try to compress/resize
-                    $processed = false;
-                    if (function_exists('gd_info')) {
-                        $src = null;
-                        if ($ext == 'jpg' || $ext == 'jpeg') $src = @imagecreatefromjpeg($tmp_name);
-                        elseif ($ext == 'png') $src = @imagecreatefrompng($tmp_name);
-                        elseif ($ext == 'webp') $src = @imagecreatefromwebp($tmp_name);
-
-                        if ($src) {
-                            $width = imagesx($src);
-                            $height = imagesy($src);
-
-                            // Max width 1024 for size reduction
-                            $max_width = 1024;
-                            if ($width > $max_width) {
-                                $new_width = $max_width;
-                                $new_height = floor($height * ($max_width / $width));
-                            } else {
-                                $new_width = $width;
-                                $new_height = $height;
-                            }
-
-                            $dst = imagecreatetruecolor($new_width, $new_height);
-
-                            // Fill white background for transparency (since we output JPG)
-                            $white = imagecolorallocate($dst, 255, 255, 255);
-                            imagefill($dst, 0, 0, $white);
-
-                            imagecopyresampled($dst, $src, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
-
-                            // Save as JPG with 75% quality
-                            if (imagejpeg($dst, $final_path, 75)) {
-                                $processed = true;
-                            }
-
-                            imagedestroy($src);
-                            imagedestroy($dst);
-                        }
+                    if (move_uploaded_file($tmp_name, $target_file)) {
+                        $db_path = "img/gallery/" . $final_name;
+                        mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
                     }
-
-                    // Fallback: just move the file if processing failed (and keep original name/ext if needed, or fail)
-                    if (!$processed) {
-                        // If we couldn't process, just move uploaded file as is
-                        $final_name_fallback = $new_base . "." . $ext;
-                        $final_path_fallback = $target_dir . $final_name_fallback;
-                        if (move_uploaded_file($tmp_name, $final_path_fallback)) {
-                            $db_path = "img/gallery/" . $final_name_fallback;
-                        } else {
-                            continue; // Skip failed uploads
-                        }
-                    }
-
-                    mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
                 }
             }
             $redirect = "../dashboard/db_galeri.php";
