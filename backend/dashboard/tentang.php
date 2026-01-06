@@ -66,7 +66,7 @@ $periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semeste
     <header class="bg-indigo-950 fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
-                <img src="../img/main/logo.png" alt="Logo" class="h-10 w-10 mr-3">
+                <img src="../img/main/logo.webp" alt="Logo" class="h-10 w-10 mr-3">
                 <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
             </div>
             <div class="flex items-center space-x-4">
@@ -161,7 +161,7 @@ $periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semeste
                     <h3 class="text-sm font-bold uppercase tracking-widest opacity-80 mb-4">Pengembang</h3>
                     <div class="flex items-center gap-4 mb-4">
                         <div class="h-16 w-16 rounded-xl overflow-hidden border-2 border-white/20 p-2 bg-white/10">
-                            <img src="../img/main/logo.png" alt="Dev" class="w-full h-full object-contain">
+                            <img src="../img/main/logo.webp" alt="Dev" class="w-full h-full object-contain">
                         </div>
                         <div>
                             <div class="font-bold text-lg">Admin PTIK C</div>

@@ -172,7 +172,7 @@ $color_filters = [
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
             <div class="flex items-center">
-                <img src="../img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../img/main/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
             </div>
             <!-- Mobile Menu Button dengan z-index yang sesuai -->
@@ -392,7 +392,7 @@ $color_filters = [
                                         <div class="flex items-center gap-3">
                                             <div class="w-10 h-10 rounded-full flex items-center justify-center <?= $is_completed ? 'bg-' . $cat['color'] . '-100 completed' : 'bg-slate-100 text-slate-400 locked' ?>">
                                                 <?php if ($is_completed): ?>
-                                                    <img src="../img/main/logo.png" class="w-6 h-6 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
+                                                    <img src="../img/main/logo.webp" class="w-6 h-6 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
                                                 <?php else: ?>
                                                     <i class="fa fa-lock text-lg"></i>
                                                 <?php endif; ?>
@@ -468,7 +468,7 @@ $color_filters = [
                                                     <!-- Tiny Logos for rank indicator -->
                                                     <div class="flex gap-0.5 mt-0.5 relative z-10">
                                                         <?php for ($s = 0; $s <= $l_idx; $s++): ?>
-                                                            <img src="../img/main/logo.png" class="w-2.5 h-2.5 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
+                                                            <img src="../img/main/logo.webp" class="w-2.5 h-2.5 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
                                                         <?php endfor; ?>
                                                     </div>
                                                 </div>

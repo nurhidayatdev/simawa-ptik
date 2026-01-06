@@ -262,7 +262,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
 
     <div class="w-full p-3 flex justify-between items-center z-50 border-b border-slate-800">
         <div class="flex items-center gap-3">
-            <img src="../img/main/logo.png" alt="Logo" class="w-8 h-8 object-contain">
+            <img src="../img/main/logo.webp" alt="Logo" class="w-8 h-8 object-contain">
             <h1 class="text-base font-bold tracking-tight">KuisHarian</h1>
             <button onclick="showRules()" class="ml-2 w-6 h-6 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700">
                 <i class="fa fa-question text-[10px]"></i>

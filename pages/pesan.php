@@ -53,6 +53,7 @@ if (isset($_POST['kirim_pesan'])) {
         gtag('config', 'G-Q0TXETXV6Y');
     </script>
 </head>
+
 <body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
 
     <div class="w-full max-w-md">
@@ -71,7 +72,7 @@ if (isset($_POST['kirim_pesan'])) {
 
                 <div class="flex items-center space-x-3 mb-6 relative z-10">
                     <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 p-2">
-                        <img src="../backend/img/main/logo.png" alt="Logo Kelas" class="w-full h-full object-contain filter drop-shadow-md">
+                        <img src="../backend/img/main/logo.webp" alt="Logo Kelas" class="w-full h-full object-contain filter drop-shadow-md">
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-white leading-tight">Private Message</h3>

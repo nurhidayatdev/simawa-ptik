@@ -71,7 +71,7 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center">
-                <img src="../backend/img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../backend/img/main/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <div>
                     <h1 class="text-lg font-bold">PTIK C 2024</h1>
                     <p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>

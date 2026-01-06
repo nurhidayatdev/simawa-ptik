@@ -42,7 +42,7 @@ ORDER BY jm.hari, jk_start.jam_mulai");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <title>Jadwal Kuliah - PTIK C 2024</title>
-   <link rel="icon" href="../backend/img/main/icon.webp" />
+    <link rel="icon" href="../backend/img/main/icon.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
@@ -73,7 +73,7 @@ ORDER BY jm.hari, jk_start.jam_mulai");
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
             <!-- Logo -->
             <div class="flex items-center">
-                <img src="../backend/img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+                <img src="../backend/img/main/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
                 <div>
                     <h1 class="text-lg font-bold">PTIK C 2024</h1>
                     <p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>

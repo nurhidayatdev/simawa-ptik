@@ -28,28 +28,28 @@ if (isset($_POST['kirim_pesan'])) {
 	<meta name="theme-color" content="#1e1b4b" />
 	<title>Galeri Kelas - PTIK C 2024</title>
 	<link rel="icon" href="../backend/img/main/icon.webp" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="../frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            font-family: "Poppins", sans-serif;
-        }
-    </style>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="../frontend/tailwind/src/output.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+	<style>
+		* {
+			font-family: "Poppins", sans-serif;
+		}
+	</style>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
 
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+		gtag('js', new Date());
 
-        gtag('config', 'G-Q0TXETXV6Y');
-    </script>
+		gtag('config', 'G-Q0TXETXV6Y');
+	</script>
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -57,7 +57,7 @@ if (isset($_POST['kirim_pesan'])) {
 		<div class="container mx-auto px-4 py-2 flex justify-between items-center">
 			<!-- Logo -->
 			<div class="flex items-center">
-				<img src="../backend/img/main/logo.png" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
+				<img src="../backend/img/main/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
 				<div>
 					<h1 class="text-lg font-bold">PTIK C 2024</h1>
 					<p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>
