@@ -242,6 +242,10 @@ if (isset($_POST['update'])) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
         .rotate-180 {
             transform: rotate(180deg);
         }

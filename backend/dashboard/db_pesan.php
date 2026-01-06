@@ -23,8 +23,12 @@ $role = $_SESSION['role'];
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
+        * {
             font-family: 'Poppins', sans-serif;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
         }
     </style>
     <!-- Google tag (gtag.js) -->
