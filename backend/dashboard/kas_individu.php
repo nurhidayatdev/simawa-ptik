@@ -115,27 +115,14 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
-    <link rel="icon" href="../img/main/icon.png" />
     <title>Kas Individu - PTIK C 2024</title>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'G-Q0TXETXV6Y');
-    </script>
-    <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
+    <link rel="icon" href="../img/main/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -151,6 +138,19 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
             }
         }
     </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-slate-100">

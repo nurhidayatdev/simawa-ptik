@@ -19,7 +19,7 @@ if (isset($_POST['kirim_pesan'])) {
     }
 }
 
-$result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester ASC");
+$result = mysqli_query($koneksi, "SELECT * FROM mata_kuliah ORDER BY semester ASC, kode_matkul ASC");
 // Fetch all rows into an array because mysqli_result cannot be iterated multiple times without seeking
 $matkul_data = [];
 while ($row = mysqli_fetch_assoc($result)) {

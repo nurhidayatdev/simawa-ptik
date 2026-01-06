@@ -20,8 +20,14 @@ if ($_SESSION['role'] !== 'Administrator Utama') {
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <meta name='theme-color' content='#1e1b4b' />
-    <link rel='icon' href='../img/main/icon.png' />
     <title>Pesan - PTIK C 2024</title>
+    <link rel='icon' href='../img/main/icon.png' />
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+    <style>
+        body { font-family: 'Poppins', sans-serif !important; }
+    </style>
     <!-- Google tag (gtag.js) -->
     <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
     <script>
@@ -34,14 +40,7 @@ if ($_SESSION['role'] !== 'Administrator Utama') {
 
         gtag('config', 'G-Q0TXETXV6Y');
     </script>
-    <link rel='icon' href='../img/main/icon.png' />
-  <link rel='preconnect' href='https://fonts.googleapis.com'>
-    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-    <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
-    <style>
-        body { font-family: 'Poppins', sans-serif !important; }
-    </style>
-        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     </head>
     <body>
         <script>
@@ -104,26 +103,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
-    <link rel="icon" href="../img/main/icon.png" />
     <title>Dashboard Pesan Anonim - PTIK C 2024</title>
-     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'G-Q0TXETXV6Y');
-    </script>
-    <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
+    <link rel="icon" href="../img/main/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .rotate-180 {
@@ -137,6 +123,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
         }
     </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Q0TXETXV6Y');
+    </script>
 </head>
 
 <body class="bg-slate-100">
@@ -419,16 +417,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             });
         }
 
-        (function(){
+        (function() {
             const input = document.getElementById('searchInput');
             if (!input) return;
             let timer = null;
-            input.addEventListener('input', function(){
+            input.addEventListener('input', function() {
                 clearTimeout(timer);
                 timer = setTimeout(() => {
                     const q = encodeURIComponent(input.value || '');
                     const url = window.location.pathname + '?search=' + q + '&ajax=1';
-                    fetch(url, { credentials: 'same-origin' })
+                    fetch(url, {
+                            credentials: 'same-origin'
+                        })
                         .then(r => r.text())
                         .then(html => {
                             const tbody = document.querySelector('table tbody');

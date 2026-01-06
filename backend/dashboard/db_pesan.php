@@ -16,8 +16,16 @@ $role = $_SESSION['role'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
-    <link rel="icon" href="..//img/main/icon.png" />
     <title>Dashboard Pesan Anonim - PTIK C 2024</title>
+    <link rel="icon" href="..//img/main/icon.png" />
+    <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
+    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
     <script>
@@ -30,15 +38,7 @@ $role = $_SESSION['role'];
 
         gtag('config', 'G-Q0TXETXV6Y');
     </script>
-    <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
 </head>
 
 <body class="bg-gray-900 min-h-screen text-gray-100">
