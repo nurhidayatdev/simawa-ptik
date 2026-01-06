@@ -45,6 +45,7 @@ $beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard Resmi Kelas PTIK C 2024">
     <meta name="theme-color" content="#1e1b4b" />
     <title>Data Mata Kuliah - PTIK C 2024</title>
     <link rel="icon" href="../img/main/icon.webp" />
