@@ -64,7 +64,7 @@ while ($row = mysqli_fetch_assoc($q_piket)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <title>Jadwal Piket Proyektor - PTIK C 2024</title>
-    <link rel="icon" href="../img/main/icon.png" />
+    <link rel="icon" href="../img/main/icon.webp" />
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">

@@ -334,7 +334,7 @@ if (isset($_POST['tambah'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <title>Tambah - PTIK C 2024</title>
-    <link rel="icon" href="../img/main/icon.png" />
+    <link rel="icon" href="../img/main/icon.webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">

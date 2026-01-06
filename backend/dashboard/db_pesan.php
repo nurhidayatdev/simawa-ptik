@@ -17,7 +17,7 @@ $role = $_SESSION['role'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e1b4b" />
     <title>Dashboard Pesan Anonim - PTIK C 2024</title>
-    <link rel="icon" href="..//img/main/icon.png" />
+    <link rel="icon" href="../img/main/icon.webp" />
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
     <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">

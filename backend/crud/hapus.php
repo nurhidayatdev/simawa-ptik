@@ -16,7 +16,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && !isset($_GET['confirm'])) {
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <meta name='theme-color' content='#1e1b4b' />
         <title>Hapus Data - Kelas PTIK C 2024</title>
-        <link rel='icon' href='../img/main/icon.png' />
+        <link rel='icon' href='../img/main/icon.webp' />
         <link rel='preconnect' href='https://fonts.googleapis.com'>
         <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
         <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
@@ -54,7 +54,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
     $tabel = $_GET['tabel'];
     $id = intval($_GET['id']);
 
-    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah','jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik'];
+    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik'];
 
     if (!in_array($tabel, $tabel_diizinkan)) {
         echo "Tabel tidak diizinkan!";
@@ -69,32 +69,32 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
             $redirect = '../dashboard/db_mahasiswa.php';
             break;
 
-            case 'mata_kuliah':
+        case 'mata_kuliah':
             $redirect = '../dashboard/db_matkul.php';
             break;
-            case 'jadwal_matkul':
+        case 'jadwal_matkul':
             $redirect = '../dashboard/db_jadwal.php';
             break;
 
-            case 'users':
+        case 'users':
             $redirect = '../dashboard/db_users.php';
             break;
-            case 'dosen':
+        case 'dosen':
             $redirect = '../dashboard/db_dosen.php';
             break;
-            case 'tugas':
+        case 'tugas':
             $redirect = '../dashboard/db_tugas.php';
             break;
-            case 'galeri':
+        case 'galeri':
             $redirect = '../dashboard/db_galeri.php';
             break;
-            case 'pesan':
+        case 'pesan':
             $redirect = '../dashboard/db_pesan.php';
             break;
-            case 'akademik':
+        case 'akademik':
             $redirect = '../dashboard/db_berita.php';
             break;
-            case 'kalender_akademik':
+        case 'kalender_akademik':
             $redirect = '../dashboard/db_kalender.php';
             break;
     }
@@ -108,7 +108,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <meta name='theme-color' content='#1e1b4b' />
                 <title>Hapus Data - Kelas PTIK C 2024</title>
-                <link rel='icon' href='../img/main/icon.png' />
+                <link rel='icon' href='../img/main/icon.webp' />
                 <link rel='preconnect' href='https://fonts.googleapis.com'>
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
                 <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
