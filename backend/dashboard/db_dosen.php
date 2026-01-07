@@ -272,14 +272,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                         <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
                                         <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
-                                        <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
                                     </div>
                                 <?php endif; ?>
-
+                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                                    <a href="reminder.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <i class="fa fa-bell w-5 h-5 mr-3 text-indigo-900"></i>
+                                        <span class="text-xs font-medium">Notifikasi</span>
+                                    </a>
+                                <?php endif; ?>
 
                                 <a href="tentang.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-info-circle w-5 h-5 mr-3 text-indigo-900"></i>
-                                    <span class="text-xs font-medium">Tentang Aplikasi</span>
+                                    <span class="text-xs font-medium">Tentang</span>
                                 </a>
 
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">
@@ -336,7 +340,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?php echo htmlspecialchars($row['no_hp']); ?></td>
                                 <td class="px-3 py-2 text-xs text-blue-600">
                                     <?php if (!empty($row['no_hp'])): ?>
-                                        <a href="https://wa.me/<?php echo htmlspecialchars($row['no_hp']); ?>" target="_blank" class="hover:underline">Chat WhatsApp →</a>
+                                        <a href="https://wa.me/<?php echo htmlspecialchars($row['no_hp']); ?>" target="_blank" class="hover:underline text-green-600"><i class="fab fa-whatsapp mr-1"></i>Chat WhatsApp</a>
                                     <?php else: ?>
                                         <span class="text-gray-400">-</span>
                                     <?php endif; ?>

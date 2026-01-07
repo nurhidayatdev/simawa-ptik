@@ -169,32 +169,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 </head>
 
 <body class="bg-slate-100">
-    <!-- Header dengan z-index lebih tinggi -->
-    <header class="bg-indigo-950  fixed w-full top-0 z-50">
-        <div class="flex justify-between items-center px-6 py-2">
-            <div class="flex items-center">
-                <img src="../img/main/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
-                <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
-            </div>
-            <!-- Mobile Menu Button dengan z-index yang sesuai -->
-            <button id="mobile-menu-button" class="text-slate-100 hover:text-indigo-950 lg:hidden p-2 rounded-lg hover:bg-gray-100">
-                <i class="fa fa-bars w-6 h-5"></i>
-            </button>
-            <div class="hidden lg:flex items-center space-x-4">
-                <div class="relative">
-                    <button id="profile-button" class="flex items-center space-x-2">
-                        <span class="text-white"><?= htmlspecialchars($nama_lengkap) ?></span>
-                        <img src="../img/profile/<?= htmlspecialchars($foto) ?>" alt="Profile" class="w-8 h-8 rounded-full">
-                    </button>
-                    <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                        <a href="profile.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
-                        <a href="../../index.php" class="block px-4 py-2 text-sm hover:bg-gray-100">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <!-- Sidebar dengan z-index di bawah header -->
     <header class="bg-indigo-950  fixed w-full top-0 z-50">
         <div class="flex justify-between items-center px-6 py-2">
@@ -365,14 +339,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                         <a href="db_users.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
                                         <a href="db_periode.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
-                                        <a href="reminder.php" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Reminder</a>
                                     </div>
                                 <?php endif; ?>
-
+                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                                    <a href="reminder.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <i class="fa fa-bell w-5 h-5 mr-3 text-indigo-900"></i>
+                                        <span class="text-xs font-medium">Notifikasi</span>
+                                    </a>
+                                <?php endif; ?>
 
                                 <a href="tentang.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                     <i class="fa fa-info-circle w-5 h-5 mr-3 text-indigo-900"></i>
-                                    <span class="text-xs font-medium">Tentang Aplikasi</span>
+                                    <span class="text-xs font-medium">Tentang</span>
                                 </a>
 
                                 <a href="../../index.php" class="flex items-center px-4 py-1 text-slate-800 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors">

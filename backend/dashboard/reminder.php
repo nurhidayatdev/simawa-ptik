@@ -12,7 +12,7 @@ $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
-if ($_SESSION['role'] !== 'Administrator Utama') {
+if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Sekretaris') {
     echo "<!DOCTYPE html>
     <html>
     <head>
