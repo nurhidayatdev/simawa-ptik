@@ -20,6 +20,13 @@ if (isset($_POST['kirim_pesan'])) {
     header("Location: pesan.php");
     exit;
 }
+
+// Logika link kembali
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+$back_link = '../index.php';
+if (strpos($referer, 'backend/dashboard/db_pesan.php') !== false) {
+    $back_link = '../backend/dashboard/db_pesan.php';
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -58,8 +65,14 @@ if (isset($_POST['kirim_pesan'])) {
 <body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
 
     <div class="w-full max-w-md">
-        <div class="mb-6 text-center">
+        <div class="mb-4">
+            <a href="<?php echo $back_link; ?>" class="inline-flex items-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors group">
+                <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i>
+                Kembali
+            </a>
+        </div>
 
+        <div class="mb-6 text-center">
             <h1 class="text-3xl font-bold text-white mb-2">Kotak Saran</h1>
             <p class="text-gray-400 text-sm">Sampaikan aspirasi atau pesan Anda secara anonim.</p>
         </div>

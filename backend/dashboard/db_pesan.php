@@ -8,6 +8,16 @@ if (!isset($_SESSION['user_id'])) {
 }
 $role = $_SESSION['role'];
 
+// Pre-encode logo to Base64 to prevent CORS/Taint issues
+$logo_path = '../img/main/logo.webp';
+$logo_base64 = '';
+if (file_exists($logo_path)) {
+    $logo_data = file_get_contents($logo_path);
+    $logo_base64 = 'data:image/webp;base64,' . base64_encode($logo_data);
+} else {
+    $logo_base64 = '../img/main/logo.webp';
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -20,7 +30,6 @@ $role = $_SESSION['role'];
     <title>Dashboard Pesan Anonim - PTIK C 2024</title>
     <link rel="icon" href="../img/main/icon.webp" />
     <link href="../../frontend/tailwind/src/output.css" rel="stylesheet">
-    <link href="../../frontend/tailwind/src/input.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -30,7 +39,48 @@ $role = $_SESSION['role'];
         .rotate-180 {
             transform: rotate(180deg);
         }
+
+        @keyframes shine {
+            100% {
+                left: 125%;
+            }
+        }
+
+        .animate-shine {
+            animation: shine 1s;
+        }
+
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
     <script>
@@ -43,7 +93,7 @@ $role = $_SESSION['role'];
 
         gtag('config', 'G-Q0TXETXV6Y');
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 </head>
 
 <body class="bg-gray-900 min-h-screen text-gray-100">
@@ -105,7 +155,7 @@ $role = $_SESSION['role'];
                     $pesan_id = $row['id'];
             ?>
                     <!-- Card Item -->
-                    <div class="break-inside-avoid relative group cursor-pointer" onclick="openModal('<?php echo addslashes($pesan_content); ?>', '<?php echo $pesan_date; ?>', '<?php echo $pesan_time; ?>')">
+                    <div class="break-inside-avoid relative group cursor-pointer" onclick='openModal(<?php echo json_encode($pesan_content); ?>, "<?php echo $pesan_date; ?>", "<?php echo $pesan_time; ?>")'>
                         <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
                         <div class="relative bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl border border-gray-700/50 group-hover:border-indigo-500/30 transition-all shadow-xl">
 
@@ -113,7 +163,7 @@ $role = $_SESSION['role'];
                             <div class="flex justify-between items-start mb-4">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-lg shadow-indigo-500/20 p-1.5">
-                                        <img src="..//img/main/logo.webp" alt="Anonim" class="w-full h-full object-contain filter drop-shadow-sm opacity-90">
+                                        <img src="../img/main/logo.webp" alt="Anonim" class="w-full h-full object-contain filter drop-shadow-sm opacity-90">
                                     </div>
                                     <div>
                                         <h4 class="text-sm font-bold text-white">PTIK C 24</h4>
@@ -185,35 +235,34 @@ $role = $_SESSION['role'];
                 <h3 class="text-xl font-bold text-white mb-6 text-center">Bagikan Pesan</h3>
 
                 <!-- Preview Area for Image Generation -->
-                <div id="captureArea" class="bg-gray-800 rounded-xl p-6 border border-gray-700/50 mb-6 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl -ml-16 -mb-16"></div>
+                <div id="captureArea"
+                    style="background-color: #1f2937; color: #ffffff; border: 1px solid #374151; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; font-family: 'Poppins', Arial, sans-serif; opacity: 1 !important; visibility: visible !important;">
 
-                    <div class="relative z-10">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center p-1.5 shadow-lg">
-                                <img src="../img/main/logo.webp" alt="Logo" class="w-full h-full object-contain opacity-90">
+                    <div style="position: relative; z-index: 10;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                            <div style="width: 3rem; height: 3rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; padding: 0.5rem; background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
+                                <img src="<?php echo $logo_base64; ?>" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
-                            <div>
-                                <h4 class="text-sm font-bold text-white">PTIK C 2024</h4>
-                                <p class="text-[10px] text-gray-400">Pesan Anonim</p>
+                            <div style="margin-left: 0.75rem;">
+                                <h4 style="font-size: 0.875rem; font-weight: 700; color: #ffffff; margin: 0;">PTIK C 2024</h4>
+                                <p style="font-size: 0.625rem; color: #9ca3af; margin: 0;">Pesan Anonim</p>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <p id="modalPesan" class="text-gray-200 text-sm leading-relaxed italic font-light"></p>
+                        <div style="margin-bottom: 1rem;">
+                            <p id="modalPesan" style="font-size: 0.875rem; line-height: 1.5; font-style: italic; font-weight: 300; color: #e5e7eb; margin: 0;"></p>
                         </div>
 
-                        <div class="flex justify-between items-center text-[10px] text-gray-500 border-t border-gray-700 pt-3">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.625rem; padding-top: 0.75rem; border-top: 1px solid #374151; color: #6b7280;">
                             <span id="modalDate"></span>
-                            <span class="text-indigo-400">@ptikc_24</span>
+                            <span style="color: #818cf8;">@ptikc_24</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="grid grid-cols-1">
-                    <button onclick="shareInstagram()" class="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-pink-900/20">
+                    <button onclick="shareInstagram(this)" class="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-semibold text-sm transition shadow-lg shadow-pink-900/20">
                         <i class="fas fa-download text-lg"></i>
                         Simpan Gambar
                     </button>
@@ -224,19 +273,23 @@ $role = $_SESSION['role'];
             </div>
         </div>
     </div>
-
+    <!-- Footer -->
+    <div class="mt-12 mb-8 text-center relative z-10">
+        <p class="text-[10px] text-gray-500">
+            &copy; 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. <br>All rights reserved.
+        </p>
+    </div>
     <script>
         const modal = document.getElementById('shareModal');
         const modalContent = document.getElementById('modalContent');
         let currentPesan = '';
 
         function openModal(pesan, date, time) {
-            currentPesan = pesan; // Store for WA sharing
+            currentPesan = pesan;
             document.getElementById('modalPesan').innerHTML = '"' + pesan.replace(/\n/g, '<br>') + '"';
             document.getElementById('modalDate').innerText = date + ' • ' + time;
 
             modal.classList.remove('hidden');
-            // Small timeout to allow removing 'hidden' to render for transition
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modalContent.classList.remove('scale-95');
@@ -254,23 +307,71 @@ $role = $_SESSION['role'];
         }
 
 
-        function shareInstagram() {
+        async function shareInstagram(btn) {
             const captureArea = document.getElementById('captureArea');
+            if (!captureArea) return;
 
-            // Show loading state if wanted, but here direct capture
-            html2canvas(captureArea, {
-                backgroundColor: '#1f2937', // Match bg-gray-800
-                scale: 2 // Higher quality
-            }).then(canvas => {
-                // Trigger download
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            const styleSheets = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+            const tailwindSheet = styleSheets.find(s => s.href.includes('output.css'));
+
+            try {
+                // Pastikan ukuran tetap stabil
+                const originalWidth = captureArea.offsetWidth;
+                captureArea.style.width = originalWidth + 'px';
+
+                if (tailwindSheet) tailwindSheet.disabled = true;
+
+                await new Promise(resolve => setTimeout(resolve, 200));
+
+                const canvas = await html2canvas(captureArea, {
+                    backgroundColor: '#1f2937',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                    // Menggunakan dimensi elemen secara eksplisit
+                    width: captureArea.offsetWidth,
+                    height: captureArea.offsetHeight,
+                    scrollX: 0,
+                    scrollY: 0,
+                    x: 0,
+                    y: 0
+                });
+
+                if (tailwindSheet) tailwindSheet.disabled = false;
+
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
+
+                // Cek jika canvas kosong (terlalu kecil/putih)
+                if (dataUrl === "data:,") {
+                    throw new Error("Canvas is empty");
+                }
+
                 const link = document.createElement('a');
+                link.href = dataUrl;
                 link.download = 'pesan_ptikc_' + Date.now() + '.png';
-                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
                 link.click();
-            });
+                document.body.removeChild(link);
+
+                btn.innerHTML = '<i class="fas fa-check"></i> Berhasil';
+            } catch (err) {
+                console.error('Capture failed:', err);
+                if (tailwindSheet) tailwindSheet.disabled = false;
+                alert('Gagal mengunduh gambar. Silakan coba lagi atau gunakan screenshot manual.');
+            } finally {
+                captureArea.style.width = '';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }
         }
 
-        // Close on click outside
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 closeModal();
@@ -278,54 +379,9 @@ $role = $_SESSION['role'];
         });
     </script>
 
-    <!-- Footer -->
-    <div class="mt-12 mb-8 text-center relative z-10">
-        <p class="text-[10px] text-gray-500">
-            &copy; 2025 Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. <br>All rights reserved.
-        </p>
-    </div>
 
-    <style>
-        @keyframes shine {
-            100% {
-                left: 125%;
-            }
-        }
 
-        .animate-shine {
-            animation: shine 1s;
-        }
 
-        @keyframes blob {
-            0% {
-                transform: translate(0px, 0px) scale(1);
-            }
-
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-
-            100% {
-                transform: translate(0px, 0px) scale(1);
-            }
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-    </style>
 
 </body>
 
