@@ -152,14 +152,14 @@ while ($r = mysqli_fetch_assoc($result)) {
 
     <!-- Card view (hidden by default) -->
     <div id="cardView">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
         <?php foreach ($rows as $row) :
           $searchTextCard = strtolower($row['nim'] . ' ' . $row['nama_lengkap'] . ' ' . $row['nama_panggilan'] . ' ' . $row['bio']);
         ?>
-          <div data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>" class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 card-3d hover:shadow-2xl transition-all">
-            <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-24 sm:h-20 relative">
-              <div class="absolute -bottom-10 sm:-bottom-12 left-1/2 -translate-x-1/2">
-                <div class="w-24 h-24 rounded-xl flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-xl border-4 border-white overflow-hidden">
+          <div data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>" class="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 hover:shadow-lg transition-all group">
+            <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-14 relative">
+              <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                   <?php if (!empty($row['foto'])): ?>
                     <img src="../backend/img/profile/<?php echo htmlspecialchars($row['foto']); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                   <?php else: ?>
@@ -168,13 +168,11 @@ while ($r = mysqli_fetch_assoc($result)) {
                 </div>
               </div>
             </div>
-            <div class="pt-14 sm:pt-16 pb-6 px-4 sm:px-6 text-center">
-
-              <h4 class="text-lg sm:text-sm font-bold text-slate-900 mb-1"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
-
-              <p class="text-xs sm:text-xs text-slate-600 mb-2"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
+            <div class="pt-10 pb-4 px-3 text-center">
+              <h4 class="text-xs font-bold text-slate-900 truncate mb-1"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+              <p class="text-[10px] text-slate-500 mb-2 truncate"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
               <?php if (!empty($row['instagram'])): ?>
-                <a href="https://instagram.com/<?php echo ltrim(htmlspecialchars($row['instagram']), '@'); ?>" target="_blank" class="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm">
+                <a href="https://instagram.com/<?php echo ltrim(htmlspecialchars($row['instagram']), '@'); ?>" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm">
                   <i class="fab fa-instagram"></i>
                   <span><?php echo htmlspecialchars($row['instagram']); ?></span>
                 </a>
