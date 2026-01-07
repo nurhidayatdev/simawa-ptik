@@ -37,6 +37,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $matkul = $_POST['matkul'] ?? [];
 
+    // Validasi SKS Server-side
+    $total_sks_post = 0;
+    if (!empty($matkul)) {
+        $ids = implode(',', array_map('intval', $matkul));
+        $res_sks = mysqli_query($koneksi, "SELECT SUM(sks) as total FROM mata_kuliah WHERE id IN ($ids)");
+        $data_sks = mysqli_fetch_assoc($res_sks);
+        $total_sks_post = (int)$data_sks['total'];
+    }
+
+    if ($total_sks_post > 24) {
+        header("Location: krs.php?error=sks_limit");
+        exit;
+    }
+
     // hapus KRS lama
     mysqli_query(
         $koneksi,
@@ -325,7 +339,23 @@ while ($row = mysqli_fetch_assoc($krs)) {
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
 
-            <h3 class="text-2xl font-bold mb-4">Kartu Rencana Studi (KRS)</h3>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-2xl font-bold">Kartu Rencana Studi (KRS)</h3>
+                    <button type="button" onclick="showKrsRules()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 transition-colors flex items-center justify-center shadow-sm border border-slate-200" title="Informasi Aturan">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Total SKS Terpilih</p>
+                        <p class="text-lg font-black text-indigo-950"><span id="total-sks-display">0</span> <span class="text-xs font-normal text-slate-500">/ 24 SKS</span></p>
+                    </div>
+                </div>
+            </div>
 
             <!-- Success logic handled by SweetAlert -->
 
@@ -350,9 +380,9 @@ while ($row = mysqli_fetch_assoc($krs)) {
                                     if ((int)$m['semester'] !== $s) continue;
                                     $found = true;
                                 ?>
-                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
+                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100 transition-colors">
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center">
-                                            <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" <?= in_array($m['id'], $diambil) ? 'checked' : '' ?>>
+                                            <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" data-sks="<?= $m['sks'] ?>" class="sks-checkbox rounded text-indigo-600 focus:ring-indigo-500" <?= in_array($m['id'], $diambil) ? 'checked' : '' ?>>
                                         </td>
                                         <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
                                         <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
@@ -384,6 +414,48 @@ while ($row = mysqli_fetch_assoc($krs)) {
         </footer>
     </main>
     <script>
+        // Reusable function for KRS rules
+        function showKrsRules() {
+            Swal.fire({
+                title: '<span class="text-indigo-950">Aturan Pengisian KRS</span>',
+                html: `
+                    <div class="text-left text-xs space-y-3 p-2">
+                        <div class="flex gap-3">
+                            <div class="mt-1"><i class="fas fa-check-circle text-indigo-600"></i></div>
+                            <p class="text-slate-700">Maksimal beban studi yang dapat diambil adalah <strong>24 SKS</strong>.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="mt-1"><i class="fas fa-check-circle text-indigo-600"></i></div>
+                            <p class="text-slate-700">Hanya mengambil mata kuliah yang <strong>diprogramkan bersama kelas PTIK C 24</strong>.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="mt-1"><i class="fas fa-exclamation-triangle text-amber-500"></i></div>
+                            <p class="text-slate-700">Dilarang mengambil mata kuliah dari kelas lain.</p>
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mt-4">
+                            <p class="text-[10px] text-indigo-900 leading-relaxed italic">
+                                *Sistem KRS ini digunakan secara otomatis sebagai filter pada sistem <strong>Absensi, Pembagian Kelompok</strong>, dan fitur akademik lainnya di dashboard ini.
+                            </p>
+                        </div>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#3730a3',
+                background: '#ffffff',
+                allowOutsideClick: false
+            });
+        }
+
+        // Show Rules Popup Automatically on Entry (Once Only)
+        document.addEventListener('DOMContentLoaded', () => {
+            const rulesSeen = localStorage.getItem('krs_rules_seen');
+            if (!rulesSeen) {
+                showKrsRules();
+                localStorage.setItem('krs_rules_seen', 'true');
+            }
+        });
+
         // Mobile menu toggle dengan perbaikan
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const sidebar = document.getElementById('sidebar');
@@ -434,11 +506,70 @@ while ($row = mysqli_fetch_assoc($krs)) {
             });
         }
 
+        // SKS Counter Logic
+        const sksCheckboxes = document.querySelectorAll('.sks-checkbox');
+        const totalSksDisplay = document.getElementById('total-sks-display');
+
+        function updateTotalSks() {
+            let total = 0;
+            sksCheckboxes.forEach(cb => {
+                if (cb.checked) {
+                    total += parseInt(cb.dataset.sks);
+                }
+            });
+            totalSksDisplay.innerText = total;
+
+            if (total > 24) {
+                totalSksDisplay.classList.add('text-red-600');
+                totalSksDisplay.parentElement.classList.add('animate-bounce');
+            } else {
+                totalSksDisplay.classList.remove('text-red-600');
+                totalSksDisplay.parentElement.classList.remove('animate-bounce');
+            }
+        }
+
+        sksCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateTotalSks();
+
+                // Optional: Prevent checking if it exceeds 24
+                const currentTotal = parseInt(totalSksDisplay.innerText);
+                if (currentTotal > 24 && cb.checked) {
+                    // We let them check but totalSksDisplay will show error
+                }
+            });
+        });
+
+        // Initial update
+        updateTotalSks();
+
         // SweetAlert for Saving KRS
         function confirmSaveKRS() {
+            const currentTotal = parseInt(totalSksDisplay.innerText);
+
+            if (currentTotal > 24) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Batas SKS Terlampaui',
+                    text: 'Total SKS yang Anda pilih (' + currentTotal + ') melebihi batas maksimal 24 SKS.',
+                    confirmButtonColor: '#3730a3'
+                });
+                return;
+            }
+
+            if (currentTotal === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Belum Ada Matkul',
+                    text: 'Silakan pilih minimal satu mata kuliah.',
+                    confirmButtonColor: '#3730a3'
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'Simpan KRS?',
-                text: "Pastikan mata kuliah yang dipilih sudah benar.",
+                text: "Total SKS terpilih: " + currentTotal + ". Pastikan pilihan Anda sudah benar.",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3730a3',
@@ -461,6 +592,16 @@ while ($row = mysqli_fetch_assoc($krs)) {
                 confirmButtonColor: '#3730a3'
             }).then(() => {
                 window.location.href = 'profile.php';
+            });
+        <?php endif; ?>
+
+        // Show Error Alert for SKS Limit
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'sks_limit'): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Menyimpan!',
+                text: 'Total SKS melebihi batas maksimal 24 SKS.',
+                confirmButtonColor: '#3730a3'
             });
         <?php endif; ?>
     </script>
