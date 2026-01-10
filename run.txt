@@ -1,4 +1,4 @@
-npx @tailwindcss/cli -i frontend/tailwind/src/input.css -o frontend/tailwind/src/output.css --watch
+npx @tailwindcss/cli -i assets/tailwind/src/input.css -o assets/tailwind/src/output.css --watch
 
 
 
@@ -11,3 +11,11 @@ if ($role === 'Administrator Utama'):
 
 
 endif;
+
+include 'includes/pesan.php';
+<?php include 'includes/meta.php'; ?>
+<?php include 'includes/link_main.php'; ?>
+<?php include 'includes/google_tag.php'; ?>
+<?php include 'includes/header_main.php'; ?>
+<?php include 'includes/footer_main.php'; ?>
+<?php include 'includes/script_main.php'; ?>
