@@ -3,6 +3,9 @@ include 'koneksi.php';
 
 include 'includes/pesan.php';
 
+// Include foto helpers for cache busting
+include_once 'functions/foto_helpers.php';
+
 $result = mysqli_query($koneksi, "SELECT * FROM mahasiswa ORDER BY nim ASC");
 $rows = [];
 while ($r = mysqli_fetch_assoc($result)) {
@@ -42,7 +45,7 @@ while ($r = mysqli_fetch_assoc($result)) {
               <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                   <?php if (!empty($row['foto'])): ?>
-                    <img src="storage/profile/<?php echo htmlspecialchars($row['foto']); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                    <img src="<?= profilePhotoUrl($row['foto']) ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                   <?php else: ?>
                     <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
                   <?php endif; ?>
@@ -66,12 +69,9 @@ while ($r = mysqli_fetch_assoc($result)) {
   </div>
 
   <?php include 'includes/footer_main.php'; ?>
-<?php include 'includes/script_main.php'; ?>
+  <?php include 'includes/script_main.php'; ?>
 
   <script>
-    
-
-
     // Search/filter functionality
     const searchInput = document.getElementById('searchInput');
 

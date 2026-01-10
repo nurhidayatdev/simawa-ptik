@@ -12,6 +12,9 @@ $user_id = $_SESSION['user_id'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+// Include foto helpers for cache busting
+include_once '../functions/foto_helpers.php';
+
 $query = "SELECT id FROM mahasiswa WHERE user_id = ?";
 $stmt  = mysqli_prepare($koneksi, $query);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
@@ -72,12 +75,10 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
 <html lang="en">
 
 <head>
-    
+
     <title>Profile - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-       
-
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -108,7 +109,7 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Profile Picture Section -->
                 <div class="md:col-span-1 flex flex-col items-center">
-                    <img src="../storage/profile/<?= htmlspecialchars($data['foto']) ?>" alt="Profile Picture"
+                    <img src="<?= profilePhotoUrl($data['foto'], '../') ?>" alt="Profile Picture"
                         class="w-32 h-32 rounded-full mb-4">
                     <h2 class="text-xl font-semibold mb-2 text-slate-800"><?= htmlspecialchars($data['nama_lengkap']) ?></h2>
                     <p class="text-slate-600"><?= htmlspecialchars($data['role']) ?></p>
@@ -200,7 +201,7 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
         <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
-    
+
 </body>
 
 </html>

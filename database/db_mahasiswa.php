@@ -12,6 +12,9 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+// Include foto helpers for cache busting
+include_once '../functions/foto_helpers.php';
+
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
@@ -42,7 +45,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
         if (!empty($row['foto'])) {
-            echo '<img src="../storage/profile/' . htmlspecialchars($row['foto']) . '" class="img-fluid rounded" style="max-width:25px; height:auto;" />';
+            echo '<img src="' . profilePhotoUrl($row['foto'], '../') . '" class="img-fluid rounded" style="max-width:25px; height:auto;" />';
         } else {
             echo '<span class="text-muted">Belum ada gambar</span>';
         }
@@ -76,12 +79,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-   
-    <title>Data Mahasiswa - PTIK C 2024</title>
-   <?php include '../includes/head.php'; ?>
-    <style>
-    
 
+    <title>Data Mahasiswa - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -95,7 +96,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
         /* live-search script removed from style block; see script at document end */
     </style>
-   
+
 </head>
 
 <body class="bg-slate-100">
@@ -163,7 +164,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs">
                                     <?php if (!empty($row['foto'])): ?>
-                                        <img src="../storage/profile/<?php echo htmlspecialchars($row['foto']); ?>"
+                                        <img src="<?= profilePhotoUrl($row['foto'], '../') ?>"
                                             class="img-fluid rounded"
                                             style="max-width:25px; height:auto;" />
                                     <?php else: ?>
@@ -207,12 +208,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 </table>
             </div>
         </div>
-       <?php include '../includes/footer_db.php'; ?>
+        <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
-       
-
         // Live search via AJAX: update table rows without leaving input focus
         (function() {
             const input = document.getElementById('searchInput');

@@ -8,6 +8,9 @@ if (file_exists('koneksi.php')) {
 } elseif (file_exists('../../koneksi.php')) {
     $base = "../../";
 }
+
+// Include foto helpers for cache busting
+include_once __DIR__ . '/../functions/foto_helpers.php';
 ?>
 <!-- Header dengan z-index lebih tinggi -->
 <header class="bg-indigo-950  fixed w-full top-0 z-50">
@@ -24,7 +27,7 @@ if (file_exists('koneksi.php')) {
             <div class="relative">
                 <button id="profile-button" class="flex items-center space-x-2">
                     <span class="text-white font-semibold"><?php echo htmlspecialchars($nama_lengkap); ?></span>
-                    <img src="<?= $base ?>storage/profile/<?php echo htmlspecialchars($foto); ?>" alt="Profile" class="w-8 h-8 rounded-full">
+                    <img src="<?= profilePhotoUrl($foto, $base) ?>" alt="Profile" class="w-8 h-8 rounded-full">
                 </button>
                 <div id="profile-dropdown" class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg hidden">
                     <a href="<?= $base ?>views/profile" class="block px-4 py-2 text-xs hover:bg-gray-100 font-semibold text-indigo-900"><i class="fa fa-user mr-2 text-indigo-900"></i>Profile</a>

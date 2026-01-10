@@ -12,6 +12,9 @@ $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
+// Include foto helpers for cache busting
+include_once 'functions/foto_helpers.php';
+
 /* =====================
    AMBIL PERIODE AKTIF
    ===================== */
@@ -320,7 +323,7 @@ function getFireColor($streak)
             <div class="mb-6 bg-white  p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
                     <div class="h-14 w-14 rounded-full overflow-hidden border-2 border-indigo-200">
-                        <img src="storage/profile/<?= htmlspecialchars($foto) ?>" alt="Profile" class="w-full h-full object-cover">
+                        <img src="<?= profilePhotoUrl($foto) ?>" alt="Profile" class="w-full h-full object-cover">
                     </div>
                     <div>
                         <h2 class="font-bold text-lg text-slate-800">Selamat Datang, <span class="text-indigo-600"><?= htmlspecialchars($nama_lengkap) ?></span>!</h2>
@@ -607,7 +610,7 @@ function getFireColor($streak)
                                         </span>
                                     </div>
                                     <div class="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
-                                        <img src="storage/profile/<?= htmlspecialchars($tk['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
+                                        <img src="<?= profilePhotoUrl($tk['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
                                     </div>
                                     <div class="flex-grow min-w-0">
                                         <div class="text-xs font-bold text-slate-700 truncate">

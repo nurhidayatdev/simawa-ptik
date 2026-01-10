@@ -7,6 +7,9 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $user_id = $_SESSION['user_id'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
+
+// Include foto helpers for cache busting
+include_once '../functions/foto_helpers.php';
 $query = "SELECT id FROM mahasiswa WHERE user_id = ?";
 $stmt  = mysqli_prepare($koneksi, $query);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
@@ -174,7 +177,7 @@ if (isset($_POST['update'])) {
 
 
 
-    include '../includes/alert_actions.php'; 
+    include '../includes/alert_actions.php';
     exit;
 }
 
@@ -183,12 +186,10 @@ if (isset($_POST['update'])) {
 <html lang="en">
 
 <head>
-   
+
     <title>Edit Profile - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-      
-
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -247,7 +248,7 @@ if (isset($_POST['update'])) {
                             <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto']); ?>">
 
                             <div class="flex items-center space-x-4 mt-4">
-                                <img id="current-preview" src="../storage/profile/<?php echo htmlspecialchars($data['foto']); ?>" class="img-fluid rounded" style="width:120px; height:120px; object-fit:cover;" />
+                                <img id="current-preview" src="<?= profilePhotoUrl($data['foto'], '../') ?>" class="img-fluid rounded" style="width:120px; height:120px; object-fit:cover;" />
                                 <div>
                                     <button type="button" id="open-cropper" class="px-3 py-1 bg-indigo-200 rounded text-xs hidden">Buka Cropper</button>
                                 </div>

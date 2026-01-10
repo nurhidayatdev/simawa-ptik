@@ -16,6 +16,8 @@ $user_info = $koneksi->query("SELECT nama_panggilan, foto FROM mahasiswa WHERE u
 $nama_panggilan = $user_info['nama_panggilan'] ?? 'User';
 $foto = $user_info['foto'] ?? 'default.png';
 
+include_once '../functions/foto_helpers.php';
+
 $stmt = $koneksi->prepare("SELECT * FROM kuis_harian_stats WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -336,7 +338,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 <div class="w-full max-w-sm bg-slate-800/60 border border-slate-700 p-5 rounded-2xl shadow-xl">
                     <div class="text-center mb-4">
                         <div class="inline-flex items-center gap-1.5 bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/20 text-[10px] font-extrabold uppercase tracking-tighter mb-4">
-                            
+
                             <span>Kuis#<?= $soal['id'] ?></span>
                         </div>
                         <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Pertanyaan</h3>
@@ -401,7 +403,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         <div class="flex items-center gap-3 p-2 rounded-lg <?= $isMe ? 'bg-indigo-500/10 border border-indigo-500/20' : 'hover:bg-slate-700/30' ?> transition-colors">
                             <span class="text-xs font-black w-4 text-center <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-300' : ($rank == 3 ? 'text-orange-400' : 'text-slate-600')) ?>"><?= $rank++ ?></span>
                             <div class="w-8 h-8 rounded-full bg-slate-700 overflow-hidden border border-slate-600 shrink-0">
-                                <img src="../storage/profile/<?= htmlspecialchars($lb['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='../assets/image/logo.webp'">
+                                <img src="<?= profilePhotoUrl($lb['foto'], '../') ?>" class="w-full h-full object-cover" onerror="this.src='../assets/image/logo.webp'">
                             </div>
                             <div class="flex-grow min-w-0 flex flex-col justify-center">
                                 <div class="text-xs font-bold text-slate-200 truncate leading-tight">
@@ -434,7 +436,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
 
     <script>
         const USER_NAME = "<?= htmlspecialchars($nama_panggilan) ?>";
-        const USER_PHOTO = "../storage/profile/<?= htmlspecialchars($foto) ?>";
+        const USER_PHOTO = "<?= profilePhotoUrl($foto, '../') ?>";
         const ANS_LENGTH = <?= $has_question ? strlen($soal['jawaban']) : 0 ?>;
         let hintStock = <?= (int)$stats['hint_stock'] ?>;
         let hintsUsed = 0;
