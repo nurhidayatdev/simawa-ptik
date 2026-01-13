@@ -322,7 +322,7 @@ function getFireColor($streak)
             <!-- Welcome & Realtime Section -->
             <div class="mb-6 bg-white  p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="h-14 w-14 rounded-full overflow-hidden border-2 border-indigo-200">
+                    <div class="h-14 w-14 flex-shrink-0 aspect-square rounded-full overflow-hidden border-2 border-indigo-200">
                         <img src="<?= profilePhotoUrl($foto) ?>" alt="Profile" class="w-full h-full object-cover">
                     </div>
                     <div>

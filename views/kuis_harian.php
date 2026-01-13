@@ -123,13 +123,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit_answer') {
 
         // Milestone Rewards (Recovery & Hint)
         $milestone_config = [
-            500 => ['recovery' => 15, 'hint' => 20],
-            200 => ['recovery' => 10, 'hint' => 15],
-            100 => ['recovery' => 7, 'hint' => 10],
-            50  => ['recovery' => 5, 'hint' => 7],
-            30  => ['recovery' => 3, 'hint' => 5],
-            10  => ['recovery' => 1, 'hint' => 3],
-            3   => ['recovery' => 0, 'hint' => 1]
+            500 => ['recovery' => 50, 'hint' => 52],
+            200 => ['recovery' => 30, 'hint' => 36],
+            100 => ['recovery' => 20, 'hint' => 22],
+            50  => ['recovery' => 15, 'hint' => 16],
+            30  => ['recovery' => 10, 'hint' => 12],
+            10  => ['recovery' => 5, 'hint' => 6],
+            3   => ['recovery' => 1, 'hint' => 2]
         ];
 
         $bonus_stock = 0;
@@ -694,55 +694,56 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                                     <div class="text-[#ff9500] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#ff9500] font-bold uppercase text-[10px]">FIRE (3)</div>
-                                        <div class="text-amber-400 text-[9px]">+1 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[9px]">+1 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+2 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
                                     <div class="text-[#e5e7eb] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#e5e7eb] font-bold uppercase text-[10px]">SILVER (10)</div>
-                                        <div class="text-indigo-400 text-[9px]">+1 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+3 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[9px]">+5 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+6 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
                                     <div class="text-[#ff6600] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#ff6600] font-bold uppercase text-[10px]">PLATINUM (30)</div>
-                                        <div class="text-indigo-400 text-[9px]">+3 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+5 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[9px]">+10 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+12 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
                                     <div class="text-[#ffd700] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#ffd700] font-bold uppercase text-[10px]">GOLD (50)</div>
-                                        <div class="text-indigo-400 text-[9px]">+5 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+7 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[9px]">+15 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+16 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
                                     <div class="text-[#00ffff] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#00ffff] font-bold uppercase text-[10px]">DIAMOND (100)</div>
-                                        <div class="text-indigo-400 text-[9px]">+7 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+10 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[9px]">+20 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+22 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
                                     <div class="text-[#ff00ff] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#ff00ff] font-bold uppercase text-[10px]">EPIC (200)</div>
-                                        <div class="text-indigo-400 text-[9px]">+10 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+15 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[9px]">+30 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+36 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-4 col-span-2">
                                     <div class="text-[#ff0000] text-3xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#ff0000] font-bold uppercase text-[11px]">LEGENDARY (500)</div>
-                                        <div class="text-indigo-400 text-[10px]">+15 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[10px]">+20 Hint Stock</div>
+                                        <div class="text-indigo-400 text-[10px]">+50 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[10px]">+52 Hint Stock</div>
                                     </div>
                                 </div>
                             </div>

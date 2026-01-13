@@ -4,6 +4,96 @@ include '../koneksi.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Handle jam_kuliah dengan jam_ke sebagai identifier
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam_ke']) && !isset($_GET['confirm'])) {
+    $tabel = 'jam_kuliah';
+    $jam_ke = intval($_GET['jam_ke']);
+
+    echo <<<HTML
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <meta name='description' content='Dashboard Resmi Kelas PTIK C 2024'>
+        <meta name='theme-color' content='#1e1b4b' />
+        <title>Hapus Data - Kelas PTIK C 2024</title>
+        <link rel='icon' href='../assets/image/icon.webp' />
+        <link rel='preconnect' href='https://fonts.googleapis.com'>
+        <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+        <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+        <style>
+            body { font-family: 'Poppins', sans-serif !important; }
+        </style>
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                title: 'Anda yakin?',
+                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'hapus?tabel={$tabel}&jam_ke={$jam_ke}&confirm=yes';
+                } else {
+                    window.history.back();
+                }
+            });
+        </script>
+    </body>
+    </html>
+    HTML;
+    exit();
+}
+
+// Handle jam_kuliah deletion dengan confirm
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam_ke']) && isset($_GET['confirm'])) {
+    $jam_ke = intval($_GET['jam_ke']);
+    $hapus = mysqli_query($koneksi, "DELETE FROM jam_kuliah WHERE jam_ke='$jam_ke'");
+    $redirect = '../database/db_jam';
+
+    if ($hapus) {
+        echo <<<HTML
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <meta name='theme-color' content='#1e1b4b' />
+                <title>Hapus Data - Kelas PTIK C 2024</title>
+                <link rel='icon' href='../assets/image/icon.webp' />
+                <link rel='preconnect' href='https://fonts.googleapis.com'>
+                <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+                <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+                <style>
+                    body { font-family: 'Poppins', sans-serif !important; }
+                </style>
+                <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+            </head>
+            <body>
+                <script>
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Data berhasil dihapus!',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.href = '$redirect';
+                        });
+                </script>
+            </body>
+            </html>
+        HTML;
+    } else {
+        echo "Gagal menghapus data.";
+    }
+    exit();
+}
+
 if (isset($_GET['tabel']) && isset($_GET['id']) && !isset($_GET['confirm'])) {
     $tabel = $_GET['tabel'];
     $id = intval($_GET['id']);
@@ -55,7 +145,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
     $tabel = $_GET['tabel'];
     $id = intval($_GET['id']);
 
-    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik'];
+    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik', 'ruangan', 'kuis_harian_soal'];
 
     if (!in_array($tabel, $tabel_diizinkan)) {
         echo "Tabel tidak diizinkan!";
@@ -97,6 +187,12 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
             break;
         case 'kalender_akademik':
             $redirect = '../database/db_kalender';
+            break;
+        case 'ruangan':
+            $redirect = '../database/db_ruangan';
+            break;
+        case 'kuis_harian_soal':
+            $redirect = '../database/db_kuis';
             break;
     }
 

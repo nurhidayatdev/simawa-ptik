@@ -222,6 +222,28 @@ if (isset($_POST['tambah'])) {
             mysqli_query($koneksi, "INSERT INTO kalender_akademik (periode_id, kegiatan, tanggal_mulai, tanggal_selesai) VALUES ('$periode_id', '$kegiatan', '$tanggal_mulai', '$tanggal_selesai')");
             $redirect = "../database/db_kalender";
             break;
+
+        case 'ruangan':
+            $nama_ruangan = mysqli_real_escape_string($koneksi, $_POST['nama_ruangan']);
+            mysqli_query($koneksi, "INSERT INTO ruangan (nama_ruangan) VALUES ('$nama_ruangan')");
+            $redirect = "../database/db_ruangan";
+            break;
+
+        case 'jam_kuliah':
+            $jam_ke = intval($_POST['jam_ke']);
+            $jam_mulai = $_POST['jam_mulai'];
+            $jam_selesai = $_POST['jam_selesai'];
+            mysqli_query($koneksi, "INSERT INTO jam_kuliah (jam_ke, jam_mulai, jam_selesai) VALUES ('$jam_ke', '$jam_mulai', '$jam_selesai')");
+            $redirect = "../database/db_jam";
+            break;
+
+        case 'kuis_harian_soal':
+            $tanggal = $_POST['tanggal'];
+            $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
+            $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
+            mysqli_query($koneksi, "INSERT INTO kuis_harian_soal (tanggal, pertanyaan, jawaban) VALUES ('$tanggal', '$pertanyaan', '$jawaban')");
+            $redirect = "../database/db_kuis";
+            break;
     }
     include '../includes/alert_actions.php';
 
@@ -646,6 +668,53 @@ if (isset($_POST['tambah'])) {
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Selesai</label>
                                 <input type="date" name="tanggal_selesai" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'ruangan'): ?>
+                        <h3 class="text-xl font-bold mb-6">Tambah Ruangan</h3>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Ruangan</label>
+                                <input type="text" name="nama_ruangan" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'jam_kuliah'): ?>
+                        <h3 class="text-xl font-bold mb-6">Tambah Jam Kuliah</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Ke</label>
+                                <input type="number" name="jam_ke" required min="1"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai</label>
+                                <input type="time" name="jam_mulai" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai</label>
+                                <input type="time" name="jam_selesai" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'kuis_harian_soal'): ?>
+                        <h3 class="text-xl font-bold mb-6">Tambah Soal Kuis Harian</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal</label>
+                                <input type="date" name="tanggal" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Pertanyaan</label>
+                                <textarea name="pertanyaan" rows="3" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jawaban</label>
+                                <input type="text" name="jawaban" required
                                     class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>

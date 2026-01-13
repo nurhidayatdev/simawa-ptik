@@ -13,7 +13,15 @@ $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 $tabel = $_GET['tabel'] ?? '';
 $id = $_GET['id'] ?? '';
-$query = mysqli_query($koneksi, "SELECT * FROM $tabel WHERE id='$id'");
+
+// Handle jam_kuliah yang menggunakan jam_ke sebagai primary key
+if ($tabel === 'jam_kuliah') {
+    $jam_ke = $_GET['jam_ke'] ?? '';
+    $query = mysqli_query($koneksi, "SELECT * FROM jam_kuliah WHERE jam_ke='$jam_ke'");
+} else {
+    $query = mysqli_query($koneksi, "SELECT * FROM $tabel WHERE id='$id'");
+}
+
 $data = mysqli_fetch_assoc($query);
 if (!$data) {
     die("Data tidak ditemukan!");
@@ -288,6 +296,28 @@ if (isset($_POST['update'])) {
 
             mysqli_query($koneksi, "UPDATE kalender_akademik SET periode_id='$periode_id', kegiatan='$kegiatan', tanggal_mulai='$tanggal_mulai', tanggal_selesai='$tanggal_selesai' WHERE id='$id'");
             $redirect = "../database/db_kalender";
+            break;
+
+        case 'ruangan':
+            $nama_ruangan = mysqli_real_escape_string($koneksi, $_POST['nama_ruangan']);
+            mysqli_query($koneksi, "UPDATE ruangan SET nama_ruangan='$nama_ruangan' WHERE id='$id'");
+            $redirect = "../database/db_ruangan";
+            break;
+
+        case 'jam_kuliah':
+            $jam_ke_param = $_GET['jam_ke'] ?? '';
+            $jam_mulai = $_POST['jam_mulai'];
+            $jam_selesai = $_POST['jam_selesai'];
+            mysqli_query($koneksi, "UPDATE jam_kuliah SET jam_mulai='$jam_mulai', jam_selesai='$jam_selesai' WHERE jam_ke='$jam_ke_param'");
+            $redirect = "../database/db_jam";
+            break;
+
+        case 'kuis_harian_soal':
+            $tanggal = $_POST['tanggal'];
+            $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
+            $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
+            mysqli_query($koneksi, "UPDATE kuis_harian_soal SET tanggal='$tanggal', pertanyaan='$pertanyaan', jawaban='$jawaban' WHERE id='$id'");
+            $redirect = "../database/db_kuis";
             break;
     }
 
@@ -753,6 +783,53 @@ if (isset($_POST['update'])) {
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Selesai</label>
                                 <input type="date" name="tanggal_selesai" value="<?= $data['tanggal_selesai']; ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'ruangan'): ?>
+                        <h3 class="text-xl font-bold mb-6">Edit Ruangan</h3>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Ruangan</label>
+                                <input type="text" name="nama_ruangan" value="<?= htmlspecialchars($data['nama_ruangan']); ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'jam_kuliah'): ?>
+                        <h3 class="text-xl font-bold mb-6">Edit Jam Kuliah</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Ke</label>
+                                <input type="number" value="<?= htmlspecialchars($data['jam_ke']); ?>" disabled
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-100 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai</label>
+                                <input type="time" name="jam_mulai" value="<?= htmlspecialchars($data['jam_mulai']); ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai</label>
+                                <input type="time" name="jam_selesai" value="<?= htmlspecialchars($data['jam_selesai']); ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                        </div>
+                    <?php elseif ($tabel === 'kuis_harian_soal'): ?>
+                        <h3 class="text-xl font-bold mb-6">Edit Soal Kuis Harian</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal</label>
+                                <input type="date" name="tanggal" value="<?= htmlspecialchars($data['tanggal']); ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Pertanyaan</label>
+                                <textarea name="pertanyaan" rows="3" required
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"><?= htmlspecialchars($data['pertanyaan']); ?></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-medium text-slate-700 mb-1">Jawaban</label>
+                                <input type="text" name="jawaban" value="<?= htmlspecialchars($data['jawaban']); ?>" required
                                     class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                             </div>
                         </div>

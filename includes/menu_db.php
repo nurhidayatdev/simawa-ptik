@@ -182,6 +182,9 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="<?= $base ?>database/db_users" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
                                     <a href="<?= $base ?>database/db_periode" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
+                                    <a href="<?= $base ?>database/db_ruangan" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Ruangan</a>
+                                    <a href="<?= $base ?>database/db_jam" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Jam Kuliah</a>
+                                    <a href="<?= $base ?>database/db_kuis" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
                                 </div>
                             <?php endif; ?>
                             <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
