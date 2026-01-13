@@ -237,7 +237,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     <div class="bg-white backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden  transition-all group">
                         <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-16 relative">
                             <div class="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-3 border-indigo-950 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                     <?php if ($ketua && !empty($ketua['foto'])): ?>
                                         <img src="<?php echo htmlspecialchars(foto_path($ketua['foto'])); ?>" alt="<?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?>" class="w-full h-full object-cover">
                                     <?php else: ?>
@@ -267,7 +267,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render sekretaris
                     while ($row = mysqli_fetch_assoc($qSek)) {
                     ?>
-                        <div class="bg-white backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-white hover:border-indigo-500/50 transition-all group">
+                        <div class="bg-white backdrop-blur-md rounded-2xl shadow-xl overflow-hidden transition-all group">
                             <div class="bg-gradient-to-br from-slate-700 to-slate-900 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-slate-900 text-lg font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-slate-800 group-hover:scale-105 transition-transform">
@@ -292,7 +292,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render bendahara
                     while ($row = mysqli_fetch_assoc($qBen)) {
                     ?>
-                        <div class="bg-white backdrop-blur-md rounded-2xl shadow-xl overflow-hidden border border-white hover:border-indigo-500/50 transition-all group">
+                        <div class="bg-white backdrop-blur-md rounded-2xl shadow-xl overflow-hidden transition-all group">
                             <div class="bg-gradient-to-br from-indigo-600 to-indigo-900 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-indigo-800 group-hover:scale-105 transition-transform">
