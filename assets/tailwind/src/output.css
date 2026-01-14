@@ -67,6 +67,7 @@
     --color-sky-800: oklch(44.3% 0.11 240.79);
     --color-blue-50: oklch(97% 0.014 254.604);
     --color-blue-100: oklch(93.2% 0.032 255.585);
+    --color-blue-200: oklch(88.2% 0.059 254.128);
     --color-blue-400: oklch(70.7% 0.165 254.624);
     --color-blue-500: oklch(62.3% 0.214 259.815);
     --color-blue-600: oklch(54.6% 0.245 262.881);
@@ -1079,30 +1080,6 @@
     --tw-translate-y: calc(var(--spacing) * 2);
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
-  .scale-10 {
-    --tw-scale-x: 10%;
-    --tw-scale-y: 10%;
-    --tw-scale-z: 10%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-20 {
-    --tw-scale-x: 20%;
-    --tw-scale-y: 20%;
-    --tw-scale-z: 20%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-30 {
-    --tw-scale-x: 30%;
-    --tw-scale-y: 30%;
-    --tw-scale-z: 30%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-50 {
-    --tw-scale-x: 50%;
-    --tw-scale-y: 50%;
-    --tw-scale-z: 50%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
   .scale-80 {
     --tw-scale-x: 80%;
     --tw-scale-y: 80%;
@@ -1125,78 +1102,6 @@
     --tw-scale-x: 105%;
     --tw-scale-y: 105%;
     --tw-scale-z: 105%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-120 {
-    --tw-scale-x: 120%;
-    --tw-scale-y: 120%;
-    --tw-scale-z: 120%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-125 {
-    --tw-scale-x: 125%;
-    --tw-scale-y: 125%;
-    --tw-scale-z: 125%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-130 {
-    --tw-scale-x: 130%;
-    --tw-scale-y: 130%;
-    --tw-scale-z: 130%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-140 {
-    --tw-scale-x: 140%;
-    --tw-scale-y: 140%;
-    --tw-scale-z: 140%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-150 {
-    --tw-scale-x: 150%;
-    --tw-scale-y: 150%;
-    --tw-scale-z: 150%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-160 {
-    --tw-scale-x: 160%;
-    --tw-scale-y: 160%;
-    --tw-scale-z: 160%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-170 {
-    --tw-scale-x: 170%;
-    --tw-scale-y: 170%;
-    --tw-scale-z: 170%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-180 {
-    --tw-scale-x: 180%;
-    --tw-scale-y: 180%;
-    --tw-scale-z: 180%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-190 {
-    --tw-scale-x: 190%;
-    --tw-scale-y: 190%;
-    --tw-scale-z: 190%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-200 {
-    --tw-scale-x: 200%;
-    --tw-scale-y: 200%;
-    --tw-scale-z: 200%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-220 {
-    --tw-scale-x: 220%;
-    --tw-scale-y: 220%;
-    --tw-scale-z: 220%;
-    scale: var(--tw-scale-x) var(--tw-scale-y);
-  }
-  .scale-250 {
-    --tw-scale-x: 250%;
-    --tw-scale-y: 250%;
-    --tw-scale-z: 250%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
   }
   .rotate-0 {
@@ -1505,6 +1410,9 @@
   }
   .border-blue-100 {
     border-color: var(--color-blue-100);
+  }
+  .border-blue-200 {
+    border-color: var(--color-blue-200);
   }
   .border-emerald-200 {
     border-color: var(--color-emerald-200);
@@ -2536,9 +2444,6 @@
   .pl-1 {
     padding-left: calc(var(--spacing) * 1);
   }
-  .pl-2 {
-    padding-left: calc(var(--spacing) * 2);
-  }
   .pl-3 {
     padding-left: calc(var(--spacing) * 3);
   }
@@ -2694,20 +2599,8 @@
   .whitespace-pre-line {
     white-space: pre-line;
   }
-  .text-\[\#0ea5e9\] {
-    color: #0ea5e9;
-  }
   .text-\[\#00A2FF\] {
     color: #00A2FF;
-  }
-  .text-\[\#00ffff\] {
-    color: #00ffff;
-  }
-  .text-\[\#5D00B3\] {
-    color: #5D00B3;
-  }
-  .text-\[\#9ca3af\] {
-    color: #9ca3af;
   }
   .text-\[\#0055FF\] {
     color: #0055FF;
@@ -2723,27 +2616,6 @@
   }
   .text-\[\#FFC300\] {
     color: #FFC300;
-  }
-  .text-\[\#e5e7eb\] {
-    color: #e5e7eb;
-  }
-  .text-\[\#ff00ff\] {
-    color: #ff00ff;
-  }
-  .text-\[\#ff0000\] {
-    color: #ff0000;
-  }
-  .text-\[\#ff6600\] {
-    color: #ff6600;
-  }
-  .text-\[\#ff9500\] {
-    color: #ff9500;
-  }
-  .text-\[\#ffd700\] {
-    color: #ffd700;
-  }
-  .text-\[px\] {
-    color: px;
   }
   .text-amber-300 {
     color: var(--color-amber-300);
@@ -2777,6 +2649,9 @@
   }
   .text-blue-700 {
     color: var(--color-blue-700);
+  }
+  .text-blue-900 {
+    color: var(--color-blue-900);
   }
   .text-emerald-200 {
     color: var(--color-emerald-200);

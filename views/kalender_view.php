@@ -69,42 +69,6 @@ function isLectureDay($timestamp, $ranges)
     return false;
 }
 
-// 2. Fetch Jadwal Matkul (weekly recurring)
-$day_map = ['Minggu' => 0, 'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6];
-$q_jadwal = mysqli_query($koneksi, "
-    SELECT jm.hari, jk.jam_mulai, mk.nama_matkul 
-    FROM jadwal_matkul jm
-    JOIN mata_kuliah mk ON jm.matkul_id = mk.id
-    LEFT JOIN jam_kuliah jk ON jm.jam_mulai_ke = jk.jam_ke
-    WHERE jm.periode_id = '$periode_id'
-    ORDER BY jk.jam_mulai ASC
-");
-$jadwal_by_day = [];
-while ($row = mysqli_fetch_assoc($q_jadwal)) {
-    $day_num = $day_map[$row['hari']] ?? -1;
-    if ($day_num >= 0) {
-        $jadwal_by_day[$day_num][] = [
-            'type' => 'jadwal',
-            'title' => $row['nama_matkul'],
-            'time' => $row['jam_mulai'] ? date('H:i', strtotime($row['jam_mulai'])) : ''
-        ];
-    }
-}
-
-// Map jadwal to each day of the month (only on lecture days)
-for ($d = 1; $d <= $days_in_month; $d++) {
-    $date_ts = mktime(0, 0, 0, $month, $d, $year);
-    $day_of_week = date('w', $date_ts);
-    $date_key = sprintf('%04d-%02d-%02d', $year, $month, $d);
-
-    // Only add jadwal if date is within lecture periods
-    if (isset($jadwal_by_day[$day_of_week]) && isLectureDay($date_ts, $lecture_ranges)) {
-        foreach ($jadwal_by_day[$day_of_week] as $j) {
-            $events[$date_key][] = $j;
-        }
-    }
-}
-
 // 2. Fetch Kalender Akademik (only show on start date)
 $month_start = sprintf('%04d-%02d-01', $year, $month);
 $month_end = sprintf('%04d-%02d-%02d', $year, $month, $days_in_month);
@@ -186,20 +150,17 @@ $today = date('Y-m-d');
             flex-shrink: 0;
         }
 
-        .event-jadwal {
+
+        .event-kalender {
             background: #6366f1;
         }
 
-        .event-kalender {
-            background: #10b981;
-        }
-
         .event-tugas {
-            background: #f59e0b;
+            background: #314158;
         }
 
         .event-tugas-done {
-            background: #22c55e;
+            background: #314158;
         }
 
         /* Mobile-only: show dots in a row */
@@ -236,7 +197,7 @@ $today = date('Y-m-d');
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800">Kalender Kelas</h1>
-                    <p class="text-slate-500 text-sm mt-1">Jadwal kuliah, kalender akademik, dan deadline tugas</p>
+                    <p class="text-slate-500 text-sm mt-1">Informasi akademik terintegrasi</p>
                 </div>
 
                 <!-- Month Navigation -->
@@ -259,10 +220,7 @@ $today = date('Y-m-d');
                     <span class="event-dot event-kalender"></span>
                     <span class="text-slate-600">Kalender Akademik</span>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="event-dot event-jadwal"></span>
-                    <span class="text-slate-600">Jadwal Kuliah</span>
-                </div>
+               
 
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-tugas"></span>
@@ -307,7 +265,7 @@ $today = date('Y-m-d');
                             <!-- Events - Mobile: dots only, Desktop: dots + text -->
                             <div class="event-row flex sm:flex-col sm:space-y-1 overflow-hidden max-h-[40px] sm:max-h-[60px] md:max-h-[80px]">
                                 <?php
-                                $event_counts = ['jadwal' => 0, 'kalender' => 0, 'tugas' => 0, 'ultah' => 0];
+                                $event_counts = ['kalender' => 0, 'tugas' => 0];
                                 $shown = 0;
                                 foreach ($day_events as $evt):
                                     $event_counts[$evt['type']]++;
@@ -343,10 +301,10 @@ $today = date('Y-m-d');
             </div>
 
             <!-- All Events This Month -->
-            <div class="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <!-- Kalender Akademik -->
-                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                    <h3 class="font-bold text-emerald-900 mb-3 flex items-center gap-2 text-sm">
+                <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-kalender" style="width:10px;height:10px;"></span>
                         Kalender Akademik
                     </h3>
@@ -371,7 +329,7 @@ $today = date('Y-m-d');
                                 $is_range = ($k['start'] !== $k['end']);
                         ?>
                                 <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs">
-                                    <div class="font-bold text-emerald-700 min-w-[70px]">
+                                    <div class="font-bold text-indigo-700 min-w-[70px]">
                                         <?php if ($is_range): ?>
                                             <?= date('d M', strtotime($k['start'])) ?> - <?= date('d M', strtotime($k['end'])) ?>
                                         <?php else: ?>
@@ -388,53 +346,13 @@ $today = date('Y-m-d');
                 </div>
 
 
-                <!-- Jadwal Kuliah -->
-                <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
-                        <span class="event-dot event-jadwal" style="width:10px;height:10px;"></span>
-                        Jadwal Kuliah
-                    </h3>
-                    <div class="space-y-2 max-h-[300px] overflow-y-auto">
-                        <?php
-                        // Get jadwal from events (already filtered by lecture days)
-                        $jadwal_list = [];
-                        foreach ($events as $date => $day_events) {
-                            foreach ($day_events as $evt) {
-                                if ($evt['type'] === 'jadwal') {
-                                    // Use title as key to avoid duplicates
-                                    $key = $evt['title'] . '_' . $evt['time'];
-                                    if (!isset($jadwal_list[$key])) {
-                                        // Get day name from date
-                                        $day_of_week = date('w', strtotime($date));
-                                        $day_name = array_search($day_of_week, $day_map);
-                                        $jadwal_list[$key] = [
-                                            'hari' => $day_name,
-                                            'title' => $evt['title'],
-                                            'time' => $evt['time']
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-                        if (!empty($jadwal_list)):
-                            foreach ($jadwal_list as $j): ?>
-                                <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs">
-                                    <span class="font-bold text-indigo-700 w-16"><?= $j['hari'] ?></span>
-                                    <span class="flex-1 text-slate-700"><?= htmlspecialchars($j['title']) ?></span>
-                                    <span class="text-indigo-600 font-medium"><?= $j['time'] ?></span>
-                                </div>
-                            <?php endforeach;
-                        else: ?>
-                            <p class="text-xs text-slate-500 italic">Tidak ada jadwal kuliah bulan ini.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
+            
 
 
 
                 <!-- Deadline Tugas -->
-                <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                    <h3 class="font-bold text-amber-900 mb-3 flex items-center gap-2 text-sm">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-tugas" style="width:10px;height:10px;"></span>
                         Deadline Tugas
                     </h3>
@@ -459,13 +377,13 @@ $today = date('Y-m-d');
                                 $is_done = ($t['status'] === 'selesai');
                         ?>
                                 <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs <?= $is_done ? 'opacity-60' : '' ?>">
-                                    <span class="font-bold text-amber-700 w-16"><?= date('d M', strtotime($t['date'])) ?></span>
+                                    <span class="font-bold text-slate-700 w-16"><?= date('d M', strtotime($t['date'])) ?></span>
                                     <span class="flex-1 text-slate-700 <?= $is_done ? 'line-through' : '' ?>"><?= htmlspecialchars($t['title']) ?></span>
                                     <?php if ($t['time']): ?>
-                                        <span class="text-amber-600 font-medium"><?= $t['time'] ?></span>
+                                        <span class="text-slate-600 font-medium"><?= $t['time'] ?></span>
                                     <?php endif; ?>
                                     <?php if ($is_done): ?>
-                                        <i class="fa fa-check-circle text-green-500"></i>
+                                        <i class="fa fa-check-circle text-slate-500"></i>
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach;
@@ -528,14 +446,12 @@ $today = date('Y-m-d');
                 dayEvents.forEach(evt => {
                     let dotClass = 'event-' + evt.type;
                     let typeLabel = {
-                        'jadwal': 'Jadwal Kuliah',
                         'kalender': 'Kalender Akademik',
                         'tugas': 'Deadline Tugas'
                     } [evt.type] || '';
                     let bgClass = {
-                        'jadwal': 'bg-indigo-50 border-indigo-200',
-                        'kalender': 'bg-emerald-50 border-emerald-200',
-                        'tugas': 'bg-amber-50 border-amber-200'
+                        'kalender': 'bg-indigo-50 border-indigo-200',
+                        'tugas': 'bg-slate-50 border-slate-200'
                     } [evt.type] || 'bg-slate-50';
 
                     if (evt.type === 'tugas' && evt.status === 'selesai') {
@@ -550,10 +466,10 @@ $today = date('Y-m-d');
                                     <div class="text-xs text-slate-500 mb-1">${typeLabel}</div>
                                     <div class="font-semibold text-slate-800">${evt.title}</div>
                                     ${evt.type === 'kalender' && evt.start && evt.end && evt.start !== evt.end ? 
-                                        `<div class="text-[10px] text-emerald-600 font-bold mt-1"><i class="fa fa-calendar-range mr-1"></i>${formatDateIndo(evt.start)} - ${formatDateIndo(evt.end)}</div>` : ''
+                                        `<div class="text-[10px] text-indigo-600 font-bold mt-1"><i class="fa fa-calendar-range mr-1"></i>${formatDateIndo(evt.start)} - ${formatDateIndo(evt.end)}</div>` : ''
                                     }
-                                    ${evt.time ? `<div class="text-sm text-slate-600 mt-1"><i class="fa fa-clock mr-1"></i>${evt.time}</div>` : ''}
-                                    ${evt.status === 'selesai' ? '<div class="text-xs text-green-600 mt-1"><i class="fa fa-check-circle mr-1"></i>Selesai</div>' : ''}
+                                    ${evt.time ? `<div class="text-xs text-slate-600 mt-1"><i class="fa fa-clock mr-1"></i>${evt.time}</div>` : ''}
+                                    ${evt.status === 'selesai' ? '<div class="text-xs text-indigo-600 mt-1"><i class="fa fa-check-circle mr-1"></i>Selesai</div>' : ''}
                                 </div>
                             </div>
                         </div>
