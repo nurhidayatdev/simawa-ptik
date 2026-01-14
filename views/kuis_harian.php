@@ -123,13 +123,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit_answer') {
 
         // Milestone Rewards (Recovery & Hint)
         $milestone_config = [
-            500 => ['recovery' => 50, 'hint' => 52],
-            200 => ['recovery' => 30, 'hint' => 36],
-            100 => ['recovery' => 20, 'hint' => 22],
-            50  => ['recovery' => 15, 'hint' => 16],
-            30  => ['recovery' => 10, 'hint' => 12],
-            10  => ['recovery' => 5, 'hint' => 6],
-            3   => ['recovery' => 1, 'hint' => 2]
+            200 => ['recovery' => 30, 'hint' => 40],
+            100 => ['recovery' => 20, 'hint' => 25],
+            50  => ['recovery' => 15, 'hint' => 20],
+            30  => ['recovery' => 10, 'hint' => 15],
+            10  => ['recovery' => 5, 'hint' => 10],
+            3   => ['recovery' => 1, 'hint' => 3]
         ];
 
         $bonus_stock = 0;
@@ -183,13 +182,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'use_recovery') {
 function getFireIcon($streak, $isActive = true)
 {
     $milestones = [
-        500 => ['color' => '#ff0000', 'glow' => '#ff6b6b', 'label' => 'LEGENDARY'],
-        200 => ['color' => '#ff00ff', 'glow' => '#ff66ff', 'label' => 'EPIC'],
-        100 => ['color' => '#00ffff', 'glow' => '#66ffff', 'label' => 'DIAMOND'],
-        50 => ['color' => '#ffd700', 'glow' => '#ffeb3b', 'label' => 'GOLD'],
-        30 => ['color' => '#ff6600', 'glow' => '#ff9933', 'label' => 'PLATINUM'],
-        10 => ['color' => '#e5e7eb', 'glow' => '#f3f4f6', 'label' => 'SILVER'],
-        3 => ['color' => '#ff9500', 'glow' => '#ffb347', 'label' => 'FIRE']
+        200 => ['color' => '#A020F0', 'glow' => '#C460FF', 'label' => 'NOVA'],
+        100 => ['color' => '#0055FF', 'glow' => '#4D8AFF', 'label' => 'PLASMA'],
+        50 => ['color' => '#00A2FF', 'glow' => '#4DC4FF', 'label' => 'INFERNO'],
+        30 => ['color' => '#FF3300', 'glow' => '#FF6640', 'label' => 'BLAZE'],
+        10 => ['color' => '#FF8800', 'glow' => '#FFAD40', 'label' => 'EMBER'],
+        3 => ['color' => '#FFC300', 'glow' => '#FFE066', 'label' => 'SPARK']
     ];
     foreach ($milestones as $threshold => $data) {
         if ($streak >= $threshold) return ['show' => true, 'color' => $isActive ? $data['color'] : '#6b7280', 'glow' => $isActive ? $data['glow'] : '#9ca3af', 'label' => $data['label'], 'active' => $isActive];
@@ -294,7 +292,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 <div class="mt-2 inline-flex items-center gap-2 bg-slate-800/80 px-4 py-1.5 rounded-full border border-slate-700 shadow-lg">
                     <span class="text-xs font-bold text-slate-200">Streak: <span class="text-indigo-400"><?= $display_streak ?></span></span>
                     <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-indigo-500/30">
-                        <i class="fa fa-shield-halved"></i> <?= $stats['recovery_stock'] ?>
+                        <i class="fa fa-shield"></i> <?= $stats['recovery_stock'] ?>
                     </span>
                     <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-500/30" title="Hint Stock">
                         <i class="fa fa-lightbulb"></i> <span id="hint-stock-display"><?= $stats['hint_stock'] ?></span>
@@ -305,7 +303,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             <?php if ($can_recover): ?>
                 <div class="w-full max-w-sm bg-orange-900/30 border border-orange-500/30 rounded-xl p-3 mb-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-1">
-                        <i class="fa fa-shield-halved text-orange-500 text-sm"></i>
+                        <i class="fa fa-shield text-orange-500 text-sm"></i>
                         <span class="font-bold text-orange-400 text-sm">Streak Terputus!</span>
                     </div>
                     <button onclick="useRecovery()" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs transition">
@@ -369,14 +367,14 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 <div class="text-[10px] text-slate-500 text-center mb-2 font-bold uppercase tracking-wider">Milestone</div>
                 <div class="flex flex-wrap justify-center gap-1.5">
                     <?php
-                    $milestones = [3, 10, 30, 50, 100, 200, 500];
-                    $colors = ['#ff9500', '#e5e7eb', '#ff6600', '#ffd700', '#00ffff', '#ff00ff', '#ff0000'];
+                    $milestones = [3, 10, 30, 50, 100, 200];
+                    $colors = ['#FFC300', '#FF8800', '#FF3300', '#00A2FF', '#0055FF', '#A020F0'];
                     foreach ($milestones as $i => $m):
                         $achieved = $display_streak >= $m;
                     ?>
                         <div class="flex items-center gap-0.5 px-1.5 py-0.5 rounded <?= $achieved ? 'bg-slate-700' : 'bg-slate-800/50' ?> border <?= $achieved ? 'border-slate-600' : 'border-slate-700/50' ?>">
-                            <i class="fa fa-fire text-[10px]" style="color: <?= $achieved ? $colors[$i] : '#4b5563' ?>;"></i>
-                            <span class="text-[9px] font-bold <?= $achieved ? 'text-white' : 'text-slate-600' ?>"><?= $m ?></span>
+                            <i class="fa fa-fire text-xs" style="color: <?= $achieved ? $colors[$i] : '#4b5563' ?>;"></i>
+                            <span class="text-[10px] font-bold <?= $achieved ? 'text-white' : 'text-slate-600' ?>"><?= $m ?></span>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -441,33 +439,29 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
         let hintStock = <?= (int)$stats['hint_stock'] ?>;
         let hintsUsed = 0;
         const MILESTONES = {
-            500: {
-                label: 'LEGENDARY',
-                color: '#ff0000'
-            },
             200: {
-                label: 'EPIC',
-                color: '#ff00ff'
+                label: 'NOVA',
+                color: '#A020F0'
             },
             100: {
-                label: 'DIAMOND',
-                color: '#00ffff'
+                label: 'PLASMA',
+                color: '#0055FF'
             },
             50: {
-                label: 'GOLD',
-                color: '#ffd700'
+                label: 'INFERNO',
+                color: '#00A2FF'
             },
             30: {
-                label: 'PLATINUM',
-                color: '#ff6600'
+                label: 'BLAZE',
+                color: '#FF3300'
             },
             10: {
-                label: 'SILVER',
-                color: '#e5e7eb'
+                label: 'EMBER',
+                color: '#FF8800'
             },
             3: {
-                label: 'FIRE',
-                color: '#ff9500'
+                label: 'SPARK',
+                color: '#FFC300'
             }
         };
 
@@ -481,7 +475,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
         }
 
         function isNewMilestone(s) {
-            return [3, 10, 30, 50, 100, 200, 500].includes(s);
+            return [3, 10, 30, 50, 100, 200].includes(s);
         }
 
 
@@ -506,7 +500,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         x: Math.random() * 0.2 + 0.1,
                         y: Math.random() - 0.2
                     },
-                    colors: ['#ff9500', '#ffd700', '#ff6600', '#ff00ff', '#00ffff']
+                    colors: ['#FFC300', '#FF8800', '#FF3300', '#00A2FF', '#0055FF', '#A020F0']
                 });
                 confetti({
                     ...f,
@@ -515,7 +509,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         x: Math.random() * 0.2 + 0.7,
                         y: Math.random() - 0.2
                     },
-                    colors: ['#ff9500', '#ffd700', '#ff6600', '#ff00ff', '#00ffff']
+                    colors: ['#FFC300', '#FF8800', '#FF3300', '#00A2FF', '#0055FF', '#A020F0']
                 });
             }, 250);
         }
@@ -525,7 +519,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             const isM = isNewMilestone(streak);
             if (isM) triggerConfetti();
             Swal.fire({
-                html: `<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../assets/image/logo.webp'"></div><div class="text-sm font-bold text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-white mb-1">Streak ${streak}!</div><div class="flex flex-col gap-1 items-center mt-2">${bonus > 0 ? `<div class="text-indigo-400 text-[10px] font-bold"><i class="fa fa-shield-halved mr-1"></i> +${bonus} Recovery Stock</div>` : ''}${bonusHint > 0 ? `<div class="text-amber-400 text-[10px] font-bold"><i class="fa fa-lightbulb mr-1"></i> +${bonusHint} Hint Stock</div>` : ''}</div><div class="text-slate-400 text-xs mt-2">Luar biasa!</div></div>`,
+                html: `<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../assets/image/logo.webp'"></div><div class="text-sm font-bold text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-white mb-1">Streak ${streak}!</div><div class="flex flex-col gap-1 items-center mt-2">${bonus > 0 ? `<div class="text-indigo-400 text-[10px] font-bold"><i class="fa fa-shield mr-1"></i> +${bonus} Recovery Stock</div>` : ''}${bonusHint > 0 ? `<div class="text-amber-400 text-[10px] font-bold"><i class="fa fa-lightbulb mr-1"></i> +${bonusHint} Hint Stock</div>` : ''}</div><div class="text-slate-400 text-xs mt-2">Luar biasa!</div></div>`,
                 showConfirmButton: true,
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#6366f1',
@@ -683,7 +677,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         </div>
                         
                         <div class="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20">
-                            <h4 class="text-orange-400 font-bold text-sm mb-1"><i class="fa fa-shield-halved mr-2"></i>Sistem Recovery & Hint</h4>
+                            <h4 class="text-orange-400 font-bold text-sm mb-1"><i class="fa fa-shield mr-2"></i>Sistem Recovery & Hint</h4>
                             <p class="text-[11px] leading-relaxed">Gunakan <b>Recovery Stock</b> untuk memulihkan streak. Gunakan <b>Hint Stock</b> (tombol lampu) untuk membuka satu huruf jawaban sebagai bantuan.</p>
                         </div>
 
@@ -691,59 +685,51 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                             <h4 class="text-white font-bold text-sm mb-2"><i class="fa fa-fire mr-2"></i>Milestone & Rewards</h4>
                             <div class="grid grid-cols-2 gap-2">
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
-                                    <div class="text-[#ff9500] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
+                                    <div class="text-[#FFC300] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#ff9500] font-bold uppercase text-[10px]">FIRE (3)</div>
+                                        <div class="text-[#FFC300] font-bold uppercase text-[10px]">SPARK (3)</div>
                                         <div class="text-indigo-400 text-[9px]">+1 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+2 Hint Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+3 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
-                                    <div class="text-[#e5e7eb] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
+                                    <div class="text-[#FF8800] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#e5e7eb] font-bold uppercase text-[10px]">SILVER (10)</div>
+                                        <div class="text-[#FF8800] font-bold uppercase text-[10px]">EMBER (10)</div>
                                         <div class="text-indigo-400 text-[9px]">+5 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+6 Hint Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+10 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
-                                    <div class="text-[#ff6600] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
+                                    <div class="text-[#FF3300] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#ff6600] font-bold uppercase text-[10px]">PLATINUM (30)</div>
+                                        <div class="text-[#FF3300] font-bold uppercase text-[10px]">BLAZE (30)</div>
                                         <div class="text-indigo-400 text-[9px]">+10 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+12 Hint Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+15 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
-                                    <div class="text-[#ffd700] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
+                                    <div class="text-[#00A2FF] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#ffd700] font-bold uppercase text-[10px]">GOLD (50)</div>
+                                        <div class="text-[#00A2FF] font-bold uppercase text-[10px]">INFERNO (50)</div>
                                         <div class="text-indigo-400 text-[9px]">+15 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+16 Hint Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+20 Hint Stock</div>
                                     </div>
                                 </div>
                                 <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
-                                    <div class="text-[#00ffff] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
+                                    <div class="text-[#0055FF] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#00ffff] font-bold uppercase text-[10px]">DIAMOND (100)</div>
+                                        <div class="text-[#0055FF] font-bold uppercase text-[10px]">PLASMA (100)</div>
                                         <div class="text-indigo-400 text-[9px]">+20 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+22 Hint Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+25 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
-                                    <div class="text-[#ff00ff] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
+                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-4">
+                                    <div class="text-[#A020F0] text-3xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#ff00ff] font-bold uppercase text-[10px]">EPIC (200)</div>
-                                        <div class="text-indigo-400 text-[9px]">+30 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+36 Hint Stock</div>
-                                    </div>
-                                </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-4 col-span-2">
-                                    <div class="text-[#ff0000] text-3xl shrink-0"><i class="fa fa-fire"></i></div>
-                                    <div class="flex-grow">
-                                        <div class="text-[#ff0000] font-bold uppercase text-[11px]">LEGENDARY (500)</div>
-                                        <div class="text-indigo-400 text-[10px]">+50 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[10px]">+52 Hint Stock</div>
+                                        <div class="text-[#A020F0] font-bold uppercase text-[11px]">NOVA (200)</div>
+                                        <div class="text-indigo-400 text-[10px]">+30 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[10px]">+40 Hint Stock</div>
                                     </div>
                                 </div>
                             </div>

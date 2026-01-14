@@ -274,13 +274,12 @@ while ($current <= $last) {
 
 function getFireColor($streak)
 {
-    if ($streak >= 500) return '#ff0000';
-    if ($streak >= 200) return '#ff00ff';
-    if ($streak >= 100) return '#00ffff';
-    if ($streak >= 50) return '#ffd700';
-    if ($streak >= 30) return '#ff6600';
-    if ($streak >= 10) return '#e5e7eb';
-    if ($streak >= 3) return '#ff9500';
+    if ($streak >= 200) return '#A020F0';
+    if ($streak >= 100) return '#0055FF';
+    if ($streak >= 50) return '#00A2FF';
+    if ($streak >= 30) return '#FF3300';
+    if ($streak >= 10) return '#FF8800';
+    if ($streak >= 3) return '#FFC300';
     return null;
 }
 

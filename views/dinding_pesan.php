@@ -208,21 +208,21 @@ if (file_exists($logo_path)) {
 
                 <!-- Preview Area for Image Generation -->
                 <div id="captureArea"
-                    style="background-color: #1f2937; color: #ffffff; border: 1px solid #374151; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; font-family: 'Poppins', Arial, sans-serif; opacity: 1 !important; visibility: visible !important;">
+                    style="max-width: 320px; margin-left: auto; margin-right: auto; background-color: #1f2937; color: #ffffff; border: 1px solid #374151; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; font-family: 'Poppins', Arial, sans-serif; opacity: 1 !important; visibility: visible !important;">
 
                     <div style="position: relative; z-index: 10;">
                         <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
-                            <div style="width: 3rem; height: 3rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; padding: 0.5rem; background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
+                            <div style="width: 2.8rem; height: 2.8rem; border-radius: 9999px; display: flex; align-items: center; justify-content: center; padding: 0.5rem; background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);">
                                 <img src="<?php echo $logo_base64; ?>" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
                             <div style="margin-left: 0.75rem;">
-                                <h4 style="font-size: 0.875rem; font-weight: 700; color: #ffffff; margin: 0;">PTIK C 2024</h4>
-                                <p style="font-size: 0.625rem; color: #9ca3af; margin: 0;">Pesan Anonim</p>
+                                <h4 style="font-size: 1rem; font-weight: 700; color: #ffffff; margin: 0;">PTIK C 2024</h4>
+                                <p style="font-size: 0.8rem; color: #9ca3af; margin: 0;">Pesan Anonim</p>
                             </div>
                         </div>
 
                         <div style="margin-bottom: 1rem;">
-                            <p id="modalPesan" style="font-size: 0.875rem; line-height: 1.5; font-style: italic; font-weight: 300; color: #e5e7eb; margin: 0;"></p>
+                            <p id="modalPesan" style="font-size: 1rem; line-height: 1.5; font-style: italic; font-weight: 300; color: #e5e7eb; margin: 0;"></p>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.625rem; padding-top: 0.75rem; border-top: 1px solid #374151; color: #6b7280;">

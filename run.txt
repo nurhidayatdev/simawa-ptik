@@ -1,6 +1,7 @@
 npx @tailwindcss/cli -i assets/tailwind/src/input.css -o assets/tailwind/src/output.css --watch
 
-
+RewriteBase /
+DirectoryIndex index.php
 
 <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
 <?php if ($role === 'Administrator Utama'): ?>

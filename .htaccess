@@ -1,6 +1,5 @@
 RewriteEngine On
-RewriteBase /
-DirectoryIndex index.php
+
 
 # Redirect /file.php to /file (handles query strings automatically)
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^/]+)/(.*)\.php [NC]
