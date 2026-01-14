@@ -2742,6 +2742,9 @@
   .text-\[\#ffd700\] {
     color: #ffd700;
   }
+  .text-\[px\] {
+    color: px;
+  }
   .text-amber-300 {
     color: var(--color-amber-300);
   }

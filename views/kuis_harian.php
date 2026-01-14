@@ -724,12 +724,12 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                                         <div class="text-amber-400 text-[9px]">+25 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-4">
-                                    <div class="text-[#A020F0] text-3xl shrink-0"><i class="fa fa-fire"></i></div>
+                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                    <div class="text-[#A020F0] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
-                                        <div class="text-[#A020F0] font-bold uppercase text-[11px]">NOVA (200)</div>
-                                        <div class="text-indigo-400 text-[10px]">+30 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[10px]">+40 Hint Stock</div>
+                                        <div class="text-[#A020F0] font-bold uppercase text-[10px]">NOVA (200)</div>
+                                        <div class="text-indigo-400 text-[9px]">+30 Recovery Stock</div>
+                                        <div class="text-amber-400 text-[9px]">+40 Hint Stock</div>
                                     </div>
                                 </div>
                             </div>
