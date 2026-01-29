@@ -132,7 +132,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                             <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                 <a href="<?= $base ?>views/kas" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Kas</a>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
-                                    <a href="<?= $base ?>views/arus_kas" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Arus Kas</a>
+                                    <a href="<?= $base ?>views/manajemen_kas" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Manajemen Kas</a>
                                     <a href="<?= $base ?>actions/tambah_kas_minggu" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Minggu</a>
                                     <a href="<?= $base ?>actions/tambah_kas_individu" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Per Individu</a>
                                 <?php endif; ?>

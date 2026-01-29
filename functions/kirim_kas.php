@@ -44,6 +44,7 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_kas.php') {
     $res = kirimKasReminder($koneksi, $minggu_ke);
     $_SESSION[$res['status']] = $res['message'];
 
-    header("Location: ../views/kas?minggu_ke=$minggu_ke");
+    $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : 'kas';
+    header("Location: ../views/$redirect?minggu_ke=$minggu_ke");
     exit;
 }
