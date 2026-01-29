@@ -113,7 +113,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && isset($_GET['minggu
 
                                 <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
                                     <button type="button" onclick="confirmReminderKas('<?= $_GET['minggu_ke'] ?>')" class="whitespace-nowrap bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 text-center text-xs flex items-center justify-center w-full">
-                                        <i class="fa fa-paper-plane mr-2"></i> Kirim Reminder
+                                        <i class="fa fa-paper-plane mr-2"></i>
                                     </button>
                                 <?php endif; ?>
 

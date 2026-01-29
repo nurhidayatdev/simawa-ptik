@@ -81,7 +81,7 @@ if (isset($_GET['fetch_adjust_data'])) {
     exit;
 }
 
-if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Sekretaris') {
+if ($_SESSION['role'] === 'Mahasiswa') {
     include '../includes/alert_role.php';
     exit();
 }

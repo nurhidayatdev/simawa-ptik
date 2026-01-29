@@ -3,6 +3,17 @@ session_start();
 include 'koneksi.php';
 
 if (isset($_POST['kirim_pesan'])) {
+    // Batasi 5 menit sekali (300 detik)
+    if (isset($_SESSION['last_send'])) {
+        $selisih = time() - $_SESSION['last_send'];
+        if ($selisih < 300) {
+            $_SESSION['pesan_status'] = 'wait';
+            $_SESSION['wait_time'] = ceil((300 - $selisih) / 60);
+            header("Location: pesan");
+            exit;
+        }
+    }
+
     $pesan_raw = $_POST['pesan_anonim'];
     $pesan_db = mysqli_real_escape_string($koneksi, $pesan_raw);
 
@@ -13,6 +24,7 @@ if (isset($_POST['kirim_pesan'])) {
             include 'functions/kirim_pesan.php';
             sendWhatsAppPesan($pesan_raw);
             $_SESSION['pesan_status'] = 'success';
+            $_SESSION['last_send'] = time(); // Simpan waktu terakhir kirim
         } else {
             $_SESSION['pesan_status'] = 'error';
         }
@@ -21,12 +33,6 @@ if (isset($_POST['kirim_pesan'])) {
     exit;
 }
 
-// Logika link kembali
-$referer = $_SERVER['HTTP_REFERER'] ?? '';
-$back_link = 'index';
-if (strpos($referer, 'views/dinding_pesan') !== false) {
-    $back_link = 'views/dinding_pesan';
-}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -41,7 +47,7 @@ if (strpos($referer, 'views/dinding_pesan') !== false) {
 
     <div class="w-full max-w-md">
         <div class="mb-4">
-            <a href="<?php echo $back_link; ?>" class="inline-flex items-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors group">
+            <a href="views/dinding_pesan.php" class="inline-flex items-center text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors group">
                 <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i>
                 Kembali
             </a>
@@ -120,6 +126,18 @@ if (strpos($referer, 'views/dinding_pesan') !== false) {
                             <div>
                                 <h4 class='text-sm font-semibold text-red-400'>Gagal Mengirim</h4>
                                 <p class='text-xs text-red-200 mt-1'>Terjadi kesalahan saat menyimpan pesan. Silakan coba lagi.</p>
+                            </div>
+                        </div>";
+                    } elseif ($_SESSION['pesan_status'] == 'wait') {
+                        $remaining = $_SESSION['wait_time'] ?? 5;
+                        echo "
+                        <div class='mt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-lg flex items-start space-x-3 animate-fade-in-up transition-all'>
+                            <div class='flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center mt-0.5'>
+                                <i class='fas fa-clock text-xs text-orange-400'></i>
+                            </div>
+                            <div>
+                                <h4 class='text-sm font-semibold text-orange-400'>Harap Tunggu</h4>
+                                <p class='text-xs text-orange-200 mt-1'>Anda hanya dapat mengirim pesan setiap 5 menit sekali. Silakan coba lagi dalam sekitar $remaining menit.</p>
                             </div>
                         </div>";
                     }

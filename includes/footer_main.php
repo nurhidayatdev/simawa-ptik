@@ -62,8 +62,13 @@ if (!isset($base)) {
                 </form>
 
                 <?php
-                if (isset($_GET['status']) && $_GET['status'] == 'success') {
-                    echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                if (isset($_GET['status'])) {
+                    if ($_GET['status'] == 'success') {
+                        echo "<p class='text-[10px] text-green-400 mt-2'><i class='fas fa-check-circle mr-1'></i> Pesan berhasil dikirim secara anonim!</p>";
+                    } elseif ($_GET['status'] == 'wait') {
+                        $wait = $_GET['wait'] ?? 5;
+                        echo "<p class='text-[10px] text-orange-400 mt-2'><i class='fas fa-clock mr-1'></i> Harap tunggu sekitar $wait menit lagi untuk mengirim pesan.</p>";
+                    }
                 }
                 ?>
             </div>
