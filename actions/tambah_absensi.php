@@ -13,8 +13,8 @@ $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
 if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Ketua Tingkat') {
-    include '../includes/alert_role.php'; 
-    
+    include '../includes/alert_role.php';
+
     exit();
 }
 
@@ -85,12 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 
 <head>
-  
+
     <title>Absensi - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-      
-
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -102,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     </style>
- 
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -120,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-                        <a href="../views/absensi.php?matkul_id=<?= $_GET['matkul_id'] ?? ''; ?>&pertemuan=<?= $_GET['pertemuan'] ?? ''; ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                        <a href="../views/manajemen_absen.php?matkul_id=<?= $_GET['matkul_id'] ?? ''; ?>&pertemuan=<?= $_GET['pertemuan'] ?? ''; ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
                             <button type="button">
                                 Kembali
                             </button>
@@ -268,8 +266,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
-      
-
         // SweetAlert for Saving Absensi
         function confirmSaveAbsensi() {
             Swal.fire({

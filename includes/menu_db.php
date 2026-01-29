@@ -118,6 +118,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                             <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                 <a href="<?= $base ?>views/absensi" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Absen</a>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                                    <a href="<?= $base ?>views/manajemen_absen" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Manajemen Absen</a>
                                     <a href="<?= $base ?>actions/tambah_absensi" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Input Absen</a>
                                 <?php endif; ?>
                             </div>
