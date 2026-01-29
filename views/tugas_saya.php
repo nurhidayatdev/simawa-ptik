@@ -1,0 +1,266 @@
+<?php
+session_start();
+include '../koneksi.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../index");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'];
+$nama_lengkap = $_SESSION['nama_lengkap'];
+$foto = $_SESSION['foto'];
+
+// Filter logic
+$show_done = isset($_GET['show_done']) && $_GET['show_done'] == '1';
+
+// Periode Aktif
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'] ?? 0;
+
+// Handle Actions
+if (isset($_POST['action'])) {
+    if ($_POST['action'] == 'add_personal') {
+        $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+        $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+        $deadline = mysqli_real_escape_string($koneksi, $_POST['deadline']);
+        mysqli_query($koneksi, "INSERT INTO tugas_personal (user_id, judul, deskripsi, deadline) VALUES ('$user_id', '$judul', '$deskripsi', '$deadline')");
+        $_SESSION['success'] = "Tugas personal berhasil ditambahkan.";
+    } elseif ($_POST['action'] == 'toggle_personal') {
+        $id = intval($_POST['id']);
+        $status = $_POST['status'] == 'selesai' ? 'belum' : 'selesai';
+        mysqli_query($koneksi, "UPDATE tugas_personal SET status = '$status' WHERE id = '$id' AND user_id = '$user_id'");
+    } elseif ($_POST['action'] == 'delete_personal') {
+        $id = intval($_POST['id']);
+        mysqli_query($koneksi, "DELETE FROM tugas_personal WHERE id = '$id' AND user_id = '$user_id'");
+        $_SESSION['success'] = "Tugas personal berhasil dihapus.";
+    } elseif ($_POST['action'] == 'toggle_global') {
+        $tugas_id = intval($_POST['tugas_id']);
+        $check = mysqli_query($koneksi, "SELECT id FROM tugas_global_done WHERE user_id = '$user_id' AND tugas_id = '$tugas_id'");
+        if (mysqli_num_rows($check) > 0) {
+            mysqli_query($koneksi, "DELETE FROM tugas_global_done WHERE user_id = '$user_id' AND tugas_id = '$tugas_id'");
+        } else {
+            mysqli_query($koneksi, "INSERT INTO tugas_global_done (user_id, tugas_id) VALUES ('$user_id', '$tugas_id')");
+        }
+    }
+    $redir = $show_done ? "?show_done=1" : "";
+    header("Location: tugas_saya" . $redir);
+    exit;
+}
+
+// Get Personal Tasks
+$personal_cond = $show_done ? "" : " AND status = 'belum'";
+$personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE user_id = '$user_id' $personal_cond ORDER BY deadline ASC");
+
+// Get Global Tasks
+$global_cond = $show_done ? "" : " AND gd.id IS NULL";
+$global_tasks = mysqli_query($koneksi, "
+    SELECT t.*, mk.nama_matkul, gd.id as is_done
+    FROM tugas t
+    LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
+    LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id'
+    WHERE t.periode_id = '$periode_id' AND t.status = 'belum' $global_cond
+    ORDER BY t.deadline_tanggal ASC
+");
+
+?>
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <title>Tugas Saya - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-slate-50">
+    <?php include '../includes/menu_db.php'; ?>
+
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+        <div class="max-w-5xl mx-auto w-full">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800">Tugas Saya</h2>
+                    <p class="text-sm text-slate-500">Kelola tugas kuliah dan tugas pribadi Anda di sini.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <?php if ($show_done): ?>
+                        <a href="tugas_saya" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2 border border-indigo-100">
+                            <i class="fas fa-eye-slash"></i> Sembunyikan Selesai
+                        </a>
+                    <?php else: ?>
+                        <a href="tugas_saya?show_done=1" class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+                            <i class="fas fa-history"></i> Tampilkan Semua Tugas
+                        </a>
+                    <?php endif; ?>
+                    <button onclick="showAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Tambah Tugas Pribadi
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Global Tasks (From Admin) -->
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-university text-indigo-600"></i> Tugas Kelas
+                    </h3>
+                    <div class="space-y-4">
+                        <?php if (mysqli_num_rows($global_tasks) > 0): ?>
+                            <?php while ($row = mysqli_fetch_assoc($global_tasks)): ?>
+                                <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group <?= $row['is_done'] ? 'opacity-60 grayscale-[0.5]' : '' ?>">
+                                    <div class="flex items-start gap-4">
+                                        <form method="POST" class="mt-1">
+                                            <input type="hidden" name="action" value="toggle_global">
+                                            <input type="hidden" name="tugas_id" value="<?= $row['id'] ?>">
+                                            <button type="submit" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all <?= $row['is_done'] ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-200 text-transparent hover:border-indigo-400' ?>">
+                                                <i class="fas fa-check text-xs"></i>
+                                            </button>
+                                        </form>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-start mb-1">
+                                                <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest"><?= htmlspecialchars($row['nama_matkul']) ?></span>
+                                                <div class="flex flex-col items-end">
+                                                    <span class="text-[10px] font-bold text-slate-500"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
+                                                    <span class="text-[9px] font-medium text-rose-400 uppercase tracking-tighter"><?= date('H:i', strtotime($row['deadline_pukul'])) ?> WITA</span>
+                                                </div>
+                                            </div>
+                                            <h4 class="text-sm font-bold text-slate-800 leading-tight <?= $row['is_done'] ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['nama_matkul']) ?></h4>
+                                            <div class="text-[11px] text-slate-500 mt-2 leading-relaxed"><?= nl2br(strip_tags($row['deskripsi'])) ?></div>
+
+                                            <div class="flex flex-wrap gap-2 mt-4">
+                                                <?php if (!empty($row['file_tugas'])): ?>
+                                                    <a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold border border-blue-100 hover:bg-blue-100 transition-colors">
+                                                        <i class="fas fa-file-download"></i> Unduh File
+                                                    </a>
+                                                <?php endif; ?>
+
+                                                <?php if (!empty($row['link_kirim'])): ?>
+                                                    <a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                                                        <i class="fas fa-paper-plane"></i> Kirim Tugas
+                                                    </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <div class="bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center">
+                                <i class="fas fa-check-circle text-slate-300 text-3xl mb-2"></i>
+                                <p class="text-xs text-slate-400 font-medium"><?= $show_done ? 'Belum ada tugas kelas.' : 'Semua tugas kelas telah selesai! ✨' ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Personal Tasks -->
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-user text-indigo-600"></i> Tugas Pribadi
+                    </h3>
+                    <div class="space-y-4">
+                        <?php if (mysqli_num_rows($personal_tasks) > 0): ?>
+                            <?php while ($row = mysqli_fetch_assoc($personal_tasks)): ?>
+                                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group <?= $row['status'] == 'selesai' ? 'opacity-60 grayscale-[0.5]' : '' ?>">
+                                    <div class="flex items-start gap-3">
+                                        <form method="POST" class="mt-1">
+                                            <input type="hidden" name="action" value="toggle_personal">
+                                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                            <input type="hidden" name="status" value="<?= $row['status'] ?>">
+                                            <button type="submit" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all <?= $row['status'] == 'selesai' ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 text-transparent hover:border-indigo-400' ?>">
+                                                <i class="fas fa-check text-[10px]"></i>
+                                            </button>
+                                        </form>
+                                        <div class="flex-1">
+                                            <div class="flex justify-between items-start">
+                                                <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest">Pribadi</span>
+                                                <div class="flex items-center gap-2 text-slate-400">
+                                                    <span class="text-[10px] font-bold"><?= $row['deadline'] ? date('d M', strtotime($row['deadline'])) : '' ?></span>
+                                                    <form method="POST" onsubmit="return confirm('Hapus tugas ini?')">
+                                                        <input type="hidden" name="action" value="delete_personal">
+                                                        <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                                        <button type="submit" class="hover:text-red-500 transition-colors">
+                                                            <i class="fas fa-trash-alt text-[10px]"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <h4 class="text-sm font-bold text-slate-800 mt-1 <?= $row['status'] == 'selesai' ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['judul']) ?></h4>
+                                            <?php if ($row['deskripsi']): ?>
+                                                <p class="text-[10px] text-slate-500 mt-1 line-clamp-2"><?= htmlspecialchars($row['deskripsi']) ?></p>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <div class="bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center">
+                                <i class="fas fa-plus-circle text-slate-300 text-3xl mb-2 cursor-pointer" onclick="showAddModal()"></i>
+                                <p class="text-xs text-slate-400 font-medium"><?= $show_done ? 'Belum ada tugas pribadi.' : 'Tugas pribadi sudah beres semua! 🚀' ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php include '../includes/footer_db.php'; ?>
+    </main>
+
+    <!-- Modal Tambah Tugas -->
+    <div id="addModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in-up">
+            <div class="bg-indigo-600 p-6 text-white text-center">
+                <h3 class="text-xl font-black">Tambah Tugas</h3>
+                <p class="text-xs text-indigo-100 mt-1 opacity-80">Rencanakan tugas harian Anda.</p>
+            </div>
+            <form method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="action" value="add_personal">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
+                    <input type="text" name="judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
+                    <input type="datetime-local" name="deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
+                    <textarea name="deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAddModal() {
+            document.getElementById('addModal').classList.remove('hidden');
+            document.getElementById('addModal').classList.add('flex');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('addModal').classList.remove('flex');
+        }
+
+        <?php if (isset($_SESSION['success'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '<?= $_SESSION['success'] ?>',
+                confirmButtonColor: '#4f46e5'
+            });
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+    </script>
+    <?php include '../includes/script_db.php'; ?>
+</body>
+
+</html>

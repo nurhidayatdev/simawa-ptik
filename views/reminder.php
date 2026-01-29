@@ -297,23 +297,17 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Kas -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" id="formKas" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="kas">
+                <input type="hidden" name="minggu_ke" id="kas_minggu_ke" value="1">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i class="fa fa-wallet text-xl"></i>
                     </div>
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800 text-md">Kas Mingguan</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pengingat kas belum lunas</p>
-                        <div class="flex gap-2 mb-3">
-                            <select name="minggu_ke" class="flex-grow text-xs border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-green-500">
-                                <?php for ($i = 1; $i <= 16; $i++): ?>
-                                    <option value="<?= $i ?>">Minggu <?= $i ?></option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat uang kas yang belum lunas</p>
+                        <button type="button" onclick="confirmKas()" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -329,7 +323,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     </div>
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800 text-md">Piket Proyektor</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat petugas piket besok</p>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat petugas piket proyektor besok</p>
                         <button type="submit" class="w-full bg-indigo-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
@@ -341,37 +335,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 
 
 
-            <!-- Kelompok Reminder -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
-                <input type="hidden" name="action" value="kelompok">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i class="fa fa-users text-xl"></i>
-                    </div>
-                    <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800">Daftar Kelompok</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-2">Kirim pembagian kelompok</p>
 
-                        <div class="mb-3">
-                            <select name="group_set" required class="w-full text-xs border border-slate-300 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-teal-500" onchange="updateGroupFields(this)">
-                                <option value="">-- Pilih Matkul & Dosen --</option>
-                                <?php foreach ($group_sets as $s): ?>
-                                    <option value="<?= $s['matkul_id'] ?>|<?= htmlspecialchars($s['dosen']) ?>|<?= htmlspecialchars($s['keterangan']) ?>">
-                                        <?= htmlspecialchars($s['nama_matkul']) ?> - <?= htmlspecialchars($s['dosen']) ?> (<?= htmlspecialchars($s['keterangan']) ?>)
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <input type="hidden" name="matkul_id" id="field_matkul_id">
-                            <input type="hidden" name="dosen" id="field_dosen">
-                            <input type="hidden" name="keterangan" id="field_keterangan">
-                        </div>
-
-                        <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-whatsapp mr-1"></i> Kirim
-                        </button>
-                    </div>
-                </div>
-            </form>
 
         </div>
         <?php include '../includes/footer_db.php'; ?>
@@ -385,6 +349,36 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         let currentJadwal = [];
         let optJam = [];
         let optRuang = [];
+
+        function confirmKas() {
+            Swal.fire({
+                title: 'Pilih Minggu Kas',
+                html: `
+                    <div class="text-left">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Minggu Ke-</label>
+                        <select id="select_minggu" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                            <?php for ($i = 1; $i <= 16; $i++): ?>
+                                <option value="<?= $i ?>">Minggu <?= $i ?></option>
+                            <?php endfor; ?>
+                        </select>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Kirim',
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    return document.getElementById('select_minggu').value;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('kas_minggu_ke').value = result.value;
+                    document.getElementById('formKas').submit();
+                }
+            });
+        }
 
         function confirmJadwal() {
             Swal.fire({
@@ -454,9 +448,10 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 
                 currentJadwal.forEach((item, index) => {
                     const checked = item.checked ? 'checked' : '';
+                    const statusBadge = item.status === 'tidak_masuk' ? '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full ml-1">Tidak Masuk</span>' : '';
                     html += `<tr>
                         <td class="p-2 text-center"><input type="checkbox" onchange="toggleCheck(${index})" ${checked}></td>
-                        <td class="p-2 font-medium">${item.matkul}</td>
+                        <td class="p-2 font-medium">${item.matkul}${statusBadge}</td>
                         <td class="p-2 text-slate-500">${item.jam_text}</td>
                         <td class="p-2 text-slate-500">${item.ruangan_text}</td>
                         <td class="p-2 text-center">
@@ -489,13 +484,16 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         function showEditForm(index) {
             const item = currentJadwal[index];
 
-            // Generate Jam Options
-            let jamHtml = `<select id="edit_jam" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">`;
-            optJam.forEach(opt => {
-                const selected = (opt.val === item.jam_text) ? 'selected' : '';
-                jamHtml += `<option value="${opt.val}" ${selected}>${opt.label}</option>`;
-            });
-            jamHtml += `</select>`;
+            // Parse existing time if available
+            let jamMulai = '07:30';
+            let jamSelesai = '09:10';
+            if (item.jam_text && item.jam_text.includes(' - ')) {
+                const parts = item.jam_text.split(' - ');
+                jamMulai = parts[0].replace('.', ':');
+                jamSelesai = parts[1].replace('.', ':');
+            }
+
+            const currentStatus = item.status || 'masuk';
 
             // Generate Ruangan Options
             let ruangHtml = `<select id="edit_ruang" class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">`;
@@ -512,8 +510,17 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <label class="block text-xs font-bold text-slate-700 mb-1">Mata Kuliah</label>
                         <input type="text" value="${item.matkul}" disabled class="w-full px-3 py-2 border bg-slate-100 rounded-md text-sm mb-3">
                         
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Jam</label>
-                        ${jamHtml}
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Status Kehadiran</label>
+                        <select id="edit_status" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                            <option value="masuk" ${currentStatus === 'masuk' ? 'selected' : ''}>Masuk</option>
+                            <option value="tidak_masuk" ${currentStatus === 'tidak_masuk' ? 'selected' : ''}>Tidak Masuk</option>
+                        </select>
+                        
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Jam Mulai</label>
+                        <input type="time" id="edit_jam_mulai" value="${jamMulai}" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Jam Selesai</label>
+                        <input type="time" id="edit_jam_selesai" value="${jamSelesai}" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                         
                         <label class="block text-xs font-bold text-slate-700 mb-1">Ruangan</label>
                         ${ruangHtml}
@@ -523,17 +530,25 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 confirmButtonText: 'Simpan',
                 cancelButtonText: 'Batal',
                 preConfirm: () => {
-                    const newJam = document.getElementById('edit_jam').value;
+                    const jamMulaiVal = document.getElementById('edit_jam_mulai').value;
+                    const jamSelesaiVal = document.getElementById('edit_jam_selesai').value;
                     const newRuang = document.getElementById('edit_ruang').value;
+                    const newStatus = document.getElementById('edit_status').value;
+
+                    // Format time as HH.MM - HH.MM
+                    const jamText = jamMulaiVal.replace(':', '.') + ' - ' + jamSelesaiVal.replace(':', '.');
+
                     return {
-                        jam: newJam,
-                        ruang: newRuang
+                        jam: jamText,
+                        ruang: newRuang,
+                        status: newStatus
                     };
                 }
             }).then((res) => {
                 if (res.isConfirmed) {
                     currentJadwal[index].jam_text = res.value.jam;
                     currentJadwal[index].ruangan_text = res.value.ruang;
+                    currentJadwal[index].status = res.value.status;
                     renderJadwalList();
                 } else {
                     renderJadwalList();
@@ -545,7 +560,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             const selectedItems = currentJadwal.filter(i => i.checked).map(i => ({
                 matkul: i.matkul,
                 jam: i.jam_text,
-                ruangan: i.ruangan_text
+                ruangan: i.ruangan_text,
+                status: i.status || 'masuk'
             }));
 
             if (selectedItems.length === 0) {
@@ -575,19 +591,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             form.submit();
         }
 
-        function updateGroupFields(select) {
-            const val = select.value;
-            if (val) {
-                const parts = val.split('|');
-                document.getElementById('field_matkul_id').value = parts[0];
-                document.getElementById('field_dosen').value = parts[1];
-                document.getElementById('field_keterangan').value = parts[2];
-            } else {
-                document.getElementById('field_matkul_id').value = '';
-                document.getElementById('field_dosen').value = '';
-                document.getElementById('field_keterangan').value = '';
-            }
-        }
+
 
         // Response Message with SweetAlert
         <?php if (isset($_SESSION['reminder_msg'])): ?>

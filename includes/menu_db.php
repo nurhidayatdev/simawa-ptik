@@ -83,16 +83,20 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <i class="fa fa-tasks w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Tugas Kuliah</span>
                             </a>
+                            <a href="<?= $base ?>views/tugas_saya" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <i class="fa fa-check-square w-5 h-5 mr-3 text-indigo-900"></i>
+                                <span class="text-xs font-medium">Tugas Saya</span>
+                            </a>
                             <a href="<?= $base ?>views/kelompok" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-users w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Kelompok</span>
                             </a>
-                           
-                                <a href="<?= $base ?>views/piket_proyektor" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                    <i class="fa fa-plug w-5 h-5 mr-3 text-indigo-900"></i>
-                                    <span class="text-xs font-medium">Piket Proyektor</span>
-                                </a>
-                           
+
+                            <a href="<?= $base ?>views/piket_proyektor" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <i class="fa fa-plug w-5 h-5 mr-3 text-indigo-900"></i>
+                                <span class="text-xs font-medium">Piket Proyektor</span>
+                            </a>
+
                             <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-calendar w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Kalender</span>

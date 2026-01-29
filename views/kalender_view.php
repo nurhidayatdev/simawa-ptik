@@ -91,11 +91,12 @@ while ($row = mysqli_fetch_assoc($q_kalender)) {
     ];
 }
 
-// 3. Fetch Tugas (deadline dates)
+// 3. Fetch Global Tugas (with completion status for this user)
 $q_tugas = mysqli_query($koneksi, "
-    SELECT t.deadline_tanggal, t.deadline_pukul, t.deskripsi, mk.nama_matkul, t.status
+    SELECT t.id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, mk.nama_matkul, gd.id as is_done
     FROM tugas t
     LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
+    LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id'
     WHERE t.periode_id = '$periode_id'
     AND t.deadline_tanggal >= '$month_start' 
     AND t.deadline_tanggal <= '$month_end'
@@ -106,11 +107,81 @@ while ($row = mysqli_fetch_assoc($q_tugas)) {
         'type' => 'tugas',
         'title' => ($row['nama_matkul'] ?? 'Tugas'),
         'time' => $row['deadline_pukul'] ? date('H:i', strtotime($row['deadline_pukul'])) : '',
+        'status' => $row['is_done'] ? 'selesai' : 'belum'
+    ];
+}
+
+// 4. Fetch Personal Tugas
+$q_personal = mysqli_query($koneksi, "
+    SELECT judul, deadline, status 
+    FROM tugas_personal 
+    WHERE user_id = '$user_id'
+    AND DATE(deadline) >= '$month_start' 
+    AND DATE(deadline) <= '$month_end'
+");
+while ($row = mysqli_fetch_assoc($q_personal)) {
+    $date_key = date('Y-m-d', strtotime($row['deadline']));
+    $events[$date_key][] = [
+        'type' => 'personal',
+        'title' => $row['judul'],
+        'time' => date('H:i', strtotime($row['deadline'])),
         'status' => $row['status']
     ];
 }
 
-// Navigation URLs
+// 5. Fetch Piket Proyektor (based on Minggu Ke)
+$lecture_start = "2026-01-19"; // Same as kirim_piket_reminder.php
+$q_piket = mysqli_query($koneksi, "
+    SELECT p.minggu_ke, jm.hari, mk.nama_matkul, m.nama_lengkap
+    FROM piket_proyektor p
+    JOIN mahasiswa m ON p.mahasiswa_id = m.id
+    JOIN jadwal_matkul jm ON p.jadwal_matkul_id = jm.id
+    JOIN mata_kuliah mk ON jm.matkul_id = mk.id
+    WHERE p.periode_id = '$periode_id' AND p.mahasiswa_id = '$user_id'
+");
+$piket_by_day = [];
+while ($row = mysqli_fetch_assoc($q_piket)) {
+    $piket_by_day[$row['minggu_ke']][$row['hari']][] = [
+        'matkul' => $row['nama_matkul'],
+        'nama' => $row['nama_lengkap']
+    ];
+}
+
+// Map Indonesian days to numeric for calculation
+$days_eng_to_ind = [
+    'Monday' => 'Senin',
+    'Tuesday' => 'Selasa',
+    'Wednesday' => 'Rabu',
+    'Thursday' => 'Kamis',
+    'Friday' => 'Jumat',
+    'Saturday' => 'Sabtu',
+    'Sunday' => 'Minggu'
+];
+
+// Combine all into $events
+for ($d = 1; $d <= $days_in_month; $d++) {
+    $date_key = sprintf('%04d-%02d-%02d', $year, $month, $d);
+    $ts = strtotime($date_key);
+    $day_name_ind = $days_eng_to_ind[date('l', $ts)];
+
+    // Calculate Minggu Ke
+    $diff = $ts - strtotime($lecture_start);
+    $days_diff = floor($diff / (60 * 60 * 24));
+    $current_minggu = floor($days_diff / 7) + 1;
+
+    if ($current_minggu >= 1 && $current_minggu <= 16) {
+        if (isset($piket_by_day[$current_minggu][$day_name_ind])) {
+            foreach ($piket_by_day[$current_minggu][$day_name_ind] as $p) {
+                $events[$date_key][] = [
+                    'type' => 'piket',
+                    'title' => 'Piket: ' . $p['matkul'],
+                    'petugas' => $p['nama'],
+                    'time' => ''
+                ];
+            }
+        }
+    }
+}
 $prev_month = $month - 1;
 $prev_year = $year;
 if ($prev_month < 1) {
@@ -131,12 +202,10 @@ $today = date('Y-m-d');
 <html lang="id">
 
 <head>
-    
+
     <title>Kalender Kelas - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-        
-
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -156,11 +225,19 @@ $today = date('Y-m-d');
         }
 
         .event-tugas {
-            background: #314158;
+            background: #6366f1;
         }
 
-        .event-tugas-done {
-            background: #314158;
+        .event-personal {
+            background: #f43f5e;
+        }
+
+        .event-piket {
+            background: #1e1b4b;
+        }
+
+        .event-done {
+            background: #94a3b8 !important;
         }
 
         /* Mobile-only: show dots in a row */
@@ -185,7 +262,7 @@ $today = date('Y-m-d');
             }
         }
     </style>
-   
+
 </head>
 
 <body class="bg-slate-100">
@@ -220,11 +297,26 @@ $today = date('Y-m-d');
                     <span class="event-dot event-kalender"></span>
                     <span class="text-slate-600">Kalender Akademik</span>
                 </div>
-               
+
 
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-tugas"></span>
-                    <span class="text-slate-600">Deadline Tugas</span>
+                    <span class="text-slate-600">Tugas Kuliah</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="event-dot event-personal"></span>
+                    <span class="text-slate-600">Tugas Pribadi</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="event-dot event-piket"></span>
+                    <span class="text-slate-600">Piket Proyektor</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="event-dot event-done"></span>
+                    <span class="text-slate-600">Sudah Selesai</span>
                 </div>
             </div>
 
@@ -265,7 +357,7 @@ $today = date('Y-m-d');
                             <!-- Events - Mobile: dots only, Desktop: dots + text -->
                             <div class="event-row flex sm:flex-col sm:space-y-1 overflow-hidden max-h-[40px] sm:max-h-[60px] md:max-h-[80px]">
                                 <?php
-                                $event_counts = ['kalender' => 0, 'tugas' => 0];
+                                $event_counts = ['kalender' => 0, 'tugas' => 0, 'personal' => 0, 'piket' => 0];
                                 $shown = 0;
                                 foreach ($day_events as $evt):
                                     $event_counts[$evt['type']]++;
@@ -273,8 +365,8 @@ $today = date('Y-m-d');
                                     $shown++;
 
                                     $dot_class = 'event-' . $evt['type'];
-                                    if ($evt['type'] === 'tugas' && isset($evt['status']) && $evt['status'] === 'selesai') {
-                                        $dot_class = 'event-tugas-done';
+                                    if (isset($evt['status']) && $evt['status'] === 'selesai') {
+                                        $dot_class = 'event-done';
                                     }
                                 ?>
                                     <div class="flex items-center gap-1 text-[10px] text-slate-600" title="<?= htmlspecialchars($evt['title']) ?>">
@@ -300,27 +392,136 @@ $today = date('Y-m-d');
                 </div>
             </div>
 
-            <!-- All Events This Month -->
-            <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <!-- Kalender Akademik -->
-                <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+            <!-- Rekap Agenda Sections -->
+            <div class="mt-6 space-y-4">
+                <!-- 1. Tugas Kuliah -->
+                <div class="p-4 bg-indigo-50/50 border border-indigo-100 rounded-xl">
+                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
+                        <span class="event-dot event-tugas" style="width:10px;height:10px;"></span>
+                        Tugas Kuliah
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-2">
+                        <?php
+                        $tugas_kuliah = [];
+                        foreach ($events as $date => $day_events) {
+                            foreach ($day_events as $evt) {
+                                if ($evt['type'] === 'tugas') {
+                                    $tugas_kuliah[] = ['date' => $date, ...$evt];
+                                }
+                            }
+                        }
+                        if (!empty($tugas_kuliah)):
+                            foreach ($tugas_kuliah as $t):
+                                $is_done = ($t['status'] === 'selesai');
+                        ?>
+                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-indigo-100 flex items-center gap-3 <?= $is_done ? 'opacity-60' : '' ?>">
+                                    <div class="font-bold text-indigo-700 w-12 text-center leading-tight">
+                                        <?= date('d', strtotime($t['date'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($t['date'])) ?></span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-slate-800 font-bold truncate mb-0.5 <?= $is_done ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($t['title']) ?></div>
+                                        <div class="text-[10px] text-slate-500 font-medium"><?= $t['time'] ?: 'No Time' ?></div>
+                                    </div>
+                                    <?php if ($is_done): ?>
+                                        <i class="fa fa-check-circle text-indigo-500"></i>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach;
+                        else: ?>
+                            <p class="text-xs text-slate-500 italic py-2">Tidak ada tugas kuliah.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 2. Tugas Pribadi -->
+                <div class="p-4 bg-rose-50/50 border border-rose-100 rounded-xl">
+                    <h3 class="font-bold text-rose-900 mb-3 flex items-center gap-2 text-sm">
+                        <span class="event-dot event-personal" style="width:10px;height:10px;"></span>
+                        Tugas Pribadi
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-2">
+                        <?php
+                        $tugas_pribadi = [];
+                        foreach ($events as $date => $day_events) {
+                            foreach ($day_events as $evt) {
+                                if ($evt['type'] === 'personal') {
+                                    $tugas_pribadi[] = ['date' => $date, ...$evt];
+                                }
+                            }
+                        }
+                        if (!empty($tugas_pribadi)):
+                            foreach ($tugas_pribadi as $t):
+                                $is_done = ($t['status'] === 'selesai');
+                        ?>
+                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-rose-100 flex items-center gap-3 <?= $is_done ? 'opacity-60' : '' ?>">
+                                    <div class="font-bold text-rose-600 w-12 text-center leading-tight">
+                                        <?= date('d', strtotime($t['date'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($t['date'])) ?></span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-slate-800 font-bold truncate mb-0.5 <?= $is_done ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($t['title']) ?></div>
+                                        <div class="text-[10px] text-slate-500 font-medium"><?= $t['time'] ?: 'No Time' ?></div>
+                                    </div>
+                                    <?php if ($is_done): ?>
+                                        <i class="fa fa-check-circle text-rose-500"></i>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach;
+                        else: ?>
+                            <p class="text-xs text-slate-500 italic py-2">Tidak ada tugas pribadi.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 3. Piket Proyektor -->
+                <div class="p-4 bg-slate-900/[0.03] border border-slate-200 rounded-xl">
+                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
+                        <span class="event-dot event-piket" style="width:10px;height:10px;"></span>
+                        Jadwal Piket Saya
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-2">
+                        <?php
+                        $piket_saya = [];
+                        foreach ($events as $date => $day_events) {
+                            foreach ($day_events as $evt) {
+                                if ($evt['type'] === 'piket') {
+                                    $piket_saya[] = ['date' => $date, ...$evt];
+                                }
+                            }
+                        }
+                        if (!empty($piket_saya)):
+                            foreach ($piket_saya as $p):
+                        ?>
+                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-slate-200">
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-bold text-slate-700 w-12 text-center leading-tight">
+                                            <?= date('d', strtotime($p['date'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($p['date'])) ?></span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-slate-800 font-bold truncate mb-0.5"><?= htmlspecialchars($p['title']) ?></div>
+                                            <div class="text-[10px] text-indigo-700 font-bold flex items-center gap-1 uppercase italic"><i class="fa fa-user text-[8px]"></i> Piket Kamu</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach;
+                        else: ?>
+                            <p class="text-xs text-slate-500 italic py-2">Tidak ada jadwal piket untukmu bulan ini.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- 4. Kalender Akademik -->
+                <div class="p-4 bg-indigo-900/10 border border-indigo-200 rounded-xl">
                     <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-kalender" style="width:10px;height:10px;"></span>
                         Kalender Akademik
                     </h3>
-                    <div class="space-y-2 max-h-[300px] overflow-y-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-2">
                         <?php
-                        // Collect kalender events
                         $kalender_list = [];
                         foreach ($events as $date => $day_events) {
                             foreach ($day_events as $evt) {
                                 if ($evt['type'] === 'kalender') {
-                                    $kalender_list[] = [
-                                        'date' => $date,
-                                        'title' => $evt['title'],
-                                        'start' => $evt['start'],
-                                        'end' => $evt['end']
-                                    ];
+                                    $kalender_list[] = ['date' => $date, ...$evt];
                                 }
                             }
                         }
@@ -328,75 +529,32 @@ $today = date('Y-m-d');
                             foreach ($kalender_list as $k):
                                 $is_range = ($k['start'] !== $k['end']);
                         ?>
-                                <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs">
-                                    <div class="font-bold text-indigo-700 min-w-[70px]">
+                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-indigo-100 flex items-center gap-3">
+                                    <div class="font-bold text-indigo-700 w-14 text-center leading-tight whitespace-nowrap">
                                         <?php if ($is_range): ?>
-                                            <?= date('d M', strtotime($k['start'])) ?> - <?= date('d M', strtotime($k['end'])) ?>
+                                            <div class="text-[10px]"><?= date('d M', strtotime($k['start'])) ?></div>
+                                            <div class="text-[8px] text-slate-400">s/d</div>
+                                            <div class="text-[10px]"><?= date('d M', strtotime($k['end'])) ?></div>
                                         <?php else: ?>
-                                            <?= date('d M', strtotime($k['start'])) ?>
+                                            <?= date('d', strtotime($k['start'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($k['start'])) ?></span>
                                         <?php endif; ?>
                                     </div>
-                                    <span class="flex-1 text-slate-700"><?= htmlspecialchars($k['title']) ?></span>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-slate-800 font-bold leading-tight"><?= htmlspecialchars($k['title']) ?></div>
+                                    </div>
                                 </div>
                             <?php endforeach;
                         else: ?>
-                            <p class="text-xs text-slate-500 italic">Tidak ada kegiatan akademik.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-
-            
-
-
-
-                <!-- Deadline Tugas -->
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
-                        <span class="event-dot event-tugas" style="width:10px;height:10px;"></span>
-                        Deadline Tugas
-                    </h3>
-                    <div class="space-y-2 max-h-[300px] overflow-y-auto">
-                        <?php
-                        // Collect tugas events
-                        $tugas_list = [];
-                        foreach ($events as $date => $day_events) {
-                            foreach ($day_events as $evt) {
-                                if ($evt['type'] === 'tugas') {
-                                    $tugas_list[] = [
-                                        'date' => $date,
-                                        'title' => $evt['title'],
-                                        'time' => $evt['time'],
-                                        'status' => $evt['status'] ?? 'belum'
-                                    ];
-                                }
-                            }
-                        }
-                        if (!empty($tugas_list)):
-                            foreach ($tugas_list as $t):
-                                $is_done = ($t['status'] === 'selesai');
-                        ?>
-                                <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs <?= $is_done ? 'opacity-60' : '' ?>">
-                                    <span class="font-bold text-slate-700 w-16"><?= date('d M', strtotime($t['date'])) ?></span>
-                                    <span class="flex-1 text-slate-700 <?= $is_done ? 'line-through' : '' ?>"><?= htmlspecialchars($t['title']) ?></span>
-                                    <?php if ($t['time']): ?>
-                                        <span class="text-slate-600 font-medium"><?= $t['time'] ?></span>
-                                    <?php endif; ?>
-                                    <?php if ($is_done): ?>
-                                        <i class="fa fa-check-circle text-slate-500"></i>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach;
-                        else: ?>
-                            <p class="text-xs text-slate-500 italic">Tidak ada tugas.</p>
+                            <p class="text-xs text-slate-500 italic py-2">Tidak ada kegiatan akademik.</p>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
+        </div>
 
         <?php include '../includes/footer_db.php'; ?>
-    
+
     </main>
 
     <!-- Date Popup Modal -->
@@ -447,15 +605,19 @@ $today = date('Y-m-d');
                     let dotClass = 'event-' + evt.type;
                     let typeLabel = {
                         'kalender': 'Kalender Akademik',
-                        'tugas': 'Deadline Tugas'
+                        'tugas': 'Tugas Kuliah',
+                        'personal': 'Tugas Pribadi',
+                        'piket': 'Piket Proyektor'
                     } [evt.type] || '';
                     let bgClass = {
                         'kalender': 'bg-indigo-50 border-indigo-200',
-                        'tugas': 'bg-slate-50 border-slate-200'
+                        'tugas': 'bg-slate-50 border-slate-200',
+                        'personal': 'bg-rose-50 border-rose-100',
+                        'piket': 'bg-indigo-900/5 border-indigo-900/20'
                     } [evt.type] || 'bg-slate-50';
 
-                    if (evt.type === 'tugas' && evt.status === 'selesai') {
-                        dotClass = 'event-tugas-done';
+                    if (evt.status === 'selesai') {
+                        dotClass = 'event-done';
                     }
 
                     html += `
@@ -463,8 +625,9 @@ $today = date('Y-m-d');
                             <div class="flex items-start gap-3">
                                 <span class="event-dot ${dotClass} mt-1" style="width:10px;height:10px;flex-shrink:0;"></span>
                                 <div class="flex-1">
-                                    <div class="text-xs text-slate-500 mb-1">${typeLabel}</div>
-                                    <div class="font-semibold text-slate-800">${evt.title}</div>
+                                    <div class="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-tighter">${typeLabel}</div>
+                                    <div class="font-semibold text-slate-800 text-xs">${evt.title}</div>
+                                    ${evt.petugas ? `<div class="text-[10px] text-indigo-700 font-bold mt-1 uppercase"><i class="fa fa-user mr-1"></i>Petugas: ${evt.petugas}</div>` : ''}
                                     ${evt.type === 'kalender' && evt.start && evt.end && evt.start !== evt.end ? 
                                         `<div class="text-[10px] text-indigo-600 font-bold mt-1"><i class="fa fa-calendar-range mr-1"></i>${formatDateIndo(evt.start)} - ${formatDateIndo(evt.end)}</div>` : ''
                                     }
@@ -498,8 +661,6 @@ $today = date('Y-m-d');
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeDatePopup();
         });
-
-        
     </script>
 </body>
 
