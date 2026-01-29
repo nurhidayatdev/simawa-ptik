@@ -376,9 +376,9 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 <!-- Feature 5 -->
                 <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fab fa-telegram"></i>
+                        <i class="fab fa-whatsapp"></i>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Bot Telegram</h3>
+                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Bot WhatsApp</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Terhubung langsung ke grup kelas untuk pengingat tugas harian setiap pagi, notifikasi berita/jadwal, dan penerusan pesan anonim secara instan.
                     </p>

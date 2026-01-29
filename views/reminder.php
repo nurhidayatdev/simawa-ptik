@@ -141,7 +141,10 @@ if (isset($_POST['action'])) {
 
     $_SESSION['reminder_msg'] = $response['message'];
     $_SESSION['reminder_type'] = $response['status'];
-    header("Location: reminder");
+
+    // Redirect back
+    $redirect_url = $_POST['redirect'] ?? 'reminder';
+    header("Location: $redirect_url");
     exit;
 }
 

@@ -27,8 +27,18 @@ $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'] ?? 0;
 $periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semester_nama'] : 'Tidak ada periode aktif';
 
+// Konfigurasi Tanggal Mulai Semester (Senin Minggu ke-1)
+$start_date = "2026-01-19"; // Sesuaikan jika berbeda
+
+// Hitung Minggu Default berdasarkan tanggal hari ini
+$today = date('Y-m-d');
+$diff = strtotime($today) - strtotime($start_date);
+$default_minggu = floor($diff / (7 * 24 * 60 * 60)) + 1;
+if ($default_minggu < 1) $default_minggu = 1;
+if ($default_minggu > 16) $default_minggu = 16;
+
 // Filter Minggu
-$filter_minggu = isset($_GET['minggu']) ? intval($_GET['minggu']) : 1;
+$filter_minggu = isset($_GET['minggu']) ? intval($_GET['minggu']) : $default_minggu;
 if ($filter_minggu < 1) $filter_minggu = 1;
 if ($filter_minggu > 16) $filter_minggu = 16;
 
@@ -87,84 +97,89 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="max-w-6xl mx-auto w-full">
-
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                 <div>
-                    <h2 class="text-2xl font-black text-slate-800">Piket Proyektor</h2>
-                    <p class="text-sm text-slate-500">Daftar mahasiswa petugas pengambil proyektor mata kuliah.</p>
+                    <h3 class="text-xl font-bold text-slate-800">Piket Proyektor</h3>
+                    <p class="text-xs text-slate-500 mt-1">Daftar mahasiswa petugas pengambil proyektor mata kuliah.</p>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <form method="GET" class="flex items-center gap-2 bg-white rounded-lg p-1 shadow-sm border border-slate-200">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Minggu Ke</label>
-                        <select name="minggu" onchange="this.form.submit()" class="bg-slate-50 border-none text-xs font-bold text-indigo-700 rounded focus:ring-0 cursor-pointer">
-                            <?php
-                            $start_date = "2026-01-19";
-                            for ($i = 1; $i <= 16; $i++):
-                                $week_start = date('d M', strtotime($start_date . " + " . (($i - 1) * 7) . " days"));
-                                $week_end = date('d M Y', strtotime($start_date . " + " . (($i * 7) - 1) . " days"));
-                            ?>
-                                <option value="<?= $i ?>" <?= $filter_minggu == $i ? 'selected' : '' ?>>
-                                    Minggu <?= $i ?> (<?= $week_start ?> - <?= $week_end ?>)
-                                </option>
-                            <?php endfor; ?>
-                        </select>
-                    </form>
-
-                    <?php if ($is_admin): ?>
-                        <div class="flex items-center gap-2">
-                            <form action="reminder" method="POST" id="reminderForm">
-                                <input type="hidden" name="action" value="piket">
-                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
-                                    <i class="fab fa-telegram-plane"></i>
-                                </button>
-                            </form>
-                            <button onclick="confirmReset()" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-black text-xs font-bold flex items-center gap-2 shadow-sm transition-all">
-                                <i class="fa fa-random"></i>
+                <?php if ($is_admin): ?>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                        <form action="reminder" method="POST" id="reminderForm" class="w-full sm:w-auto">
+                            <input type="hidden" name="action" value="piket">
+                            <input type="hidden" name="redirect" value="piket_proyektor">
+                            <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
+                                <i class="fab fa-telegram-plane"></i> Kirim Notifikasi
                             </button>
-                        </div>
-                    <?php endif; ?>
-                </div>
+                        </form>
+                        <button onclick="confirmReset()" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-black text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
+                            <i class="fa fa-random"></i> Acak Ulang
+                        </button>
+                    </div>
+                <?php endif; ?>
             </div>
 
-            <?php if (empty($piket_data)): ?>
-                <div class="bg-white rounded-2xl p-12 text-center border border-dashed border-slate-300">
-                    <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fa fa-clipboard-list text-3xl text-slate-300"></i>
+            <form method="GET" class="my-6 max-w-sm">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Pilih Minggu Perkuliahan</label>
+                <div class="relative">
+                    <select name="minggu" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm">
+                        <?php
+                        for ($i = 1; $i <= 16; $i++):
+                            $week_start = date('d M', strtotime($start_date . " + " . (($i - 1) * 7) . " days"));
+                            $week_end = date('d M Y', strtotime($start_date . " + " . (($i * 7) - 1) . " days"));
+                        ?>
+                            <option value="<?= $i ?>" <?= $filter_minggu == $i ? 'selected' : '' ?>>
+                                Minggu <?= $i ?> (<?= $week_start ?> - <?= $week_end ?>)
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+                        <i class="fa fa-chevron-down text-[10px]"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-slate-700">Belum Ada Data Piket</h3>
-                    <p class="text-sm text-slate-500 max-w-xs mx-auto mb-6">Administrator belum mengacak daftar piket proyektor untuk periode ini.</p>
+                </div>
+            </form>
+
+            <?php if (empty($piket_data)): ?>
+                <div class="bg-slate-50 rounded-2xl p-12 text-center border border-dashed border-slate-300">
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+                        <i class="fa fa-clipboard-list text-2xl text-slate-300"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-700">Belum Ada Data Piket</h3>
+                    <p class="text-[11px] text-slate-500 max-w-xs mx-auto">Administrator belum mengacak daftar piket proyektor untuk periode ini.</p>
                 </div>
             <?php else: ?>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <?php
                     $day_map = ['Senin' => 0, 'Selasa' => 1, 'Rabu' => 2, 'Kamis' => 3, 'Jumat' => 4, 'Sabtu' => 5, 'Minggu' => 6];
                     foreach ($piket_data as $jid => $data):
                         $day_idx = $day_map[$data['hari']] ?? 0;
                         $duty_date = date('d M Y', strtotime($start_date . " + " . (($filter_minggu - 1) * 7 + $day_idx) . " days"));
                     ?>
-                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden piket-card">
-                            <div class="bg-indigo-50 px-4 py-3 border-b border-indigo-100">
-                                <div class="flex justify-between items-start mb-1">
-                                    <span class="text-[9px] font-black text-indigo-600 uppercase tracking-widest"><?= $data['hari'] ?>, <?= $duty_date ?></span>
-                                    <span class="text-[9px] bg-white px-2 py-0.5 rounded-full border border-indigo-200 text-indigo-700 font-bold"><?= $data['jam'] ?></span>
+                        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all group">
+                            <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 group-hover:bg-indigo-50 transition-colors">
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-500"><?= $data['hari'] ?></span>
+                                    <span class="text-[9px] font-bold text-slate-500"><?= $duty_date ?></span>
                                 </div>
-                                <h3 class="text-sm font-bold text-slate-800 line-clamp-1" title="<?= htmlspecialchars($data['matkul']) ?>"><?= htmlspecialchars($data['matkul']) ?></h3>
-                                <div class="flex items-center gap-1.5 mt-1">
-                                    <i class="fa fa-map-marker-alt text-red-400 text-[10px]"></i>
-                                    <span class="text-[10px] font-medium text-slate-500"><?= htmlspecialchars($data['ruangan']) ?></span>
+                                <h3 class="text-xs font-bold text-slate-800 line-clamp-1 mb-1" title="<?= htmlspecialchars($data['matkul']) ?>"><?= htmlspecialchars($data['matkul']) ?></h3>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[9px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600 font-bold"><?= $data['jam'] ?></span>
+                                    <div class="flex items-center gap-1">
+                                        <i class="fa fa-map-marker-alt text-slate-300 text-[9px]"></i>
+                                        <span class="text-[9px] font-medium text-slate-500"><?= htmlspecialchars($data['ruangan']) ?></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-4">
-                                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-2">Petugas Piket</div>
+                            <div class="p-3">
+                                <div class="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-2">Petugas Piket</div>
                                 <div class="space-y-2">
                                     <?php foreach ($data['petugas'] as $petugas): ?>
                                         <div class="flex items-center gap-2">
-                                            <div class="h-7 w-7 rounded-full overflow-hidden border border-slate-200 shrink-0 shadow-sm">
+                                            <div class="h-6 w-6 rounded-full overflow-hidden border border-slate-200 shrink-0 shadow-sm">
                                                 <img src="<?= profilePhotoUrl($petugas['foto'], '../') ?>" class="w-full h-full object-cover">
                                             </div>
-                                            <span class="text-[11px] font-bold text-slate-700 truncate"><?= htmlspecialchars($petugas['nama']) ?></span>
+                                            <span class="text-[10px] font-semibold text-slate-700 truncate"><?= htmlspecialchars($petugas['nama']) ?></span>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -174,19 +189,15 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                 </div>
             <?php endif; ?>
 
-            <div class="mt-12 bg-indigo-900 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
-                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div class="text-center md:text-left">
-                        <h3 class="text-xl font-black mb-2 flex items-center gap-2 justify-center md:justify-start">
-                            <i class="fa fa-info-circle text-indigo-400"></i>
-                            Informasi Penting
-                        </h3>
-                        <p class="text-indigo-200 text-sm max-w-xl">Petugas piket diharapkan mengambil proyektor di Lab/Ruang Sarpras 15 menit sebelum perkuliahan dimulai dan mengembalikannya segera setelah mata kuliah selesai.</p>
-                    </div>
+            <div class="mt-8 bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
+                <div class="relative z-10">
+                    <h3 class="text-sm font-bold mb-2 flex items-center gap-2">
+                        <i class="fa fa-info-circle text-indigo-400"></i>
+                        Informasi Penting
+                    </h3>
+                    <p class="text-slate-400 text-[11px] leading-relaxed max-w-2xl">Petugas piket diharapkan mengambil proyektor di Ruangan Admin 15 menit sebelum perkuliahan dimulai dan mengembalikannya segera setelah mata kuliah selesai.</p>
                 </div>
-                <!-- Abstract Background Elements -->
-                <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-800 rounded-full opacity-50"></div>
-                <div class="absolute -left-10 -top-10 w-32 h-32 bg-indigo-800 rounded-full opacity-30"></div>
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-slate-800 rounded-full opacity-50"></div>
             </div>
 
             <?php include '../includes/footer_db.php'; ?>
@@ -232,6 +243,19 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                 confirmButtonColor: '#d33'
             });
             <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['reminder_msg'])): ?>
+            Swal.fire({
+                icon: '<?= $_SESSION['reminder_type'] === "success" ? "success" : ($_SESSION['reminder_type'] === "error" ? "error" : "info") ?>',
+                title: '<?= $_SESSION['reminder_type'] === "success" ? "Berhasil!" : ($_SESSION['reminder_type'] === "error" ? "Gagal!" : "Informasi") ?>',
+                text: '<?= addslashes($_SESSION['reminder_msg']) ?>',
+                confirmButtonColor: '#312e81'
+            });
+            <?php
+            unset($_SESSION['reminder_msg']);
+            unset($_SESSION['reminder_type']);
+            ?>
         <?php endif; ?>
     </script>
 </body>

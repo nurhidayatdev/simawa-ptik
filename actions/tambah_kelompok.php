@@ -12,6 +12,9 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+// Include foto helpers for cache busting
+include_once '../functions/foto_helpers.php';
+
 if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Sekretaris') {
     include '../includes/alert_role.php';
     exit();
@@ -73,15 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
 
         // =====================
-        // TELEGRAM NOTIFICATION
+        // WHATSAPP NOTIFICATION
         // =====================
         include_once '../functions/kirim_kelompok.php';
-        $telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
-        $telegram_chat_id = "-1003577478223";
+        $res = kirimKelompokReminder($koneksi, $mata_kuliah_id, $dosen_name, $keterangan, 'new');
 
-        $res = kirimKelompokReminder($koneksi, $telegram_token, $telegram_chat_id, $mata_kuliah_id, $dosen_name, $keterangan);
-
-        $_SESSION['success'] = "Kelompok berhasil disimpan " . ($res['status'] === 'success' ? "dan notifikasi telah dikirim ke Telegram." : "namun gagal mengirim notifikasi: " . ($res['message'] ?? ''));
+        $_SESSION['success'] = "Kelompok berhasil disimpan " . ($res['status'] === 'success' ? "dan notifikasi telah dikirim ke WhatsApp." : "namun gagal mengirim notifikasi: " . ($res['message'] ?? ''));
         header("Location: ../views/kelompok");
         exit;
     } else {
@@ -119,11 +119,13 @@ if ($selected_matkul) {
         if ($rl['nama_dosen']) $lecturers[] = $rl['nama_dosen'];
     }
 
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     while ($r = mysqli_fetch_assoc($res)) {
+        // Pre-calculate photo URL for JS usage
+        $r['foto_url'] = profilePhotoUrl($r['foto'], '../');
         $students[] = $r;
     }
 }
@@ -158,79 +160,96 @@ if ($selected_matkul) {
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full shadow-sm">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                <h3 class="text-xl font-bold text-slate-800 mb-4">Pengaturan Kelompok (Baru)</h3>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-
-
-
-
-                        <a href="../views/kelompok" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
-
-                            Kembali
-
-                        </a>
-                    </form>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800">Atur Kelompok Baru</h3>
+                    <p class="text-xs text-slate-500 mt-1">Buat pembagian kelompok mahasiswa untuk mata kuliah tertentu.</p>
                 </div>
+                <a href="../views/kelompok" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 text-xs font-bold transition-all">
+                    <i class="fa fa-arrow-left mr-2"></i> Kembali
+                </a>
             </div>
+
             <div id="statusAlert" class="mb-4 hidden">
                 <?php if (isset($existing_data) && $existing_data): ?>
-                    <div class="p-3 bg-red-100 text-red-700 text-xs rounded-lg border border-red-200">
-                        <i class="fa fa-exclamation-triangle mr-2"></i> PERHATIAN: Kelompok untuk mata kuliah ini sudah dibuat. Anda tidak bisa menambahkannya lagi.
+                    <div class="p-3 bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-red-100">
+                        <i class="fa fa-exclamation-triangle mr-2"></i> PERHATIAN: Kelompok untuk mata kuliah ini sudah dibuat.
                     </div>
                 <?php endif; ?>
             </div>
 
-            <div class="flex flex-wrap items-end gap-4 mb-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 my-8">
+                <!-- Pemilihan Mata Kuliah -->
+                <div class="lg:col-span-1">
+                    <form id="selectForm" method="GET">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Mata Kuliah</label>
+                        <div class="relative">
+                            <select id="mata_kuliah" name="matkul_id" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-indigo-700 rounded-lg px-4 py-3 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm transition-all">
+                                <option value="">-- Pilih Mata Kuliah --</option>
+                                <?php while ($mk = mysqli_fetch_assoc($matkuls)) : ?>
+                                    <option value="<?= $mk['id'] ?>" <?= ($mk['id'] == $selected_matkul) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($mk['nama_matkul']) ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                <i class="fa fa-chevron-down text-[10px]"></i>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-                <form id="selectForm" method="GET" class="flex-1 min-w-[200px]">
-                    <label class="text-xs block mb-1">Pilih Mata Kuliah</label>
-                    <select id="mata_kuliah" name="matkul_id" class="w-full px-3 py-2 border rounded text-xs">
-                        <option value="">-- Pilih --</option>
-                        <?php while ($mk = mysqli_fetch_assoc($matkuls)) : ?>
-                            <option value="<?= $mk['id'] ?>" <?= ($mk['id'] == $selected_matkul) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($mk['nama_matkul']) ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                </form>
+                <!-- Konfigurasi Kelompok -->
+                <div class="lg:col-span-2">
+                    <form id="kelompokForm" method="POST">
+                        <input type="hidden" name="action" value="save">
+                        <input type="hidden" name="mata_kuliah_id" id="mata_kuliah_hidden" value="<?= $selected_matkul ?>">
+                        <input type="hidden" name="groups_json" id="groups_json" value="[]">
 
-                <form id="kelompokForm" method="POST" class="flex flex-wrap items-end gap-2">
-                    <input type="hidden" name="action" value="save">
-                    <input type="hidden" name="mata_kuliah_id" id="mata_kuliah_hidden" value="<?= $selected_matkul ?>">
-                    <input type="hidden" name="groups_json" id="groups_json" value="[]">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Dosen Pengampu</label>
+                                <div class="relative">
+                                    <select name="dosen" id="dosen" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 rounded-lg px-4 py-3 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm transition-all" required>
+                                        <option value="">-- Pilih Dosen --</option>
+                                        <?php foreach ($lecturers as $l): ?>
+                                            <option value="<?= htmlspecialchars($l) ?>"><?= htmlspecialchars($l) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                        <i class="fa fa-chevron-down text-[10px]"></i>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div>
-                        <label class="text-xs block mb-1">Dosen</label>
-                        <select name="dosen" id="dosen" class="w-full px-3 py-2 border rounded text-xs" required>
-                            <option value="">-- Pilih Dosen --</option>
-                            <?php foreach ($lecturers as $l): ?>
-                                <option value="<?= htmlspecialchars($l) ?>"><?= htmlspecialchars($l) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Keterangan (Opsional)</label>
+                                <input name="keterangan" id="keterangan" type="text" placeholder="Contoh: Tugas 1" class="w-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all" />
+                            </div>
 
-                    <div>
-                        <label class="text-xs block mb-1">Keterangan (Opsional)</label>
-                        <input name="keterangan" id="keterangan" type="text" placeholder="Contoh: Tugas 1" class="w-full px-3 py-2 border rounded text-xs" />
-                    </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Anggota per Kelompok</label>
+                                <input id="per_group" type="number" min="1" max="17" value="3" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all" />
+                            </div>
+                        </div>
 
-                    <div>
-                        <label class="text-xs block mb-1">Orang per Kelompok</label>
-                        <input id="per_group" type="number" min="1" max="17" value="3" class="w-full px-3 py-2 border rounded text-xs" />
-                    </div>
-
-                    <button id="acakBtn" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded text-xs h-[34px]">Acak</button>
-
-                    <button id="manualBtn" type="button" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs h-[34px]">Manual</button>
-
-                    <button id="simpanBtn" type="submit" class="bg-indigo-800 hover:bg-indigo-950 text-white px-4 py-2 rounded text-xs h-[34px]">Simpan</button>
-                </form>
+                        <div class="flex flex-wrap gap-3 mt-6 justify-end">
+                            <button id="acakBtn" type="button" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-sm">
+                                <i class="fa fa-random"></i> Acak Otomatis
+                            </button>
+                            <button id="manualBtn" type="button" class="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-sm">
+                                <i class="fa fa-hand-pointer"></i> Atur Manual
+                            </button>
+                            <button id="simpanBtn" type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all shadow-lg">
+                                <i class="fa fa-save"></i> Simpan Kelompok
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <div id="groupsContainer" class="flex flex-wrap gap-4 justify-between mt-4"></div>
+            <div id="groupsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-8"></div>
         </div>
         <?php include '../includes/footer_db.php'; ?>
     </main>
@@ -303,19 +322,30 @@ if ($selected_matkul) {
             container.innerHTML = '';
             groups.forEach((g, idx) => {
                 const div = document.createElement('div');
-                div.className = 'p-4 border rounded bg-slate-50 w-56';
-                const title = document.createElement('h4');
-                title.className = 'font-semibold mb-2';
-                title.textContent = 'Kelompok ' + (idx + 1);
-                div.appendChild(title);
-                const ul = document.createElement('ul');
-                ul.className = 'list-disc pl-5 text-sm';
+                div.className = 'bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all group-card';
+
+                let membersHtml = '';
                 g.forEach(s => {
-                    const li = document.createElement('li');
-                    li.textContent = s.nama_lengkap;
-                    ul.appendChild(li);
+                    membersHtml += `
+                        <li class="flex items-center gap-3">
+                            <div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 shrink-0 shadow-sm">
+                                <img src="${s.foto_url}" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-[11px] font-semibold text-slate-700 truncate">${s.nama_lengkap}</span>
+                        </li>
+                    `;
                 });
-                div.appendChild(ul);
+
+                div.innerHTML = `
+                    <div class="bg-slate-50 px-4 py-3 border-b border-slate-100">
+                        <h4 class="font-bold text-indigo-900 text-sm">Kelompok ${idx + 1}</h4>
+                    </div>
+                    <div class="p-4">
+                        <ul class="space-y-3">
+                            ${membersHtml}
+                        </ul>
+                    </div>
+                `;
                 container.appendChild(div);
             });
             document.getElementById('groups_json').value = JSON.stringify(groups);
@@ -339,69 +369,66 @@ if ($selected_matkul) {
 
             groups.forEach((g, idx) => {
                 const div = document.createElement('div');
-                div.className = 'p-4 border rounded bg-slate-50 w-56 flex flex-col';
-                const title = document.createElement('h4');
-                title.className = 'font-semibold mb-2';
-                title.textContent = 'Kelompok ' + (idx + 1);
-                div.appendChild(title);
+                div.className = 'bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all group-card flex flex-col';
 
-                const ul = document.createElement('ul');
-                ul.className = 'list-disc pl-5 text-sm mb-2';
+                let membersHtml = '';
                 (g || []).forEach((s, si) => {
-                    const li = document.createElement('li');
-                    li.className = 'flex justify-between items-center';
-                    const span = document.createElement('span');
-                    span.textContent = s.nama_lengkap || s;
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.className = 'text-red-600 ml-2 text-xs';
-                    btn.textContent = 'Hapus';
-                    btn.addEventListener('click', () => {
-                        currentGroups[idx].splice(si, 1);
-                        renderEditable(currentGroups);
-                    });
-                    li.appendChild(span);
-                    li.appendChild(btn);
-                    ul.appendChild(li);
+                    membersHtml += `
+                        <li class="flex items-center justify-between gap-3 group/item">
+                            <div class="flex items-center gap-3 truncate">
+                                <div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 shrink-0 shadow-sm">
+                                    <img src="${s.foto_url}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-[11px] font-semibold text-slate-700 truncate">${s.nama_lengkap}</span>
+                            </div>
+                            <button type="button" onclick="removeMember(${idx}, ${si})" class="text-red-400 hover:text-red-600 transition-colors p-1 opacity-0 group-hover/item:opacity-100">
+                                <i class="fa fa-times-circle"></i>
+                            </button>
+                        </li>
+                    `;
                 });
-                div.appendChild(ul);
 
-                // Add from available students
-                const avail = getAvailableStudents();
-                const select = document.createElement('select');
-                select.className = 'w-full px-2 py-1 border rounded text-sm mb-1';
-                const opt0 = document.createElement('option');
-                opt0.value = '';
-                opt0.textContent = 'Tambah dari daftar...';
-                select.appendChild(opt0);
-                avail.forEach(s => {
-                    const o = document.createElement('option');
-                    o.value = s.nim;
-                    o.textContent = s.nama_lengkap;
-                    select.appendChild(o);
-                });
-                const addBtn = document.createElement('button');
-                addBtn.type = 'button';
-                addBtn.className = 'bg-green-600 text-white px-2 py-1 rounded text-sm';
-                addBtn.textContent = 'Tambah';
-                addBtn.addEventListener('click', () => {
-                    const val = select.value;
-                    if (!val) return;
-                    const stu = students.find(x => x.nim === val);
-                    if (stu) {
-                        currentGroups[idx].push(stu);
-                        // reset select so user sees it's added
-                        select.value = '';
-                        renderEditable(currentGroups);
-                    }
-                });
-                div.appendChild(select);
-                div.appendChild(addBtn);
-
+                div.innerHTML = `
+                    <div class="bg-slate-50 px-4 py-3 border-b border-slate-100">
+                        <h4 class="font-bold text-indigo-900 text-sm">Kelompok ${idx + 1}</h4>
+                    </div>
+                    <div class="p-4 flex-grow">
+                        <ul class="space-y-3 mb-4">
+                            ${membersHtml}
+                        </ul>
+                    </div>
+                    <div class="p-3 bg-slate-50 border-t border-slate-100">
+                        <div class="flex flex-col gap-2">
+                            <select class="student-select w-full bg-white border border-slate-200 text-[10px] font-medium text-slate-700 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all">
+                                <option value="">+ Tambah Anggota</option>
+                                ${getAvailableStudents().map(s => `<option value="${s.nim}">${s.nama_lengkap}</option>`).join('')}
+                            </select>
+                            <button type="button" onclick="addMemberManual(${idx}, this)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-[10px] font-bold transition-all shadow-sm">
+                                + Tambah
+                            </button>
+                        </div>
+                    </div>
+                `;
                 container.appendChild(div);
             });
             document.getElementById('groups_json').value = JSON.stringify(currentGroups);
         }
+
+        window.removeMember = function(gIdx, si) {
+            currentGroups[gIdx].splice(si, 1);
+            renderEditable(currentGroups);
+        };
+
+        window.addMemberManual = function(idx, btn) {
+            const select = btn.parentElement.querySelector('.student-select');
+            const val = select.value;
+            if (!val) return;
+            const stu = students.find(x => x.nim === val);
+            if (stu) {
+                currentGroups[idx].push(stu);
+                renderEditable(currentGroups);
+            }
+        };
 
         document.getElementById('acakBtn').addEventListener('click', () => {
             const per = parseInt(document.getElementById('per_group').value) || 1;
@@ -411,6 +438,12 @@ if ($selected_matkul) {
         });
 
         document.getElementById('manualBtn').addEventListener('click', () => {
+            // If currentGroups already has data, just render it as editable
+            if (currentGroups && currentGroups.length > 0) {
+                renderEditable(currentGroups);
+                return;
+            }
+
             const per = parseInt(document.getElementById('per_group').value) || 1;
             const n = Math.max(1, Math.ceil((students.length || 0) / per));
             const groups = [];
