@@ -12,8 +12,8 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
-// CSV export handler (top of file) - responds to ?export=csv&minggu_ke=...&filter=...
-if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_ke'])) {
+// Excel export handler (top of file) - responds to ?export=excel&minggu_ke=...&filter=...
+if (isset($_GET['export']) && $_GET['export'] === 'excel' && isset($_GET['minggu_ke'])) {
     $minggu = mysqli_real_escape_string($koneksi, $_GET['minggu_ke']);
     $filter = $_GET['filter'] ?? 'all';
     $filter = in_array($filter, ['all', 'Lunas', 'Belum']) ? $filter : 'all';
@@ -33,15 +33,33 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
 
     $res = mysqli_query($koneksi, $q);
 
-    header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename=kas_minggu_' . $minggu . '.csv');
-    $out = fopen('php://output', 'w');
-    fputcsv($out, ['NIM', 'Nama Lengkap', 'Minggu', 'Status', 'Tanggal Bayar']);
+    $filename = 'kas_minggu_' . $minggu . '.xls';
+    header("Content-Type: application/vnd.ms-excel");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+
+    echo '<table border="1">';
+    echo '<tr><th colspan="5">DATA KAS MINGGU ' . $minggu . '</th></tr>';
+    echo '<tr>
+            <th style="background-color: #1e1b4b; color: white;">NIM</th>
+            <th style="background-color: #1e1b4b; color: white;">Nama Lengkap</th>
+            <th style="background-color: #1e1b4b; color: white;">Minggu</th>
+            <th style="background-color: #1e1b4b; color: white;">Status</th>
+            <th style="background-color: #1e1b4b; color: white;">Tanggal Bayar</th>
+          </tr>';
+
     while ($r = mysqli_fetch_assoc($res)) {
-        $tanggal = !empty($r['tanggal_bayar']) ? date('d/m/Y', strtotime($r['tanggal_bayar'])) : '';
-        fputcsv($out, [$r['nim'], $r['nama_lengkap'], $r['minggu_ke'], $r['status'], $tanggal]);
+        $tanggal = !empty($r['tanggal_bayar']) ? date('d/m/Y', strtotime($r['tanggal_bayar'])) : '-';
+        echo '<tr>';
+        echo '<td style="mso-number-format:\'@\'">' . $r['nim'] . '</td>';
+        echo '<td>' . $r['nama_lengkap'] . '</td>';
+        echo '<td>' . $r['minggu_ke'] . '</td>';
+        echo '<td>' . $r['status'] . '</td>';
+        echo '<td>' . $tanggal . '</td>';
+        echo '</tr>';
     }
-    fclose($out);
+    echo '</table>';
     exit;
 }
 
@@ -94,12 +112,12 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['minggu_k
                                 <a href="../actions/tambah_kas_individu" class="whitespace-nowrap bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center w-full">Input Individu</a>
 
                                 <?php if (isset($_GET['minggu_ke']) && !empty($_GET['minggu_ke'])): ?>
-                                    <button type="button" onclick="confirmReminderKas('<?= $_GET['minggu_ke'] ?>')" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim Reminder Telegram">
-                                        <i class="fa fa-paper-plane"></i>
+                                    <button type="button" onclick="confirmReminderKas('<?= $_GET['minggu_ke'] ?>')" class="whitespace-nowrap bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 text-center text-xs flex items-center justify-center w-full">
+                                        <i class="fa fa-paper-plane mr-2"></i> Kirim Reminder
                                     </button>
                                 <?php endif; ?>
 
-                                <a href="?export=csv&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center"><i class="fas fa-file-csv"></i></a>
+                                <a href="?export=excel&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>&filter=<?= urlencode($_GET['filter'] ?? 'all') ?>" class="whitespace-nowrap bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Export to Excel"><i class="fas fa-file-excel"></i></a>
 
 
                         </form>

@@ -66,12 +66,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-  
-    <title>Data Kalender Akademik - PTIK C 2024</title>
-   <?php include '../includes/head.php'; ?>
-    <style>
-      
 
+    <title>Data Kalender Akademik - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -83,13 +81,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
         }
     </style>
-   
+
 </head>
 
 <body class="bg-slate-100">
     <?php include '../includes/menu_db.php'; ?>
 
-   
+
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
@@ -167,7 +165,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 </table>
             </div>
         </div>
-       <?php include '../includes/footer_db.php'; ?>
+        <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
 </body>

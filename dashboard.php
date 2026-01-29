@@ -201,9 +201,21 @@ if ($abs_matkul !== '') $abs_where .= " AND matkul_id = '$abs_matkul'";
 if ($abs_pertemuan !== '') $abs_where .= " AND pertemuan = '$abs_pertemuan'";
 
 $q_absensi = mysqli_query($koneksi, "SELECT status, COUNT(*) as cnt FROM absensi $abs_where GROUP BY status");
-$absensi_stats = ['Hadir' => 0, 'Izin' => 0, 'Sakit' => 0, 'Alpha' => 0];
+$absensi_stats_raw = ['Hadir' => 0, 'Izin' => 0, 'Sakit' => 0, 'Alpha' => 0];
+$total_absensi = 0;
 while ($row = mysqli_fetch_assoc($q_absensi)) {
-    if (isset($absensi_stats[$row['status']])) $absensi_stats[$row['status']] = (int)$row['cnt'];
+    if (isset($absensi_stats_raw[$row['status']])) {
+        $absensi_stats_raw[$row['status']] = (int)$row['cnt'];
+        $total_absensi += (int)$row['cnt'];
+    }
+}
+
+// Hitung Persentase
+$absensi_stats = ['Hadir' => 0, 'Izin' => 0, 'Sakit' => 0, 'Alpha' => 0];
+if ($total_absensi > 0) {
+    foreach ($absensi_stats_raw as $status => $count) {
+        $absensi_stats[$status] = round(($count / $total_absensi) * 100, 1);
+    }
 }
 
 // Ambil daftar matkul & pertemuan untuk filter absensi
@@ -895,8 +907,9 @@ function getFireColor($streak)
             data: {
                 labels: ['Hadir', 'Izin', 'Sakit', 'Alpha'],
                 datasets: [{
-                    label: 'Jumlah Absensi',
+                    label: 'Persentase Absensi',
                     data: [<?= $absensi_stats['Hadir'] ?>, <?= $absensi_stats['Izin'] ?>, <?= $absensi_stats['Sakit'] ?>, <?= $absensi_stats['Alpha'] ?>],
+                    rawCounts: [<?= $absensi_stats_raw['Hadir'] ?>, <?= $absensi_stats_raw['Izin'] ?>, <?= $absensi_stats_raw['Sakit'] ?>, <?= $absensi_stats_raw['Alpha'] ?>],
                     backgroundColor: ['#00bc7d', '#51a2ff', '#ffb900', '#ff2056'],
                     borderRadius: 4
                 }]
@@ -907,17 +920,30 @@ function getFireColor($streak)
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const percentage = context.parsed.y;
+                                const count = context.dataset.rawCounts[context.dataIndex];
+                                return context.label + ': ' + percentage + '% (' + count + ' Mhs)';
+                            }
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        max: 100,
                         grid: {
                             display: false
                         },
                         ticks: {
                             font: {
                                 size: 9
+                            },
+                            callback: function(value) {
+                                return value + "%";
                             }
                         }
                     },

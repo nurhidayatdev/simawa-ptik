@@ -14,7 +14,7 @@ $role = $_SESSION['role'];
 
 if ($_SESSION['role'] !== 'Administrator Utama') {
     // Kita tetap butuh HTML dikit untuk menjalankan JS
-   include '../includes/alert_role.php'; 
+    include '../includes/alert_role.php';
     exit();
 }
 
@@ -72,12 +72,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-    
+
     <title>Data Periode - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-      
-
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -91,7 +89,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
         /* live-search script removed from style block; see script at document end */
     </style>
-   
+
 </head>
 
 <body class="bg-slate-100">
@@ -183,8 +181,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
-        
-
         // Live search via AJAX: update table rows without leaving input focus
         (function() {
             const input = document.getElementById('searchInput');

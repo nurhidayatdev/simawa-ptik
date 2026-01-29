@@ -15,9 +15,11 @@ $role = $_SESSION['role'];
 /* =====================
    AMBIL PERIODE AKTIF
    ===================== */
-$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$q_periode = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama FROM periode WHERE status = 'aktif' LIMIT 1");
 $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'];
+$semester_aktif = (int)$periode['semester_ke'];
+$periode_info = $periode['tahun_periode'] . ' ' . $periode['semester_nama'];
 /* =====================
    AMBIL MAHASISWA_ID
    ===================== */
@@ -29,6 +31,31 @@ mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $mahasiswa = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 $mahasiswa_id = $mahasiswa['id'];
+
+/* =====================
+   AMBIL STATUS VALIDASI
+   ===================== */
+// Ensure table exists (safeguard)
+mysqli_query($koneksi, "CREATE TABLE IF NOT EXISTS krs_temp (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mahasiswa_id INT NOT NULL,
+    matkul_id INT NOT NULL,
+    periode_id INT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_mhs_per (mahasiswa_id, periode_id)
+)");
+mysqli_query($koneksi, "CREATE TABLE IF NOT EXISTS krs_validasi (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mahasiswa_id INT NOT NULL,
+    periode_id INT NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    tanggal_validasi DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_validasi (mahasiswa_id, periode_id)
+)");
+
+$q_val = mysqli_query($koneksi, "SELECT status FROM krs_validasi WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
+$val_data = mysqli_fetch_assoc($q_val);
+$status_validasi = $val_data['status'] ?? null; // null means not submitted yet
 
 /* =====================
    SIMPAN KRS
@@ -51,22 +78,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // hapus KRS lama
+    // hapus KRS TEMP lama (Draft)
     mysqli_query(
         $koneksi,
-        "DELETE FROM krs WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id"
+        "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id"
     );
 
-    // insert KRS baru
+    // insert KRS TEMP baru
     $stmt = mysqli_prepare(
         $koneksi,
-        "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)"
+        "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)"
     );
 
     foreach ($matkul as $matkul_id) {
         mysqli_stmt_bind_param($stmt, "iii", $mahasiswa_id, $matkul_id, $periode_id);
         mysqli_stmt_execute($stmt);
     }
+
+    // Update Status Validasi -> Pending
+    $stmt_val = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending'");
+    mysqli_stmt_bind_param($stmt_val, "ii", $mahasiswa_id, $periode_id);
+    mysqli_stmt_execute($stmt_val);
 
     header("Location: edit_krs.php?sukses=1");
     exit;
@@ -85,27 +117,40 @@ while ($r = mysqli_fetch_assoc($res_matkul)) {
 /* =====================
    MATKUL YANG SUDAH DIAMBIL
    ===================== */
+// Cek di krs_temp dulu
 $krs = mysqli_query($koneksi, "
-    SELECT matkul_id FROM krs
+    SELECT matkul_id FROM krs_temp
     WHERE mahasiswa_id = $mahasiswa_id
     AND periode_id = $periode_id
 ");
 
+// Kalau temp kosong, cek krs (active), KECUALI status rejected (rejected means draft needs fix, so might be in temp, but if user cleared it, fall back to active?)
+// Actually, if krs_temp has rows, use it. If not, use krs.
 $diambil = [];
-while ($row = mysqli_fetch_assoc($krs)) {
-    $diambil[] = $row['matkul_id'];
+if (mysqli_num_rows($krs) > 0) {
+    while ($row = mysqli_fetch_assoc($krs)) {
+        $diambil[] = $row['matkul_id'];
+    }
+} else {
+    // Fallback to active KRS
+    $krs_active = mysqli_query($koneksi, "
+        SELECT matkul_id FROM krs
+        WHERE mahasiswa_id = $mahasiswa_id
+        AND periode_id = $periode_id
+    ");
+    while ($row = mysqli_fetch_assoc($krs_active)) {
+        $diambil[] = $row['matkul_id'];
+    }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-   
+
     <title>Kartu Rencana Studi - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-      
-
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -117,7 +162,7 @@ while ($row = mysqli_fetch_assoc($krs)) {
             }
         }
     </style>
-  
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -129,7 +174,10 @@ while ($row = mysqli_fetch_assoc($krs)) {
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div class="flex items-center gap-4">
-                    <h3 class="text-2xl font-bold">Kartu Rencana Studi (KRS)</h3>
+                    <div>
+                        <h3 class="text-2xl font-bold">Kartu Rencana Studi (KRS)</h3>
+                        <p class="text-xs text-slate-500 font-medium mt-1">Periode Aktif: <span class="text-indigo-600"><?= htmlspecialchars($periode_info) ?></span></p>
+                    </div>
                     <button type="button" onclick="showKrsRules()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 transition-colors flex items-center justify-center shadow-sm border border-slate-200" title="Informasi Aturan">
                         <i class="fas fa-info-circle"></i>
                     </button>
@@ -147,10 +195,49 @@ while ($row = mysqli_fetch_assoc($krs)) {
 
             <!-- Success logic handled by SweetAlert -->
 
+            <?php if ($status_validasi === 'approved'): ?>
+                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                    <i class="fas fa-check-circle mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-bold text-sm">Approved</p>
+                        <p class="text-xs">KRS Anda telah <strong>disetujui</strong>. Jika Anda melakukan perubahan dan menyimpannya kembali, status akan berubah menjadi <strong>Menunggu Persetujuan</strong>.</p>
+                    </div>
+                </div>
+            <?php elseif ($status_validasi === 'pending'): ?>
+                <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                    <i class="fas fa-clock mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-bold text-sm">Menunggu Persetujuan</p>
+                        <p class="text-xs">Draft KRS Anda sedang menunggu validasi oleh Admin. Anda masih dapat mengubahnya selama belum disetujui.</p>
+                    </div>
+                </div>
+            <?php elseif ($status_validasi === 'rejected'): ?>
+                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                    <i class="fas fa-times-circle mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-bold text-sm">Ditolak</p>
+                        <p class="text-xs">KRS Anda ditolak. Silakan perbaiki pilihan mata kuliah Anda dan simpan kembali.</p>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                    <i class="fas fa-info-circle mt-1 mr-3"></i>
+                    <div>
+                        <p class="font-bold text-sm">Silakan Isi KRS</p>
+                        <p class="text-xs">Pilih mata kuliah dan klik Simpan. Data akan dikirim untuk divalidasi.</p>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <form method="POST">
 
-                <?php for ($s = 1; $s <= 8; $s++): ?>
-                    <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>
+                <?php for ($s = $semester_aktif; $s <= $semester_aktif; $s++): ?>
+                    <div class="flex justify-between items-end mt-4 mb-2">
+                        <h4 class="text-lg font-semibold">Semester <?= $s ?></h4>
+                        <button type="button" onclick="toggleSelectAll()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition-colors font-semibold flex items-center shadow-sm">
+                            <i class="fas fa-check-double mr-2"></i> Pilih Semua
+                        </button>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-indigo-900">
@@ -243,7 +330,7 @@ while ($row = mysqli_fetch_assoc($krs)) {
             }
         });
 
-        
+
 
         // SKS Counter Logic
         const sksCheckboxes = document.querySelectorAll('.sks-checkbox');
@@ -322,15 +409,26 @@ while ($row = mysqli_fetch_assoc($krs)) {
             });
         }
 
+        // Toggle Select All
+        function toggleSelectAll() {
+            const allCbs = document.querySelectorAll('.sks-checkbox');
+            const allChecked = Array.from(allCbs).every(cb => cb.checked);
+
+            allCbs.forEach(cb => {
+                cb.checked = !allChecked;
+            });
+            updateTotalSks();
+        }
+
         // Show Success Alert
         <?php if (isset($_GET['sukses'])): ?>
             Swal.fire({
                 icon: 'success',
-                title: 'Berhasil!',
-                text: 'Kartu Rencana Studi Anda telah berhasil diperbarui.',
+                title: 'Berhasil Disimpan!',
+                text: 'Draft KRS Anda berhasil disimpan dan menunggu persetujuan.',
                 confirmButtonColor: '#3730a3'
             }).then(() => {
-                window.location.href = '../views/profile.php';
+                window.location.href = '../views/ksm.php';
             });
         <?php endif; ?>
 

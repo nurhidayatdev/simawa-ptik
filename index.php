@@ -234,7 +234,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
                 <!-- Ketua -->
                 <div class="mb-12 max-w-xs mx-auto">
-                    <div class="bg-white backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden  transition-all group">
+                    <div class="bg-white backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden transition-all group">
                         <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-16 relative">
                             <div class="absolute -bottom-10 left-1/2 -translate-x-1/2">
                                 <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">

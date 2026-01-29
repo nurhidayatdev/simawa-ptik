@@ -69,6 +69,77 @@ mysqli_stmt_bind_param($stmt_krs, "i", $user_id);
 mysqli_stmt_execute($stmt_krs);
 $result_krs = mysqli_stmt_get_result($stmt_krs);
 
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = $periode['id'] ?? 0;
+
+/* =====================
+   HITUNG PROGRES & MISI
+   ===================== */
+
+// 1. Kas
+$res_kas = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kas WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Lunas' AND periode_id = '$periode_id'");
+$count_kas = mysqli_fetch_assoc($res_kas)['total'] ?? 0;
+
+// 2. Kuis
+$res_kuis = mysqli_query($koneksi, "SELECT current_streak, total_games FROM kuis_harian_stats WHERE user_id = '$user_id'");
+$kuis_stats = mysqli_fetch_assoc($res_kuis);
+$kuis_streak = $kuis_stats['current_streak'] ?? 0;
+$kuis_total = $kuis_stats['total_games'] ?? 0;
+
+// 3. Absensi
+$res_absensi_total = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Hadir' AND periode_id = '$periode_id'");
+$count_absensi = mysqli_fetch_assoc($res_absensi_total)['total'] ?? 0;
+
+// 4. Profil & Lainnya
+$profil_lengkap = (!empty($data['foto']) && $data['foto'] !== 'Yaya.png' && !empty($data['instagram']) && !empty($data['bio'])) ? 1 : 0;
+$res_krs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM krs WHERE mahasiswa_id = '$mahasiswa_id' AND periode_id = '$periode_id'");
+$count_krs = mysqli_fetch_assoc($res_krs_count)['total'] ?? 0;
+
+$q_nim = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE id = '$mahasiswa_id'");
+$nim_mhs = mysqli_fetch_assoc($q_nim)['nim'] ?? '';
+$res_kelompok = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kelompok WHERE FIND_IN_SET('$nim_mhs', REPLACE(anggota, ' ', '')) OR anggota LIKE '%$nim_mhs%'");
+$count_kelompok = mysqli_fetch_assoc($res_kelompok)['total'] ?? 0;
+
+// Definisi Misi (untuk Badge)
+$missions = [
+    ['icon' => 'fa-wallet', 'color' => 'emerald', 'levels' => [['name' => 'Bronze', 'target' => 5, 'current' => $count_kas], ['name' => 'Silver', 'target' => 10, 'current' => $count_kas], ['name' => 'Gold', 'target' => 16, 'current' => $count_kas]]],
+    ['icon' => 'fa-user-check', 'color' => 'blue', 'levels' => [['name' => 'Hadir 5x', 'target' => 5, 'current' => $count_absensi], ['name' => 'Hadir 15x', 'target' => 15, 'current' => $count_absensi], ['name' => 'Hadir 30x', 'target' => 30, 'current' => $count_absensi]]],
+    ['icon' => 'fa-fire', 'color' => 'orange', 'levels' => [['name' => 'Starter', 'target' => 3, 'current' => $kuis_streak], ['name' => 'Veteran', 'target' => 14, 'current' => $kuis_streak], ['name' => 'Gamer', 'target' => 50, 'current' => $kuis_total]]],
+    ['icon' => 'fa-users', 'color' => 'purple', 'levels' => [['name' => 'KRS', 'target' => 1, 'current' => ($count_krs > 0 ? 1 : 0)], ['name' => 'Profil', 'target' => 1, 'current' => $profil_lengkap], ['name' => 'Kelompok', 'target' => 9, 'current' => $count_kelompok]]]
+];
+
+$color_filters = [
+    'emerald' => 'brightness(0) saturate(100%) invert(65%) sepia(16%) saturate(3065%) hue-rotate(116deg) brightness(101%) contrast(86%)',
+    'blue'    => 'brightness(0) saturate(100%) invert(51%) sepia(85%) saturate(2394%) hue-rotate(201deg) brightness(99%) contrast(94%)',
+    'orange'  => 'brightness(0) saturate(100%) invert(62%) sepia(77%) saturate(3143%) hue-rotate(352deg) brightness(101%) contrast(96%)',
+    'purple'  => 'brightness(0) saturate(100%) invert(43%) sepia(72%) saturate(3085%) hue-rotate(244deg) brightness(102%) contrast(95%)'
+];
+
+$badge_gradients = [
+    'emerald' => 'from-emerald-400 to-emerald-600',
+    'blue'    => 'from-blue-400 to-blue-600',
+    'orange'  => 'from-orange-400 to-orange-600',
+    'purple'  => 'from-purple-400 to-purple-600'
+];
+
+// --- Attendance per Matkul Progress ---
+$q_att_matkul = "
+    SELECT 
+        mk.nama_matkul,
+        COUNT(a.id) as hadir_count
+    FROM krs k
+    JOIN mata_kuliah mk ON k.matkul_id = mk.id
+    LEFT JOIN absensi a ON (a.mahasiswa_id = k.mahasiswa_id AND a.matkul_id = k.matkul_id AND a.status = 'Hadir' AND a.periode_id = k.periode_id)
+    WHERE k.mahasiswa_id = '$mahasiswa_id' AND k.periode_id = '$periode_id'
+    GROUP BY mk.id
+    ORDER BY mk.nama_matkul ASC
+";
+$res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
+
 
 ?>
 <!DOCTYPE html>
@@ -151,50 +222,103 @@ $result_krs = mysqli_stmt_get_result($stmt_krs);
 
                         <!-- Bio Section -->
 
-                        <hr class="my-6">
 
-                        <h2 class="text-xl font-bold mb-4 text-slate-800">Kartu Rencana Studi (KRS)</h2>
-                        <a href="../actions/edit_krs.php" id="edit-profile" class="px-4 py-2 bg-indigo-900 text-white rounded-lg hover:bg-indigo-800 text-xs">
-
-                            Edit KRS
-
-                        </a>
-                        <br>
-                        <br>
-                        <?php if (mysqli_num_rows($result_krs) > 0): ?>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-200">
-                                    <thead class="bg-indigo-900">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Kode</th>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Mata Kuliah</th>
-                                            <th class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">SKS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-slate-200">
-                                        <?php
-                                        $no = 1;
-                                        $id = 1;
-                                        while ($krs = mysqli_fetch_assoc($result_krs)) : ?>
-                                            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-                                                <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++ ?></td>
-                                                <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $krs['kode_matkul'] ?></td>
-                                                <td class="px-6 py-2 text-xs text-slate-800"><?= $krs['nama_matkul'] ?></td>
-                                                <td class="px-6 py-2 whitespace-nowrap text-xs text-slate-800"><?= $krs['sks'] ?></td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php else: ?>
-                            <p class="text-slate-500 italic">Belum ada mata kuliah yang diambil.</p>
-                        <?php endif; ?>
 
 
                         <!-- Submit Button -->
 
                     </form>
+
+                    <!-- Achievements & Progress Section -->
+                    <div class="mt-12 space-y-8">
+                        
+
+                       
+                            <!-- KAS Progress -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                                        <i class="fa fa-wallet text-emerald-500"></i>
+                                        Progres Kas
+                                    </h3>
+                                    <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded"><?= $count_kas ?> / 16 Minggu</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden shadow-inner flex">
+                                    <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-1000" style="width: <?= min(100, ($count_kas / 16) * 100) ?>%"></div>
+                                </div>
+                                <p class="text-[10px] text-slate-400 mt-2 italic">*Target lunas 16 minggu pembayaran kas dalam satu semester.</p>
+                            </div>
+
+                            <!-- Attendance Progress -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <i class="fa fa-user-check text-blue-500"></i>
+                                    Kehadiran Kuliah
+                                </h3>
+                                <div class="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                                    <?php while ($row = mysqli_fetch_assoc($res_att_matkul)):
+                                        $att_percent = min(100, ($row['hadir_count'] / 16) * 100);
+                                    ?>
+                                        <div>
+                                            <div class="flex justify-between text-[10px] font-bold mb-1">
+                                                <span class="text-slate-600 truncate"><?= htmlspecialchars($row['nama_matkul']) ?></span>
+                                                <span class="text-blue-600"><?= $row['hadir_count'] ?>/16</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                                <div class="h-full bg-blue-500 transition-all duration-1000" style="width: <?= $att_percent ?>%"></div>
+                                            </div>
+                                        </div>
+                                    <?php endwhile; ?>
+                                </div>
+                            </div>
+
+                            
+                        
+                        <!-- Badges Section -->
+                        <div class="bg-indigo-950 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden">
+                            <div class="relative z-10">
+                                <h3 class="text-lg font-black mb-4 flex items-center gap-2">
+                                    <i class="fa fa-medal text-yellow-400"></i>
+                                    Koleksi Lencana
+                                </h3>
+                                <div class="flex flex-wrap gap-4">
+                                    <?php
+                                    $any_badge = false;
+                                    foreach ($missions as $cat):
+                                        $bg_grad = $badge_gradients[$cat['color']] ?? 'from-slate-400 to-slate-600';
+                                        foreach ($cat['levels'] as $l_idx => $level):
+                                            if ($level['current'] >= $level['target']):
+                                                $any_badge = true;
+                                    ?>
+                                                <div class="group relative flex flex-col items-center">
+                                                    <div class="relative w-12 h-12 rounded-full bg-gradient-to-br <?= $bg_grad ?> p-[1px] shadow-lg transform group-hover:-translate-y-1 transition-transform">
+                                                        <div class="w-full h-full rounded-full bg-slate-900 flex flex-col items-center justify-center relative overflow-hidden">
+                                                            <i class="fa <?= $cat['icon'] ?> text-xs text-white"></i>
+                                                            <div class="flex gap-0.5 mt-0.5">
+                                                                <?php for ($s = 0; $s <= $l_idx; $s++): ?>
+                                                                    <img src="../assets/image/logo.webp" class="w-2 h-2 object-contain" style="filter: <?= $color_filters[$cat['color']] ?>;">
+                                                                <?php endfor; ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-[9px] font-bold uppercase mt-1 text-white/70"><?= $level['name'] ?></span>
+                                                </div>
+                                        <?php
+                                            endif;
+                                        endforeach;
+                                    endforeach;
+
+                                    if (!$any_badge):
+                                        ?>
+                                        <div class="w-full text-center py-4 bg-white/5 rounded-xl border border-dashed border-white/20">
+                                            <p class="text-[10px] text-indigo-300">Belum ada lencana yang terbuka.</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

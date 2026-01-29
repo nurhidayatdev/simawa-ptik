@@ -59,12 +59,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-   
-    <title>Data Dosen - PTIK C 2024</title>
-   <?php include '../includes/head.php'; ?>
-    <style>
-     
 
+    <title>Data Dosen - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -76,7 +74,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
         }
     </style>
-  
+
 </head>
 
 <body class="bg-slate-100">
@@ -141,13 +139,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 </table>
             </div>
         </div>
-       <?php include '../includes/footer_db.php'; ?>
+        <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
 
     <script>
-        
-
         // Live search via AJAX (debounced) - keeps input focus
         (function() {
             const input = document.getElementById('searchInput');

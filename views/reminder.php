@@ -88,9 +88,9 @@ if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_
 
 date_default_timezone_set('Asia/Makassar');
 
-// Telegram Config
-$telegram_token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
-$telegram_chat_id = "-1003577478223";
+// Fonnte Config (Moved to helpers.php)
+include_once '../functions/helpers.php';
+
 
 // Include reminder functions
 include_once '../functions/helpers.php';
@@ -100,6 +100,7 @@ include_once '../functions/kirim_kas.php';
 include_once '../functions/kirim_streak.php';
 include_once '../functions/kirim_krs.php';
 include_once '../functions/kirim_kelompok.php';
+include_once '../functions/kirim_piket_reminder.php';
 
 // Handle Actions (PRG Pattern)
 if (isset($_POST['action'])) {
@@ -107,34 +108,35 @@ if (isset($_POST['action'])) {
     $response = ['status' => 'error', 'message' => 'Aksi tidak dikenal'];
 
     if ($action === 'jadwal') {
-        $response = kirimJadwalReminder($koneksi, $telegram_token, $telegram_chat_id);
+        $response = kirimJadwalReminder($koneksi);
     } elseif ($action === 'jadwal_custom') {
         // Handle custom data via JSON payload
         if (isset($_POST['custom_payload'])) {
             $custom_data = json_decode($_POST['custom_payload'], true);
         } else {
-            // Fallback
             $custom_data = [[
                 'matkul' => $_POST['matkul'] ?? '',
                 'jam' => $_POST['jam'] ?? '',
                 'ruangan' => $_POST['ruangan'] ?? ''
             ]];
         }
-        $response = kirimJadwalReminder($koneksi, $telegram_token, $telegram_chat_id, $custom_data);
+        $response = kirimJadwalReminder($koneksi, null, null, $custom_data);
     } elseif ($action === 'tugas') {
-        $response = kirimTugasReminder($koneksi, $telegram_token, $telegram_chat_id);
+        $response = kirimTugasReminder($koneksi);
     } elseif ($action === 'kas') {
         $minggu_ke = (int)($_POST['minggu_ke'] ?? 1);
-        $response = kirimKasReminder($koneksi, $telegram_token, $telegram_chat_id, $minggu_ke);
+        $response = kirimKasReminder($koneksi, $minggu_ke);
     } elseif ($action === 'streak') {
-        $response = kirimStreakReminder($koneksi, $telegram_token, $telegram_chat_id);
+        $response = kirimStreakReminder($koneksi);
     } elseif ($action === 'krs') {
-        $response = kirimKrsReminder($koneksi, $telegram_token, $telegram_chat_id);
+        $response = kirimKrsReminder($koneksi);
     } elseif ($action === 'kelompok') {
         $matkul_id = $_POST['matkul_id'];
         $dosen = $_POST['dosen'];
         $keterangan = $_POST['keterangan'];
-        $response = kirimKelompokReminder($koneksi, $telegram_token, $telegram_chat_id, $matkul_id, $dosen, $keterangan);
+        $response = kirimKelompokReminder($koneksi, $matkul_id, $dosen, $keterangan);
+    } elseif ($action === 'piket') {
+        $response = kirimPiketReminder($koneksi);
     }
 
     $_SESSION['reminder_msg'] = $response['message'];
@@ -203,12 +205,12 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                    <i class="fab fa-telegram text-white text-2xl"></i>
+                <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                    <i class="fab fa-whatsapp text-white text-2xl"></i>
                 </div>
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">Kirim Reminder ke Telegram</h2>
-                    <p class="text-xs text-slate-500">Pilih jenis reminder yang ingin dikirim ke grup PTIK C</p>
+                    <h2 class="text-lg font-bold text-slate-800">Kirim Reminder ke WhatsApp</h2>
+                    <p class="text-xs text-slate-500">Pilih jenis reminder yang ingin dikirim ke grup WhatsApp PTIK C</p>
                 </div>
             </div>
         </div>
@@ -231,7 +233,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <h3 class="font-bold text-slate-800 text-md">Reminder KRS</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan mahasiswa yang belum mengisi KRS</p>
                         <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
@@ -251,7 +253,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <h3 class="font-bold text-slate-800 text-md">Tugas Aktif</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Kirim rekap tugas yang belum dikumpulkan</p>
                         <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
@@ -271,7 +273,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <h3 class="font-bold text-slate-800 text-md">Streak Kuis Harian</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
                         <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
@@ -288,7 +290,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <h3 class="font-bold text-slate-800 text-md">Jadwal Besok</h3>
                         <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan jadwal kuliah untuk hari besok</p>
                         <button type="button" onclick="confirmJadwal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
@@ -312,7 +314,24 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                             </select>
                         </div>
                         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Piket proyektor -->
+            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+                <input type="hidden" name="action" value="piket">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 bg-indigo-900 text-white rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                        <i class="fa fa-plug text-xl"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-slate-800 text-md">Piket Proyektor</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat petugas piket besok</p>
+                        <button type="submit" class="w-full bg-indigo-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
@@ -348,7 +367,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         </div>
 
                         <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
-                            <i class="fab fa-telegram mr-1"></i> Kirim
+                            <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
                 </div>
@@ -370,7 +389,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         function confirmJadwal() {
             Swal.fire({
                 title: 'Kirim Jadwal?',
-                text: "Pilih metode pengiriman jadwal ke Telegram.",
+                text: "Pilih metode pengiriman jadwal ke WhatsApp.",
+
                 icon: 'question',
                 showCancelButton: true,
                 showDenyButton: true,

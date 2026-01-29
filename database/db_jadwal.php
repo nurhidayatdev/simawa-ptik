@@ -214,6 +214,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 </button>
 
 
+                                <a href="../jadwal" class="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center" title="Lihat View">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+
                                 <a href="../actions/tambah.php?tabel=jadwal_matkul" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
                                     <i class="fa fa-plus"></i>
                                 </a>

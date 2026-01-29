@@ -43,12 +43,10 @@ $beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8
 <html lang="en">
 
 <head>
-   
-    <title>Data Mata Kuliah - PTIK C 2024</title>
-   <?php include '../includes/head.php'; ?>
-    <style>
-      
 
+    <title>Data Mata Kuliah - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -60,7 +58,7 @@ $beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8
             }
         }
     </style>
-   
+
 </head>
 
 <body class="bg-slate-100">
@@ -161,8 +159,8 @@ $beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8
         <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
-    
-        
+
+
 </body>
 
 </html>

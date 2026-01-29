@@ -2,7 +2,7 @@
 // functions/kirim_streak.php
 include_once __DIR__ . '/helpers.php';
 
-function kirimStreakReminder($koneksi, $token, $chat_id)
+function kirimStreakReminder($koneksi, $token = null, $chat_id = null)
 {
     date_default_timezone_set('Asia/Makassar');
     $today = date('Y-m-d');
@@ -27,9 +27,9 @@ function kirimStreakReminder($koneksi, $token, $chat_id)
         }
         $message .= "\n_Main sekarang untuk jaga streak!_ 🎮";
 
-        $res = sendTelegramMessage($token, $chat_id, $message);
+        $res = sendFonnteMessage($message);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Reminder streak berhasil dikirim ke " . ($no - 1) . " pemain!"];
+            return ['status' => 'success', 'message' => "Reminder streak berhasil dikirim ke WhatsApp untuk " . ($no - 1) . " pemain!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }

@@ -5,9 +5,9 @@ if (isset($_POST['kirim_pesan'])) {
     if (!empty($pesan_raw)) {
         $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan_db')";
         if (mysqli_query($koneksi, $query_pesan)) {
-            // Kirim notifikasi ke Telegram
+            // Kirim notifikasi ke WhatsApp
             include_once 'functions/kirim_pesan.php';
-            sendTelegramPesan($pesan_raw);
+            sendWhatsAppPesan($pesan_raw);
             // Redirect back to the source page to prevent form resubmission
             $redirect_url = $_SERVER['HTTP_REFERER'] ?? 'index.php';
 

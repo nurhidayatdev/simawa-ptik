@@ -87,6 +87,12 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <i class="fa fa-users w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Kelompok</span>
                             </a>
+                           
+                                <a href="<?= $base ?>views/piket_proyektor" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                    <i class="fa fa-plug w-5 h-5 mr-3 text-indigo-900"></i>
+                                    <span class="text-xs font-medium">Piket Proyektor</span>
+                                </a>
+                           
                             <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-calendar w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Kalender</span>
@@ -168,7 +174,8 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                             </button>
                             <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                 <a href="<?= $base ?>views/profile" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Profile Saya</a>
-                                <a href="<?= $base ?>actions/edit_krs" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS</a>
+                                <a href="<?= $base ?>actions/edit_krs" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KRS Mahasiswa</a>
+                                <a href="<?= $base ?>views/ksm" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">KSM Mahasiswa</a>
 
                             </div>
                             <?php if ($role === 'Administrator Utama'): ?>
@@ -181,6 +188,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 </button>
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
                                     <a href="<?= $base ?>database/db_users" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Users</a>
+                                    <a href="<?= $base ?>actions/validasi_krs" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Validasi KRS</a>
                                     <a href="<?= $base ?>database/db_periode" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
                                     <a href="<?= $base ?>database/db_ruangan" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Ruangan</a>
                                     <a href="<?= $base ?>database/db_jam" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Jam Kuliah</a>

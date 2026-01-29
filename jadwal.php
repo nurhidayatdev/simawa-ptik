@@ -82,7 +82,7 @@ ORDER BY jm.hari, jk_start.jam_mulai");
                                 <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
 
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['ruangan']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['ruangan']; ?></td>
                                 <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_matkul']; ?></td>
                                 <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['sks']; ?></td>
                                 <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>

@@ -2,7 +2,7 @@
 // functions/kirim_kelompok.php
 include_once __DIR__ . '/helpers.php';
 
-function kirimKelompokReminder($koneksi, $token, $chat_id, $matkul_id, $dosen, $keterangan, $type = 'new')
+function kirimKelompokReminder($koneksi, $matkul_id, $dosen, $keterangan, $type = 'new', $token = null, $chat_id = null)
 {
     date_default_timezone_set('Asia/Makassar');
 
@@ -71,9 +71,9 @@ function kirimKelompokReminder($koneksi, $token, $chat_id, $matkul_id, $dosen, $
         }
         $message .= $footer;
 
-        $res = sendTelegramMessage($token, $chat_id, $message);
+        $res = sendFonnteMessage($message);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Daftar kelompok berhasil dikirim!"];
+            return ['status' => 'success', 'message' => "Daftar kelompok berhasil dikirim ke WhatsApp!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }

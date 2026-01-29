@@ -14,7 +14,7 @@ $role = $_SESSION['role'];
 
 if ($_SESSION['role'] !== 'Administrator Utama') {
     // Kita tetap butuh HTML dikit untuk menjalankan JS
-    include '../includes/alert_role.php'; 
+    include '../includes/alert_role.php';
     exit();
 }
 
@@ -69,7 +69,42 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['role']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
         echo '<a href="../actions/edit.php?tabel=users&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
-        echo '<a href="../actions/hapus.php?tabel=users&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus user ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+        echo '<a href="javascript:void(0)" onclick="confirmReset(' . $row['id'] . ')" title="Reset Password"><i class="fa fa-key text-yellow-600 hover:text-yellow-900 mr-3"></i></a>';
+        echo '<a href="javascript:void(0)" onclick="confirmDelete(' . $row['id'] . ')" title="Hapus"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+        echo '<script>
+            function confirmReset(id) {
+                Swal.fire({
+                    title: "Reset Password?",
+                    text: "Password akan diubah kembali ke \'ptikClass24\'",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#eab308",
+                    cancelButtonColor: "#64748b",
+                    confirmButtonText: "Ya, Reset!",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "../actions/reset_password.php?id=" + id;
+                    }
+                })
+            }
+            function confirmDelete(id) {
+                Swal.fire({
+                    title: "Hapus User?",
+                    text: "Data yang dihapus tidak dapat dikembalikan!",
+                    icon: "error",
+                    showCancelButton: true,
+                    confirmButtonColor: "#dc2626",
+                    cancelButtonColor: "#64748b",
+                    confirmButtonText: "Ya, Hapus!",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "../actions/hapus.php?tabel=users&id=" + id;
+                    }
+                })
+            }
+        </script>';
         echo '</td>';
         echo '</tr>';
     }
@@ -81,12 +116,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-   
-    <title>Data Users - PTIK C 2024</title>
-   <?php include '../includes/head.php'; ?>
-    <style>
-      
 
+    <title>Data Users - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -98,7 +132,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
         }
     </style>
-   
+
 </head>
 
 <body class="bg-slate-100">
@@ -166,7 +200,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
                                     <a href="../actions/edit.php?tabel=users&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
 
-                                    <a href="../actions/hapus.php?tabel=users&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus user ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
+                                    <a href="javascript:void(0)" onclick="confirmReset(<?= $row['id']; ?>)" title="Reset Password"><i class="fa fa-key text-yellow-600 hover:text-yellow-900 mr-3"></i></a>
+
+                                    <a href="javascript:void(0)" onclick="confirmDelete(<?= $row['id']; ?>)" title="Hapus"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
 
                                 </td>
                             </tr>
@@ -179,8 +215,51 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
-        
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'success_reset'): ?>
+            Swal.fire({
+                title: 'Berhasil!',
+                text: "Password berhasil direset ke 'ptikClass24'",
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Bersihkan URL dari parameter status
+                window.history.replaceState({}, document.title, window.location.pathname);
+            });
+        <?php endif; ?>
 
+        function confirmReset(id) {
+            Swal.fire({
+                title: 'Reset Password?',
+                text: "Password akan diubah kembali ke 'ptikClass24'",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#eab308',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../actions/reset_password.php?id=' + id;
+                }
+            })
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Hapus User?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../actions/hapus.php?tabel=users&id=' + id;
+                }
+            })
+        }
         // Live search via AJAX (debounced) - keep focus in input
         (function() {
             const input = document.getElementById('searchInput');
@@ -203,24 +282,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 }, 250);
             });
         })();
-
-        // Profile dropdown
-        const profileButton = document.getElementById('profile-button');
-        const profileDropdown = document.getElementById('profile-dropdown');
-
-        if (profileButton && profileDropdown) {
-            profileButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                profileDropdown.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!profileButton.contains(e.target)) {
-                    profileDropdown.classList.add('hidden');
-                }
-            });
-        }
     </script>
 </body>
 
 </html>
+```

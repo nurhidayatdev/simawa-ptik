@@ -71,7 +71,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		}
 		$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
 		echo '<td class="px-3 py-2 whitespace-nowrap text-xs"><span class="px-2 py-1 rounded-full border ' . $statusColor . '">' . ucfirst($row['status']) . '</span></td>';
-		if ($role === 'Administrator Utama' || $role === 'Sekretaris'):
+		if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'):
 			echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
 			echo '<a href="../actions/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
 			echo '<a href="../actions/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus tugas ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
@@ -87,12 +87,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-	
+
 	<title>Data Tugas Kuliah - PTIK C 2024</title>
 	<?php include '../includes/head.php'; ?>
 	<style>
-	
-
 		.rotate-180 {
 			transform: rotate(180deg);
 		}
@@ -104,7 +102,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			}
 		}
 	</style>
-	
+
 	<!-- SweetAlert2 -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -133,10 +131,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
 								placeholder="Cari Mata Kuliah / Deskripsi..."
 								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
-							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
 								<button type="button" onclick="confirmReminderTelegram()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
 									<i class="fa fa-paper-plane"></i>
 								</button>
+								<a href="../tugas" class="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center mr-1" title="Lihat View">
+									<i class="fa fa-eye"></i>
+								</a>
 								<a href="../actions/tambah.php?tabel=tugas" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
 									<i class="fa fa-plus"></i>
 								</a>
@@ -165,7 +166,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								Link Kirim</th>
 							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Status</th>
-							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
 								<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 									Actions</th>
 							<?php endif; ?>
@@ -189,7 +190,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								</td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
 									<?php if (!empty($row['file_tugas'])): ?>
-										<a href="../storage/files/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a>
+										<a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a>
 									<?php else: echo '-';
 									endif; ?>
 								</td>
@@ -205,7 +206,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 									?>
 									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
 								</td>
-								<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+								<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
 									<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
 										<a href="../actions/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
 										<a href="../actions/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus tugas ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
@@ -218,12 +219,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			</div>
 		</div>
 		<?php include '../includes/footer_db.php'; ?>
-    </main>
-    <?php include '../includes/script_db.php'; ?>
+	</main>
+	<?php include '../includes/script_db.php'; ?>
 	<script>
-		
-		
-
 		// Live search via AJAX (debounced) - keep focus in input
 		(function() {
 			const input = document.getElementById('searchInput');

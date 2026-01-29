@@ -163,9 +163,17 @@ if (isset($_POST['update'])) {
         WHERE user_id='$user_id'
     ");
 
+    // Server-side password validation
+    $password = $_POST['password'];
+    if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/', $password)) {
+        $error_message = "Password must be at least 8 characters, contain uppercase, lowercase, numbers, and no symbols.";
+        include '../includes/alert_actions.php';
+        exit;
+    }
+
     mysqli_query($koneksi, "UPDATE users SET 
         email='{$_POST['email']}',
-        password='{$_POST['password']}'
+        password='{$password}'
         WHERE id='$user_id'
     ");
 
@@ -228,13 +236,18 @@ if (isset($_POST['update'])) {
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
-                            <input type="text" name="password" value="<?= $data['password']; ?>"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" maxlength="8" required>
+                            <input type="text" name="password" value="<?= htmlspecialchars($data['password']); ?>"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"
+                                minlength="8"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
+                                title="Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and NO symbols."
+                                required>
+                            <p class="mt-1 text-[10px] text-gray-500 italic">* Minimal 8 karakter, harus ada huruf besar, kecil, angka, dan tanpa simbol.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Instagram</label>
                             <input name="instagram" value="<?= $data['instagram']; ?>" placeholder="@Username"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></input>
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" readonly></input>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Bio</label>
@@ -302,6 +315,7 @@ if (isset($_POST['update'])) {
         <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         // Image cropper for profile foto

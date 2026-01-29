@@ -119,7 +119,7 @@ if ($selected_matkul) {
         if ($rl['nama_dosen']) $lecturers[] = $rl['nama_dosen'];
     }
 
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
@@ -250,12 +250,50 @@ if ($selected_matkul) {
         }
 
         function makeGroups(perGroup) {
-            const copy = students.slice();
-            shuffleArray(copy);
-            const groups = [];
-            for (let i = 0; i < copy.length; i += perGroup) {
-                groups.push(copy.slice(i, i + perGroup));
-            }
+            const boys = students.filter(s => s.jenis_kelamin === 'Laki-laki');
+            const girls = students.filter(s => s.jenis_kelamin === 'Perempuan');
+            const others = students.filter(s => s.jenis_kelamin !== 'Laki-laki' && s.jenis_kelamin !== 'Perempuan');
+
+            shuffleArray(boys);
+            shuffleArray(girls);
+            shuffleArray(others);
+
+            const numGroups = Math.ceil(students.length / perGroup);
+            const groups = Array.from({
+                length: numGroups
+            }, () => []);
+
+            // Distribute boys
+            let groupIdx = 0;
+            boys.forEach(b => {
+                groups[groupIdx].push(b);
+                groupIdx = (groupIdx + 1) % numGroups;
+            });
+
+            // Distribute girls
+            groupIdx = 0;
+            girls.forEach(g => {
+                let searchCount = 0;
+                while (groups[groupIdx].length >= perGroup && searchCount < numGroups) {
+                    groupIdx = (groupIdx + 1) % numGroups;
+                    searchCount++;
+                }
+                groups[groupIdx].push(g);
+                groupIdx = (groupIdx + 1) % numGroups;
+            });
+
+            // Distribute others
+            groupIdx = 0;
+            others.forEach(o => {
+                let searchCount = 0;
+                while (groups[groupIdx].length >= perGroup && searchCount < numGroups) {
+                    groupIdx = (groupIdx + 1) % numGroups;
+                    searchCount++;
+                }
+                groups[groupIdx].push(o);
+                groupIdx = (groupIdx + 1) % numGroups;
+            });
+
             return groups;
         }
 

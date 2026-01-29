@@ -2,7 +2,7 @@
 // functions/kirim_kas.php
 include_once __DIR__ . '/helpers.php';
 
-function kirimKasReminder($koneksi, $token, $chat_id, $minggu_ke)
+function kirimKasReminder($koneksi, $minggu_ke, $token = null, $chat_id = null)
 {
     date_default_timezone_set('Asia/Makassar');
 
@@ -18,9 +18,9 @@ function kirimKasReminder($koneksi, $token, $chat_id, $minggu_ke)
         }
         $message .= "\n_Segera lakukan pembayaran!_ 🙏";
 
-        $res = sendTelegramMessage($token, $chat_id, $message);
+        $res = sendFonnteMessage($message);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Reminder kas minggu $minggu_ke berhasil dikirim!"];
+            return ['status' => 'success', 'message' => "Reminder kas minggu $minggu_ke berhasil dikirim ke WhatsApp!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }
@@ -39,11 +39,9 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_kas.php') {
         exit;
     }
 
-    $token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
-    $chat_id = "-1003577478223";
     $minggu_ke = isset($_GET['minggu_ke']) ? (int)$_GET['minggu_ke'] : 1;
 
-    $res = kirimKasReminder($koneksi, $token, $chat_id, $minggu_ke);
+    $res = kirimKasReminder($koneksi, $minggu_ke);
     $_SESSION[$res['status']] = $res['message'];
 
     header("Location: ../views/kas?minggu_ke=$minggu_ke");

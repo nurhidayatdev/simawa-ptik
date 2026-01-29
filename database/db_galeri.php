@@ -65,12 +65,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-  
-    <title>Data Galeri - PTIK C 2024</title>
- <?php include '../includes/head.php'; ?>
-    <style>
-     
 
+    <title>Data Galeri - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -82,7 +80,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
         }
     </style>
-  
+
 </head>
 
 <body class="bg-slate-100">
@@ -161,8 +159,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <?php include '../includes/script_db.php'; ?>
 
     <script>
-        
-
         const input = document.getElementById('searchInput');
         let timer = null;
         input.addEventListener('input', () => {

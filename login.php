@@ -133,7 +133,7 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
                 </span>
                 <input type="email" name="email" id="email" required
                   class="block w-full rounded-xl border border-slate-200 py-2.5 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
-                  placeholder="nama@example.com">
+                  placeholder="nim@ptikc.id">
               </div>
             </div>
 
@@ -145,7 +145,7 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
                 </span>
                 <input type="password" name="password" id="password" required
                   class="block w-full rounded-xl border border-slate-200 py-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
-                  placeholder="••••••••">
+                  placeholder="********">
                 <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition-colors">
                   <i class="fas fa-eye" id="eyeIcon"></i>
                 </button>

@@ -60,13 +60,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 <html lang="en">
 
 <head>
-    
+
     <title>Data Berita - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
-    
-    <style>
-        
 
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -78,7 +76,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
         }
     </style>
-    
+
 </head>
 
 <body class="bg-slate-100">
@@ -165,8 +163,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <?php include '../includes/script_db.php'; ?>
 
     <script>
-        
-
         // Live search via AJAX: update table rows without leaving input focus
         (function() {
             const input = document.getElementById('searchInput');

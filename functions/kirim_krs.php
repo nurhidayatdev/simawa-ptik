@@ -2,7 +2,7 @@
 // functions/kirim_krs.php
 include_once __DIR__ . '/helpers.php';
 
-function kirimKrsReminder($koneksi, $token, $chat_id)
+function kirimKrsReminder($koneksi, $token = null, $chat_id = null)
 {
     date_default_timezone_set('Asia/Makassar');
 
@@ -26,9 +26,9 @@ function kirimKrsReminder($koneksi, $token, $chat_id)
         }
         $message .= "\n_Harap segera mengisi KRS di sistem!_ 🚀";
 
-        $res = sendTelegramMessage($token, $chat_id, $message);
+        $res = sendFonnteMessage($message);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Reminder KRS berhasil dikirim ke " . ($no - 1) . " mahasiswa!"];
+            return ['status' => 'success', 'message' => "Reminder KRS berhasil dikirim ke WhatsApp untuk " . ($no - 1) . " mahasiswa!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }

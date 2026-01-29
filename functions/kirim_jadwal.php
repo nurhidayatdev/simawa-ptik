@@ -2,7 +2,7 @@
 // functions/kirim_jadwal.php
 include_once __DIR__ . '/helpers.php';
 
-function kirimJadwalReminder($koneksi, $token, $chat_id, $custom_data = null)
+function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_data = null)
 {
     // Set timezone to WITA
     date_default_timezone_set('Asia/Makassar');
@@ -39,9 +39,9 @@ function kirimJadwalReminder($koneksi, $token, $chat_id, $custom_data = null)
         }
         $message .= "_Jangan lupa datang tepat waktu!_ 📝";
 
-        $res = sendTelegramMessage($token, $chat_id, $message);
+        $res = sendFonnteMessage($message);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Jadwal Custom besok berhasil dikirim!"];
+            return ['status' => 'success', 'message' => "Jadwal Custom besok berhasil dikirim ke WhatsApp!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }
@@ -66,14 +66,14 @@ function kirimJadwalReminder($koneksi, $token, $chat_id, $custom_data = null)
         if ($result && mysqli_num_rows($result) > 0) {
             $no = 1;
             while ($row = mysqli_fetch_assoc($result)) {
-                $message .= "{$no}. *{$row['nama_matkul']}*\n   ⏰ " . date('H:i', strtotime($row['jam_mulai'])) . " - " . date('H:i', strtotime($row['jam_selesai'])) . " WITA\n   🏛️ {$row['ruangan']}\n   👨‍🏫 {$row['dosen_pengampu']}\n\n";
+                $message .= "{$no}. *{$row['nama_matkul']}*\n   ⏰ " . date('H:i', strtotime($row['jam_mulai'])) . " - " . date('H:i', strtotime($row['jam_selesai'])) . " WITA\n   🏛️ {$row['ruangan']}\n\n";
                 $no++;
             }
             $message .= "_Jangan lupa datang tepat waktu!_ 📝";
 
-            $res = sendTelegramMessage($token, $chat_id, $message);
+            $res = sendFonnteMessage($message);
             if ($res['success']) {
-                return ['status' => 'success', 'message' => "Jadwal $tomorrow_ind berhasil dikirim!"];
+                return ['status' => 'success', 'message' => "Jadwal $tomorrow_ind berhasil dikirim ke WhatsApp!"];
             } else {
                 return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
             }
@@ -93,9 +93,6 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_jadwal.php') {
         exit;
     }
 
-    $token = "8212322367:AAGCGc4TG__EnsEd-20wFTI_s2adp-dp1OY";
-    $chat_id = "-1003577478223";
-
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'kirim_custom') {
         // Handle custom data via JSON payload
         if (isset($_POST['custom_payload'])) {
@@ -110,10 +107,10 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_jadwal.php') {
                 ]
             ];
         }
-        $res = kirimJadwalReminder($koneksi, $token, $chat_id, $custom_data);
+        $res = kirimJadwalReminder($koneksi, null, null, $custom_data);
     } else {
         // Default / 'kirim_langsung'
-        $res = kirimJadwalReminder($koneksi, $token, $chat_id);
+        $res = kirimJadwalReminder($koneksi);
     }
 
     $_SESSION[$res['status']] = $res['message'];

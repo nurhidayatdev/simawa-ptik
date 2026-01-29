@@ -68,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: ../actions/tambah_absensi?matkul_id=$matkul_id&pertemuan=$pertemuan");
     exit;
 }
-// CSV export handler (top of file) - responds to ?export=csv&pertemuan=...&matkul_id=...&filter=...
-if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemuan']) && isset($_GET['matkul_id'])) {
+// Excel export handler (top of file) - responds to ?export=excel&pertemuan=...&matkul_id=...&filter=...
+if (isset($_GET['export']) && $_GET['export'] === 'excel' && isset($_GET['pertemuan']) && isset($_GET['matkul_id'])) {
     $pertemuan = (int) $_GET['pertemuan'];
     $matkul_id = (int) $_GET['matkul_id'];
     $filter = $_GET['filter'] ?? 'all';
@@ -121,21 +121,31 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
         $safe_name = str_replace(' ', '_', $safe_name);
         $safe_name = substr($safe_name, 0, 80);
 
-        $filename = 'absensi_' . $safe_name . '_p' . $pertemuan . '.csv';
+        $filename = 'absensi_' . $safe_name . '_p' . $pertemuan . '.xls';
 
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        $out = fopen('php://output', 'w');
-        fputcsv($out, ['NIM', 'Nama Lengkap', 'Status']);
+        header("Content-Type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+
+        echo '<table border="1">';
+        echo '<tr><th colspan="3">DATA ABSENSI ' . strtoupper($matkul_name) . ' - PERTEMUAN ' . $pertemuan . '</th></tr>';
+        echo '<tr>
+                <th style="background-color: #1e1b4b; color: white;">NIM</th>
+                <th style="background-color: #1e1b4b; color: white;">Nama Lengkap</th>
+                <th style="background-color: #1e1b4b; color: white;">Status</th>
+              </tr>';
+
         while ($r = mysqli_fetch_assoc($res)) {
-            // Ensure NIM is numeric when possible
-            $nim_value = is_numeric($r['nim']) ? ($r['nim'] + 0) : $r['nim'];
-            fputcsv($out, [$nim_value, $r['nama_lengkap'], $r['status']]);
+            echo '<tr>';
+            echo '<td style="mso-number-format:\'@\'">' . $r['nim'] . '</td>';
+            echo '<td>' . $r['nama_lengkap'] . '</td>';
+            echo '<td>' . $r['status'] . '</td>';
+            echo '</tr>';
         }
-        fclose($out);
+        echo '</table>';
         exit;
     } else {
-        // fallback: query error
         die('Query error: ' . mysqli_error($koneksi));
     }
 }
@@ -182,8 +192,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                                 <a href="../actions/tambah_absensi?matkul_id=<?= $_GET['matkul_id'] ?? ''; ?>&pertemuan=<?= $_GET['pertemuan'] ?? ''; ?>" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
                                     Absensi
                                 </a>
-                                <button type="button" onclick="confirmExport()" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Export to CSV">
-                                    <i class="fas fa-file-csv"></i>
+                                <button type="button" onclick="confirmExport()" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Export to Excel">
+                                    <i class="fas fa-file-excel"></i>
                                 </button>
                             </div>
                         </form>
@@ -325,7 +335,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
-        // SweetAlert for Export CSV
+        // SweetAlert for Export Excel
         function confirmExport() {
             const matkulId = "<?= $_GET['matkul_id'] ?? '' ?>";
             const pertemuan = "<?= $_GET['pertemuan'] ?? '' ?>";
@@ -335,15 +345,15 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                 Swal.fire({
                     icon: 'warning',
                     title: 'Peringatan',
-                    text: 'Silakan pilih mata kuliah dan pertemuan terlebih dahulu.',
+                    text: 'Silakan pilih mata kuliah and pertemuan terlebih dahulu.',
                     confirmButtonColor: '#3730a3'
                 });
                 return;
             }
 
             Swal.fire({
-                title: 'Export ke CSV?',
-                text: "Data absensi akan diunduh dalam format CSV.",
+                title: 'Export ke Excel?',
+                text: "Data absensi akan diunduh dalam format Excel.",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#10b981',
@@ -352,7 +362,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv' && isset($_GET['pertemua
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = `?export=csv&matkul_id=${matkulId}&pertemuan=${pertemuan}&filter=${filter}`;
+                    window.location.href = `?export=excel&matkul_id=${matkulId}&pertemuan=${pertemuan}&filter=${filter}`;
                 }
             });
         }

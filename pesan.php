@@ -9,9 +9,9 @@ if (isset($_POST['kirim_pesan'])) {
     if (!empty($pesan_raw)) {
         $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan_db')";
         if (mysqli_query($koneksi, $query_pesan)) {
-            // Kirim notifikasi Telegram (gunakan pesan raw agar \r\n tidak muncul)
+            // Kirim notifikasi WhatsApp (gunakan pesan raw agar \r\n tidak muncul)
             include 'functions/kirim_pesan.php';
-            sendTelegramPesan($pesan_raw);
+            sendWhatsAppPesan($pesan_raw);
             $_SESSION['pesan_status'] = 'success';
         } else {
             $_SESSION['pesan_status'] = 'error';
