@@ -173,11 +173,17 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
 
         /* Sticky Column for Name */
         .sticky-col {
-            position: sticky;
-            left: 0;
             background: white;
-            z-index: 10;
-            border-right: 1px solid #e2e8f0;
+            z-index: 5;
+        }
+
+        @media (min-width: 768px) {
+            .sticky-col {
+                position: sticky;
+                left: 0;
+                z-index: 10;
+                border-right: 1px solid #e2e8f0;
+            }
         }
 
         tr:hover .sticky-col {
@@ -199,10 +205,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                 </div>
                 <div class="flex gap-2">
                     <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
-                    <button onclick="confirmExport()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
-                        <i class="fas fa-file-excel"></i> EXPORT REKAP
-                    </button>
-                    
+                        <button onclick="confirmExport()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
+                            <i class="fas fa-file-excel"></i> EXPORT REKAP
+                        </button>
+
                         <a href="../actions/tambah_absensi.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
                             <i class="fas fa-plus-circle"></i> INPUT ABSEN
                         </a>
