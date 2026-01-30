@@ -96,7 +96,7 @@ $q_tugas = mysqli_query($koneksi, "
     SELECT t.id, t.deadline_tanggal, t.deadline_pukul, t.deskripsi, mk.nama_matkul, gd.id as is_done
     FROM tugas t
     LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
-    LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id'
+    LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
     WHERE t.periode_id = '$periode_id'
     AND t.deadline_tanggal >= '$month_start' 
     AND t.deadline_tanggal <= '$month_end'
@@ -115,7 +115,7 @@ while ($row = mysqli_fetch_assoc($q_tugas)) {
 $q_personal = mysqli_query($koneksi, "
     SELECT judul, deadline, status 
     FROM tugas_personal 
-    WHERE user_id = '$user_id'
+    WHERE user_id = '$user_id' AND periode_id = '$periode_id'
     AND DATE(deadline) >= '$month_start' 
     AND DATE(deadline) <= '$month_end'
 ");

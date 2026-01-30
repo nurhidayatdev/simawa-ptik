@@ -100,7 +100,7 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-800">Piket Proyektor</h3>
+                    <h3 class="text-xl font-semibold text-slate-800">Piket Proyektor</h3>
                     <p class="text-xs text-slate-500 mt-1">Daftar mahasiswa petugas pengambil proyektor mata kuliah.</p>
                 </div>
 
@@ -109,11 +109,11 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                         <form action="reminder" method="POST" id="reminderForm" class="w-full sm:w-auto">
                             <input type="hidden" name="action" value="piket">
                             <input type="hidden" name="redirect" value="piket_proyektor">
-                            <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
+                            <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all">
                                 <i class="fab fa-telegram-plane"></i> Kirim Notifikasi
                             </button>
                         </form>
-                        <button onclick="confirmReset()" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-black text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
+                        <button onclick="confirmReset()" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-black text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all">
                             <i class="fa fa-random"></i> Acak Ulang
                         </button>
                     </div>
@@ -121,9 +121,9 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
             </div>
 
             <form method="GET" class="my-6 max-w-sm">
-                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Pilih Minggu Perkuliahan</label>
+                <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">Pilih Minggu Perkuliahan</label>
                 <div class="relative">
-                    <select name="minggu" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm">
+                    <select name="minggu" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm">
                         <?php
                         for ($i = 1; $i <= 16; $i++):
                             $week_start = date('d M', strtotime($start_date . " + " . (($i - 1) * 7) . " days"));
@@ -145,7 +145,7 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                     <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                         <i class="fa fa-clipboard-list text-2xl text-slate-300"></i>
                     </div>
-                    <h3 class="text-sm font-bold text-slate-700">Belum Ada Data Piket</h3>
+                    <h3 class="text-sm font-semibold text-slate-700">Belum Ada Data Piket</h3>
                     <p class="text-[11px] text-slate-500 max-w-xs mx-auto">Administrator belum mengacak daftar piket proyektor untuk periode ini.</p>
                 </div>
             <?php else: ?>
@@ -159,12 +159,12 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all group">
                             <div class="bg-slate-50 px-4 py-3 border-b border-slate-100 group-hover:bg-indigo-50 transition-colors">
                                 <div class="flex justify-between items-center mb-1.5">
-                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-500"><?= $data['hari'] ?></span>
-                                    <span class="text-[9px] font-bold text-slate-500"><?= $duty_date ?></span>
+                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-indigo-500"><?= $data['hari'] ?></span>
+                                    <span class="text-[9px] font-semibold text-slate-500"><?= $duty_date ?></span>
                                 </div>
-                                <h3 class="text-xs font-bold text-slate-800 line-clamp-1 mb-1" title="<?= htmlspecialchars($data['matkul']) ?>"><?= htmlspecialchars($data['matkul']) ?></h3>
+                                <h3 class="text-xs font-semibold text-slate-800 line-clamp-1 mb-1" title="<?= htmlspecialchars($data['matkul']) ?>"><?= htmlspecialchars($data['matkul']) ?></h3>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[9px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600 font-bold"><?= $data['jam'] ?></span>
+                                    <span class="text-[9px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600 font-semibold"><?= $data['jam'] ?></span>
                                     <div class="flex items-center gap-1">
                                         <i class="fa fa-map-marker-alt text-slate-300 text-[9px]"></i>
                                         <span class="text-[9px] font-medium text-slate-500"><?= htmlspecialchars($data['ruangan']) ?></span>
@@ -172,7 +172,7 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                                 </div>
                             </div>
                             <div class="p-3">
-                                <div class="text-[8px] font-bold text-slate-400 uppercase tracking-wider mb-2">Petugas Piket</div>
+                                <div class="text-[8px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Petugas Piket</div>
                                 <div class="space-y-2">
                                     <?php foreach ($data['petugas'] as $petugas): ?>
                                         <div class="flex items-center gap-2">
@@ -191,7 +191,7 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
 
             <div class="mt-8 bg-slate-900 rounded-xl p-6 text-white relative overflow-hidden shadow-lg">
                 <div class="relative z-10">
-                    <h3 class="text-sm font-bold mb-2 flex items-center gap-2">
+                    <h3 class="text-sm font-semibold mb-2 flex items-center gap-2">
                         <i class="fa fa-info-circle text-indigo-400"></i>
                         Informasi Penting
                     </h3>

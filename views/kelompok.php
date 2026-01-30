@@ -112,7 +112,7 @@ if ($selected_matkul) {
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-800">Data Kelompok</h3>
+                    <h3 class="text-xl font-semibold text-slate-800">Data Kelompok</h3>
                     <p class="text-xs text-slate-500 mt-1">Daftar pembagian kelompok mahasiswa per mata kuliah.</p>
                 </div>
                 <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
@@ -147,9 +147,9 @@ if ($selected_matkul) {
 
             <form id="selectForm" method="GET" class="my-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Mata Kuliah</label>
+                    <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">Mata Kuliah</label>
                     <div class="relative">
-                        <select id="mata_kuliah" name="matkul_id" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm" onchange="this.form.submit()">
+                        <select id="mata_kuliah" name="matkul_id" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm" onchange="this.form.submit()">
                             <option value="">-- Pilih Mata Kuliah --</option>
                             <?php while ($mk = mysqli_fetch_assoc($matkuls_res)) : ?>
                                 <option value="<?= $mk['id'] ?>" <?= ($mk['id'] == $selected_matkul) ? 'selected' : '' ?>><?= htmlspecialchars($mk['nama_matkul']) ?></option>
@@ -162,9 +162,9 @@ if ($selected_matkul) {
                 </div>
                 <?php if (count($sets) > 1): ?>
                     <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Set Kelompok</label>
+                        <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">Set Kelompok</label>
                         <div class="relative">
-                            <select name="set_idx" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm" onchange="this.form.submit()">
+                            <select name="set_idx" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-indigo-700 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm" onchange="this.form.submit()">
                                 <?php foreach ($sets as $idx => $s): ?>
                                     <option value="<?= $idx ?>" <?= $idx == $selected_set_idx ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($s['dosen']) ?> <?= !empty($s['keterangan']) ? '(' . htmlspecialchars($s['keterangan']) . ')' : '' ?>
@@ -184,11 +184,11 @@ if ($selected_matkul) {
                     <div class="p-4 bg-yellow-100 text-yellow-800 text-xs">Tidak ada kelompok tersimpan untuk mata kuliah ini.</div>
                 <?php else: ?>
                     <div class="mb-4 p-3 bg-indigo-50 border border-indigo-100 rounded-lg">
-                        <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Set Aktif</div>
-                        <div class="text-sm font-bold text-indigo-900">
+                        <div class="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider mb-1">Set Aktif</div>
+                        <div class="text-sm font-semibold text-indigo-900">
                             👨‍🏫 <?= htmlspecialchars($current_set['dosen']) ?>
                             <?php if (!empty($current_set['keterangan'])): ?>
-                                <span class="ml-2 px-2 py-0.5 bg-indigo-200 text-indigo-800 rounded text-[10px] uppercase font-bold"><?= htmlspecialchars($current_set['keterangan']) ?></span>
+                                <span class="ml-2 px-2 py-0.5 bg-indigo-200 text-indigo-800 rounded text-[10px] uppercase font-semibold"><?= htmlspecialchars($current_set['keterangan']) ?></span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ if ($selected_matkul) {
                         <?php foreach ($groups as $idx => $g): ?>
                             <div class="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all group-card">
                                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-100">
-                                    <h4 class="font-bold text-indigo-900 text-sm">Kelompok <?= htmlspecialchars($g['kelompok_no']) ?></h4>
+                                    <h4 class="font-semibold text-indigo-900 text-sm">Kelompok <?= htmlspecialchars($g['kelompok_no']) ?></h4>
                                 </div>
                                 <div class="p-4">
                                     <ul class="space-y-3">

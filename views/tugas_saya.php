@@ -26,7 +26,7 @@ if (isset($_POST['action'])) {
         $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
         $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
         $deadline = mysqli_real_escape_string($koneksi, $_POST['deadline']);
-        mysqli_query($koneksi, "INSERT INTO tugas_personal (user_id, judul, deskripsi, deadline) VALUES ('$user_id', '$judul', '$deskripsi', '$deadline')");
+        mysqli_query($koneksi, "INSERT INTO tugas_personal (user_id, periode_id, judul, deskripsi, deadline) VALUES ('$user_id', '$periode_id', '$judul', '$deskripsi', '$deadline')");
         $_SESSION['success'] = "Tugas personal berhasil ditambahkan.";
     } elseif ($_POST['action'] == 'toggle_personal') {
         $id = intval($_POST['id']);
@@ -42,7 +42,7 @@ if (isset($_POST['action'])) {
         if (mysqli_num_rows($check) > 0) {
             mysqli_query($koneksi, "DELETE FROM tugas_global_done WHERE user_id = '$user_id' AND tugas_id = '$tugas_id'");
         } else {
-            mysqli_query($koneksi, "INSERT INTO tugas_global_done (user_id, tugas_id) VALUES ('$user_id', '$tugas_id')");
+            mysqli_query($koneksi, "INSERT INTO tugas_global_done (user_id, tugas_id, periode_id) VALUES ('$user_id', '$tugas_id', '$periode_id')");
         }
     }
     $redir = $show_done ? "?show_done=1" : "";
@@ -52,7 +52,7 @@ if (isset($_POST['action'])) {
 
 // Get Personal Tasks
 $personal_cond = $show_done ? "" : " AND status = 'belum'";
-$personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE user_id = '$user_id' $personal_cond ORDER BY deadline ASC");
+$personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' $personal_cond ORDER BY deadline ASC");
 
 // Get Global Tasks
 $global_cond = $show_done ? "" : " AND gd.id IS NULL";
@@ -60,7 +60,7 @@ $global_tasks = mysqli_query($koneksi, "
     SELECT t.*, mk.nama_matkul, gd.id as is_done
     FROM tugas t
     LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
-    LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id'
+    LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
     WHERE t.periode_id = '$periode_id' AND t.status = 'belum' $global_cond
     ORDER BY t.deadline_tanggal ASC
 ");
@@ -82,20 +82,20 @@ $global_tasks = mysqli_query($koneksi, "
         <div class="max-w-5xl mx-auto w-full">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h2 class="text-2xl font-black text-slate-800">Tugas Saya</h2>
+                    <h2 class="text-2xl font-bold text-slate-800">Tugas Saya</h2>
                     <p class="text-sm text-slate-500">Kelola tugas kuliah dan tugas pribadi Anda di sini.</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <?php if ($show_done): ?>
-                        <a href="tugas_saya" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2 border border-indigo-100">
+                        <a href="tugas_saya" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 border border-indigo-100">
                             <i class="fas fa-eye-slash"></i> Sembunyikan Selesai
                         </a>
                     <?php else: ?>
-                        <a href="tugas_saya?show_done=1" class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+                        <a href="tugas_saya?show_done=1" class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2">
                             <i class="fas fa-history"></i> Tampilkan Semua Tugas
                         </a>
                     <?php endif; ?>
-                    <button onclick="showAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
+                    <button onclick="showAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
                         <i class="fas fa-plus"></i> Tambah Tugas Pribadi
                     </button>
                 </div>
@@ -104,7 +104,7 @@ $global_tasks = mysqli_query($koneksi, "
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Global Tasks (From Admin) -->
                 <div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fas fa-university text-indigo-600"></i> Tugas Kelas
                     </h3>
                     <div class="space-y-4">
@@ -121,24 +121,24 @@ $global_tasks = mysqli_query($koneksi, "
                                         </form>
                                         <div class="flex-1">
                                             <div class="flex justify-between items-start mb-1">
-                                                <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest"><?= htmlspecialchars($row['nama_matkul']) ?></span>
+                                                <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest"><?= htmlspecialchars($row['nama_matkul']) ?></span>
                                                 <div class="flex flex-col items-end">
-                                                    <span class="text-[10px] font-bold text-slate-500"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
+                                                    <span class="text-[10px] font-semibold text-slate-500"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
                                                     <span class="text-[9px] font-medium text-rose-400 uppercase tracking-tighter"><?= date('H:i', strtotime($row['deadline_pukul'])) ?> WITA</span>
                                                 </div>
                                             </div>
-                                            <h4 class="text-sm font-bold text-slate-800 leading-tight <?= $row['is_done'] ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['nama_matkul']) ?></h4>
+                                            <h4 class="text-sm font-semibold text-slate-800 leading-tight <?= $row['is_done'] ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['nama_matkul']) ?></h4>
                                             <div class="text-[11px] text-slate-500 mt-2 leading-relaxed"><?= nl2br(strip_tags($row['deskripsi'])) ?></div>
 
                                             <div class="flex flex-wrap gap-2 mt-4">
                                                 <?php if (!empty($row['file_tugas'])): ?>
-                                                    <a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold border border-blue-100 hover:bg-blue-100 transition-colors">
+                                                    <a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-semibold border border-blue-100 hover:bg-blue-100 transition-colors">
                                                         <i class="fas fa-file-download"></i> Unduh File
                                                     </a>
                                                 <?php endif; ?>
 
                                                 <?php if (!empty($row['link_kirim'])): ?>
-                                                    <a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                                                    <a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-semibold border border-indigo-100 hover:bg-indigo-100 transition-colors">
                                                         <i class="fas fa-paper-plane"></i> Kirim Tugas
                                                     </a>
                                                 <?php endif; ?>
@@ -158,7 +158,7 @@ $global_tasks = mysqli_query($koneksi, "
 
                 <!-- Personal Tasks -->
                 <div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                         <i class="fas fa-user text-indigo-600"></i> Tugas Pribadi
                     </h3>
                     <div class="space-y-4">
@@ -176,9 +176,9 @@ $global_tasks = mysqli_query($koneksi, "
                                         </form>
                                         <div class="flex-1">
                                             <div class="flex justify-between items-start">
-                                                <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest">Pribadi</span>
+                                                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Pribadi</span>
                                                 <div class="flex items-center gap-2 text-slate-400">
-                                                    <span class="text-[10px] font-bold"><?= $row['deadline'] ? date('d M', strtotime($row['deadline'])) : '' ?></span>
+                                                    <span class="text-[10px] font-semibold"><?= $row['deadline'] ? date('d M', strtotime($row['deadline'])) : '' ?></span>
                                                     <form method="POST" onsubmit="return confirm('Hapus tugas ini?')">
                                                         <input type="hidden" name="action" value="delete_personal">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
@@ -188,7 +188,7 @@ $global_tasks = mysqli_query($koneksi, "
                                                     </form>
                                                 </div>
                                             </div>
-                                            <h4 class="text-sm font-bold text-slate-800 mt-1 <?= $row['status'] == 'selesai' ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['judul']) ?></h4>
+                                            <h4 class="text-sm font-semibold text-slate-800 mt-1 <?= $row['status'] == 'selesai' ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['judul']) ?></h4>
                                             <?php if ($row['deskripsi']): ?>
                                                 <p class="text-[10px] text-slate-500 mt-1 line-clamp-2"><?= htmlspecialchars($row['deskripsi']) ?></p>
                                             <?php endif; ?>
@@ -214,26 +214,26 @@ $global_tasks = mysqli_query($koneksi, "
     <div id="addModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
         <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in-up">
             <div class="bg-indigo-600 p-6 text-white text-center">
-                <h3 class="text-xl font-black">Tambah Tugas</h3>
+                <h3 class="text-xl font-bold">Tambah Tugas</h3>
                 <p class="text-xs text-indigo-100 mt-1 opacity-80">Rencanakan tugas harian Anda.</p>
             </div>
             <form method="POST" class="p-6 space-y-4">
                 <input type="hidden" name="action" value="add_personal">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
                     <input type="text" name="judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
                     <input type="datetime-local" name="deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
                     <textarea name="deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium resize-none"></textarea>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-colors">Batal</button>
-                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">Simpan</button>
+                    <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">Simpan</button>
                 </div>
             </form>
         </div>

@@ -121,8 +121,6 @@ $color_filters = [
     <title>Pusat Misi - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-       
-
         .glass {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
@@ -147,7 +145,7 @@ $color_filters = [
             filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
         }
     </style>
-  
+
 </head>
 
 <body class="bg-slate-100 min-h-screen">
@@ -156,7 +154,7 @@ $color_filters = [
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen bg-indigo-950/5">
         <div class="max-w-6xl mx-auto w-full">
             <div class="mb-8">
-                <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Pusat Misi & Pencapaian</h1>
+                <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Pusat Misi & Pencapaian</h1>
                 <p class="text-slate-500 text-sm mt-1">Selesaikan misi untuk mendapatkan lencana prestisius!</p>
             </div>
 
@@ -170,8 +168,8 @@ $color_filters = [
                                 <i class="fa <?= $cat['icon'] ?> text-2xl"></i>
                             </div>
                             <div>
-                                <span class="text-[10px] uppercase font-black tracking-widest text-<?= $cat['color'] ?>-600"><?= $cat['category'] ?></span>
-                                <h3 class="text-xl font-bold text-slate-800"><?= $cat['title'] ?></h3>
+                                <span class="text-[10px] uppercase font-bold tracking-widest text-<?= $cat['color'] ?>-600"><?= $cat['category'] ?></span>
+                                <h3 class="text-xl font-semibold text-slate-800"><?= $cat['title'] ?></h3>
                             </div>
                         </div>
 
@@ -191,12 +189,12 @@ $color_filters = [
                                                 <?php endif; ?>
                                             </div>
                                             <div>
-                                                <h4 class="font-bold text-sm text-slate-700"><?= $level['name'] ?></h4>
+                                                <h4 class="font-semibold text-sm text-slate-700"><?= $level['name'] ?></h4>
                                                 <p class="text-[10px] text-slate-500"><?= $level['desc'] ?></p>
                                             </div>
                                         </div>
                                         <div class="text-right">
-                                            <span class="text-xs font-black text-slate-700"><?= $level['current'] ?> / <?= $level['target'] ?></span>
+                                            <span class="text-xs font-bold text-slate-700"><?= $level['current'] ?> / <?= $level['target'] ?></span>
                                         </div>
                                     </div>
 
@@ -205,7 +203,7 @@ $color_filters = [
                                     </div>
 
                                     <?php if ($is_completed): ?>
-                                        <div class="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-green-600 uppercase">
+                                        <div class="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-green-600 uppercase">
                                             <i class="fa fa-check-circle"></i> Berhasil Dicapai!
                                         </div>
                                     <?php endif; ?>
@@ -218,7 +216,7 @@ $color_filters = [
 
             <div class="mt-12 p-8 rounded-3xl border border-indigo-900/50 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white overflow-hidden relative shadow-2xl">
                 <div class="relative z-10">
-                    <h2 class="text-2xl font-black mb-2 flex items-center gap-3">
+                    <h2 class="text-2xl font-bold mb-2 flex items-center gap-3">
                         <i class="fa fa-star text-yellow-400"></i>
                         Koleksi Lencana Kamu
                     </h2>
@@ -270,14 +268,14 @@ $color_filters = [
 
                                         <!-- Label -->
                                         <div class="mt-3 text-center">
-                                            <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/90 bg-white/10 px-3 py-1 rounded-full border border-white/5 shadow-sm group-hover:bg-white/20 transition-colors">
+                                            <span class="text-[10px] md:text-xs font-semibold uppercase tracking-widest text-white/90 bg-white/10 px-3 py-1 rounded-full border border-white/5 shadow-sm group-hover:bg-white/20 transition-colors">
                                                 <?= $level['name'] ?>
                                             </span>
                                         </div>
 
                                         <!-- Detailed Tooltip -->
                                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-900 text-white text-xs py-2 px-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform translate-y-2 group-hover:translate-y-0 w-max max-w-[150px] text-center z-50 border border-white/10">
-                                            <p class="font-bold text-<?= $cat['color'] ?>-400 mb-0.5"><?= $cat['category'] ?></p>
+                                            <p class="font-semibold text-<?= $cat['color'] ?>-400 mb-0.5"><?= $cat['category'] ?></p>
                                             <p class="text-[10px] text-slate-300 leading-tight"><?= $level['desc'] ?></p>
                                             <!-- Arrow -->
                                             <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>

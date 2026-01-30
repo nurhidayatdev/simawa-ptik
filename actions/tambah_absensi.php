@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-                        <a href="../views/manajemen_absen.php?matkul_id=<?= $_GET['matkul_id'] ?? ''; ?>&pertemuan=<?= $_GET['pertemuan'] ?? ''; ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
+                        <a href="../views/rekap_absen.php?matkul_id=<?= $_GET['matkul_id'] ?? ''; ?>&pertemuan=<?= $_GET['pertemuan'] ?? ''; ?>" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs">
                             <button type="button">
                                 Kembali
                             </button>
