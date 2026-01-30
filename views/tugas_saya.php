@@ -51,11 +51,11 @@ if (isset($_POST['action'])) {
 }
 
 // Get Personal Tasks
-$personal_cond = $show_done ? "" : " AND status = 'belum'";
+$personal_cond = $show_done ? " AND status = 'selesai'" : " AND status = 'belum'";
 $personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' $personal_cond ORDER BY deadline ASC");
 
 // Get Global Tasks
-$global_cond = $show_done ? "" : " AND gd.id IS NULL";
+$global_cond = $show_done ? " AND gd.id IS NOT NULL" : " AND gd.id IS NULL";
 $global_tasks = mysqli_query($koneksi, "
     SELECT t.*, mk.nama_matkul, gd.id as is_done
     FROM tugas t
@@ -85,18 +85,17 @@ $global_tasks = mysqli_query($koneksi, "
                     <h2 class="text-2xl font-bold text-slate-800">Tugas Saya</h2>
                     <p class="text-sm text-slate-500">Kelola tugas kuliah dan tugas pribadi Anda di sini.</p>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <?php if ($show_done): ?>
-                        <a href="tugas_saya" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2 border border-indigo-100">
-                            <i class="fas fa-eye-slash"></i> Sembunyikan Selesai
+                <div class="flex items-center gap-2">
+                    <div class="flex bg-white/50 backdrop-blur-sm p-1 rounded-2xl border border-slate-200 shadow-sm">
+                        <a href="tugas_saya" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all <?= !$show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
+                            Tugas Aktif
                         </a>
-                    <?php else: ?>
-                        <a href="tugas_saya?show_done=1" class="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2">
-                            <i class="fas fa-history"></i> Tampilkan Semua Tugas
+                        <a href="tugas_saya?show_done=1" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all <?= $show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
+                            Tugas Selesai
                         </a>
-                    <?php endif; ?>
-                    <button onclick="showAddModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-200 transition-all flex items-center gap-2">
-                        <i class="fas fa-plus"></i> Tambah Tugas Pribadi
+                    </div>
+                    <button onclick="showAddModal()" class="bg-white hover:bg-slate-50 text-indigo-600 border border-indigo-100 w-10 h-10 rounded-2xl shadow-sm transition-all flex items-center justify-center">
+                        <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </div>
@@ -109,10 +108,14 @@ $global_tasks = mysqli_query($koneksi, "
                     </h3>
                     <div class="space-y-4">
                         <?php if (mysqli_num_rows($global_tasks) > 0): ?>
-                            <?php while ($row = mysqli_fetch_assoc($global_tasks)): ?>
-                                <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all group <?= $row['is_done'] ? 'opacity-60 grayscale-[0.5]' : '' ?>">
+                            <?php while ($row = mysqli_fetch_assoc($global_tasks)):
+                                $row['deadline_fmt'] = date('d M Y', strtotime($row['deadline_tanggal'])) . ' ' . date('H:i', strtotime($row['deadline_pukul'])) . ' WITA';
+                                $row['deskripsi_clean'] = strip_tags($row['deskripsi']);
+                                $json_data = htmlspecialchars(json_encode($row));
+                            ?>
+                                <div onclick="showDetail('global', <?= $json_data ?>)" class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['is_done'] ? 'opacity-60 grayscale-[0.5]' : '' ?>">
                                     <div class="flex items-start gap-4">
-                                        <form method="POST" class="mt-1">
+                                        <form method="POST" class="mt-1" onclick="event.stopPropagation()">
                                             <input type="hidden" name="action" value="toggle_global">
                                             <input type="hidden" name="tugas_id" value="<?= $row['id'] ?>">
                                             <button type="submit" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all <?= $row['is_done'] ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-200 text-transparent hover:border-indigo-400' ?>">
@@ -128,9 +131,9 @@ $global_tasks = mysqli_query($koneksi, "
                                                 </div>
                                             </div>
                                             <h4 class="text-sm font-semibold text-slate-800 leading-tight <?= $row['is_done'] ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['nama_matkul']) ?></h4>
-                                            <div class="text-[11px] text-slate-500 mt-2 leading-relaxed"><?= nl2br(strip_tags($row['deskripsi'])) ?></div>
+                                            <div class="text-[11px] text-slate-500 mt-2 leading-relaxed line-clamp-2"><?= $row['deskripsi_clean'] ?></div>
 
-                                            <div class="flex flex-wrap gap-2 mt-4">
+                                            <div class="flex flex-wrap gap-2 mt-4" onclick="event.stopPropagation()">
                                                 <?php if (!empty($row['file_tugas'])): ?>
                                                     <a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-semibold border border-blue-100 hover:bg-blue-100 transition-colors">
                                                         <i class="fas fa-file-download"></i> Unduh File
@@ -163,10 +166,13 @@ $global_tasks = mysqli_query($koneksi, "
                     </h3>
                     <div class="space-y-4">
                         <?php if (mysqli_num_rows($personal_tasks) > 0): ?>
-                            <?php while ($row = mysqli_fetch_assoc($personal_tasks)): ?>
-                                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group <?= $row['status'] == 'selesai' ? 'opacity-60 grayscale-[0.5]' : '' ?>">
+                            <?php while ($row = mysqli_fetch_assoc($personal_tasks)):
+                                $row['deadline_fmt'] = $row['deadline'] ? date('d M Y, H:i', strtotime($row['deadline'])) : 'Tanpa Deadline';
+                                $json_data = htmlspecialchars(json_encode($row));
+                            ?>
+                                <div onclick="showDetail('personal', <?= $json_data ?>)" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['status'] == 'selesai' ? 'opacity-60 grayscale-[0.5]' : '' ?>">
                                     <div class="flex items-start gap-3">
-                                        <form method="POST" class="mt-1">
+                                        <form method="POST" class="mt-1" onclick="event.stopPropagation()">
                                             <input type="hidden" name="action" value="toggle_personal">
                                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
                                             <input type="hidden" name="status" value="<?= $row['status'] ?>">
@@ -177,12 +183,12 @@ $global_tasks = mysqli_query($koneksi, "
                                         <div class="flex-1">
                                             <div class="flex justify-between items-start">
                                                 <span class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Pribadi</span>
-                                                <div class="flex items-center gap-2 text-slate-400">
+                                                <div class="flex items-center gap-2 text-slate-400" onclick="event.stopPropagation()">
                                                     <span class="text-[10px] font-semibold"><?= $row['deadline'] ? date('d M', strtotime($row['deadline'])) : '' ?></span>
-                                                    <form method="POST" onsubmit="return confirm('Hapus tugas ini?')">
+                                                    <form id="delete-form-<?= $row['id'] ?>" method="POST">
                                                         <input type="hidden" name="action" value="delete_personal">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                                                        <button type="submit" class="hover:text-red-500 transition-colors">
+                                                        <button type="button" onclick="confirmDelete(<?= $row['id'] ?>)" class="hover:text-red-500 transition-colors">
                                                             <i class="fas fa-trash-alt text-[10px]"></i>
                                                         </button>
                                                     </form>
@@ -212,7 +218,7 @@ $global_tasks = mysqli_query($koneksi, "
 
     <!-- Modal Tambah Tugas -->
     <div id="addModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in-up">
+        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up">
             <div class="bg-indigo-600 p-6 text-white text-center">
                 <h3 class="text-xl font-bold">Tambah Tugas</h3>
                 <p class="text-xs text-indigo-100 mt-1 opacity-80">Rencanakan tugas harian Anda.</p>
@@ -239,6 +245,52 @@ $global_tasks = mysqli_query($koneksi, "
         </div>
     </div>
 
+    <!-- Detail Task Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up">
+            <div id="detailHeader" class="p-6 text-white relative">
+                <button onclick="closeDetailModal()" class="absolute top-5 right-5 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-all">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+                <div class="flex justify-between items-start mb-3">
+                    <span id="detailBadge" class="px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-[0.1em] bg-white/20">Label</span>
+                </div>
+                <h3 id="detailTitle" class="text-xl font-bold leading-tight mb-1">Judul Tugas</h3>
+                <p id="detailSubtitle" class="text-xs text-white/70 font-medium">Subtitle</p>
+            </div>
+            <div class="p-6 space-y-5">
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Deskripsi Tugas</label>
+                    <div id="detailDesc" class="text-xs text-slate-600 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 min-h-[80px] leading-relaxed">
+                        ...
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                        <label class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Tenggat Waktu</label>
+                        <div class="flex items-center gap-2 text-slate-700 font-bold">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
+                                <i class="far fa-calendar-alt text-indigo-500 text-[10px]"></i>
+                            </div>
+                            <span id="detailDeadline" class="text-[10px]">Date</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                        <label class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Status Saat Ini</label>
+                        <div id="detailStatus" class="flex items-center gap-2 font-bold">
+                            ...
+                        </div>
+                    </div>
+                </div>
+
+                <div id="detailActions" class="flex flex-col gap-2 pt-1">
+                    <!-- Dynamic buttons -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function showAddModal() {
             document.getElementById('addModal').classList.remove('hidden');
@@ -250,12 +302,117 @@ $global_tasks = mysqli_query($koneksi, "
             document.getElementById('addModal').classList.remove('flex');
         }
 
+        function showDetail(type, data) {
+            const modal = document.getElementById('detailModal');
+            const header = document.getElementById('detailHeader');
+            const badge = document.getElementById('detailBadge');
+            const title = document.getElementById('detailTitle');
+            const subtitle = document.getElementById('detailSubtitle');
+            const desc = document.getElementById('detailDesc');
+            const deadline = document.getElementById('detailDeadline');
+            const status = document.getElementById('detailStatus');
+            const actions = document.getElementById('detailActions');
+
+            actions.innerHTML = '';
+
+            if (type === 'global') {
+                header.className = 'p-6 text-white relative bg-gradient-to-br from-indigo-600 to-violet-700';
+                badge.innerText = 'Tugas Kelas';
+                title.innerText = data.nama_matkul;
+                subtitle.innerText = 'Tugas dari Dosen / Admin';
+                desc.innerHTML = data.deskripsi || '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada deskripsi detail untuk tugas ini.</span>';
+                deadline.innerText = data.deadline_fmt;
+
+                if (data.is_done) {
+                    status.className = 'flex items-center gap-2.5 text-emerald-600 font-bold';
+                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center"><i class="fas fa-check-circle text-xs"></i></div> <span class="text-[11px]">Selesai</span>';
+                } else {
+                    status.className = 'flex items-center gap-2.5 text-amber-500 font-bold';
+                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center"><i class="fas fa-clock text-xs"></i></div> <span class="text-[11px]">Belum Beres</span>';
+                }
+
+                if (data.file_tugas) {
+                    actions.innerHTML += `
+                        <a href="../storage/tugas/${data.file_tugas}" target="_blank" class="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-blue-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+                            <i class="fas fa-file-download"></i> Unduh Berkas Tugas
+                        </a>
+                    `;
+                }
+                if (data.link_kirim) {
+                    actions.innerHTML += `
+                        <a href="${data.link_kirim}" target="_blank" class="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-widest hover:bg-indigo-100 transition-all border border-indigo-100">
+                            <i class="fas fa-paper-plane"></i> Kirim Jawaban Tugas
+                        </a>
+                    `;
+                }
+            } else {
+                header.className = 'p-6 text-white relative bg-gradient-to-br from-rose-500 to-pink-600';
+                badge.innerText = 'Tugas Pribadi';
+                title.innerText = data.judul;
+                subtitle.innerText = 'Catatan Tugas Mandiri';
+                desc.innerHTML = data.deskripsi || '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada catatan tambahan.</span>';
+                deadline.innerText = data.deadline_fmt;
+
+                if (data.status === 'selesai') {
+                    status.className = 'flex items-center gap-2.5 text-emerald-600 font-bold';
+                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center"><i class="fas fa-check-circle text-xs"></i></div> <span class="text-[11px]">Selesai</span>';
+                } else {
+                    status.className = 'flex items-center gap-2.5 text-rose-500 font-bold';
+                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-rose-50 flex items-center justify-center"><i class="fas fa-clock text-xs"></i></div> <span class="text-[11px]">Berjalan</span>';
+                }
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.getElementById('detailModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Hapus Tugas?',
+                text: "Tugas yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#f1f5f9',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                padding: '2rem',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest',
+                    cancelButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest text-slate-600'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+
+        // Close on backdrop click
+        document.getElementById('detailModal').addEventListener('click', function(e) {
+            if (e.target === this) closeDetailModal();
+        });
+
         <?php if (isset($_SESSION['success'])): ?>
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
                 text: '<?= $_SESSION['success'] ?>',
-                confirmButtonColor: '#4f46e5'
+                confirmButtonColor: '#4f46e5',
+                padding: '2rem',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest'
+                }
             });
             <?php unset($_SESSION['success']); ?>
         <?php endif; ?>
