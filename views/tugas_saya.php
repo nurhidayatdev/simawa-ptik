@@ -61,7 +61,7 @@ $global_tasks = mysqli_query($koneksi, "
     FROM tugas t
     LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
     LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
-    WHERE t.periode_id = '$periode_id' AND t.status = 'belum' $global_cond
+    WHERE t.periode_id = '$periode_id' $global_cond
     ORDER BY t.deadline_tanggal ASC
 ");
 
@@ -73,6 +73,25 @@ $global_tasks = mysqli_query($koneksi, "
     <title>Tugas Saya - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
 </head>
 
 <body class="bg-slate-50">
@@ -111,9 +130,11 @@ $global_tasks = mysqli_query($koneksi, "
                             <?php while ($row = mysqli_fetch_assoc($global_tasks)):
                                 $row['deadline_fmt'] = date('d M Y', strtotime($row['deadline_tanggal'])) . ' ' . date('H:i', strtotime($row['deadline_pukul'])) . ' WITA';
                                 $row['deskripsi_clean'] = strip_tags($row['deskripsi']);
+                                $deadline_ts = strtotime($row['deadline_tanggal'] . ' ' . $row['deadline_pukul']);
+                                $is_overdue = ($deadline_ts < time() && !$row['is_done']);
                                 $json_data = htmlspecialchars(json_encode($row));
                             ?>
-                                <div onclick="showDetail('global', <?= $json_data ?>)" class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['is_done'] ? 'opacity-60 grayscale-[0.5]' : '' ?>">
+                                <div onclick="showDetail('global', <?= $json_data ?>)" class="bg-white p-5 rounded-3xl border shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['is_done'] ? 'border-slate-200 opacity-60 grayscale-[0.5]' : ($is_overdue ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200') ?>">
                                     <div class="flex items-start gap-4">
                                         <form method="POST" class="mt-1" onclick="event.stopPropagation()">
                                             <input type="hidden" name="action" value="toggle_global">
@@ -126,7 +147,12 @@ $global_tasks = mysqli_query($koneksi, "
                                             <div class="flex justify-between items-start mb-1">
                                                 <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest"><?= htmlspecialchars($row['nama_matkul']) ?></span>
                                                 <div class="flex flex-col items-end">
-                                                    <span class="text-[10px] font-semibold text-slate-500"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
+                                                    <div class="flex items-center gap-1.5">
+                                                        <?php if ($is_overdue): ?>
+                                                            <span class="bg-rose-500 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded-md animate-pulse">TERLEWAT</span>
+                                                        <?php endif; ?>
+                                                        <span class="text-[10px] font-semibold text-slate-500"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
+                                                    </div>
                                                     <span class="text-[9px] font-medium text-rose-400 uppercase tracking-tighter"><?= date('H:i', strtotime($row['deadline_pukul'])) ?> WITA</span>
                                                 </div>
                                             </div>
@@ -168,9 +194,11 @@ $global_tasks = mysqli_query($koneksi, "
                         <?php if (mysqli_num_rows($personal_tasks) > 0): ?>
                             <?php while ($row = mysqli_fetch_assoc($personal_tasks)):
                                 $row['deadline_fmt'] = $row['deadline'] ? date('d M Y, H:i', strtotime($row['deadline'])) : 'Tanpa Deadline';
+                                $deadline_ts = $row['deadline'] ? strtotime($row['deadline']) : null;
+                                $is_overdue = ($deadline_ts && $deadline_ts < time() && $row['status'] == 'belum');
                                 $json_data = htmlspecialchars(json_encode($row));
                             ?>
-                                <div onclick="showDetail('personal', <?= $json_data ?>)" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['status'] == 'selesai' ? 'opacity-60 grayscale-[0.5]' : '' ?>">
+                                <div onclick="showDetail('personal', <?= $json_data ?>)" class="bg-white p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['status'] == 'selesai' ? 'border-slate-200 opacity-60 grayscale-[0.5]' : ($is_overdue ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200') ?>">
                                     <div class="flex items-start gap-3">
                                         <form method="POST" class="mt-1" onclick="event.stopPropagation()">
                                             <input type="hidden" name="action" value="toggle_personal">
@@ -184,6 +212,9 @@ $global_tasks = mysqli_query($koneksi, "
                                             <div class="flex justify-between items-start">
                                                 <span class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Pribadi</span>
                                                 <div class="flex items-center gap-2 text-slate-400" onclick="event.stopPropagation()">
+                                                    <?php if ($is_overdue): ?>
+                                                        <span class="bg-rose-500 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded-md animate-pulse">TERLEWAT</span>
+                                                    <?php endif; ?>
                                                     <span class="text-[10px] font-semibold"><?= $row['deadline'] ? date('d M', strtotime($row['deadline'])) : '' ?></span>
                                                     <form id="delete-form-<?= $row['id'] ?>" method="POST">
                                                         <input type="hidden" name="action" value="delete_personal">
@@ -247,7 +278,7 @@ $global_tasks = mysqli_query($koneksi, "
 
     <!-- Detail Task Modal -->
     <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up">
+        <div class="bg-white rounded-[2rem] w-full max-w-md h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in-up">
             <div id="detailHeader" class="p-6 text-white relative">
                 <button onclick="closeDetailModal()" class="absolute top-5 right-5 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-all">
                     <i class="fas fa-times text-xs"></i>
@@ -258,10 +289,10 @@ $global_tasks = mysqli_query($koneksi, "
                 <h3 id="detailTitle" class="text-xl font-bold leading-tight mb-1">Judul Tugas</h3>
                 <p id="detailSubtitle" class="text-xs text-white/70 font-medium">Subtitle</p>
             </div>
-            <div class="p-6 space-y-5">
+            <div class="p-6 space-y-5 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Deskripsi Tugas</label>
-                    <div id="detailDesc" class="text-xs text-slate-600 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 min-h-[80px] leading-relaxed">
+                    <div id="detailDesc" class="text-xs text-slate-600 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 min-h-[100px] leading-relaxed whitespace-pre-wrap">
                         ...
                     </div>
                 </div>
@@ -284,7 +315,7 @@ $global_tasks = mysqli_query($koneksi, "
                     </div>
                 </div>
 
-                <div id="detailActions" class="flex flex-col gap-2 pt-1">
+                <div id="detailActions" class="flex flex-col gap-2 pt-1 pb-4">
                     <!-- Dynamic buttons -->
                 </div>
             </div>
@@ -320,7 +351,11 @@ $global_tasks = mysqli_query($koneksi, "
                 badge.innerText = 'Tugas Kelas';
                 title.innerText = data.nama_matkul;
                 subtitle.innerText = 'Tugas dari Dosen / Admin';
-                desc.innerHTML = data.deskripsi || '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada deskripsi detail untuk tugas ini.</span>';
+                if (data.deskripsi) {
+                    desc.innerText = data.deskripsi;
+                } else {
+                    desc.innerHTML = '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada deskripsi detail untuk tugas ini.</span>';
+                }
                 deadline.innerText = data.deadline_fmt;
 
                 if (data.is_done) {
@@ -350,7 +385,11 @@ $global_tasks = mysqli_query($koneksi, "
                 badge.innerText = 'Tugas Pribadi';
                 title.innerText = data.judul;
                 subtitle.innerText = 'Catatan Tugas Mandiri';
-                desc.innerHTML = data.deskripsi || '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada catatan tambahan.</span>';
+                if (data.deskripsi) {
+                    desc.innerText = data.deskripsi;
+                } else {
+                    desc.innerHTML = '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada catatan tambahan.</span>';
+                }
                 deadline.innerText = data.deadline_fmt;
 
                 if (data.status === 'selesai') {
