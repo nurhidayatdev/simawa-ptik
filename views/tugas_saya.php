@@ -44,6 +44,13 @@ if (isset($_POST['action'])) {
         } else {
             mysqli_query($koneksi, "INSERT INTO tugas_global_done (user_id, tugas_id, periode_id) VALUES ('$user_id', '$tugas_id', '$periode_id')");
         }
+    } elseif ($_POST['action'] == 'edit_personal') {
+        $id = intval($_POST['id']);
+        $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
+        $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
+        $deadline = mysqli_real_escape_string($koneksi, $_POST['deadline']);
+        mysqli_query($koneksi, "UPDATE tugas_personal SET judul = '$judul', deskripsi = '$deskripsi', deadline = '$deadline' WHERE id = '$id' AND user_id = '$user_id'");
+        $_SESSION['success'] = "Tugas personal berhasil diupdate.";
     }
     $redir = $show_done ? "?show_done=1" : "";
     header("Location: tugas_saya" . $redir);
@@ -51,10 +58,12 @@ if (isset($_POST['action'])) {
 }
 
 // Get Personal Tasks
+$personal_order = $show_done ? "DESC" : "ASC";
 $personal_cond = $show_done ? " AND status = 'selesai'" : " AND status = 'belum'";
-$personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' $personal_cond ORDER BY deadline ASC");
+$personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' $personal_cond ORDER BY deadline $personal_order");
 
 // Get Global Tasks
+$global_order = $show_done ? "DESC" : "ASC";
 $global_cond = $show_done ? " AND gd.id IS NOT NULL" : " AND gd.id IS NULL";
 $global_tasks = mysqli_query($koneksi, "
     SELECT t.*, mk.nama_matkul, gd.id as is_done
@@ -62,7 +71,7 @@ $global_tasks = mysqli_query($koneksi, "
     LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
     LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
     WHERE t.periode_id = '$periode_id' $global_cond
-    ORDER BY t.deadline_tanggal ASC
+    ORDER BY t.deadline_tanggal $global_order
 ");
 
 ?>
@@ -215,7 +224,10 @@ $global_tasks = mysqli_query($koneksi, "
                                                     <?php if ($is_overdue): ?>
                                                         <span class="bg-rose-500 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded-md animate-pulse">TERLEWAT</span>
                                                     <?php endif; ?>
-                                                    <span class="text-[10px] font-semibold"><?= $row['deadline'] ? date('d M', strtotime($row['deadline'])) : '' ?></span>
+                                                    <span class="text-[10px] font-semibold"><?= $row['deadline'] ? date('d M Y, H:i', strtotime($row['deadline'])) : '' ?></span>
+                                                    <button type="button" onclick="event.stopPropagation(); showEditModal(<?= $json_data ?>)" class="hover:text-indigo-500 transition-colors">
+                                                        <i class="fas fa-edit text-[10px]"></i>
+                                                    </button>
                                                     <form id="delete-form-<?= $row['id'] ?>" method="POST">
                                                         <input type="hidden" name="action" value="delete_personal">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
@@ -276,6 +288,36 @@ $global_tasks = mysqli_query($koneksi, "
         </div>
     </div>
 
+    <!-- Modal Edit Tugas -->
+    <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up">
+            <div class="bg-amber-500 p-6 text-white text-center">
+                <h3 class="text-xl font-bold">Edit Tugas</h3>
+                <p class="text-xs text-amber-100 mt-1 opacity-80">Perbarui rencana tugas Anda.</p>
+            </div>
+            <form method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="action" value="edit_personal">
+                <input type="hidden" name="id" id="edit_id">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
+                    <input type="text" name="judul" id="edit_judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
+                    <input type="datetime-local" name="deadline" id="edit_deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
+                    <textarea name="deskripsi" id="edit_deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-amber-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-amber-600 shadow-lg shadow-amber-200 transition-all">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Detail Task Modal -->
     <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] w-full max-w-md h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in-up">
@@ -331,6 +373,28 @@ $global_tasks = mysqli_query($koneksi, "
         function closeAddModal() {
             document.getElementById('addModal').classList.add('hidden');
             document.getElementById('addModal').classList.remove('flex');
+        }
+
+        function showEditModal(data) {
+            document.getElementById('edit_id').value = data.id;
+            document.getElementById('edit_judul').value = data.judul;
+            document.getElementById('edit_deskripsi').value = data.deskripsi || '';
+
+            if (data.deadline) {
+                // Convert YYYY-MM-DD HH:MM:SS to YYYY-MM-DDTHH:MM
+                const dt = data.deadline.replace(' ', 'T').substring(0, 16);
+                document.getElementById('edit_deadline').value = dt;
+            } else {
+                document.getElementById('edit_deadline').value = '';
+            }
+
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
         }
 
         function showDetail(type, data) {
@@ -437,6 +501,12 @@ $global_tasks = mysqli_query($koneksi, "
         }
 
         // Close on backdrop click
+        document.getElementById('addModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddModal();
+        });
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
         document.getElementById('detailModal').addEventListener('click', function(e) {
             if (e.target === this) closeDetailModal();
         });
