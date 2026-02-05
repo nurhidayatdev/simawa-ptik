@@ -116,7 +116,7 @@ if (file_exists($logo_path)) {
         </div>
 
         <!-- Grid Pesan -->
-        <div class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <?php
             $query = mysqli_query($koneksi, "SELECT * FROM pesan ORDER BY tanggal DESC");
             if (mysqli_num_rows($query) > 0) {
@@ -127,7 +127,7 @@ if (file_exists($logo_path)) {
                     $pesan_id = $row['id'];
             ?>
                     <!-- Card Item -->
-                    <div class="break-inside-avoid relative group cursor-pointer" onclick='openModal(<?php echo json_encode($pesan_content); ?>, "<?php echo $pesan_date; ?>", "<?php echo $pesan_time; ?>")'>
+                    <div class="relative group cursor-pointer" onclick='openModal(<?php echo json_encode($pesan_content); ?>, "<?php echo $pesan_date; ?>", "<?php echo $pesan_time; ?>")'>
                         <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
                         <div class="relative bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl border border-gray-700/50 group-hover:border-indigo-500/30 transition-all shadow-xl">
 
