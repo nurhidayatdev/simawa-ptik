@@ -319,45 +319,68 @@ $global_tasks = mysqli_query($koneksi, "
     </div>
 
     <!-- Detail Task Modal -->
-    <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[150] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-md h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in-up">
-            <div id="detailHeader" class="p-6 text-white relative">
-                <button onclick="closeDetailModal()" class="absolute top-5 right-5 w-7 h-7 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-all">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
-                <div class="flex justify-between items-start mb-3">
-                    <span id="detailBadge" class="px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-[0.1em] bg-white/20">Label</span>
-                </div>
-                <h3 id="detailTitle" class="text-xl font-bold leading-tight mb-1">Judul Tugas</h3>
-                <p id="detailSubtitle" class="text-xs text-white/70 font-medium">Subtitle</p>
-            </div>
-            <div class="p-6 space-y-5 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
+    <div id="detailModal" class="fixed inset-0 bg-black/50 z-[150] hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="detailModalContent">
+            <!-- Modal Header -->
+            <div id="detailHeader" class="p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl transition-colors duration-300">
                 <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Deskripsi Tugas</label>
-                    <div id="detailDesc" class="text-xs text-slate-600 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 min-h-[100px] leading-relaxed whitespace-pre-wrap">
-                        ...
-                    </div>
+                    <span id="detailBadge" class="inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2"></span>
+                    <h3 id="detailTitle" class="text-xl font-bold text-gray-900 leading-snug"></h3>
+                    <p id="detailSubtitle" class="text-[10px] text-gray-500 font-medium mt-1"></p>
+                </div>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 transition p-1 hover:bg-gray-100 rounded-full">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 overflow-y-auto">
+                <div class="mb-6">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Deskripsi Tugas</h4>
+                    <div id="detailDesc" class="text-sm text-gray-700 whitespace-pre-line leading-relaxed"></div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
-                        <label class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Tenggat Waktu</label>
-                        <div class="flex items-center gap-2 text-slate-700 font-bold">
-                            <div class="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
-                                <i class="far fa-calendar-alt text-indigo-500 text-[10px]"></i>
-                            </div>
-                            <span id="detailDeadline" class="text-[10px]">Date</span>
+                <div class="grid grid-cols-1 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div class="flex items-start">
+                        <div id="deadlineIcon" class="bg-indigo-100 p-2 rounded-lg mr-3">
+                            <i class="far fa-clock text-indigo-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase">Tenggat Waktu</p>
+                            <p id="detailDeadline" class="text-sm font-semibold text-gray-800"></p>
                         </div>
                     </div>
-                    <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
-                        <label class="block text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Status Saat Ini</label>
-                        <div id="detailStatus" class="flex items-center gap-2 font-bold">
-                            ...
+
+                    <div id="detailStatusContainer" class="flex items-start">
+                        <div id="statusIcon" class="bg-emerald-100 p-2 rounded-lg mr-3">
+                            <i class="fas fa-info-circle text-emerald-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase">Status</p>
+                            <p id="detailStatusText" class="text-sm font-semibold text-gray-800"></p>
+                        </div>
+                    </div>
+
+                    <div id="modalFileContainer" class="items-start hidden">
+                        <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                            <i class="far fa-file-alt text-blue-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase">Lampiran File</p>
+                            <a id="modalFileLink" href="#" target="_blank" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center">
+                                Unduh Dokumen <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div id="detailActions" class="flex flex-col gap-2 pt-1 pb-4">
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+                <button onclick="closeDetailModal()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition">
+                    Tutup
+                </button>
+                <div id="detailActions" class="flex gap-2">
                     <!-- Dynamic buttons -->
                 </div>
             </div>
@@ -399,81 +422,107 @@ $global_tasks = mysqli_query($koneksi, "
 
         function showDetail(type, data) {
             const modal = document.getElementById('detailModal');
+            const modalContent = document.getElementById('detailModalContent');
             const header = document.getElementById('detailHeader');
             const badge = document.getElementById('detailBadge');
             const title = document.getElementById('detailTitle');
             const subtitle = document.getElementById('detailSubtitle');
             const desc = document.getElementById('detailDesc');
             const deadline = document.getElementById('detailDeadline');
-            const status = document.getElementById('detailStatus');
+            const deadlineIcon = document.getElementById('deadlineIcon');
+            const statusIcon = document.getElementById('statusIcon');
+            const statusText = document.getElementById('detailStatusText');
             const actions = document.getElementById('detailActions');
+            const fileContainer = document.getElementById('modalFileContainer');
 
             actions.innerHTML = '';
+            fileContainer.classList.add('hidden');
 
             if (type === 'global') {
-                header.className = 'p-6 text-white relative bg-gradient-to-br from-indigo-600 to-violet-700';
+                header.className = 'p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl transition-colors duration-300';
+                badge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-indigo-100 text-indigo-700';
                 badge.innerText = 'Tugas Kelas';
                 title.innerText = data.nama_matkul;
                 subtitle.innerText = 'Tugas dari Dosen / Admin';
-                if (data.deskripsi) {
-                    desc.innerText = data.deskripsi;
-                } else {
-                    desc.innerHTML = '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada deskripsi detail untuk tugas ini.</span>';
-                }
+                desc.innerText = data.deskripsi || 'Tidak ada deskripsi detail untuk tugas ini.';
                 deadline.innerText = data.deadline_fmt;
 
+                deadlineIcon.className = 'bg-indigo-100 p-2 rounded-lg mr-3';
+                deadlineIcon.querySelector('i').className = 'far fa-clock text-indigo-600 text-sm';
+
                 if (data.is_done) {
-                    status.className = 'flex items-center gap-2.5 text-emerald-600 font-bold';
-                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center"><i class="fas fa-check-circle text-xs"></i></div> <span class="text-[11px]">Selesai</span>';
+                    statusIcon.className = 'bg-emerald-100 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-check-circle text-emerald-600 text-sm';
+                    statusText.innerText = 'Selesai';
                 } else {
-                    status.className = 'flex items-center gap-2.5 text-amber-500 font-bold';
-                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-amber-50 flex items-center justify-center"><i class="fas fa-clock text-xs"></i></div> <span class="text-[11px]">Belum Beres</span>';
+                    statusIcon.className = 'bg-amber-100 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-clock text-amber-600 text-sm';
+                    statusText.innerText = 'Belum Selesai';
                 }
 
                 if (data.file_tugas) {
-                    actions.innerHTML += `
-                        <a href="../storage/tugas/${data.file_tugas}" target="_blank" class="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-blue-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-                            <i class="fas fa-file-download"></i> Unduh Berkas Tugas
+                    fileContainer.classList.remove('hidden');
+                    fileContainer.classList.add('flex');
+                    document.getElementById('modalFileLink').href = '../storage/tugas/' + data.file_tugas;
+                }
+
+                if (data.link_kirim) {
+                    actions.innerHTML = `
+                        <a href="${data.link_kirim}" target="_blank" class="px-5 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition flex items-center">
+                            <i class="fas fa-paper-plane mr-2"></i> Kirim Tugas
                         </a>
                     `;
-                }
-                if (data.link_kirim) {
-                    actions.innerHTML += `
-                        <a href="${data.link_kirim}" target="_blank" class="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-widest hover:bg-indigo-100 transition-all border border-indigo-100">
-                            <i class="fas fa-paper-plane"></i> Kirim Jawaban Tugas
-                        </a>
+                } else {
+                    actions.innerHTML = `
+                        <span class="px-4 py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed flex items-center">
+                            <i class="fas fa-lock mr-2"></i> Tidak ada link
+                        </span>
                     `;
                 }
             } else {
-                header.className = 'p-6 text-white relative bg-gradient-to-br from-rose-500 to-pink-600';
+                header.className = 'p-6 border-b border-gray-100 flex justify-between items-start bg-rose-50/50 rounded-t-2xl transition-colors duration-300';
+                badge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-rose-100 text-rose-700';
                 badge.innerText = 'Tugas Pribadi';
                 title.innerText = data.judul;
                 subtitle.innerText = 'Catatan Tugas Mandiri';
-                if (data.deskripsi) {
-                    desc.innerText = data.deskripsi;
-                } else {
-                    desc.innerHTML = '<span class="italic text-slate-400 text-xs text-center block py-4">Tidak ada catatan tambahan.</span>';
-                }
+                desc.innerText = data.deskripsi || 'Tidak ada catatan tambahan.';
                 deadline.innerText = data.deadline_fmt;
 
+                deadlineIcon.className = 'bg-rose-100 p-2 rounded-lg mr-3';
+                deadlineIcon.querySelector('i').className = 'far fa-clock text-rose-600 text-sm';
+
                 if (data.status === 'selesai') {
-                    status.className = 'flex items-center gap-2.5 text-emerald-600 font-bold';
-                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center"><i class="fas fa-check-circle text-xs"></i></div> <span class="text-[11px]">Selesai</span>';
+                    statusIcon.className = 'bg-emerald-100 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-check-circle text-emerald-600 text-sm';
+                    statusText.innerText = 'Selesai';
                 } else {
-                    status.className = 'flex items-center gap-2.5 text-rose-500 font-bold';
-                    status.innerHTML = '<div class="w-7 h-7 rounded-lg bg-rose-50 flex items-center justify-center"><i class="fas fa-clock text-xs"></i></div> <span class="text-[11px]">Berjalan</span>';
+                    statusIcon.className = 'bg-amber-100 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-clock text-amber-600 text-sm';
+                    statusText.innerText = 'Dalam Proses';
                 }
             }
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
             document.body.style.overflow = 'hidden';
         }
 
         function closeDetailModal() {
-            document.getElementById('detailModal').classList.add('hidden');
-            document.getElementById('detailModal').classList.remove('flex');
-            document.body.style.overflow = 'auto';
+            const modal = document.getElementById('detailModal');
+            const modalContent = document.getElementById('detailModalContent');
+
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         function confirmDelete(id) {

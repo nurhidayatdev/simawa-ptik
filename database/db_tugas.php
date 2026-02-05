@@ -55,28 +55,41 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		echo '<tr class="' . $rowClass . '">';
 		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
 		echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_matkul'] ?? '—') . '</td>';
-		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : '') . ' ' . htmlspecialchars($row['deadline_pukul']) . '</td>';
+		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+				<span class="block">' . ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : '') . '</span>
+				<span class="block md:inline md:ml-1 text-[10px] md:text-xs text-slate-500 md:text-slate-800">' . htmlspecialchars($row['deadline_pukul']) . '</span>
+			  </td>';
 		$desc = strip_tags($row['deskripsi']);
 		if (strlen($desc) > 120) $desc = substr($desc, 0, 117) . '...';
-		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($desc) . '</td>';
+		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($desc) . '</td>';
 		if (!empty($row['file_tugas'])) {
-			echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><a href="../storage/tugas/' . htmlspecialchars($row['file_tugas']) . '" target="_blank" class="text-blue-600 underline">Lihat</a></td>';
+			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><a href="../storage/tugas/' . htmlspecialchars($row['file_tugas']) . '" target="_blank" class="text-blue-600 underline">Lihat</a></td>';
 		} else {
-			echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
+			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
 		}
 		if (!empty($row['link_kirim'])) {
-			echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><a href="' . htmlspecialchars($row['link_kirim']) . '" target="_blank" class="text-blue-600 underline">Kirim</a></td>';
+			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><a href="' . htmlspecialchars($row['link_kirim']) . '" target="_blank" class="text-blue-600 underline">Kirim</a></td>';
 		} else {
-			echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
+			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
 		}
 		$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
-		echo '<td class="px-3 py-2 whitespace-nowrap text-xs"><span class="px-2 py-1 rounded-full border ' . $statusColor . '">' . ucfirst($row['status']) . '</span></td>';
+		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs"><span class="px-2 py-1 rounded-full border ' . $statusColor . '">' . ucfirst($row['status']) . '</span></td>';
+		echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
+		echo '<button type="button" onclick="openModal(this)" 
+				data-matkul="' . htmlspecialchars($row['nama_matkul'] ?? '—') . '" 
+				data-deskripsi="' . htmlspecialchars($row['deskripsi']) . '" 
+				data-deadline="' . ($row['deadline_tanggal'] ? date('d M Y', strtotime($row['deadline_tanggal'])) : '') . ' - ' . htmlspecialchars($row['deadline_pukul']) . '" 
+				data-link="' . htmlspecialchars($row['link_kirim']) . '" 
+				data-file="' . htmlspecialchars($row['file_tugas']) . '" 
+				data-status="' . $row['status'] . '" 
+				title="Info">
+				<i class="fa fa-info-circle text-indigo-600 hover:text-indigo-900 mr-3"></i>
+			  </button>';
 		if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'):
-			echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
 			echo '<a href="../actions/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
 			echo '<a href="../actions/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus tugas ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
-			echo '</td>';
 		endif;
+		echo '</td>';
 		echo '</tr>';
 	}
 	exit;
@@ -158,18 +171,16 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								Mata Kuliah</th>
 							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Deadline</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Deskripsi</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								File</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Link Kirim</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
 								Status</th>
-							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
-								<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-									Actions</th>
-							<?php endif; ?>
+							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+								Actions</th>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-slate-200">
@@ -182,36 +193,47 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
 								<td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['nama_matkul'] ?? '—'); ?></td>
 								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-									<?= ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : '') . ' ' . htmlspecialchars($row['deadline_pukul']); ?>
+									<span class="block"><?= ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : ''); ?></span>
+									<span class="block md:inline md:ml-1 text-[10px] md:text-xs text-slate-500 md:text-slate-800"><?= htmlspecialchars($row['deadline_pukul']); ?></span>
 								</td>
-								<td class="px-3 py-2 text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 text-xs text-slate-800">
 									<?php $d = strip_tags($row['deskripsi']);
 									echo htmlspecialchars((strlen($d) > 120) ? substr($d, 0, 117) . '...' : $d); ?>
 								</td>
-								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">
 									<?php if (!empty($row['file_tugas'])): ?>
 										<a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a>
 									<?php else: echo '-';
 									endif; ?>
 								</td>
-								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">
 									<?php if (!empty($row['link_kirim'])): ?>
 										<a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="text-blue-600 underline">Kirim</a>
 									<?php else: echo '-';
 									endif; ?>
 								</td>
-								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">
 									<?php
 									$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
 									?>
 									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
 								</td>
-								<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
-									<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
+								<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
+									<button type="button" onclick="openModal(this)"
+										data-matkul="<?= htmlspecialchars($row['nama_matkul'] ?? '—') ?>"
+										data-deskripsi="<?= htmlspecialchars($row['deskripsi']) ?>"
+										data-deadline="<?= ($row['deadline_tanggal'] ? date('d M Y', strtotime($row['deadline_tanggal'])) : '') . ' - ' . htmlspecialchars($row['deadline_pukul']) ?>"
+										data-link="<?= htmlspecialchars($row['link_kirim']) ?>"
+										data-file="<?= htmlspecialchars($row['file_tugas']) ?>"
+										data-status="<?= $row['status'] ?>"
+										title="Info">
+										<i class="fa fa-info-circle text-indigo-600 hover:text-indigo-900 mr-3 cursor-pointer"></i>
+									</button>
+									<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
 										<a href="../actions/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
 										<a href="../actions/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus tugas ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
-									</td>
-								<?php endif; ?>
+									<?php endif; ?>
+								</td>
 							</tr>
 						<?php endwhile; ?>
 					</tbody>
@@ -220,6 +242,67 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		</div>
 		<?php include '../includes/footer_db.php'; ?>
 	</main>
+
+	<!-- Task Detail Modal -->
+	<div id="taskModal" class="fixed inset-0 bg-black/50 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
+		<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
+			<!-- Modal Header -->
+			<div class="p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl">
+				<div>
+					<span id="modalStatus" class="inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2"></span>
+					<h3 id="modalTitle" class="text-xl font-bold text-gray-900 leading-snug"></h3>
+				</div>
+				<button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition p-1 hover:bg-gray-100 rounded-full">
+					<i class="fas fa-times text-xl"></i>
+				</button>
+			</div>
+
+			<!-- Modal Body -->
+			<div class="p-6 overflow-y-auto">
+				<div class="mb-6">
+					<h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Deskripsi Tugas</h4>
+					<div id="modalDesc" class="text-sm text-gray-700 whitespace-pre-line leading-relaxed"></div>
+				</div>
+
+				<div class="grid grid-cols-1 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+					<div class="flex items-start">
+						<div class="bg-indigo-100 p-2 rounded-lg mr-3">
+							<i class="far fa-clock text-indigo-600 text-sm"></i>
+						</div>
+						<div>
+							<p class="text-[10px] font-bold text-gray-500 uppercase">Deadline Pengumpulan</p>
+							<p id="modalDeadline" class="text-sm font-semibold text-gray-800"></p>
+						</div>
+					</div>
+
+					<div id="modalFileContainer" class="items-start hidden">
+						<div class="bg-blue-100 p-2 rounded-lg mr-3">
+							<i class="far fa-file-alt text-blue-600 text-sm"></i>
+						</div>
+						<div>
+							<p class="text-[10px] font-bold text-gray-500 uppercase">Lampiran File</p>
+							<a id="modalFileLink" href="#" target="_blank" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center">
+								Unduh Dokumen <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Modal Footer -->
+			<div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+				<button onclick="closeModal()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition">
+					Tutup
+				</button>
+				<a id="modalActionBtn" href="#" target="_blank" class="px-5 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition flex items-center">
+					<i class="fas fa-paper-plane mr-2"></i> Kirim Tugas
+				</a>
+				<span id="modalNoAction" class="hidden px-4 py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed items-center">
+					<i class="fas fa-lock mr-2"></i> Tidak ada link
+				</span>
+			</div>
+		</div>
+	</div>
 	<?php include '../includes/script_db.php'; ?>
 	<script>
 		// Live search via AJAX (debounced) - keep focus in input
@@ -248,6 +331,85 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			input.addEventListener('input', performSearch);
 			statusSelect.addEventListener('change', performSearch);
 		})();
+
+		// Modal Logic
+		const modal = document.getElementById('taskModal');
+		const modalContent = document.getElementById('modalContent');
+
+		function openModal(element) {
+			const data = element.dataset;
+
+			// Populate Data
+			document.getElementById('modalTitle').textContent = data.matkul;
+			document.getElementById('modalDesc').textContent = data.deskripsi;
+			document.getElementById('modalDeadline').textContent = data.deadline;
+
+			// Status styling
+			const statusBadge = document.getElementById('modalStatus');
+			if (data.status === 'selesai') {
+				statusBadge.textContent = 'Selesai';
+				statusBadge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-gray-100 text-gray-500';
+			} else {
+				statusBadge.textContent = 'Aktif';
+				statusBadge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-yellow-100 text-yellow-700';
+			}
+
+			// File Handling
+			const fileContainer = document.getElementById('modalFileContainer');
+			const fileLink = document.getElementById('modalFileLink');
+			if (data.file) {
+				fileContainer.classList.remove('hidden');
+				fileContainer.classList.add('flex');
+				fileLink.href = '../storage/tugas/' + data.file;
+			} else {
+				fileContainer.classList.add('hidden');
+				fileContainer.classList.remove('flex');
+			}
+
+			// Action Button Handling
+			const actionBtn = document.getElementById('modalActionBtn');
+			const noAction = document.getElementById('modalNoAction');
+			if (data.link) {
+				actionBtn.href = data.link;
+				actionBtn.classList.remove('hidden');
+				noAction.classList.add('hidden');
+			} else {
+				actionBtn.classList.add('hidden');
+				noAction.classList.remove('hidden');
+			}
+
+			// Show Modal with Animation
+			modal.classList.remove('hidden');
+			modal.classList.add('flex');
+			setTimeout(() => {
+				modalContent.classList.remove('scale-95', 'opacity-0');
+				modalContent.classList.add('scale-100', 'opacity-100');
+			}, 10);
+		}
+
+		function closeModal() {
+			modalContent.classList.remove('scale-100', 'opacity-100');
+			modalContent.classList.add('scale-95', 'opacity-0');
+
+			setTimeout(() => {
+				modal.classList.remove('flex');
+				modal.classList.add('hidden');
+			}, 300);
+		}
+
+		// Close on outside click
+		modal.addEventListener('click', (e) => {
+			if (e.target === modal) {
+				closeModal();
+			}
+		});
+
+		// Close on Escape key
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+				closeModal();
+			}
+		});
 
 		// SweetAlert Confirmation for Telegram Reminder
 		function confirmReminderTelegram() {
