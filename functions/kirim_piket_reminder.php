@@ -1,11 +1,12 @@
 <?php
-function kirimPiketReminder($koneksi, $token = null, $chat_id = null)
+function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok')
 {
     date_default_timezone_set('Asia/Makassar');
 
-    // 1. Tentukan Besok (Hari & Tanggal)
-    $tomorrow_eng = date('l', strtotime('+1 day'));
-    $tomorrow_date = date('Y-m-d', strtotime('+1 day'));
+    // 1. Tentukan Target (Hari & Tanggal)
+    $offset = ($day === 'hari_ini') ? 'now' : '+1 day';
+    $target_eng = date('l', strtotime($offset));
+    $target_date = date('Y-m-d', strtotime($offset));
 
     $days_map = [
         'Monday' => 'Senin',
@@ -16,11 +17,11 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null)
         'Saturday' => 'Sabtu',
         'Sunday' => 'Minggu'
     ];
-    $tomorrow_ind = $days_map[$tomorrow_eng];
+    $target_ind = $days_map[$target_eng];
 
     // 2. Hitung Minggu Ke (Berdasarkan 19 Januari 2026 sebagai Minggu 1)
     $start_date = "2026-01-19";
-    $diff = strtotime($tomorrow_date) - strtotime($start_date);
+    $diff = strtotime($target_date) - strtotime($start_date);
     $days_diff = floor($diff / (60 * 60 * 24));
 
     if ($days_diff < 0) {
@@ -37,7 +38,7 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null)
     $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
     $p_id = mysqli_fetch_assoc($q_p)['id'] ?? 0;
 
-    // 4. Query Data Piket Besok
+    // 4. Query Data Piket Target
     $query = "SELECT p.*, m.nama_lengkap, jm.hari, mk.nama_matkul, r.nama_ruangan, jk_start.jam_mulai, jk_end.jam_selesai
               FROM piket_proyektor p
               JOIN mahasiswa m ON p.mahasiswa_id = m.id
@@ -48,19 +49,20 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null)
               LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
               WHERE p.periode_id = $p_id 
               AND p.minggu_ke = $minggu_ke 
-              AND jm.hari = '$tomorrow_ind'
+              AND jm.hari = '$target_ind'
               ORDER BY jk_start.jam_mulai ASC, p.jadwal_matkul_id, m.nama_lengkap";
 
     $res = mysqli_query($koneksi, $query);
 
     if (mysqli_num_rows($res) == 0) {
-        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor untuk hari besok ($tomorrow_ind)."];
+        $day_label = ($day === 'hari_ini') ? 'hari ini' : 'hari besok';
+        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor untuk $day_label ($target_ind)."];
     }
 
     // 5. Format Pesan
     $msg = "📢 *REMINDER PIKET PROYEKTOR*\n";
-    $msg .= "📅 Besok: *{$tomorrow_ind}, " . date('d M Y', strtotime($tomorrow_date)) . "*\n";
-    $msg .= "🔢 Minggu Ke: *{$minggu_ke}*\n\n";
+    $header_label = ($day === 'hari_ini') ? 'Hari Ini' : 'Besok';
+    $msg .= "📅 {$header_label}: *{$target_ind}, " . date('d M Y', strtotime($target_date)) . "*\n\n";
 
     $piket_grouped = [];
     while ($row = mysqli_fetch_assoc($res)) {

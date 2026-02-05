@@ -108,9 +108,10 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
                     <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <form action="reminder" method="POST" id="reminderForm" class="w-full sm:w-auto">
                             <input type="hidden" name="action" value="piket">
+                            <input type="hidden" name="day" id="piket_day" value="besok">
                             <input type="hidden" name="redirect" value="piket_proyektor">
-                            <button type="submit" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all">
-                                <i class="fab fa-telegram-plane"></i> Kirim Notifikasi
+                            <button type="button" onclick="confirmPiket()" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all">
+                                <i class="fab fa-whatsapp"></i> Kirim Notifikasi
                             </button>
                         </form>
                         <button onclick="confirmReset()" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-black text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all">
@@ -208,6 +209,30 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function confirmPiket() {
+            Swal.fire({
+                title: 'Kirim Pengingat Piket',
+                text: "Pilih piket yang ingin dikirim ke WhatsApp PTIK C.",
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonColor: '#312e81',
+                denyButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Piket Besok',
+                denyButtonText: 'Piket Hari Ini',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                let day = 'besok';
+                if (result.isDenied) day = 'hari_ini';
+
+                if (result.isConfirmed || result.isDenied) {
+                    document.getElementById('piket_day').value = day;
+                    document.getElementById('reminderForm').submit();
+                }
+            });
+        }
+
         function confirmReset() {
             Swal.fire({
                 title: 'Acak Ulang Piket?',

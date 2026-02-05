@@ -74,6 +74,14 @@ $global_tasks = mysqli_query($koneksi, "
     ORDER BY t.deadline_tanggal $global_order
 ");
 
+// Get Counts for Badges
+$count_personal_active = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' AND status = 'belum'"))['cnt'] ?? 0;
+$count_global_active = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas t LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id' WHERE t.periode_id = '$periode_id' AND gd.id IS NULL"))['cnt'] ?? 0;
+$total_active = $count_personal_active + $count_global_active;
+
+$count_personal_done = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' AND status = 'selesai'"))['cnt'] ?? 0;
+$count_global_done = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas t JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id' WHERE t.periode_id = '$periode_id'"))['cnt'] ?? 0;
+$total_done = $count_personal_done + $count_global_done;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -115,11 +123,21 @@ $global_tasks = mysqli_query($koneksi, "
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="flex bg-white/50 backdrop-blur-sm p-1 rounded-2xl border border-slate-200 shadow-sm">
-                        <a href="tugas_saya" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all <?= !$show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
+                        <a href="tugas_saya" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 <?= !$show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
                             Tugas Aktif
+                            <?php if ($total_active > 0): ?>
+                                <span class="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[8px] font-extrabold <?= !$show_done ? 'bg-white text-indigo-600' : 'bg-slate-200 text-slate-600' ?>">
+                                    <?= $total_active ?>
+                                </span>
+                            <?php endif; ?>
                         </a>
-                        <a href="tugas_saya?show_done=1" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all <?= $show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
+                        <a href="tugas_saya?show_done=1" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 <?= $show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
                             Tugas Selesai
+                            <?php if ($total_done > 0): ?>
+                                <span class="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[8px] font-extrabold <?= $show_done ? 'bg-white text-indigo-600' : 'bg-slate-200 text-slate-600' ?>">
+                                    <?= $total_done ?>
+                                </span>
+                            <?php endif; ?>
                         </a>
                     </div>
                     <button onclick="showAddModal()" class="bg-white hover:bg-slate-50 text-indigo-600 border border-indigo-100 w-10 h-10 rounded-2xl shadow-sm transition-all flex items-center justify-center">

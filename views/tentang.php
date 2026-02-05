@@ -125,7 +125,7 @@ $periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semeste
                             <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[9px] font-bold">FontAwesome 6</span>
                             <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[9px] font-bold">Canvas Confetti</span>
                             <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[9px] font-bold">Google Fonts</span>
-                            <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[9px] font-bold">Telegram Bot API</span>
+                            <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-[9px] font-bold">Fonnte API</span>
                         </div>
                     </div>
                 </section>
@@ -157,11 +157,11 @@ $periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semeste
                     <h3 class="text-sm font-bold text-slate-800 mb-3">Versi Aplikasi</h3>
                     <div class="flex items-center justify-between py-2 border-b border-slate-50">
                         <span class="text-xs text-slate-500">Current Version</span>
-                        <span class="text-xs font-bold text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded">v2.5.0-stable</span>
+                        <span class="text-xs font-bold text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded">v2.6.5</span>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-50">
                         <span class="text-xs text-slate-500">Last Build</span>
-                        <span class="text-xs font-medium text-slate-700">25 Jan 2026</span>
+                        <span class="text-xs font-medium text-slate-700">5 Feb 2026</span>
                     </div>
                     <div class="flex items-center justify-between py-2">
                         <span class="text-xs text-slate-500">Environment</span>

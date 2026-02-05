@@ -2,7 +2,7 @@
 // functions/kirim_jadwal.php
 include_once __DIR__ . '/helpers.php';
 
-function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_data = null)
+function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_data = null, $day = 'besok')
 {
     // Set timezone to WITA
     date_default_timezone_set('Asia/Makassar');
@@ -17,10 +17,13 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
         'Saturday' => 'Sabtu'
     ];
 
-    $tomorrow_eng = date('l', strtotime('+1 day'));
-    $tomorrow_ind = $days_map[$tomorrow_eng];
+    $offset = ($day === 'hari_ini') ? 'now' : '+1 day';
+    $target_eng = date('l', strtotime($offset));
+    $target_ind = $days_map[$target_eng];
 
-    $message = "📅 *JADWAL KULIAH BESOK* 📅\nHari: *{$tomorrow_ind}*, " . date('d M Y', strtotime('+1 day')) . "\n\n";
+    $header_label = ($day === 'hari_ini') ? 'HARI INI' : 'BESOK';
+
+    $message = "📅 *JADWAL KULIAH {$header_label}* 📅\nHari: *{$target_ind}*, " . date('d M Y', strtotime($offset)) . "\n\n";
 
     if ($custom_data) {
         // Use custom data
@@ -34,14 +37,18 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
 
         $no = 1;
         foreach ($custom_data as $item) {
-            $message .= "{$no}. *{$item['matkul']}*\n   ⏰ {$item['jam']} WITA\n   🏛️ {$item['ruangan']}\n   Note: _Jadwal Disesuaikan_\n\n";
+            if (isset($item['status']) && $item['status'] === 'tidak_masuk') {
+                $message .= "{$no}. *{$item['matkul']}*\n   ❌ *TIDAK MASUK*\n   Note: _Jadwal Disesuaikan_\n\n";
+            } else {
+                $message .= "{$no}. *{$item['matkul']}*\n   ⏰ {$item['jam']} WITA\n   🏛️ {$item['ruangan']}\n   Note: _Jadwal Disesuaikan_\n\n";
+            }
             $no++;
         }
-        $message .= "_Jangan lupa datang tepat waktu!_ 📝";
+        $message .= "_Tetap semangat kuliahnya!_ 🚀";
 
         $res = sendFonnteMessage($message);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Jadwal Custom besok berhasil dikirim ke WhatsApp!"];
+            return ['status' => 'success', 'message' => "Jadwal Custom " . strtolower($header_label) . " berhasil dikirim ke WhatsApp!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }
@@ -58,7 +65,7 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
                   LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
                   LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
                   LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
-                  WHERE jm.periode_id = $periode_id AND jm.hari = '$tomorrow_ind'
+                  WHERE jm.periode_id = $periode_id AND jm.hari = '$target_ind'
                   ORDER BY jk_start.jam_mulai ASC";
 
         $result = mysqli_query($koneksi, $query);
@@ -69,16 +76,16 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
                 $message .= "{$no}. *{$row['nama_matkul']}*\n   ⏰ " . date('H:i', strtotime($row['jam_mulai'])) . " - " . date('H:i', strtotime($row['jam_selesai'])) . " WITA\n   🏛️ {$row['ruangan']}\n\n";
                 $no++;
             }
-            $message .= "_Jangan lupa datang tepat waktu!_ 📝";
+            $message .= "_Tetap semangat kuliahnya!_ 🚀";
 
             $res = sendFonnteMessage($message);
             if ($res['success']) {
-                return ['status' => 'success', 'message' => "Jadwal $tomorrow_ind berhasil dikirim ke WhatsApp!"];
+                return ['status' => 'success', 'message' => "Jadwal $target_ind " . strtolower($header_label) . " berhasil dikirim ke WhatsApp!"];
             } else {
                 return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
             }
         } else {
-            return ['status' => 'info', 'message' => "Tidak ada jadwal untuk hari $tomorrow_ind besok."];
+            return ['status' => 'info', 'message' => "Tidak ada jadwal untuk hari $target_ind " . strtolower($header_label) . "."];
         }
     }
 }

@@ -17,11 +17,13 @@ if (isset($_GET['fetch_adjust_data'])) {
     header('Content-Type: application/json');
     date_default_timezone_set('Asia/Makassar');
 
+    $day_type = $_GET['day'] ?? 'besok';
     $days_map = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
-    $tomorrow_eng = date('l', strtotime('+1 day'));
-    $tomorrow_ind = $days_map[$tomorrow_eng];
+    $offset = ($day_type === 'hari_ini') ? 'now' : '+1 day';
+    $target_eng = date('l', strtotime($offset));
+    $target_ind = $days_map[$target_eng];
 
-    // 1. Get Tomorrow's Schedule
+    // 1. Get Schedule
     $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
     $p_id = mysqli_fetch_assoc($q_p)['id'] ?? 0;
 
@@ -33,22 +35,34 @@ if (isset($_GET['fetch_adjust_data'])) {
                      LEFT JOIN ruangan r ON jm.ruangan_id = r.id
                      LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
                      LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
-                     WHERE jm.periode_id = $p_id AND jm.hari = '$tomorrow_ind'
+                     WHERE jm.periode_id = $p_id AND jm.hari = '$target_ind'
                      ORDER BY jk_start.jam_mulai ASC";
 
     $res_jadwal = mysqli_query($koneksi, $query_jadwal);
     $jadwal = [];
     while ($row = mysqli_fetch_assoc($res_jadwal)) {
-        // Format jam display (e.g. 07.30 - 09.10)
         $jam_display = date('H.i', strtotime($row['jam_mulai'])) . ' - ' . date('H.i', strtotime($row['jam_selesai']));
         $jadwal[] = [
             'id' => $row['id'],
             'matkul' => $row['nama_matkul'],
             'jam_text' => $jam_display,
-            'ruangan_text' => $row['nama_ruangan'],
-            'ruangan_id' => $row['ruangan_id'],
-            'checked' => true // default checked
+            'ruangan_text' => $row['nama_ruangan'] ?? '—',
+            'ruangan_id' => $row['ruangan_id'] ?? 0,
+            'checked' => true,
+            'status' => 'masuk'
         ];
+    }
+
+    // 2. Get Matkul that exist in Schedule for active period
+    $query_mk = "SELECT DISTINCT mk.id, mk.nama_matkul 
+                 FROM jadwal_matkul jm 
+                 JOIN mata_kuliah mk ON jm.matkul_id = mk.id 
+                 WHERE jm.periode_id = $p_id 
+                 ORDER BY mk.nama_matkul ASC";
+    $res_mk = mysqli_query($koneksi, $query_mk);
+    $opts_mk = [];
+    while ($row = mysqli_fetch_assoc($res_mk)) {
+        $opts_mk[] = ['id' => $row['id'], 'nama' => $row['nama_matkul']];
     }
 
     // 2. Get All Jam Kuliah Options
@@ -66,17 +80,18 @@ if (isset($_GET['fetch_adjust_data'])) {
     $opts_ruang = [];
     while ($row = mysqli_fetch_assoc($res_ruang)) {
         $opts_ruang[] = [
-            'val' => $row['nama_ruangan'], // We send text to telegram, so value is content
+            'val' => $row['nama_ruangan'],
             'label' => $row['nama_ruangan']
         ];
     }
 
     echo json_encode([
-        'tomorrow' => $tomorrow_ind,
-        'date' => date('d M Y', strtotime('+1 day')),
+        'tomorrow' => $target_ind,
+        'date' => date('d M Y', strtotime($offset)),
         'jadwal' => $jadwal,
         'opt_jam' => $opts_jam,
-        'opt_ruang' => $opts_ruang
+        'opt_ruang' => $opts_ruang,
+        'opt_mk' => $opts_mk
     ]);
     exit;
 }
@@ -89,18 +104,17 @@ if ($_SESSION['role'] === 'Mahasiswa') {
 date_default_timezone_set('Asia/Makassar');
 
 // Fonnte Config (Moved to helpers.php)
-include_once '../functions/helpers.php';
+require_once __DIR__ . '/../functions/helpers.php';
 
 
 // Include reminder functions
-include_once '../functions/helpers.php';
-include_once '../functions/kirim_jadwal.php';
-include_once '../functions/kirim_tugas.php';
-include_once '../functions/kirim_kas.php';
-include_once '../functions/kirim_streak.php';
-include_once '../functions/kirim_krs.php';
-include_once '../functions/kirim_kelompok.php';
-include_once '../functions/kirim_piket_reminder.php';
+require_once __DIR__ . '/../functions/kirim_jadwal.php';
+require_once __DIR__ . '/../functions/kirim_tugas.php';
+require_once __DIR__ . '/../functions/kirim_kas.php';
+require_once __DIR__ . '/../functions/kirim_streak.php';
+require_once __DIR__ . '/../functions/kirim_krs.php';
+require_once __DIR__ . '/../functions/kirim_kelompok.php';
+require_once __DIR__ . '/../functions/kirim_piket_reminder.php';
 
 // Handle Actions (PRG Pattern)
 if (isset($_POST['action'])) {
@@ -108,19 +122,22 @@ if (isset($_POST['action'])) {
     $response = ['status' => 'error', 'message' => 'Aksi tidak dikenal'];
 
     if ($action === 'jadwal') {
-        $response = kirimJadwalReminder($koneksi);
+        $day = $_POST['day'] ?? 'besok';
+        $response = kirimJadwalReminder($koneksi, null, null, null, $day);
     } elseif ($action === 'jadwal_custom') {
         // Handle custom data via JSON payload
+        $day = $_POST['day'] ?? 'besok';
         if (isset($_POST['custom_payload'])) {
             $custom_data = json_decode($_POST['custom_payload'], true);
         } else {
             $custom_data = [[
                 'matkul' => $_POST['matkul'] ?? '',
                 'jam' => $_POST['jam'] ?? '',
-                'ruangan' => $_POST['ruangan'] ?? ''
+                'ruangan' => $_POST['ruangan'] ?? '',
+                'status' => $_POST['status'] ?? 'masuk'
             ]];
         }
-        $response = kirimJadwalReminder($koneksi, null, null, $custom_data);
+        $response = kirimJadwalReminder($koneksi, null, null, $custom_data, $day);
     } elseif ($action === 'tugas') {
         $response = kirimTugasReminder($koneksi);
     } elseif ($action === 'kas') {
@@ -136,7 +153,8 @@ if (isset($_POST['action'])) {
         $keterangan = $_POST['keterangan'];
         $response = kirimKelompokReminder($koneksi, $matkul_id, $dosen, $keterangan);
     } elseif ($action === 'piket') {
-        $response = kirimPiketReminder($koneksi);
+        $day = $_POST['day'] ?? 'besok';
+        $response = kirimPiketReminder($koneksi, null, null, $day);
     }
 
     $_SESSION['reminder_msg'] = $response['message'];
@@ -285,13 +303,14 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             <!-- Jadwal -->
             <form id="formJadwal" method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="jadwal">
+                <input type="hidden" name="day" id="jadwal_day" value="besok">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i class="fa fa-calendar-alt text-xl"></i>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Jadwal Besok</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan jadwal kuliah untuk hari besok</p>
+                        <h3 class="font-bold text-slate-800 text-md">Jadwal Kuliah</h3>
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan jadwal kuliah hari ini atau besok</p>
                         <button type="button" onclick="confirmJadwal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
@@ -318,16 +337,17 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Piket proyektor -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" id="formPiket" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="piket">
+                <input type="hidden" name="day" id="piket_day" value="besok">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 bg-indigo-900 text-white rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-plug text-xl"></i>
                     </div>
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800 text-md">Piket Proyektor</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat petugas piket proyektor besok</p>
-                        <button type="submit" class="w-full bg-indigo-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
+                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat petugas piket hari ini atau besok</p>
+                        <button type="button" onclick="confirmPiket()" class="w-full bg-indigo-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -383,39 +403,81 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             });
         }
 
-        function confirmJadwal() {
+        function confirmPiket() {
             Swal.fire({
-                title: 'Kirim Jadwal?',
-                text: "Pilih metode pengiriman jadwal ke WhatsApp.",
-
+                title: 'Kirim Pengingat Piket',
+                text: "Pilih piket yang ingin dikirim ke WhatsApp PTIK C.",
                 icon: 'question',
                 showCancelButton: true,
                 showDenyButton: true,
-                confirmButtonColor: '#3085d6',
-                denyButtonColor: '#f59e0b',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Kirim Langsung',
-                denyButtonText: 'Sesuaikan Jadwal',
+                confirmButtonColor: '#312e81',
+                denyButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Piket Besok',
+                denyButtonText: 'Piket Hari Ini',
                 cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    // Kirim Langsung (Submit form default HTML)
-                    document.getElementById('formJadwal').submit();
-                } else if (result.isDenied) {
-                    fetchDataAndShowList();
+                let day = 'besok';
+                if (result.isDenied) day = 'hari_ini';
+
+                if (result.isConfirmed || result.isDenied) {
+                    document.getElementById('piket_day').value = day;
+                    document.getElementById('formPiket').submit();
                 }
             });
         }
 
-        function fetchDataAndShowList() {
+        function confirmJadwal() {
+            Swal.fire({
+                title: 'Kirim Jadwal Kuliah',
+                text: "Pilih jadwal yang ingin dikirim ke WhatsApp PTIK C.",
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonColor: '#3085d6',
+                denyButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Jadwal Besok',
+                denyButtonText: 'Jadwal Hari Ini',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                let day = 'besok';
+                if (result.isDenied) day = 'hari_ini';
+
+                if (result.isConfirmed || result.isDenied) {
+                    Swal.fire({
+                        title: 'Metode Pengiriman',
+                        text: `Pilih metode pengiriman untuk jadwal ${day === 'hari_ini' ? 'hari ini' : 'besok'}.`,
+                        icon: 'info',
+                        showCancelButton: true,
+                        showDenyButton: true,
+                        confirmButtonColor: '#3085d6',
+                        denyButtonColor: '#f59e0b',
+                        confirmButtonText: 'Kirim Langsung',
+                        denyButtonText: 'Sesuaikan Jadwal',
+                        cancelButtonText: 'Kembali'
+                    }).then((methodResult) => {
+                        if (methodResult.isConfirmed) {
+                            document.getElementById('jadwal_day').value = day;
+                            document.getElementById('formJadwal').submit();
+                        } else if (methodResult.isDenied) {
+                            fetchDataAndShowList(day);
+                        }
+                    });
+                }
+            });
+        }
+
+        function fetchDataAndShowList(day) {
             Swal.showLoading();
-            // Fetch ke diri sendiri (local endpoint)
-            fetch('?fetch_adjust_data=1')
+            window.lastSelectedDay = day;
+            fetch(`?fetch_adjust_data=1&day=${day}`)
                 .then(r => r.json())
                 .then(data => {
                     currentJadwal = data.jadwal;
                     optJam = data.opt_jam;
                     optRuang = data.opt_ruang;
+                    optMk = data.opt_mk;
                     renderJadwalList(data.tomorrow, data.date);
                 })
                 .catch(err => {
@@ -425,40 +487,50 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         }
 
         function renderJadwalList(dayName, dateStr) {
-            // Check for saved state
             if (dayName) window.lastDayName = dayName;
             if (dateStr) window.lastDateStr = dateStr;
             dayName = dayName || window.lastDayName;
             dateStr = dateStr || window.lastDateStr;
 
-            let html = `<div class="text-left text-sm mb-2">Hari: <b>${dayName}</b>, ${dateStr}</div>`;
+            let html = `<div class="text-left text-sm mb-4 flex justify-between items-center">
+                <span>Hari: <b>${dayName}</b>, ${dateStr}</span>
+                <button type="button" onclick="addNewMatkul()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1.5">
+                    <i class="fas fa-plus"></i> Tambah Matkul
+                </button>
+            </div>`;
 
             if (currentJadwal.length === 0) {
-                html += '<p class="text-red-500 text-sm">Tidak ada jadwal untuk besok.</p>';
+                html += '<p class="text-slate-400 text-xs text-center py-8">Belum ada jadwal yang ditambahkan.</p>';
             } else {
-                html += `<div class="overflow-x-auto max-h-64 border rounded-lg">
+                html += `<div class="overflow-x-auto max-h-64 border rounded-lg bg-slate-50">
                     <table class="w-full text-xs text-left">
-                        <thead class="bg-indigo-50 text-indigo-900 border-b">
+                        <thead class="bg-indigo-900 text-white border-b sticky top-0">
                             <tr>
-                                <th class="p-2 w-8 text-center">#</th>
+                                <th class="p-2 w-8 text-center"><i class="fas fa-check-circle"></i></th>
                                 <th class="p-2">Mata Kuliah</th>
-                                <th class="p-2">Jam</th>
-                                <th class="p-2">Ruangan</th>
+                                <th class="p-2">Jam & Ruangan</th>
                                 <th class="p-2 w-16 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y">`;
+                        <tbody class="divide-y bg-white">`;
 
                 currentJadwal.forEach((item, index) => {
                     const checked = item.checked ? 'checked' : '';
-                    const statusBadge = item.status === 'tidak_masuk' ? '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full ml-1">Tidak Masuk</span>' : '';
-                    html += `<tr>
-                        <td class="p-2 text-center"><input type="checkbox" onchange="toggleCheck(${index})" ${checked}></td>
-                        <td class="p-2 font-medium">${item.matkul}${statusBadge}</td>
-                        <td class="p-2 text-slate-500">${item.jam_text}</td>
-                        <td class="p-2 text-slate-500">${item.ruangan_text}</td>
+                    const isAbsent = item.status === 'tidak_masuk';
+                    const statusBadge = isAbsent ? '<span class="text-[8px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-md ml-1.5 font-bold uppercase tracking-tighter">Tidak Masuk</span>' : '';
+                    const detailText = isAbsent ? '-' : `${item.jam_text} (${item.ruangan_text})`;
+                    html += `<tr class="${!item.checked ? 'opacity-50' : ''}">
+                        <td class="p-2 text-center"><input type="checkbox" onchange="toggleCheck(${index})" ${checked} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"></td>
+                        <td class="p-2">
+                            <div class="font-bold text-slate-800">${item.matkul}</div>
+                            ${statusBadge}
+                        </td>
+                        <td class="p-2 text-slate-500 font-medium">${detailText}</td>
                         <td class="p-2 text-center">
-                            <button type="button" onclick="showEditForm(${index})" class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded">Edit</button>
+                            <div class="flex gap-1 justify-center">
+                                <button type="button" onclick="showEditForm(${index})" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"><i class="fas fa-edit"></i></button>
+                                <button type="button" onclick="removeItem(${index})" class="p-1.5 text-red-600 hover:bg-red-50 rounded transition"><i class="fas fa-trash"></i></button>
+                            </div>
                         </td>
                     </tr>`;
                 });
@@ -471,8 +543,13 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 html: html,
                 width: '650px',
                 showCancelButton: true,
-                confirmButtonText: 'Kirim',
-                cancelButtonText: 'Batal'
+                confirmButtonText: '<i class="fab fa-whatsapp mr-1.5"></i> Kirim WhatsApp',
+                cancelButtonText: 'Kembali',
+                confirmButtonColor: '#4f46e5',
+                customClass: {
+                    confirmButton: 'text-xs px-6 py-2.5 rounded-lg font-bold uppercase tracking-wider',
+                    cancelButton: 'text-xs px-6 py-2.5 rounded-lg font-bold uppercase tracking-wider'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     submitCustomJadwal();
@@ -482,6 +559,86 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 
         function toggleCheck(index) {
             currentJadwal[index].checked = !currentJadwal[index].checked;
+            renderJadwalList();
+        }
+
+        function removeItem(index) {
+            currentJadwal.splice(index, 1);
+            renderJadwalList();
+        }
+
+        function addNewMatkul() {
+            let mkSelect = `<select id="new_matkul" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm mb-4 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
+            mkSelect += `<option value="" disabled selected>-- Pilih Mata Kuliah --</option>`;
+            optMk.forEach(opt => {
+                mkSelect += `<option value="${opt.nama}">${opt.nama}</option>`;
+            });
+            mkSelect += `</select>`;
+
+            let ruangSelect = `<select id="new_ruang" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
+            ruangSelect += `<option value="" disabled selected>-- Pilih Ruangan --</option>`;
+            optRuang.forEach(opt => {
+                ruangSelect += `<option value="${opt.val}">${opt.label}</option>`;
+            });
+            ruangSelect += `</select>`;
+
+            Swal.fire({
+                title: 'Tambah Mata Kuliah',
+                html: `
+                    <div class="text-left space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Pilih Mata Kuliah</label>
+                            ${mkSelect}
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Mulai</label>
+                                <input type="time" id="new_jam_mulai" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Selesai</label>
+                                <input type="time" id="new_jam_selesai" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Pilih Ruangan</label>
+                            ${ruangSelect}
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Tambah',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#4f46e5',
+                preConfirm: () => {
+                    const matkul = document.getElementById('new_matkul').value;
+                    const jamMulai = document.getElementById('new_jam_mulai').value;
+                    const jamSelesai = document.getElementById('new_jam_selesai').value;
+                    const ruangan = document.getElementById('new_ruang').value;
+
+                    if (!matkul || !jamMulai || !jamSelesai || !ruangan) {
+                        Swal.showValidationMessage('Semua field harus diisi!');
+                        return false;
+                    }
+
+                    const jamText = jamMulai.replace(':', '.') + ' - ' + jamSelesai.replace(':', '.');
+
+                    return {
+                        matkul,
+                        jam_text: jamText,
+                        ruangan_text: ruangan,
+                        checked: true,
+                        status: 'masuk'
+                    };
+                }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    currentJadwal.push(res.value);
+                    renderJadwalList();
+                } else {
+                    renderJadwalList();
+                }
+            });
         }
 
         function showEditForm(index) {
@@ -499,7 +656,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             const currentStatus = item.status || 'masuk';
 
             // Generate Ruangan Options
-            let ruangHtml = `<select id="edit_ruang" class="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">`;
+            let ruangHtml = `<select id="edit_ruang" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
             optRuang.forEach(opt => {
                 const selected = (opt.val === item.ruangan_text) ? 'selected' : '';
                 ruangHtml += `<option value="${opt.val}" ${selected}>${opt.label}</option>`;
@@ -509,42 +666,58 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             Swal.fire({
                 title: 'Edit Item Jadwal',
                 html: `
-                    <div class="text-left">
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Mata Kuliah</label>
-                        <input type="text" value="${item.matkul}" disabled class="w-full px-3 py-2 border bg-slate-100 rounded-md text-sm mb-3">
+                    <div class="text-left space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Status Kehadiran</label>
+                            <select id="edit_status" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium" onchange="toggleEditFields(this.value)">
+                                <option value="masuk" ${currentStatus === 'masuk' ? 'selected' : ''}>Masuk</option>
+                                <option value="tidak_masuk" ${currentStatus === 'tidak_masuk' ? 'selected' : ''}>Tidak Masuk (Absen)</option>
+                            </select>
+                        </div>
                         
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Status Kehadiran</label>
-                        <select id="edit_status" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                            <option value="masuk" ${currentStatus === 'masuk' ? 'selected' : ''}>Masuk</option>
-                            <option value="tidak_masuk" ${currentStatus === 'tidak_masuk' ? 'selected' : ''}>Tidak Masuk</option>
-                        </select>
-                        
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Jam Mulai</label>
-                        <input type="time" id="edit_jam_mulai" value="${jamMulai}" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                        
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Jam Selesai</label>
-                        <input type="time" id="edit_jam_selesai" value="${jamSelesai}" class="w-full px-3 py-2 border rounded-md text-sm mb-3 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                        
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Ruangan</label>
-                        ${ruangHtml}
+                        <div id="time_fields_container" class="${currentStatus === 'tidak_masuk' ? 'hidden' : 'space-y-4'}">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Mulai</label>
+                                    <input type="time" id="edit_jam_mulai" value="${jamMulai}" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Selesai</label>
+                                    <input type="time" id="edit_jam_selesai" value="${jamSelesai}" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Pilih Ruangan Kuliah</label>
+                                ${ruangHtml}
+                            </div>
+                        </div>
                     </div>
                 `,
                 showCancelButton: true,
-                confirmButtonText: 'Simpan',
+                confirmButtonText: 'Simpan Perubahan',
                 cancelButtonText: 'Batal',
+                confirmButtonColor: '#4f46e5',
                 preConfirm: () => {
-                    const jamMulaiVal = document.getElementById('edit_jam_mulai').value;
-                    const jamSelesaiVal = document.getElementById('edit_jam_selesai').value;
-                    const newRuang = document.getElementById('edit_ruang').value;
-                    const newStatus = document.getElementById('edit_status').value;
+                    const status = document.getElementById('edit_status').value;
+                    let jamText = item.jam_text;
+                    let ruangText = item.ruangan_text;
 
-                    // Format time as HH.MM - HH.MM
-                    const jamText = jamMulaiVal.replace(':', '.') + ' - ' + jamSelesaiVal.replace(':', '.');
+                    if (status === 'masuk') {
+                        const jamMulaiVal = document.getElementById('edit_jam_mulai').value;
+                        const jamSelesaiVal = document.getElementById('edit_jam_selesai').value;
+                        jamText = jamMulaiVal.replace(':', '.') + ' - ' + jamSelesaiVal.replace(':', '.');
+                        ruangText = document.getElementById('edit_ruang').value;
+                    } else {
+                        // If 'tidak_masuk', clear or set default for jam and ruang
+                        jamText = '-'; // Or any other placeholder
+                        ruangText = '-'; // Or any other placeholder
+                    }
 
                     return {
                         jam: jamText,
-                        ruang: newRuang,
-                        status: newStatus
+                        ruang: ruangText,
+                        status: status
                     };
                 }
             }).then((res) => {
@@ -552,11 +725,20 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     currentJadwal[index].jam_text = res.value.jam;
                     currentJadwal[index].ruangan_text = res.value.ruang;
                     currentJadwal[index].status = res.value.status;
-                    renderJadwalList();
-                } else {
-                    renderJadwalList();
                 }
+                renderJadwalList();
             });
+        }
+
+        function toggleEditFields(status) {
+            const container = document.getElementById('time_fields_container');
+            if (status === 'tidak_masuk') {
+                container.classList.add('hidden');
+                container.classList.remove('space-y-4');
+            } else {
+                container.classList.remove('hidden');
+                container.classList.add('space-y-4');
+            }
         }
 
         function submitCustomJadwal() {
@@ -573,16 +755,21 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 return;
             }
 
-            // Create hidden form to submit array to THIS PAGE (reminder.php)
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = 'reminder'; // submit to self
+            form.action = 'reminder';
 
             const inputAction = document.createElement('input');
             inputAction.type = 'hidden';
             inputAction.name = 'action';
             inputAction.value = 'jadwal_custom';
             form.appendChild(inputAction);
+
+            const inputDay = document.createElement('input');
+            inputDay.type = 'hidden';
+            inputDay.name = 'day';
+            inputDay.value = window.lastSelectedDay;
+            form.appendChild(inputDay);
 
             const inputPayload = document.createElement('input');
             inputPayload.type = 'hidden';

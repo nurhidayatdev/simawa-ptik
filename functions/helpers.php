@@ -5,10 +5,10 @@
 
 // Fonnte Configuration
 if (!defined('FONNTE_TOKEN')) {
-    define('FONNTE_TOKEN', 'u1EPmvTn73JuHRGeKyE6');
+    define('FONNTE_TOKEN', 'nUqX73mNV9B29DG8ixau');
 }
 if (!defined('FONNTE_GROUP_ID')) {
-    define('FONNTE_GROUP_ID', '120363425662585531@g.us');
+    define('FONNTE_GROUP_ID', '120363403722910475@g.us');
 }
 if (!defined('FONNTE_ANON_GROUP_ID')) {
     define('FONNTE_ANON_GROUP_ID', '120363407814831709@g.us'); // Ganti dengan ID grup khusus pesan anonim

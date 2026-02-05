@@ -720,9 +720,7 @@ if (isset($_POST['tambah'])) {
                 </div>
 
                 <!-- Form Actions -->
-                <div class="flex justify-end space-x-4">
-                    <button type="button"
-                        class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-xs">Cancel</button>
+                <div class="flex justify-end">
                     <button type="submit" name="tambah"
                         class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
                 </div>

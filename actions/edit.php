@@ -18,6 +18,8 @@ $id = $_GET['id'] ?? '';
 if ($tabel === 'jam_kuliah') {
     $jam_ke = $_GET['jam_ke'] ?? '';
     $query = mysqli_query($koneksi, "SELECT * FROM jam_kuliah WHERE jam_ke='$jam_ke'");
+} elseif ($tabel === 'users') {
+    $query = mysqli_query($koneksi, "SELECT u.*, m.nama_lengkap FROM users u LEFT JOIN mahasiswa m ON m.user_id = u.id WHERE u.id='$id'");
 } else {
     $query = mysqli_query($koneksi, "SELECT * FROM $tabel WHERE id='$id'");
 }
@@ -166,11 +168,23 @@ if (isset($_POST['update'])) {
             break;
 
         case 'users':
-            mysqli_query($koneksi, "UPDATE users SET 
-                    email='{$_POST['email']}',
-                    password='{$_POST['password']}',
-                    role='{$_POST['role']}'
-                    WHERE id='$id'");
+            $email = mysqli_real_escape_string($koneksi, $_POST['email']);
+            $role = mysqli_real_escape_string($koneksi, $_POST['role']);
+            $password = $_POST['password'];
+
+            if ($password === '**********') {
+                // Jangan update password jika value-nya adalah mask
+                mysqli_query($koneksi, "UPDATE users SET 
+                        email='$email',
+                        role='$role'
+                        WHERE id='$id'");
+            } else {
+                mysqli_query($koneksi, "UPDATE users SET 
+                        email='$email',
+                        password='$password',
+                        role='$role'
+                        WHERE id='$id'");
+            }
             $redirect = "../database/db_users";
             break;
 
@@ -506,13 +520,18 @@ if (isset($_POST['update'])) {
                             <h3 class="text-xl font-bold mb-6">Edit Users</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-xs font-medium text-slate-700 mb-1">Email</label>
-                                    <input type="text" name="email" value="<?= $data['email']; ?>"
-                                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                                    <input type="text" value="<?= $data['nama_lengkap'] ?? 'Bukan Mahasiswa'; ?>" readonly
+                                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none bg-slate-100 text-xs cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-slate-700 mb-1">Password</label>
-                                    <input type="text" name="password" value="<?= $data['password']; ?>"
+                                    <input type="text" name="password" value="**********" readonly
+                                        class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none bg-slate-100 text-xs cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-700 mb-1">Email</label>
+                                    <input type="text" name="email" value="<?= $data['email']; ?>"
                                         class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
                                 </div>
                                 <div>
@@ -526,7 +545,6 @@ if (isset($_POST['update'])) {
                                         <option value="Koordinator Akademik" <?= ($data['role'] == 'Koordinator Akademik') ? 'selected' : '' ?>>Koordinator Akademik</option>
                                         <option value="Mahasiswa" <?= ($data['role'] == 'Mahasiswa') ? 'selected' : '' ?>>Mahasiswa</option>
                                     </select>
-
                                 </div>
                             <?php elseif ($tabel === 'dosen'): ?>
                                 <h3 class="text-xl font-bold mb-6">Edit Dosen</h3>
@@ -836,9 +854,7 @@ if (isset($_POST['update'])) {
 
 
                 </div>
-                <div class="flex justify-end space-x-4 mt-4">
-                    <button type="button"
-                        class="px-6 py-2 border border-slata-300 rounded-lg hover:bg-slate-50 text-xs">Kembali</button>
+                <div class="flex justify-end mt-4">
                     <button type="submit" name="update"
                         class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
                 </div>

@@ -301,12 +301,7 @@ if (isset($_POST['update'])) {
 
                 </div>
 
-                <div class="flex justify-end space-x-4">
-                    <a href="../dashboard/profile.php">
-                        <button type="button"
-                            class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-indigo-50 text-xs">Cancel</button>
-                    </a>
-
+                <div class="flex justify-end">
                     <button type="submit" name="update"
                         class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
                 </div>
