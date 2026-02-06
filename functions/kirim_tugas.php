@@ -71,7 +71,7 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_tugas.php') {
     session_start();
     include '../koneksi.php';
 
-    if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'Administrator Utama' && $_SESSION['role'] !== 'Sekretaris')) {
+    if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'Administrator Utama' && $_SESSION['role'] !== 'Sekretaris' && $_SESSION['role'] !== 'Koordinator Akademik')) {
         header("Location: ../../index");
         exit;
     }
