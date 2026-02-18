@@ -738,7 +738,7 @@ if (isset($_POST['update'])) {
                                         while ($f = mysqli_fetch_assoc($q_f)) {
                                         ?>
                                             <div class="relative group">
-                                                <img src="../<?= htmlspecialchars($f['foto_path']) ?>" class="w-full h-24 object-cover rounded-lg">
+                                                <img src="../storage/gallery/<?= htmlspecialchars($f['foto_path']) ?>" class="w-full h-24 object-cover rounded-lg">
                                                 <div class="absolute top-1 right-1">
                                                     <input type="checkbox" name="delete_photos[]" value="<?= $f['id'] ?>" class="w-4 h-4 text-red-600 bg-slate-100 border-slate-300 rounded focus:ring-red-500">
                                                 </div>

@@ -113,7 +113,19 @@ for ($block = 0; $block < 8; $block++) {
         $selected = [];
 
         // Pilih gender yang pool-nya masih cukup banyak untuk membentuk tim homogen
-        if (count($boys_pool) >= count($girls_pool)) {
+        // MODIFIKASI: Prioritaskan parity (ganjil/genap) untuk mengakomodasi kelas dengan jumlah ganjil
+        // agar sisa (remainder) selalu sesuai dengan gender yang ganjil (laki-laki).
+        $boy_count = count($boys_pool);
+        $girl_count = count($girls_pool);
+        $priority_boys = ($boy_count >= $girl_count);
+
+        if ($needed % 2 != 0) {
+            // Jika butuh ganjil (misal 1 atau 3 orang), prioritaskan gender yang pool-nya ganjil
+            if ($boy_count % 2 != 0 && $girl_count % 2 == 0) $priority_boys = true;
+            else if ($girl_count % 2 != 0 && $boy_count % 2 == 0) $priority_boys = false;
+        }
+
+        if ($priority_boys) {
             // Prioritas laki-laki
             if (count($eligible_boys) >= $needed) {
                 shuffle($eligible_boys);
@@ -132,6 +144,7 @@ for ($block = 0; $block < 8; $block++) {
                 $selected = array_slice($eligible_girls, 0, $needed);
                 $girls_pool = array_diff($girls_pool, $selected);
             } elseif (count($eligible_boys) >= $needed) {
+                // Jika perempuan tidak cukup, coba laki-laki
                 shuffle($eligible_boys);
                 $selected = array_slice($eligible_boys, 0, $needed);
                 $boys_pool = array_diff($boys_pool, $selected);

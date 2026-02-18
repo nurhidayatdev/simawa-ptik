@@ -60,19 +60,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id, dosen, keterangan) VALUES (?, ?, ?, ?, ?, ?)");
         $message_groups = "";
 
+        $kel_count = 1;
         foreach ($groups as $no => $anggotaArr) {
+            if (empty($anggotaArr)) continue;
+
             $anggotaStr = implode(',', array_map(function ($s) {
                 return $s['nim'];
             }, $anggotaArr));
-            $kel_no = $no + 1;
-            mysqli_stmt_bind_param($insert, 'iisiss', $mata_kuliah_id, $kel_no, $anggotaStr, $periode_id, $dosen_name, $keterangan);
+
+            mysqli_stmt_bind_param($insert, 'iisiss', $mata_kuliah_id, $kel_count, $anggotaStr, $periode_id, $dosen_name, $keterangan);
             mysqli_stmt_execute($insert);
 
             // Format message for Telegram
             $namesArr = array_map(function ($s) {
                 return "• " . $s['nama_lengkap'];
             }, $anggotaArr);
-            $message_groups .= "👥 *Kelompok {$kel_no}*\n" . implode("\n", $namesArr) . "\n\n";
+            $message_groups .= "👥 *Kelompok {$kel_count}*\n" . implode("\n", $namesArr) . "\n\n";
+            $kel_count++;
         }
 
         // =====================

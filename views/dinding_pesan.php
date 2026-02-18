@@ -208,7 +208,7 @@ if (file_exists($logo_path)) {
 
                 <!-- Preview Area for Image Generation -->
                 <div id="captureArea"
-                    style="max-width: 320px; margin-left: auto; margin-right: auto; background-color: #1f2937; color: #ffffff; border: 1px solid #374151; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; font-family: 'Poppins', Arial, sans-serif; opacity: 1 !important; visibility: visible !important;">
+                    style="width: 100%; max-width: 320px; margin-left: auto; margin-right: auto; background-color: #1f2937; color: #ffffff; border: 1px solid #374151; border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; font-family: 'Poppins', Arial, sans-serif; opacity: 1 !important; visibility: visible !important; box-sizing: border-box;">
 
                     <div style="position: relative; z-index: 10;">
                         <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
@@ -261,6 +261,13 @@ if (file_exists($logo_path)) {
             document.getElementById('modalPesan').innerHTML = '"' + pesan.replace(/\n/g, '<br>') + '"';
             document.getElementById('modalDate').innerText = date + ' • ' + time;
 
+            // Reset button state whenever modal is opened
+            const downloadBtn = modal.querySelector('button[onclick="shareInstagram(this)"]');
+            if (downloadBtn) {
+                downloadBtn.innerHTML = '<i class="fas fa-download text-lg"></i> Simpan Gambar';
+                downloadBtn.disabled = false;
+            }
+
             modal.classList.remove('hidden');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
@@ -283,20 +290,22 @@ if (file_exists($logo_path)) {
             const captureArea = document.getElementById('captureArea');
             if (!captureArea) return;
 
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const originalText = '<i class="fas fa-download text-lg"></i> Simpan Gambar';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
             btn.disabled = true;
 
             const styleSheets = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
             const tailwindSheet = styleSheets.find(s => s.href.includes('output.css'));
+            let originalWidth = captureArea.style.width;
 
             try {
-                // Pastikan ukuran tetap stabil
-                const originalWidth = captureArea.offsetWidth;
-                captureArea.style.width = originalWidth + 'px';
+                // Stabilize dimensions
+                captureArea.style.width = captureArea.offsetWidth + 'px';
 
+                // Temporarily disable tailwind to prevent some capture issues
                 if (tailwindSheet) tailwindSheet.disabled = true;
 
+                // Small delay to let browser reflow if needed
                 await new Promise(resolve => setTimeout(resolve, 200));
 
                 const canvas = await html2canvas(captureArea, {
@@ -304,21 +313,11 @@ if (file_exists($logo_path)) {
                     scale: 2,
                     useCORS: true,
                     allowTaint: false,
-                    logging: false,
-                    // Menggunakan dimensi elemen secara eksplisit
-                    width: captureArea.offsetWidth,
-                    height: captureArea.offsetHeight,
-                    scrollX: 0,
-                    scrollY: 0,
-                    x: 0,
-                    y: 0
+                    logging: false
                 });
-
-                if (tailwindSheet) tailwindSheet.disabled = false;
 
                 const dataUrl = canvas.toDataURL('image/png', 1.0);
 
-                // Cek jika canvas kosong (terlalu kecil/putih)
                 if (dataUrl === "data:,") {
                     throw new Error("Canvas is empty");
                 }
@@ -333,14 +332,23 @@ if (file_exists($logo_path)) {
                 btn.innerHTML = '<i class="fas fa-check"></i> Berhasil';
             } catch (err) {
                 console.error('Capture failed:', err);
-                if (tailwindSheet) tailwindSheet.disabled = false;
-                alert('Gagal mengunduh gambar. Silakan coba lagi atau gunakan screenshot manual.');
+                alert('Gagal mengunduh gambar. Silakan coba lagi.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             } finally {
-                captureArea.style.width = '';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 2000);
+                // ALWAYS restore these states
+                if (tailwindSheet) tailwindSheet.disabled = false;
+                captureArea.style.width = originalWidth;
+
+                // Allow button to be clickable again after a delay if success
+                if (btn.innerHTML.includes('Berhasil')) {
+                    setTimeout(() => {
+                        if (modal.classList.contains('hidden')) {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }
+                    }, 2000);
+                }
             }
         }
 

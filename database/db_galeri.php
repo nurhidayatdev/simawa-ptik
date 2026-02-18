@@ -19,7 +19,7 @@ if (!empty($search)) {
         $koneksi,
         "SELECT * FROM galeri 
          WHERE judul LIKE ? 
-         ORDER BY created_at DESC"
+         ORDER BY tanggal_kegiatan DESC"
     );
 
     $like = "%$search%";
@@ -27,7 +27,7 @@ if (!empty($search)) {
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
-    $result = mysqli_query($koneksi, "SELECT * FROM galeri ORDER BY created_at DESC");
+    $result = mysqli_query($koneksi, "SELECT * FROM galeri ORDER BY tanggal_kegiatan DESC");
 }
 
 // AJAX handler
@@ -49,6 +49,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         } else {
             echo '<span class="text-xs text-gray-400">No image</span>';
         }
+        echo '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
+        echo '<a href="../actions/download_galeri.php?id=' . $row['id'] . '" class="text-indigo-600 hover:text-indigo-900" title="Download Semua Foto">';
+        echo '<i class="fa fa-download"></i> Download';
+        echo '</a>';
         echo '</td>';
         if ($role === 'Administrator Utama'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
@@ -112,6 +117,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Judul</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Tanggal</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Foto</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Download</th>
                             <?php if ($role === 'Administrator Utama'): ?>
                                 <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Actions</th>
                             <?php endif; ?>
@@ -137,6 +143,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                         echo '<span class="text-xs text-gray-400">No image</span>';
                                     }
                                     ?>
+                                </td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+                                    <a href="../actions/download_galeri.php?id=<?= $row['id']; ?>" class="text-indigo-600 hover:text-indigo-900" title="Download Semua Foto">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
                                 </td>
                                 <?php if ($role === 'Administrator Utama'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">

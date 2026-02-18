@@ -116,7 +116,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
                             </button>
                             <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                
+
                                 <a href="<?= $base ?>views/rekap_absen" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Rekap Absen</a>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
                                     <a href="<?= $base ?>views/manajemen_absen" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Absen</a>
@@ -132,7 +132,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
                             </button>
                             <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 ml-6">
-                                
+
                                 <a href="<?= $base ?>views/rekap_kas" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Rekap Kas</a>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Bendahara'): ?>
                                     <a href="<?= $base ?>views/manajemen_kas" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Data Kas</a>
