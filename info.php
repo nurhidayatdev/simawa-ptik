@@ -245,6 +245,7 @@ $periode = mysqli_fetch_assoc($q_periode);
     </main>
 
     <?php include 'includes/footer_main.php'; ?>
+    <?php include 'includes/script_main.php'; ?>
 </body>
 
 </html>

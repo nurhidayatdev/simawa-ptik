@@ -210,30 +210,29 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             <!-- Modified this section for better mobile responsiveness -->
             <!-- Session Alerts handled by SweetAlert -->
 
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Jadwal Mata Kuliah</h3>
-                <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <div class="w-full md:w-auto">
                     <form method="GET" class="w-full">
-                        <div class="flex flex-row gap-2 items-center">
+                        <div class="flex flex-row flex-nowrap gap-2 items-center">
                             <input
                                 id="searchInput"
                                 type="text"
                                 name="search"
                                 value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
                                 placeholder="Cari Hari / Mata Kuliah..."
-                                class="flex-grow px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                class="flex-1 min-w-0 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
 
                             <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
-                                <button type="button" onclick="confirmJadwal()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center" title="Kirim WhatsApp">
+                                <button type="button" onclick="confirmJadwal()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center shrink-0" title="Kirim WhatsApp">
                                     <i class="fa fa-paper-plane"></i>
                                 </button>
 
-
-                                <a href="../jadwal" class="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center" title="Lihat View">
+                                <a href="../jadwal" class="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center shrink-0" title="Lihat View">
                                     <i class="fa fa-eye"></i>
                                 </a>
 
-                                <a href="../actions/tambah.php?tabel=jadwal_matkul" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
+                                <a href="../actions/tambah.php?tabel=jadwal_matkul" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center shrink-0" title="Tambah">
                                     <i class="fa fa-plus"></i>
                                 </a>
                             <?php endif; ?>
