@@ -233,7 +233,7 @@ if ($q_memories) {
     </style>
 </head>
 
-<body class="bg-[#020617] h-screen w-full overflow-hidden flex flex-col items-center justify-center font-['Poppins']">
+<body class="bg-[#020617] min-h-screen w-full flex flex-col items-center font-['Poppins'] scroll-smooth">
 
     <!-- Background Elements -->
     <div class="fixed inset-0 z-0">
@@ -242,179 +242,152 @@ if ($q_memories) {
         <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-[#020617]/50 to-[#020617]"></div>
     </div>
 
-    <!-- The Poster -->
-    <div class="poster-container animate-fade-in">
+    <!-- Hero Section (Full Height) -->
+    <div class="relative w-full h-screen flex flex-col items-center justify-center shrink-0">
+        <div class="poster-container animate-fade-in relative z-10">
 
-        <!-- Top Ornament -->
-        <div class="w-full flex justify-between items-start opacity-30 shrink-0">
-            <div class="w-10 h-10 border-t border-l border-indigo-500/50 rounded-tl-lg"></div>
-            <div class="text-indigo-400 text-xl animate-float-soft"><i class="fas fa-moon"></i></div>
-            <div class="w-10 h-10 border-t border-r border-indigo-500/50 rounded-tr-lg"></div>
+            <!-- Top Ornament -->
+            <div class="w-full flex justify-between items-start opacity-30 shrink-0">
+                <div class="w-10 h-10 border-t border-l border-indigo-500/50 rounded-tl-lg"></div>
+                <div class="text-indigo-400 text-xl animate-float-soft"><i class="fas fa-moon"></i></div>
+                <div class="w-10 h-10 border-t border-r border-indigo-500/50 rounded-tr-lg"></div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-wrapper flex flex-col items-center justify-center space-y-6 md:space-y-8 flex-grow shrink">
+                <!-- Logo Section -->
+                <div class="relative shrink-0">
+                    <div class="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
+                    <div class="relative w-24 h-24 md:w-28 md:h-28 p-2 rounded-full border border-indigo-500/30 flex items-center justify-center">
+                        <img src="assets/image/logo.webp" alt="Logo" class="w-3/4 h-3/4 object-contain glow-indigo brightness-110 contrast-125">
+                        <div class="absolute -inset-1 border-t border-indigo-400/50 rounded-full animate-slow-spin"></div>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-1 md:space-y-2 shrink-0">
+                    <span class="text-indigo-400 font-medium tracking-[0.3em] uppercase text-[10px] md:text-xs block opacity-80">Marhaban Ya</span>
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-black gold-text leading-none py-1">RAMADAN</h1>
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="h-[1px] w-6 bg-indigo-500/50"></div>
+                        <span class="text-2xl md:text-3xl font-bold text-indigo-200 tracking-tighter">1447 H</span>
+                        <div class="h-[1px] w-6 bg-indigo-500/50"></div>
+                    </div>
+                </div>
+
+                <!-- Quote Area -->
+                <div class="relative px-2 shrink">
+                    <p class="quotes-p text-indigo-100/90 text-base md:text-xl font-light leading-relaxed italic text-center">
+                        "Semoga setiap langkah ibadah kita di bulan yang suci ini membawa keberkahan dan kedamaian yang abadi."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="w-full space-y-4 md:space-y-6 pt-4 shrink-0">
+                <div class="text-center">
+                    <span class="text-indigo-400 font-bold tracking-[0.2em] text-[10px] md:text-xs uppercase block mb-2">Keluarga Besar</span>
+                    <a href="#momen-kebersamaan" class="inline-block bg-indigo-600/20 px-5 py-2 rounded-xl border border-indigo-500/30 backdrop-blur-sm hover:bg-indigo-600/40 hover:scale-105 active:scale-95 transition-all cursor-pointer group shadow-lg shadow-indigo-500/10">
+                        <span class="text-white text-base md:text-lg font-black tracking-widest uppercase group-hover:text-indigo-300 transition-colors">PTIK C 2024</span>
+                    </a>
+                </div>
+
+                <!-- Bottom Frame -->
+                <div class="flex justify-between items-end opacity-30">
+                    <div class="w-10 h-10 border-b border-l border-indigo-500/50 rounded-bl-lg"></div>
+                    <div class="text-indigo-500/30 text-[8px] space-x-2 pb-1">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="w-10 h-10 border-b border-r border-indigo-500/50 rounded-br-lg"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- Content Area -->
-        <div class="content-wrapper flex flex-col items-center justify-center space-y-6 md:space-y-8 flex-grow shrink">
-            <!-- Logo Section -->
-            <div class="relative shrink-0">
-                <div class="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
-                <div class="relative w-24 h-24 md:w-28 md:h-28 p-2 rounded-full border border-indigo-500/30 flex items-center justify-center">
-                    <img src="assets/image/logo.webp" alt="Logo" class="w-3/4 h-3/4 object-contain glow-indigo brightness-110 contrast-125">
-                    <div class="absolute -inset-1 border-t border-indigo-400/50 rounded-full animate-slow-spin"></div>
-                </div>
-            </div>
-
-            <div class="text-center space-y-1 md:space-y-2 shrink-0">
-                <span class="text-indigo-400 font-medium tracking-[0.3em] uppercase text-[10px] md:text-xs block opacity-80">Marhaban Ya</span>
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-black gold-text leading-none py-1">RAMADAN</h1>
-                <div class="flex items-center justify-center gap-3">
-                    <div class="h-[1px] w-6 bg-indigo-500/50"></div>
-                    <span class="text-2xl md:text-3xl font-bold text-indigo-200 tracking-tighter">1447 H</span>
-                    <div class="h-[1px] w-6 bg-indigo-500/50"></div>
-                </div>
-            </div>
-
-            <!-- Quote Area -->
-            <div class="relative px-2 shrink">
-                <p class="quotes-p text-indigo-100/90 text-base md:text-xl font-light leading-relaxed italic text-center">
-                    "Semoga setiap langkah ibadah kita di bulan yang suci ini membawa keberkahan dan kedamaian yang abadi."
-                </p>
-            </div>
-        </div>
-
-        <!-- Bottom Section -->
-        <div class="w-full space-y-4 md:space-y-6 pt-4 shrink-0">
-            <div class="text-center">
-                <span class="text-indigo-400 font-bold tracking-[0.2em] text-[10px] md:text-xs uppercase block mb-2">Keluarga Besar</span>
-                <button onclick="openMemories()" class="inline-block bg-indigo-600/20 px-5 py-2 rounded-xl border border-indigo-500/30 backdrop-blur-sm hover:bg-indigo-600/40 hover:scale-105 active:scale-95 transition-all cursor-pointer group shadow-lg shadow-indigo-500/10">
-                    <span class="text-white text-base md:text-lg font-black tracking-widest uppercase group-hover:text-indigo-300 transition-colors">PTIK C 2024</span>
-                </button>
-            </div>
-
-            <!-- Bottom Frame -->
-            <div class="flex justify-between items-end opacity-30">
-                <div class="w-10 h-10 border-b border-l border-indigo-500/50 rounded-bl-lg"></div>
-                <div class="text-indigo-500/30 text-[8px] space-x-2 pb-1">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="w-10 h-10 border-b border-r border-indigo-500/50 rounded-br-lg"></div>
-            </div>
+        <!-- Ultra-subtle background mosque -->
+        <div class="absolute bottom-0 w-full flex justify-center opacity-[0.02] pointer-events-none -mb-10 lg:-mb-20">
+            <i class="fas fa-mosque text-[50vh] text-indigo-500"></i>
         </div>
     </div>
 
-    <!-- Ultra-subtle background mosque -->
-    <div class="fixed bottom-0 w-full flex justify-center opacity-[0.02] pointer-events-none -mb-10 lg:-mb-20">
-        <i class="fas fa-mosque text-[50vh] text-indigo-500"></i>
-    </div>
-
-    <!-- Memories Modal (Bukber) -->
-    <div id="memoriesModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-950/95 backdrop-blur-2xl" onclick="closeMemories()"></div>
-        <div class="relative bg-slate-900 w-full max-w-5xl rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(79,70,229,0.2)] animate-scale-up border border-indigo-500/20 flex flex-col max-h-[95vh]">
-            <!-- Header -->
-            <div class="px-6 py-4 md:px-10 md:py-6 bg-slate-900 text-white flex justify-between items-center shrink-0 border-b border-indigo-500/10">
-                <div>
-                    <h2 class="text-xl md:text-2xl font-black tracking-tighter mb-1 uppercase gold-text">Momen Kebersamaan</h2>
-                    <p class="text-[10px] uppercase tracking-widest font-bold text-indigo-400 opacity-80">Flashback Buka Puasa Bersama PTIK C 2024</p>
-                </div>
-                <button onclick="closeMemories()" class="w-10 h-10 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 flex items-center justify-center transition-all border border-indigo-500/20">
-                    <i class="fas fa-times text-indigo-400"></i>
-                </button>
+    <!-- Integrated Momen Kebersamaan Section -->
+    <div id="momen-kebersamaan" class="relative z-10 w-full max-w-5xl px-4 mt-10 space-y-12">
+        <!-- Section Header -->
+        <div class="text-center transform transition-all duration-700" data-aos="fade-up">
+            <h2 class="text-3xl md:text-4xl font-black tracking-tighter mb-3 uppercase gold-text">Momen Kebersamaan</h2>
+            <div class="flex flex-col items-center space-y-2">
+                <p class="text-xs uppercase tracking-[0.3em] font-bold text-indigo-400 opacity-80">Flashback Buka Puasa Bersama (Bukber)</p>
+                <div class="h-1 w-20 bg-gradient-to-r from-transparent via-indigo-500 to-transparent rounded-full"></div>
             </div>
+        </div>
 
-            <!-- Content (Swiper Slider - Theater Mode) -->
-            <div class="p-0 overflow-hidden flex-grow bg-slate-950 flex items-center justify-center relative">
+        <!-- Integrated Slider -->
+        <div class="relative bg-slate-900/50 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-indigo-500/10 backdrop-blur-lg">
+            <!-- Content (Swiper Slider) -->
+            <div class="p-0 overflow-hidden bg-slate-950 flex items-center justify-center relative min-h-[300px] md:min-h-[600px]">
                 <?php if (!empty($memories)): ?>
                     <div class="swiper memorySwiper w-full h-full">
                         <div class="swiper-wrapper">
                             <?php foreach ($memories as $m): ?>
                                 <div class="swiper-slide flex flex-col items-center justify-center p-0 relative group">
-                                    <!-- Blurred Background Fallback for different aspect ratios -->
-                                    <div class="absolute inset-0 opacity-20 blur-3xl scale-125 pointer-events-none">
-                                        <img src="storage/gallery/<?= htmlspecialchars($m['foto_path']) ?>"
-                                            class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 opacity-10 blur-3xl scale-125 pointer-events-none">
+                                        <img src="storage/gallery/<?= htmlspecialchars($m['foto_path']) ?>" class="w-full h-full object-cover">
                                     </div>
-
-                                    <!-- Main Image Container -->
-                                    <div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-6 md:p-12 lg:p-20">
-                                        <div class="relative max-w-full max-h-[60vh] md:max-h-[65vh] flex items-center justify-center rounded-2xl overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.8)] bg-slate-900 border border-indigo-500/20 group">
+                                    <div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-3 md:p-8 lg:p-12">
+                                        <!-- Cinematic 16:9 Container -->
+                                        <div class="relative w-full max-w-5xl aspect-video rounded-3xl md:rounded-[2rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] bg-slate-900 border border-indigo-500/20 group">
                                             <img src="storage/gallery/<?= htmlspecialchars($m['foto_path']) ?>"
-                                                class="max-w-full max-h-full object-contain block mx-auto transition-transform duration-1000 group-hover:scale-105"
+                                                class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                                 alt="<?= htmlspecialchars($m['judul']) ?>"
                                                 onerror="this.src='assets/image/logo.webp'">
 
-                                            <!-- Floating Minimal Caption (inside image) -->
-                                            <div class="absolute bottom-0 inset-x-0 p-4 md:p-6 bg-gradient-to-t from-black/95 via-black/40 to-transparent">
-                                                <div class="flex flex-col items-center text-center">
-                                                    <h3 class="text-white text-[9px] md:text-[11px] font-black uppercase tracking-widest leading-tight drop-shadow-xl gold-text">
+                                            <!-- Elegant Bottom-Right Floating Caption -->
+                                            <div class="absolute bottom-6 right-6 z-20">
+                                                <div class="bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-2xl flex flex-col items-end">
+                                                    <h3 class="text-white text-[10px] md:text-sm font-black uppercase tracking-widest leading-none gold-text mb-1">
                                                         <?= htmlspecialchars($m['judul']) ?>
                                                     </h3>
-                                                    <div class="flex items-center justify-center gap-2 mt-1 md:mt-1.5">
-                                                        <span class="w-1 h-1 rounded-full bg-indigo-500"></span>
-                                                        <p class="text-indigo-200 text-[7px] md:text-[8px] font-bold uppercase tracking-[0.2em] opacity-80 italic">
-                                                            <?= date('d F Y', strtotime($m['tanggal_kegiatan'])) ?>
-                                                        </p>
-                                                        <span class="w-1 h-1 rounded-full bg-indigo-500"></span>
-                                                    </div>
+                                                    <p class="text-indigo-300 text-[8px] md:text-[10px] font-bold uppercase tracking-widest opacity-80 italic">
+                                                        <?= date('d M Y', strtotime($m['tanggal_kegiatan'])) ?>
+                                                    </p>
                                                 </div>
                                             </div>
+
+                                            <!-- Bottom Gradient Overlay -->
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                                         </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <!-- Navigation -->
-                        <div class="swiper-button-next !hidden md:!flex"></div>
-                        <div class="swiper-button-prev !hidden md:!flex"></div>
-                        <div class="swiper-pagination !bottom-4 md:!bottom-8"></div>
+                        <div class="swiper-button-next !hidden md:!flex shadow-2xl"></div>
+                        <div class="swiper-button-prev !hidden md:!flex shadow-2xl"></div>
+                        <div class="swiper-pagination !bottom-6"></div>
                     </div>
                 <?php else: ?>
-                    <div class="flex flex-col items-center justify-center py-20 text-slate-400 italic">
-                        <i class="fas fa-camera-retro text-5xl mb-4 opacity-20"></i>
-                        <p class="text-sm">Belum ada foto momen ramadan yang tersimpan.</p>
+                    <div class="flex flex-col items-center justify-center py-40 text-slate-500 italic">
+                        <i class="fas fa-camera-retro text-6xl mb-6 opacity-20"></i>
+                        <p class="text-base tracking-widest uppercase font-bold">Galeri Masih Kosong</p>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <!-- Footer Action -->
-            <div class="p-4 md:px-10 md:py-6 bg-slate-900 border-t border-indigo-500/10 shrink-0 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center border border-indigo-500/20">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs font-black text-white uppercase tracking-tight">Tradisi Kebersamaan</p>
-                        <p class="text-[10px] font-medium text-slate-400">Terus mengukir cerita di setiap Ramadan.</p>
-                    </div>
-                </div>
-                <div class="flex flex-wrap md:flex-nowrap items-center justify-center md:justify-end gap-3 w-full">
-                    <button onclick="openImsakiyah()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all shadow-xl shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-3 w-full md:w-auto border border-indigo-400/20 group">
-                        Buka Jadwal Imsakiyah <i class="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
-                    </button>
-                </div>
-            </div>
+            <!-- Footer Removed for Clean Look -->
         </div>
     </div>
-    <div id="imsakiyahModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onclick="closeImsakiyah()"></div>
-        <div class="relative bg-slate-900 w-full max-w-4xl max-h-[85vh] rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(79,70,229,0.2)] animate-scale-up border border-indigo-500/20 flex flex-col">
-            <!-- Modal Header -->
-            <div class="px-8 py-6 bg-slate-900 text-white flex justify-between items-center shrink-0 border-b border-indigo-500/10 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10 rotate-12 scale-150">
-                    <i class="fas fa-mosque text-6xl text-indigo-500"></i>
-                </div>
-                <div class="relative z-10">
-                    <h2 class="text-xl md:text-2xl font-black tracking-tighter leading-none mb-1 gold-text">JADWAL IMSAKIYAH 1447 H</h2>
-                    <p class="text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-indigo-400 font-bold flex items-center gap-2">
-                        <i class="fas fa-map-marker-alt"></i> Wilayah Asia/Makassar (PTIK C 2024)
-                    </p>
-                </div>
-                <button onclick="closeImsakiyah()" class="relative z-10 w-10 h-10 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 flex items-center justify-center transition-all active:scale-90">
-                    <i class="fas fa-times text-indigo-400"></i>
-                </button>
-            </div>
 
+    <!-- Integrated Jadwal Imsakiyah Section -->
+    <div id="jadwal-imsakiyah" class="relative z-10 w-full max-w-5xl px-4 mt-16 md:mt-24 space-y-8 md:space-y-12">
+        <!-- Section Header -->
+        <div class="text-center transform transition-all duration-700" data-aos="fade-up">
+            <h2 class="text-3xl md:text-4xl font-black tracking-tighter mb-3 uppercase gold-text">Jadwal Imsakiyah</h2>
+            <div class="flex flex-col items-center space-y-2">
+                <p class="text-xs uppercase tracking-[0.3em] font-bold text-indigo-400 opacity-80">Wilayah Asia/Makassar (PTIK C 2024)</p>
+                <div class="h-1 w-20 bg-gradient-to-r from-transparent via-indigo-500 to-transparent rounded-full"></div>
+            </div>
+        </div>
+
+        <div class="relative bg-slate-900/50 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-indigo-500/10 backdrop-blur-lg flex flex-col max-h-[85vh]">
             <!-- Table Body -->
             <div class="overflow-x-auto overflow-y-auto custom-scrollbar flex-grow bg-slate-950 italic-table-container">
                 <table class="w-full text-left border-collapse min-w-[800px]">
@@ -436,7 +409,7 @@ if ($q_memories) {
                     <tbody class="divide-y divide-indigo-500/10">
                         <?php
                         date_default_timezone_set('Asia/Makassar');
-                        $today_masehi = date('j M'); // Format: "19 Feb"
+                        $today_masehi = date('j M');
 
                         $imsakData = [
                             ["1", "Kamis", "19 Feb", "04:41", "04:51", "06:08", "06:32", "12:20", "15:30", "18:26", "19:36"],
@@ -505,76 +478,65 @@ if ($q_memories) {
                     </tbody>
                 </table>
             </div>
-
-            <!-- Modal Footer -->
-            <div class="px-8 py-5 bg-slate-900 border-t border-indigo-500/10 flex flex-col md:flex-row justify-between items-center gap-4 shrink-0">
-                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest italic flex items-center gap-2">
-                    <i class="fas fa-info-circle text-indigo-500"></i> Sumber Data: al-habib.info | Zona Asia/Makassar
-                </p>
-                <button onclick="closeImsakiyah()" class="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">
-                    Tutup Jadwal
-                </button>
-            </div>
         </div>
     </div>
+    </div>
+    </div>
+
+    <!-- Simple Footer -->
+    <footer class="relative z-10 w-full mt-12 pt-8 pb-4 border-t border-indigo-500/10 bg-slate-950/30 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-[0.3em]">
+                &copy; 2026 PTIK C 2024. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
 
     <script>
-        // Modal logic
+        // Anchor logic for Imsakiyah scroll
         function openImsakiyah() {
-            closeMemories(); // Ensure memories is closed
-            const modal = document.getElementById('imsakiyahModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
+            const section = document.getElementById('jadwal-imsakiyah');
+            if (section) {
+                section.scrollIntoView({
+                    behavior: 'smooth'
+                });
 
-            // Auto-scroll to today
-            setTimeout(() => {
-                const todayRow = document.getElementById('todayRow');
-                if (todayRow) {
-                    todayRow.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
-            }, 100);
+                // Auto-scroll to today row inside the table container
+                setTimeout(() => {
+                    const todayRow = document.getElementById('todayRow');
+                    if (todayRow) {
+                        todayRow.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                }, 800);
+            }
         }
 
-        function openMemories() {
-            const modal = document.getElementById('memoriesModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
 
-            // Initialize Swiper after modal is visible
-            new Swiper(".memorySwiper", {
-                effect: "slide",
-                grabCursor: true,
-                centeredSlides: true,
-                slidesPerView: 1,
-                spaceBetween: 30,
-                loop: true,
-                autoplay: {
-                    delay: 4000,
-                    disableOnInteraction: false,
-                },
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
-                    dynamicBullets: true,
-                },
-                navigation: {
-                    nextEl: ".swiper-button-next",
-                    prevEl: ".swiper-button-prev",
-                },
-            });
-        }
-
-        function closeMemories() {
-            const modal = document.getElementById('memoriesModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = 'auto';
-        }
+        // Initialize Swiper on load
+        new Swiper(".memorySwiper", {
+            effect: "slide",
+            grabCursor: true,
+            centeredSlides: true,
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+                dynamicBullets: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
 
         function closeImsakiyah() {
             const modal = document.getElementById('imsakiyahModal');
@@ -585,15 +547,6 @@ if ($q_memories) {
 
         const container = document.getElementById('star-container');
 
-        // Auto-open modal once per session
-        window.addEventListener('load', () => {
-            if (!sessionStorage.getItem('ramadan_notif_shown')) {
-                setTimeout(() => {
-                    openMemories();
-                    sessionStorage.setItem('ramadan_notif_shown', 'true');
-                }, 1500); // Small delay for better UX
-            }
-        });
 
         const count = 80;
         for (let i = 0; i < count; i++) {
