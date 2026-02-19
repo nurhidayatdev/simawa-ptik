@@ -148,10 +148,16 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                     <div>
                         <p class="px-4 text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Aktivitas</p>
                         <div class="space-y-1">
-
-
-
-
+                            <a href="<?= $base ?>ramadan" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <i class="fa fa-moon w-5 h-5 mr-3 text-indigo-900"></i>
+                                <span class="text-xs font-medium">Ramadan 1447H</span>
+                                <div class="ml-auto shrink-0">
+                                    <span class="flex h-1.5 w-1.5 relative">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+                                    </span>
+                                </div>
+                            </a>
                             <a href="<?= $base ?>views/misi" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Pusat Misi</span>
