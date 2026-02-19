@@ -239,7 +239,7 @@ if (isset($_POST['tambah'])) {
             $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
             $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
             mysqli_query($koneksi, "INSERT INTO kuis_harian_soal (tanggal, pertanyaan, jawaban) VALUES ('$tanggal', '$pertanyaan', '$jawaban')");
-            $redirect = "../database/db_kuis";
+            $redirect = "../views/manajemen_kuis";
             break;
     }
     include '../includes/alert_actions.php';

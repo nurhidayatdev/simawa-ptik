@@ -328,7 +328,7 @@ if (isset($_POST['update'])) {
             $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
             $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
             mysqli_query($koneksi, "UPDATE kuis_harian_soal SET tanggal='$tanggal', pertanyaan='$pertanyaan', jawaban='$jawaban' WHERE id='$id'");
-            $redirect = "../database/db_kuis";
+            $redirect = "../views/manajemen_kuis";
             break;
     }
 

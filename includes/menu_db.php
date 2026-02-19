@@ -198,7 +198,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                     <a href="<?= $base ?>database/db_periode" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Periode</a>
                                     <a href="<?= $base ?>database/db_ruangan" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Ruangan</a>
                                     <a href="<?= $base ?>database/db_jam" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Jam Kuliah</a>
-                                    <a href="<?= $base ?>database/db_kuis" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Kuis Harian</a>
+                                    <a href="<?= $base ?>views/manajemen_kuis" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Manajemen Kuis</a>
                                     <a href="<?= $base ?>database/db_pesan" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Pesan Anonim</a>
                                     <a href="<?= $base ?>actions/validasi_krs" class="block px-4 py-1 text-xs text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-lg">Validasi KRS</a>
                                 </div>

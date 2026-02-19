@@ -192,7 +192,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
             $redirect = '../database/db_ruangan';
             break;
         case 'kuis_harian_soal':
-            $redirect = '../database/db_kuis';
+            $redirect = '../views/manajemen_kuis';
             break;
     }
 
