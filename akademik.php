@@ -124,11 +124,9 @@ $today = date('Y-m-d');
 
 <head>
     <title>Akademik - Kelas PTIK C 2024</title>
-   <?php include 'includes/head.php'; ?>
+    <?php include 'includes/head.php'; ?>
 
     <style>
-       
-
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -142,7 +140,7 @@ $today = date('Y-m-d');
             flex-shrink: 0;
         }
 
-       
+
 
         .event-kalender {
             background: #6366f1;
@@ -177,8 +175,21 @@ $today = date('Y-m-d');
                 height: 8px;
             }
         }
+
+        /* Scroll Reveal Animation Styles */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
-   
+
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -190,7 +201,7 @@ $today = date('Y-m-d');
     <main class="flex-grow ">
         <section class="py-12 p-6">
             <div class="container mx-auto">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Berita & Informasi Akademik</h2>
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 scroll-reveal">Berita & Informasi Akademik</h2>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- sample card -->
@@ -198,7 +209,7 @@ $today = date('Y-m-d');
                     if (mysqli_num_rows($query) > 0) {
                         while ($data = mysqli_fetch_assoc($query)) {
                     ?>
-                            <article class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                            <article class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition scroll-reveal">
 
                                 <div class="p-4">
                                     <h3 class="font-semibold text-lg mb-2"><?php echo $data['judul']; ?></h3>
@@ -216,208 +227,208 @@ $today = date('Y-m-d');
             </div>
         </section>
         <section class="ml-0 p-6 flex flex-col">
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 md:p-6">
-            <!-- Header with Navigation -->
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-800">Kalender Kelas</h1>
-                    <p class="text-slate-500 text-sm mt-1">Informasi akademik terintegrasi</p>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 md:p-6 scroll-reveal">
+                <!-- Header with Navigation -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Kalender Kelas</h1>
+                        <p class="text-slate-500 text-sm mt-1">Informasi akademik terintegrasi</p>
+                    </div>
+
+                    <!-- Month Navigation -->
+                    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+                        <a href="?month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
+                            <i class="fa fa-chevron-left text-slate-600"></i>
+                        </a>
+                        <span class="px-4 font-bold text-indigo-900 text-sm min-w-[140px] text-center">
+                            <?= $month_names[$month] ?> <?= $year ?>
+                        </span>
+                        <a href="?month=<?= $next_month ?>&year=<?= $next_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
+                            <i class="fa fa-chevron-right text-slate-600"></i>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Month Navigation -->
-                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
-                    <a href="?month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
-                        <i class="fa fa-chevron-left text-slate-600"></i>
-                    </a>
-                    <span class="px-4 font-bold text-indigo-900 text-sm min-w-[140px] text-center">
-                        <?= $month_names[$month] ?> <?= $year ?>
-                    </span>
-                    <a href="?month=<?= $next_month ?>&year=<?= $next_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
-                        <i class="fa fa-chevron-right text-slate-600"></i>
-                    </a>
-                </div>
-            </div>
+                <!-- Legend -->
+                <div class="flex flex-wrap gap-4 mb-4 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="event-dot event-kalender"></span>
+                        <span class="text-slate-600">Kalender Akademik</span>
+                    </div>
 
-            <!-- Legend -->
-            <div class="flex flex-wrap gap-4 mb-4 text-xs">
-                <div class="flex items-center gap-2">
-                    <span class="event-dot event-kalender"></span>
-                    <span class="text-slate-600">Kalender Akademik</span>
-                </div>
-               
 
-                <div class="flex items-center gap-2">
-                    <span class="event-dot event-tugas"></span>
-                    <span class="text-slate-600">Deadline Tugas</span>
-                </div>
-            </div>
-
-            <!-- Calendar Grid -->
-            <div class="border border-slate-200 rounded-lg overflow-hidden">
-                <!-- Day Headers -->
-                <div class="calendar-grid bg-indigo-900 text-white">
-                    <?php foreach ($day_names as $dn): ?>
-                        <div class="p-2 md:p-3 text-center text-xs font-bold uppercase"><?= $dn ?></div>
-                    <?php endforeach; ?>
+                    <div class="flex items-center gap-2">
+                        <span class="event-dot event-tugas"></span>
+                        <span class="text-slate-600">Deadline Tugas</span>
+                    </div>
                 </div>
 
-                <!-- Calendar Days -->
-                <div class="calendar-grid bg-white">
-                    <?php
-                    // Empty cells before first day
-                    for ($i = 0; $i < $start_day; $i++): ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
-                    <?php endfor; ?>
+                <!-- Calendar Grid -->
+                <div class="border border-slate-200 rounded-lg overflow-hidden">
+                    <!-- Day Headers -->
+                    <div class="calendar-grid bg-indigo-900 text-white">
+                        <?php foreach ($day_names as $dn): ?>
+                            <div class="p-2 md:p-3 text-center text-xs font-bold uppercase"><?= $dn ?></div>
+                        <?php endforeach; ?>
+                    </div>
 
-                    <?php for ($d = 1; $d <= $days_in_month; $d++):
-                        $date_key = sprintf('%04d-%02d-%02d', $year, $month, $d);
-                        $is_today = ($date_key === $today);
-                        $day_events = $events[$date_key] ?? [];
-                        $has_events = !empty($day_events);
-                    ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 min-h-[60px] sm:min-h-[80px] md:min-h-[100px] <?= $is_today ? 'bg-indigo-50 ring-2 ring-indigo-400 ring-inset' : '' ?> <?= $has_events ? 'cursor-pointer hover:bg-slate-50 transition-colors' : '' ?>"
-                            <?php if ($has_events): ?>
-                            onclick="showDatePopup('<?= $date_key ?>', <?= $d ?>)"
-                            <?php endif; ?>>
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs sm:text-sm font-bold <?= $is_today ? 'text-indigo-700' : 'text-slate-700' ?>"><?= $d ?></span>
-                                <?php if ($is_today): ?>
-                                    <span class="hidden sm:inline text-[8px] bg-indigo-600 text-white px-1 rounded">HARI INI</span>
-                                <?php endif; ?>
-                            </div>
-
-                            <!-- Events - Mobile: dots only, Desktop: dots + text -->
-                            <div class="event-row flex sm:flex-col sm:space-y-1 overflow-hidden max-h-[40px] sm:max-h-[60px] md:max-h-[80px]">
-                                <?php
-                                $event_counts = ['kalender' => 0, 'tugas' => 0];
-                                $shown = 0;
-                                foreach ($day_events as $evt):
-                                    $event_counts[$evt['type']]++;
-                                    if ($shown >= 4) continue;
-                                    $shown++;
-
-                                    $dot_class = 'event-' . $evt['type'];
-                                    if ($evt['type'] === 'tugas' && isset($evt['status']) && $evt['status'] === 'selesai') {
-                                        $dot_class = 'event-tugas-done';
-                                    }
-                                ?>
-                                    <div class="flex items-center gap-1 text-[10px] text-slate-600" title="<?= htmlspecialchars($evt['title']) ?>">
-                                        <span class="event-dot <?= $dot_class ?>"></span>
-                                        <span class="event-text truncate hidden sm:inline"><?= htmlspecialchars(mb_strimwidth($evt['title'], 0, 12, '..')) ?></span>
-                                    </div>
-                                <?php endforeach; ?>
-
-                                <?php if (count($day_events) > 3): ?>
-                                    <div class="event-text text-[9px] text-slate-400 italic hidden sm:block">+<?= count($day_events) - 3 ?> lainnya</div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endfor; ?>
-
-                    <?php
-                    // Fill remaining cells
-                    $total_cells = $start_day + $days_in_month;
-                    $remaining = (7 - ($total_cells % 7)) % 7;
-                    for ($i = 0; $i < $remaining; $i++): ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
-                    <?php endfor; ?>
-                </div>
-            </div>
-
-            <!-- All Events This Month -->
-            <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <!-- Kalender Akademik -->
-                <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
-                        <span class="event-dot event-kalender" style="width:10px;height:10px;"></span>
-                        Kalender Akademik
-                    </h3>
-                    <div class="space-y-2 max-h-[300px] overflow-y-auto">
+                    <!-- Calendar Days -->
+                    <div class="calendar-grid bg-white">
                         <?php
-                        // Collect kalender events
-                        $kalender_list = [];
-                        foreach ($events as $date => $day_events) {
-                            foreach ($day_events as $evt) {
-                                if ($evt['type'] === 'kalender') {
-                                    $kalender_list[] = [
-                                        'date' => $date,
-                                        'title' => $evt['title'],
-                                        'start' => $evt['start'],
-                                        'end' => $evt['end']
-                                    ];
+                        // Empty cells before first day
+                        for ($i = 0; $i < $start_day; $i++): ?>
+                            <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
+                        <?php endfor; ?>
+
+                        <?php for ($d = 1; $d <= $days_in_month; $d++):
+                            $date_key = sprintf('%04d-%02d-%02d', $year, $month, $d);
+                            $is_today = ($date_key === $today);
+                            $day_events = $events[$date_key] ?? [];
+                            $has_events = !empty($day_events);
+                        ?>
+                            <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 min-h-[60px] sm:min-h-[80px] md:min-h-[100px] <?= $is_today ? 'bg-indigo-50 ring-2 ring-indigo-400 ring-inset' : '' ?> <?= $has_events ? 'cursor-pointer hover:bg-slate-50 transition-colors' : '' ?>"
+                                <?php if ($has_events): ?>
+                                onclick="showDatePopup('<?= $date_key ?>', <?= $d ?>)"
+                                <?php endif; ?>>
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="text-xs sm:text-sm font-bold <?= $is_today ? 'text-indigo-700' : 'text-slate-700' ?>"><?= $d ?></span>
+                                    <?php if ($is_today): ?>
+                                        <span class="hidden sm:inline text-[8px] bg-indigo-600 text-white px-1 rounded">HARI INI</span>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Events - Mobile: dots only, Desktop: dots + text -->
+                                <div class="event-row flex sm:flex-col sm:space-y-1 overflow-hidden max-h-[40px] sm:max-h-[60px] md:max-h-[80px]">
+                                    <?php
+                                    $event_counts = ['kalender' => 0, 'tugas' => 0];
+                                    $shown = 0;
+                                    foreach ($day_events as $evt):
+                                        $event_counts[$evt['type']]++;
+                                        if ($shown >= 4) continue;
+                                        $shown++;
+
+                                        $dot_class = 'event-' . $evt['type'];
+                                        if ($evt['type'] === 'tugas' && isset($evt['status']) && $evt['status'] === 'selesai') {
+                                            $dot_class = 'event-tugas-done';
+                                        }
+                                    ?>
+                                        <div class="flex items-center gap-1 text-[10px] text-slate-600" title="<?= htmlspecialchars($evt['title']) ?>">
+                                            <span class="event-dot <?= $dot_class ?>"></span>
+                                            <span class="event-text truncate hidden sm:inline"><?= htmlspecialchars(mb_strimwidth($evt['title'], 0, 12, '..')) ?></span>
+                                        </div>
+                                    <?php endforeach; ?>
+
+                                    <?php if (count($day_events) > 3): ?>
+                                        <div class="event-text text-[9px] text-slate-400 italic hidden sm:block">+<?= count($day_events) - 3 ?> lainnya</div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endfor; ?>
+
+                        <?php
+                        // Fill remaining cells
+                        $total_cells = $start_day + $days_in_month;
+                        $remaining = (7 - ($total_cells % 7)) % 7;
+                        for ($i = 0; $i < $remaining; $i++): ?>
+                            <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+
+                <!-- All Events This Month -->
+                <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <!-- Kalender Akademik -->
+                    <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl scroll-reveal">
+                        <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
+                            <span class="event-dot event-kalender" style="width:10px;height:10px;"></span>
+                            Kalender Akademik
+                        </h3>
+                        <div class="space-y-2 max-h-[300px] overflow-y-auto">
+                            <?php
+                            // Collect kalender events
+                            $kalender_list = [];
+                            foreach ($events as $date => $day_events) {
+                                foreach ($day_events as $evt) {
+                                    if ($evt['type'] === 'kalender') {
+                                        $kalender_list[] = [
+                                            'date' => $date,
+                                            'title' => $evt['title'],
+                                            'start' => $evt['start'],
+                                            'end' => $evt['end']
+                                        ];
+                                    }
                                 }
                             }
-                        }
-                        if (!empty($kalender_list)):
-                            foreach ($kalender_list as $k):
-                                $is_range = ($k['start'] !== $k['end']);
-                        ?>
-                                <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs">
-                                    <div class="font-bold text-indigo-700 min-w-[70px]">
-                                        <?php if ($is_range): ?>
-                                            <?= date('d M', strtotime($k['start'])) ?> - <?= date('d M', strtotime($k['end'])) ?>
-                                        <?php else: ?>
-                                            <?= date('d M', strtotime($k['start'])) ?>
+                            if (!empty($kalender_list)):
+                                foreach ($kalender_list as $k):
+                                    $is_range = ($k['start'] !== $k['end']);
+                            ?>
+                                    <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs">
+                                        <div class="font-bold text-indigo-700 min-w-[70px]">
+                                            <?php if ($is_range): ?>
+                                                <?= date('d M', strtotime($k['start'])) ?> - <?= date('d M', strtotime($k['end'])) ?>
+                                            <?php else: ?>
+                                                <?= date('d M', strtotime($k['start'])) ?>
+                                            <?php endif; ?>
+                                        </div>
+                                        <span class="flex-1 text-slate-700"><?= htmlspecialchars($k['title']) ?></span>
+                                    </div>
+                                <?php endforeach;
+                            else: ?>
+                                <p class="text-xs text-slate-500 italic">Tidak ada kegiatan akademik.</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                    <!-- Deadline Tugas -->
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl scroll-reveal">
+                        <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
+                            <span class="event-dot event-tugas" style="width:10px;height:10px;"></span>
+                            Deadline Tugas
+                        </h3>
+                        <div class="space-y-2 max-h-[300px] overflow-y-auto">
+                            <?php
+                            // Collect tugas events
+                            $tugas_list = [];
+                            foreach ($events as $date => $day_events) {
+                                foreach ($day_events as $evt) {
+                                    if ($evt['type'] === 'tugas') {
+                                        $tugas_list[] = [
+                                            'date' => $date,
+                                            'title' => $evt['title'],
+                                            'time' => $evt['time'],
+                                            'status' => $evt['status'] ?? 'belum'
+                                        ];
+                                    }
+                                }
+                            }
+                            if (!empty($tugas_list)):
+                                foreach ($tugas_list as $t):
+                                    $is_done = ($t['status'] === 'selesai');
+                            ?>
+                                    <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs <?= $is_done ? 'opacity-60' : '' ?>">
+                                        <span class="font-bold text-slate-700 w-16"><?= date('d M', strtotime($t['date'])) ?></span>
+                                        <span class="flex-1 text-slate-700 <?= $is_done ? 'line-through' : '' ?>"><?= htmlspecialchars($t['title']) ?></span>
+                                        <?php if ($t['time']): ?>
+                                            <span class="text-slate-600 font-medium"><?= $t['time'] ?></span>
+                                        <?php endif; ?>
+                                        <?php if ($is_done): ?>
+                                            <i class="fa fa-check-circle text-slate-500"></i>
                                         <?php endif; ?>
                                     </div>
-                                    <span class="flex-1 text-slate-700"><?= htmlspecialchars($k['title']) ?></span>
-                                </div>
-                            <?php endforeach;
-                        else: ?>
-                            <p class="text-xs text-slate-500 italic">Tidak ada kegiatan akademik.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-
-            
-
-
-
-                <!-- Deadline Tugas -->
-                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
-                        <span class="event-dot event-tugas" style="width:10px;height:10px;"></span>
-                        Deadline Tugas
-                    </h3>
-                    <div class="space-y-2 max-h-[300px] overflow-y-auto">
-                        <?php
-                        // Collect tugas events
-                        $tugas_list = [];
-                        foreach ($events as $date => $day_events) {
-                            foreach ($day_events as $evt) {
-                                if ($evt['type'] === 'tugas') {
-                                    $tugas_list[] = [
-                                        'date' => $date,
-                                        'title' => $evt['title'],
-                                        'time' => $evt['time'],
-                                        'status' => $evt['status'] ?? 'belum'
-                                    ];
-                                }
-                            }
-                        }
-                        if (!empty($tugas_list)):
-                            foreach ($tugas_list as $t):
-                                $is_done = ($t['status'] === 'selesai');
-                        ?>
-                                <div class="flex items-center gap-2 bg-white/60 p-2 rounded-lg text-xs <?= $is_done ? 'opacity-60' : '' ?>">
-                                    <span class="font-bold text-slate-700 w-16"><?= date('d M', strtotime($t['date'])) ?></span>
-                                    <span class="flex-1 text-slate-700 <?= $is_done ? 'line-through' : '' ?>"><?= htmlspecialchars($t['title']) ?></span>
-                                    <?php if ($t['time']): ?>
-                                        <span class="text-slate-600 font-medium"><?= $t['time'] ?></span>
-                                    <?php endif; ?>
-                                    <?php if ($is_done): ?>
-                                        <i class="fa fa-check-circle text-slate-500"></i>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endforeach;
-                        else: ?>
-                            <p class="text-xs text-slate-500 italic">Tidak ada tugas.</p>
-                        <?php endif; ?>
+                                <?php endforeach;
+                            else: ?>
+                                <p class="text-xs text-slate-500 italic">Tidak ada tugas.</p>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </section>
 
         <!-- Date Popup Modal -->
@@ -439,7 +450,7 @@ $today = date('Y-m-d');
     </main>
 
     <?php include 'includes/footer_main.php'; ?>
-<?php include 'includes/script_main.php'; ?>
+    <?php include 'includes/script_main.php'; ?>
 
     <script>
         // Events data from PHP
@@ -522,8 +533,28 @@ $today = date('Y-m-d');
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeDatePopup();
         });
+    </script>
+    <script>
+        // Scroll Reveal Implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
 
-        
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    } else {
+                        entry.target.classList.remove('active');
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.scroll-reveal');
+            revealElements.forEach(el => observer.observe(el));
+        });
     </script>
 </body>
 

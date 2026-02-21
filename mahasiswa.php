@@ -18,6 +18,20 @@ while ($r = mysqli_fetch_assoc($result)) {
 <head>
   <title>Mahasiswa - Kelas PTIK C 2024</title>
   <?php include 'includes/head.php'; ?>
+  <style>
+    /* Scroll Reveal Animation Styles */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: opacity, transform;
+    }
+
+    .scroll-reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -28,9 +42,9 @@ while ($r = mysqli_fetch_assoc($result)) {
 
 
   <div class="container mx-auto p-6 mt-4">
-    <h1 class="text-2xl font-bold mb-4 text-center text-indigo-950">Mahasiswa</h1>
+    <h1 class="text-2xl font-bold mb-4 text-center text-indigo-950 scroll-reveal">Mahasiswa</h1>
 
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 scroll-reveal">
       <input id="searchInput" type="search" placeholder="Cari nama, panggilan, NIM" class="w-full sm:w-1/2 px-4 py-2 rounded-full border border-slate-200 shadow-sm" />
     </div>
 
@@ -49,7 +63,7 @@ while ($r = mysqli_fetch_assoc($result)) {
             data-initials="<?= strtoupper(substr($row['nama_lengkap'], 0, 2)) ?>"
             data-instagram="<?php echo htmlspecialchars($row['instagram'] ?? ''); ?>"
             data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>"
-            class="cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 hover:shadow-lg transition-all group hover:-translate-y-1">
+            class="cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 hover:shadow-lg transition-all group hover:-translate-y-1 scroll-reveal">
             <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-14 relative">
               <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
@@ -230,6 +244,27 @@ while ($r = mysqli_fetch_assoc($result)) {
       if (event.key === "Escape" && !modal.classList.contains('hidden')) {
         closeModal();
       }
+    });
+
+    // Scroll Reveal Implementation
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          } else {
+            entry.target.classList.remove('active');
+          }
+        });
+      }, observerOptions);
+
+      const revealElements = document.querySelectorAll('.scroll-reveal');
+      revealElements.forEach(el => observer.observe(el));
     });
   </script>
 </body>

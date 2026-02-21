@@ -22,6 +22,19 @@ include 'includes/pesan.php';
 		.aspect-16-9 {
 			aspect-ratio: 16 / 9;
 		}
+
+		/* Scroll Reveal Animation Styles */
+		.scroll-reveal {
+			opacity: 0;
+			transform: translateY(30px);
+			transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+			will-change: opacity, transform;
+		}
+
+		.scroll-reveal.active {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	</style>
 </head>
 
@@ -34,7 +47,7 @@ include 'includes/pesan.php';
 	<main class="flex-grow">
 		<section class="py-12">
 			<div class="container mx-auto px-4">
-				<h2 class="text-3xl font-bold mb-6 text-gray-800">Galeri Kegiatan</h2>
+				<h2 class="text-3xl font-bold mb-6 text-gray-800 scroll-reveal">Galeri Kegiatan</h2>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					<?php
@@ -46,7 +59,7 @@ include 'includes/pesan.php';
 							$galeri_id = $row['id'];
 							$slider_id = "s" . $galeri_id;
 					?>
-							<div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col">
+							<div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col scroll-reveal">
 								<div class="relative group aspect-16-9 overflow-hidden">
 									<div class="slider h-full overflow-hidden relative" data-slider-id="<?= $slider_id ?>">
 										<div class="slides h-full flex transition-transform duration-500">
@@ -234,6 +247,27 @@ include 'includes/pesan.php';
 				currentPhotoIndex = (currentPhotoIndex - 1 + currentPhotos.length) % currentPhotos.length;
 				updateModalContent();
 			}
+		});
+
+		// Scroll Reveal Implementation
+		document.addEventListener('DOMContentLoaded', function() {
+			const observerOptions = {
+				threshold: 0.1,
+				rootMargin: '0px 0px -50px 0px'
+			};
+
+			const observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('active');
+					} else {
+						entry.target.classList.remove('active');
+					}
+				});
+			}, observerOptions);
+
+			const revealElements = document.querySelectorAll('.scroll-reveal');
+			revealElements.forEach(el => observer.observe(el));
 		});
 	</script>
 </body>

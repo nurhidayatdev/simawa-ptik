@@ -72,6 +72,36 @@ $sms = mysqli_fetch_assoc($sms_aktif);
         .delay-200 {
             animation-delay: 0.4s;
         }
+
+        /* Scroll Reveal Animation Styles */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delay for grid items */
+        .reveal-delay-1 {
+            transition-delay: 0.1s;
+        }
+
+        .reveal-delay-2 {
+            transition-delay: 0.2s;
+        }
+
+        .reveal-delay-3 {
+            transition-delay: 0.3s;
+        }
+
+        .reveal-delay-4 {
+            transition-delay: 0.4s;
+        }
     </style>
 
 </head>
@@ -136,25 +166,27 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
     <!-- Profil Kelas -->
     <section class="py-12 bg-white overflow-hidden">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-8 md:px-16 lg:px-24">
             <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                 <!-- Content Left -->
-                <div class="lg:w-1/2">
+                <div class="lg:w-1/2 scroll-reveal">
 
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight">
                         Membangun Masa Depan <br>
                         <span class="text-indigo-600 italic">Teknologi Bersama</span>
                     </h2>
-                    <div class="space-y-4 text-slate-600 leading-relaxed max-w-xl">
+                    <div class="space-y-4 text-slate-600 leading-relaxed max-w-xl md:max-w-2xl text-sm md:text-base">
                         <p>
                             Kelas PTIK C Angkatan 2024 adalah bagian dari Program Studi Teknik Informatika dan Komputer
                             di Fakultas Teknik, Universitas Negeri Makassar. Kami adalah kelompok mahasiswa yang
                             berdedikasi untuk menguasai teknologi dan inovasi di era transformasi digital.
                         </p>
                         <p>
-                            Dengan semangat kolaborasi yang kuat, kami tidak hanya belajar secara akademis,
-                            tetapi juga membangun ekosistem pendukung yang mempermudah interaksi dan pengelolaan
-                            informasi kelas secara pintar dan transparan.
+                            Dikenal juga dengan identitas <span class="font-bold text-indigo-600">ProTechNoTy</span>, sebuah akronim yang melambangkan semangat kami:
+                            <span class="italic text-slate-500">Programmer</span>,
+                            <span class="italic text-slate-500">Technology</span>,
+                            <span class="italic text-slate-500">INovation</span>, dan
+                            <span class="italic text-slate-500">CreativiTy</span>. Identitas ini mencerminkan tekad kami untuk menjadi inovator masa depan yang kreatif dan berkompeten.
                         </p>
                     </div>
 
@@ -178,7 +210,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 </div>
 
                 <!-- Image Right -->
-                <div class="lg:w-1/2 relative">
+                <div class="lg:w-1/2 relative scroll-reveal">
                     <div class="absolute -top-6 -left-6 w-24 h-24 bg-indigo-600/5 rounded-full blur-2xl"></div>
                     <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-600/10 rounded-full blur-3xl"></div>
 
@@ -213,8 +245,8 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
         <div class="container mx-auto px-4 relative z-10">
             <div class="max-w-5xl mx-auto">
-                <div class="text-center mb-16">
-                    <h3 class="text-3xl font-bold text-white">Pengurus Kelas <span class="text-indigo-400">PTIK C 24</span></h3>
+                <div class="text-center mb-10 scroll-reveal">
+                    <h3 class="text-2xl md:text-3xl font-bold text-white">Pengurus Kelas <span class="text-indigo-400">PTIK C 24</span></h3>
                     <p class="text-indigo-200/50 text-sm mt-2 font-light tracking-wide">Struktur organisasi kelas periode aktif</p>
                 </div>
 
@@ -233,11 +265,11 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 ?>
 
                 <!-- Ketua -->
-                <div class="mb-12 max-w-xs mx-auto">
-                    <div class="bg-white backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden transition-all group">
-                        <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-16 relative">
+                <div class="mb-12 max-w-xs mx-auto scroll-reveal">
+                    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all group border border-white/5">
+                        <div class="bg-gradient-to-br from-indigo-600 to-indigo-900 h-16 relative">
                             <div class="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-950 group-hover:scale-105 transition-transform">
                                     <?php if ($ketua && !empty($ketua['foto'])): ?>
                                         <img src="<?php echo htmlspecialchars(foto_path($ketua['foto'])); ?>" alt="<?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?>" class="w-full h-full object-cover">
                                     <?php else: ?>
@@ -247,10 +279,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                             </div>
                         </div>
                         <div class="pt-12 pb-6 px-4 text-center">
-                            <div class="inline-block px-3 pb-0.5 bg-indigo-900/20 rounded-full mb-2">
-                                <span class="text-[10px] font-bold text-indigo-900 uppercase tracking-wider"><?php echo htmlspecialchars($ketua['role'] ?? ''); ?></span>
+                            <div class="inline-block px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full mb-2">
+                                <span class="text-[10px] font-black text-indigo-700 uppercase tracking-widest"><?php echo htmlspecialchars($ketua['role'] ?? ''); ?></span>
                             </div>
-                            <h4 class="text-sm font-bold text-indigo-950 mb-0.5"><?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?></h4>
+                            <h4 class="text-sm font-bold text-slate-900 mb-0.5"><?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?></h4>
                         </div>
                     </div>
                 </div>
@@ -259,18 +291,28 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 // Ambil Sekretaris dan Bendahara dari users (join mahasiswa untuk nama & foto)
                 $qSek = mysqli_query($koneksi, "SELECT u.id, u.email, u.role, m.nama_lengkap, m.foto FROM users u LEFT JOIN mahasiswa m ON m.user_id = u.id WHERE u.role = 'Sekretaris' ORDER BY m.nama_lengkap");
                 $qBen = mysqli_query($koneksi, "SELECT u.id, u.email, u.role, m.nama_lengkap, m.foto FROM users u LEFT JOIN mahasiswa m ON m.user_id = u.id WHERE u.role = 'Bendahara' ORDER BY m.nama_lengkap");
+
+                // Ambil Media Kreatif (Manual NIM)
+                $nimMedia = ["240209501052", "240209501055"];
+                $nimMediaStr = "'" . implode("','", $nimMedia) . "'";
+                $qMedia = mysqli_query($koneksi, "SELECT nama_lengkap, foto FROM mahasiswa WHERE nim IN ($nimMediaStr) ORDER BY FIELD(nim, $nimMediaStr)");
+
+                // Ambil Manager Tugas (Manual NIM)
+                $nimManager = ["240209500066", "240209501056"];
+                $nimManagerStr = "'" . implode("','", $nimManager) . "'";
+                $qManager = mysqli_query($koneksi, "SELECT nama_lengkap, foto FROM mahasiswa WHERE nim IN ($nimManagerStr) ORDER BY FIELD(nim, $nimManagerStr)");
                 ?>
 
-                <!-- Sekretaris & Bendahara -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <!-- Pengurus & Staff -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
                     <?php
                     // render sekretaris
                     while ($row = mysqli_fetch_assoc($qSek)) {
                     ?>
-                        <div class="bg-white backdrop-blur-md rounded-2xl shadow-xl overflow-hidden transition-all group">
-                            <div class="bg-gradient-to-br from-slate-700 to-slate-900 h-14 relative">
+                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-1">
+                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-slate-900 text-lg font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-slate-800 group-hover:scale-105 transition-transform">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -280,10 +322,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 </div>
                             </div>
                             <div class="pt-10 pb-4 px-3 text-center">
-                                <div class="inline-block px-2 py-0.5 bg-slate-500/20 rounded-full mb-1">
-                                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Sekretaris</span>
+                                <div class="inline-block px-2 py-0.5 bg-sky-50 border border-sky-100 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-sky-600 uppercase tracking-widest">Sekretaris</span>
                                 </div>
-                                <h4 class="text-xs font-bold text-indigo-950 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
                             </div>
                         </div>
                     <?php
@@ -292,10 +334,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render bendahara
                     while ($row = mysqli_fetch_assoc($qBen)) {
                     ?>
-                        <div class="bg-white backdrop-blur-md rounded-2xl shadow-xl overflow-hidden transition-all group">
-                            <div class="bg-gradient-to-br from-indigo-600 to-indigo-900 h-14 relative">
+                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-2">
+                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-indigo-950 overflow-hidden bg-indigo-800 group-hover:scale-105 transition-transform">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -305,10 +347,60 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 </div>
                             </div>
                             <div class="pt-10 pb-4 px-3 text-center">
-                                <div class="inline-block px-2 py-0.5 bg-indigo-500/20 rounded-full mb-1">
-                                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Bendahara</span>
+                                <div class="inline-block px-2 py-0.5 bg-amber-50 border border-amber-100 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Bendahara</span>
                                 </div>
-                                <h4 class="text-xs font-bold text-indigo-950 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                            </div>
+                        </div>
+                    <?php
+                    }
+
+                    // render media kreatif
+                    while ($row = mysqli_fetch_assoc($qMedia)) {
+                    ?>
+                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-3">
+                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
+                                <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                        <?php if (!empty($row['foto'])): ?>
+                                            <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                            <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-10 pb-4 px-3 text-center">
+                                <div class="inline-block px-2 py-0.5 bg-rose-50 border border-rose-100 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-rose-600 uppercase tracking-widest">Media Kreatif</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                            </div>
+                        </div>
+                    <?php
+                    }
+
+                    // render manager tugas
+                    while ($row = mysqli_fetch_assoc($qManager)) {
+                    ?>
+                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-4">
+                            <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
+                                <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                        <?php if (!empty($row['foto'])): ?>
+                                            <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                                        <?php else: ?>
+                                            <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-10 pb-4 px-3 text-center">
+                                <div class="inline-block px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Manager Tugas</span>
+                                </div>
+                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
                             </div>
                         </div>
                     <?php
@@ -323,73 +415,86 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
     <!-- Fitur & Fasilitas Sistem -->
     <section class="py-12 bg-slate-50 border-t border-slate-100">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Fitur & Fasilitas Sistem</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto hidden md:block">Platform digital ini dirancang untuk mempermudah segala kebutuhan akademik dalam satu ekosistem yang terintegrasi</p>
+        <div class="container mx-auto px-4 md:px-16 lg:px-24">
+            <div class="text-center mb-8 scroll-reveal">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">Fitur & Fasilitas Sistem</h2>
+                <p class="text-gray-600 text-sm max-w-2xl mx-auto hidden md:block">Platform digital ini dirancang untuk mempermudah segala kebutuhan akademik dalam satu ekosistem yang terintegrasi</p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fa fa-desktop"></i>
+                <!-- Feature 1 -->
+                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-1">
+                    <div class="flex items-center gap-2 md:gap-3 mb-0 md:mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                            <i class="fa fa-desktop"></i>
+                        </div>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Dashboard Pintar</h3>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Dashboard Pintar</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Pusat kendali utama yang menyajikan statistik absensi, deadline tugas terdekat, laporan kas terbaru, dan berita akademik dalam satu tampilan bersih.
                     </p>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fa fa-tasks"></i>
+                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-2">
+                    <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                            <i class="fa fa-tasks"></i>
+                        </div>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Manajemen Tugas</h3>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Manajemen Tugas</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Tak ada lagi tugas yang terlewat. Dilengkapi pemantau deadline, filter mata kuliah, dan pengiriman notifikasi otomatis via Bot Telegram ke grup kelas.
                     </p>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fa fa-wallet"></i>
+                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-3">
+                    <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                            <i class="fa fa-wallet"></i>
+                        </div>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Transparansi Kas</h3>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Transparansi Kas</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Laporan keuangan kelas yang akuntabel. Mahasiswa dapat memantau saldo, tagihan pribadi, riwayat pemasukan, dan detail pengeluaran secara real-time.
                     </p>
                 </div>
 
                 <!-- Feature 4 -->
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fa fa-calendar-check"></i>
+                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-1">
+                    <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                            <i class="fa fa-calendar-check"></i>
+                        </div>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Absensi Digital</h3>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Absensi Digital</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Pencatatan kehadiran harian yang mempermudah admin dalam rekapitulasi. Menampilkan persentase kehadiran masing-masing mahasiswa untuk evaluasi.
                     </p>
                 </div>
 
                 <!-- Feature 5 -->
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fab fa-whatsapp"></i>
+                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-2">
+                    <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Bot WhatsApp</h3>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Bot WhatsApp</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Terhubung langsung ke grup kelas untuk pengingat tugas harian setiap pagi, notifikasi berita/jadwal, dan penerusan pesan anonim secara instan.
                     </p>
                 </div>
 
-                <!-- Feature 9 -->
-                <div class="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col items-center md:items-start text-center md:text-left">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg md:text-xl mb-4 md:mb-6">
-                        <i class="fa fa-calendar-alt"></i>
+                <!-- Feature 6 -->
+                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-3">
+                    <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                            <i class="fa fa-calendar-alt"></i>
+                        </div>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Kalender Pintar</h3>
                     </div>
-                    <h3 class="text-sm md:text-xl font-bold mb-0 md:mb-3 text-slate-800">Kalender Pintar</h3>
                     <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
                         Sinkronisasi antara jadwal kuliah rutin dengan kalender akademik UNM. Memberikan gambaran agenda kelas selama satu semester penuh.
                     </p>
@@ -402,6 +507,29 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
     <?php include 'includes/footer_main.php'; ?>
     <?php include 'includes/script_main.php'; ?>
+    <script>
+        // Scroll Reveal Implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    } else {
+                        // Hapus class active jika ingin animasi berulang tiap kali scroll
+                        entry.target.classList.remove('active');
+                    }
+                });
+            }, observerOptions);
+
+            const revealElements = document.querySelectorAll('.scroll-reveal');
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
 </body>
 
 </html>
