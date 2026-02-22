@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "ptikc_class";
+$db   = "ptikc24";
 
 $koneksi = mysqli_connect($host, $user, $pass, $db);
 

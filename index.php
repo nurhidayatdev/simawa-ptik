@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include_once 'functions/foto_helpers.php';
 
 // Handle Anonymous Message Form Submission
 
@@ -251,14 +252,6 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                 </div>
 
                 <?php
-                // helper: path foto
-                function foto_path($file)
-                {
-                    if (!$file) return 'assets/image/logo.webp';
-                    $p = 'storage/profile/' . $file;
-                    return file_exists($p) ? $p : 'assets/image/logo.webp';
-                }
-
                 // Ambil Ketua (role = 'Ketua')
                 $qKetua = mysqli_query($koneksi, "SELECT u.id, u.email, u.role, m.nama_lengkap, m.foto FROM users u LEFT JOIN mahasiswa m ON m.user_id = u.id WHERE u.role = 'Ketua Tingkat' LIMIT 1");
                 $ketua = mysqli_fetch_assoc($qKetua);
@@ -271,7 +264,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                             <div class="absolute -bottom-10 left-1/2 -translate-x-1/2">
                                 <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-950 group-hover:scale-105 transition-transform">
                                     <?php if ($ketua && !empty($ketua['foto'])): ?>
-                                        <img src="<?php echo htmlspecialchars(foto_path($ketua['foto'])); ?>" alt="<?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?>" class="w-full h-full object-cover">
+                                        <img src="<?php echo htmlspecialchars(profilePhotoUrl($ketua['foto'])); ?>" alt="<?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?>" class="w-full h-full object-cover">
                                     <?php else: ?>
                                         <span><?php echo isset($ketua['nama_lengkap']) ? strtoupper(substr($ketua['nama_lengkap'], 0, 2)) : 'KT'; ?></span>
                                     <?php endif; ?>
@@ -314,7 +307,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
-                                            <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                                            <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
                                             <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
                                         <?php endif; ?>
@@ -339,7 +332,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
-                                            <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                                            <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
                                             <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
                                         <?php endif; ?>
@@ -364,7 +357,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
-                                            <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                                            <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
                                             <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
                                         <?php endif; ?>
@@ -389,7 +382,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                                     <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
-                                            <img src="<?php echo htmlspecialchars(foto_path($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
+                                            <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
                                             <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
                                         <?php endif; ?>
