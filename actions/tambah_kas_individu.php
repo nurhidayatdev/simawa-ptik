@@ -13,7 +13,7 @@ $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
 if ($role === 'Mahasiswa' || $role === 'Ketua Tingkat' || $role === 'Sekretaris') {
-    include '../includes/alert_role.php'; 
+    include '../includes/alert_role.php';
     exit();
 }
 
@@ -79,12 +79,10 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
 <html lang="en">
 
 <head>
-    
+
     <title>Kas Individu - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
-        
-
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -95,18 +93,18 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
             }
         }
     </style>
-   
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-slate-100">
-   <?php include '../includes/menu_db.php'; ?>
+    <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <h3 class="text-xl font-bold text-slate-800">Input Kas Individu</h3>
-                <a href="../views/kas.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Kembali</a>
+                <a href="../views/manajemen_kas.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Kembali</a>
             </div>
 
             <form method="GET" class="mb-6">
@@ -199,8 +197,6 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
     <?php include '../includes/script_db.php'; ?>
 
     <script>
-        
-
         document.querySelectorAll('.status-select').forEach(select => {
             select.addEventListener('change', function() {
                 const week = this.getAttribute('data-week');

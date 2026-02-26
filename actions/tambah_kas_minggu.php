@@ -13,7 +13,7 @@ $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
 if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Ketua Tingkat' || $_SESSION['role'] === 'Sekretaris') {
-    include '../includes/alert_role.php'; 
+    include '../includes/alert_role.php';
     exit();
 }
 
@@ -73,7 +73,7 @@ if (isset($_POST['simpan_kas'])) {
         }
     }
 
-    header("Location: ../views/kas.php?minggu_ke=$minggu&success=1");
+    header("Location: ../views/manajemen_kas.php?minggu_ke=$minggu&success=1");
     exit;
 }
 
@@ -82,12 +82,10 @@ if (isset($_POST['simpan_kas'])) {
 <html lang="en">
 
 <head>
-   
-    <title>Kas Mingguan - PTIK C 2024</title>
-   <?php include '../includes/head.php'; ?>
-    <style>
-      
 
+    <title>Kas Mingguan - PTIK C 2024</title>
+    <?php include '../includes/head.php'; ?>
+    <style>
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -99,7 +97,7 @@ if (isset($_POST['simpan_kas'])) {
             }
         }
     </style>
-   
+
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -115,7 +113,7 @@ if (isset($_POST['simpan_kas'])) {
                 <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         <a href="tambah_kas_individu.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Input Individu</a>
-                        <a href="../views/kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-xs text-center">Kembali</a>
+                        <a href="../views/manajemen_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-xs text-center">Kembali</a>
                     </form>
                 </div>
 
@@ -240,8 +238,6 @@ if (isset($_POST['simpan_kas'])) {
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
-        
-
         // no-op: filter handled by GET form onchange submit
 
         // Handle Status vs Date Automation

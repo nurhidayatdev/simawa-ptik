@@ -192,7 +192,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
 $entries = mysqli_query($koneksi, "SELECT * FROM arus_kas ORDER BY tanggal DESC, created_at DESC");
 
 // Weekly Table Status (from kas.php)
-$f_minggu = $_GET['minggu_ke'] ?? $current_week;
+$f_minggu = $_GET['minggu_ke'] ?? 1;
 $f_filter_mhs = $_GET['filter_mhs'] ?? 'all';
 $where_mhs = ($f_filter_mhs === 'Lunas') ? " AND k.status = 'Lunas'" : (($f_filter_mhs === 'Belum') ? " AND (k.status IS NULL OR k.status != 'Lunas')" : "");
 

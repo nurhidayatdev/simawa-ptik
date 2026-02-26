@@ -170,7 +170,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                             <i class="fas fa-file-excel"></i> EXPORT REKAP
                         </button>
 
-                        <a href="../views/kas.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
+                        <a href="../views/manajemen_kas.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
                             <i class="fas fa-plus-circle"></i> INPUT KAS
                         </a>
                     <?php endif; ?>
