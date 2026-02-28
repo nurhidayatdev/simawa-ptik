@@ -51,6 +51,18 @@ if (isset($_POST['action'])) {
         $deadline = mysqli_real_escape_string($koneksi, $_POST['deadline']);
         mysqli_query($koneksi, "UPDATE tugas_personal SET judul = '$judul', deskripsi = '$deskripsi', deadline = '$deadline' WHERE id = '$id' AND user_id = '$user_id'");
         $_SESSION['success'] = "Tugas personal berhasil diupdate.";
+    } elseif ($_POST['action'] == 'complete_all_global') {
+        mysqli_query($koneksi, "
+            INSERT INTO tugas_global_done (user_id, tugas_id, periode_id) 
+            SELECT '$user_id', t.id, '$periode_id' 
+            FROM tugas t 
+            LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
+            WHERE t.periode_id = '$periode_id' AND gd.id IS NULL
+        ");
+        $_SESSION['success'] = "Semua tugas kelas telah ditandai selesai.";
+    } elseif ($_POST['action'] == 'complete_all_personal') {
+        mysqli_query($koneksi, "UPDATE tugas_personal SET status = 'selesai' WHERE user_id = '$user_id' AND periode_id = '$periode_id' AND status = 'belum'");
+        $_SESSION['success'] = "Semua tugas pribadi telah ditandai selesai.";
     }
     $redir = $show_done ? "?show_done=1" : "";
     header("Location: tugas_saya" . $redir);
@@ -149,9 +161,19 @@ $total_done = $count_personal_done + $count_global_done;
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Global Tasks (From Admin) -->
                 <div>
-                    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-university text-indigo-600"></i> Tugas Kelas
-                    </h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-university text-indigo-600"></i> Tugas Kelas
+                        </h3>
+                        <?php if (!$show_done && $count_global_active > 0): ?>
+                            <form id="form-complete-global" method="POST">
+                                <input type="hidden" name="action" value="complete_all_global">
+                                <button type="button" onclick="confirmCompleteAll('global')" class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 rounded-xl hover:bg-indigo-100 transition-all border border-indigo-100/50 flex items-center gap-1.5 ring-offset-2 focus:ring-2 focus:ring-indigo-100 outline-none">
+                                    <i class="fas fa-check-double"></i> Selesaikan Semua
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
                     <div class="space-y-4">
                         <?php if (mysqli_num_rows($global_tasks) > 0): ?>
                             <?php while ($row = mysqli_fetch_assoc($global_tasks)):
@@ -214,9 +236,19 @@ $total_done = $count_personal_done + $count_global_done;
 
                 <!-- Personal Tasks -->
                 <div>
-                    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-user text-indigo-600"></i> Tugas Pribadi
-                    </h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-user text-indigo-600"></i> Tugas Pribadi
+                        </h3>
+                        <?php if (!$show_done && $count_personal_active > 0): ?>
+                            <form id="form-complete-personal" method="POST">
+                                <input type="hidden" name="action" value="complete_all_personal">
+                                <button type="button" onclick="confirmCompleteAll('personal')" class="text-[9px] font-bold text-rose-600 bg-rose-50 px-2.5 py-1.5 rounded-xl hover:bg-rose-100 transition-all border border-rose-100/50 flex items-center gap-1.5 ring-offset-2 focus:ring-2 focus:ring-rose-100 outline-none">
+                                    <i class="fas fa-check-double"></i> Selesaikan Semua
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
                     <div class="space-y-4">
                         <?php if (mysqli_num_rows($personal_tasks) > 0): ?>
                             <?php while ($row = mysqli_fetch_assoc($personal_tasks)):
@@ -541,6 +573,33 @@ $total_done = $count_personal_done + $count_global_done;
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }, 300);
+        }
+
+        function confirmCompleteAll(type) {
+            const title = type === 'global' ? 'Selesaikan Semua Tugas Kelas?' : 'Selesaikan Semua Tugas Pribadi?';
+            const color = type === 'global' ? '#4f46e5' : '#e11d48';
+
+            Swal.fire({
+                title: title,
+                text: "Semua tugas yang aktif akan ditandai sebagai selesai!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: color,
+                cancelButtonColor: '#f1f5f9',
+                confirmButtonText: 'Ya, Selesaikan!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                padding: '2rem',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest',
+                    cancelButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest text-slate-600'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('form-complete-' + type).submit();
+                }
+            });
         }
 
         function confirmDelete(id) {

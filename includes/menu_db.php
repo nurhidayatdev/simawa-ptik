@@ -162,16 +162,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Pusat Misi</span>
                             </a>
-                            <a href="<?= $base ?>wrapped" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
-                                <i class="fa fa-gift w-5 h-5 mr-3 text-indigo-900"></i>
-                                <span class="text-xs font-medium">PTIK C Wrapped</span>
-                                <div class="ml-auto shrink-0">
-                                    <span class="flex h-1.5 w-1.5 relative">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
-                                    </span>
-                                </div>
-                            </a>
+
                             <a href="<?= $base ?>views/kuis_harian" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-gamepad w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Kuis Harian</span>
@@ -179,6 +170,13 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                             <a href="<?= $base ?>views/dinding_pesan" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-comments w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Pesan Anonim</span>
+                            </a>
+                            <a href="<?= $base ?>spin" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <i class="fa fa-sync w-5 h-5 mr-3 text-indigo-900"></i>
+                                <span class="text-xs font-medium">Random Picker</span>
+                                <div class="ml-2">
+                                    <span class="px-1.5 py-0.5 rounded-md bg-rose-500 text-[8px] font-bold text-white uppercase tracking-tighter shadow-sm animate-pulse">NEW</span>
+                                </div>
                             </a>
 
                         </div>
