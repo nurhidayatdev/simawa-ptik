@@ -75,6 +75,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         mysqli_stmt_execute($stmt);
     }
+
+    // --- FITUR: WHATSAPP NOTIFICATION VIA FONNTE ---
+    include_once '../functions/helpers.php';
+
+    // Fetch matkul name
+    $q_matkul_info = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = '$matkul_id'");
+    $matkul_name = mysqli_fetch_assoc($q_matkul_info)['nama_matkul'];
+
+    // Fetch all students in this course with their attendance for this meeting
+    $q_report = mysqli_query($koneksi, "
+        SELECT m.nama_lengkap, IFNULL(a.status, 'Alpha') as status_absen
+        FROM krs k
+        JOIN mahasiswa m ON k.mahasiswa_id = m.id
+        LEFT JOIN absensi a ON a.mahasiswa_id = m.id AND a.matkul_id = '$matkul_id' AND a.pertemuan = '$pertemuan' AND a.periode_id = '$periode_id'
+        WHERE k.matkul_id = '$matkul_id' AND k.periode_id = '$periode_id'
+        ORDER BY m.nama_lengkap ASC
+    ");
+
+    $hadir = [];
+    $izin = [];
+    $sakit = [];
+    $alpha = [];
+
+    while ($row = mysqli_fetch_assoc($q_report)) {
+        $st = $row['status_absen'];
+        if ($st === 'Hadir') $hadir[] = $row['nama_lengkap'];
+        elseif ($st === 'Izin') $izin[] = $row['nama_lengkap'];
+        elseif ($st === 'Sakit') $sakit[] = $row['nama_lengkap'];
+        else $alpha[] = $row['nama_lengkap'];
+    }
+
+    $wa_msg = "📝 *LAPORAN ABSENSI PTIK C 2024*\n";
+    $wa_msg .= "📘 *{$matkul_name}*\n";
+    $wa_msg .= "🔢 Pertemuan Ke-{$pertemuan}\n\n";
+
+    if (count($alpha) > 0) {
+        $count_alpha = count($alpha);
+        $wa_msg .= "❌ *ALPHA ({$count_alpha} Orang):*\n";
+        foreach ($alpha as $idx => $nama) {
+            $wa_msg .= ($idx + 1) . ". " . $nama . "\n";
+        }
+        $wa_msg .= "\n";
+    }
+
+    if (count($izin) > 0 || count($sakit) > 0) {
+        $wa_msg .= "⚠️ *KETERANGAN:*\n";
+        foreach ($sakit as $nama) {
+            $wa_msg .= "• " . $nama . " (Sakit)\n";
+        }
+        foreach ($izin as $nama) {
+            $wa_msg .= "• " . $nama . " (Izin)\n";
+        }
+        $wa_msg .= "\n";
+    }
+
+    if (count($hadir) > 0) {
+        $count_hadir = count($hadir);
+        $wa_msg .= "✅ *HADIR ({$count_hadir} Orang):*\n";
+        foreach ($hadir as $idx => $nama) {
+            $wa_msg .= ($idx + 1) . ". " . $nama . "\n";
+        }
+    } else {
+        $wa_msg .= "✅ *HADIR (0 Orang)*\n";
+    }
+
+    $wa_msg .= "\n_Terima kasih bagi yang telah hadir tepat waktu!_";
+
+    // Kirim Notifikasi
+    $res_wa = sendFonnteMessage($wa_msg);
+
+    if ($res_wa['success']) {
+        $_SESSION['success_msg'] = "Absensi berhasil disimpan & Rekap terkirim ke WhatsApp!";
+    } else {
+        $_SESSION['success_msg'] = "Absensi disimpan (Namun gagal kirim WA: " . $res_wa['error'] . ")";
+    }
+
     // redirect agar tidak double submit
     header("Location: tambah_absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan&sukses=1");
     exit;
@@ -289,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
-                text: 'Data absensi telah berhasil disimpan.',
+                text: '<?= $_SESSION['success_msg'] ?? "Data absensi telah berhasil disimpan." ?>',
                 confirmButtonColor: '#3730a3'
             }).then(() => {
                 // Remove parameter from URL
@@ -297,6 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 url.searchParams.delete('sukses');
                 window.history.replaceState({}, document.title, url);
             });
+            <?php unset($_SESSION['success_msg']); ?>
         <?php endif; ?>
     </script>
 </body>

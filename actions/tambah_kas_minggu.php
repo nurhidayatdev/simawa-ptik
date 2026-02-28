@@ -73,6 +73,62 @@ if (isset($_POST['simpan_kas'])) {
         }
     }
 
+    // --- FITUR: WHATSAPP NOTIFICATION VIA FONNTE ---
+    include_once '../functions/helpers.php';
+
+    // Fetch all students and their status for this week to create a complete report
+    $q_report = mysqli_query($koneksi, "
+        SELECT m.nama_panggilan, IFNULL(k.status, 'Belum') as status_bayar
+        FROM mahasiswa m
+        LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id'
+        ORDER BY m.nama_panggilan ASC
+    ");
+
+    $lunas = [];
+    $belum = [];
+
+    while ($row = mysqli_fetch_assoc($q_report)) {
+        if ($row['status_bayar'] === 'Lunas') {
+            $lunas[] = $row['nama_panggilan'];
+        } else {
+            $belum[] = $row['nama_panggilan'];
+        }
+    }
+
+    $wa_msg = "💰 *LAPORAN KAS PTIK C 2024*\n";
+    $wa_msg .= "📅 *Minggu Ke-{$minggu}*\n\n";
+
+    $count_belum = count($belum);
+    $wa_msg .= "❌ *BELUM BAYAR ({$count_belum} Orang):*\n";
+    if ($count_belum > 0) {
+        foreach ($belum as $idx => $nama) {
+            $wa_msg .= ($idx + 1) . ". " . $nama . "\n";
+        }
+    } else {
+        $wa_msg .= "_Alhamdulillah, Lunas Semua!_ ✨\n";
+    }
+
+    $count_lunas = count($lunas);
+    $wa_msg .= "\n✅ *SUDAH BAYAR ({$count_lunas} Orang):*\n";
+    if ($count_lunas > 0) {
+        foreach ($lunas as $idx => $nama) {
+            $wa_msg .= ($idx + 1) . ". " . $nama . "\n";
+        }
+    } else {
+        $wa_msg .= "_Belum ada data pembayaran._\n";
+    }
+
+    $wa_msg .= "\n⚠️ _Mohon segera melunasi kas tepat waktu untuk kelancaran kegiatan kelas. Terima kasih!_";
+
+    // Kirim Notifikasi
+    $res_wa = sendFonnteMessage($wa_msg);
+
+    if ($res_wa['success']) {
+        $_SESSION['success'] = "Data kas minggu ke-{$minggu} disimpan & Laporan terkirim ke WhatsApp!";
+    } else {
+        $_SESSION['success'] = "Data kas minggu ke-{$minggu} disimpan (Namun gagal kirim WA: " . $res_wa['error'] . ")";
+    }
+
     header("Location: ../views/manajemen_kas.php?minggu_ke=$minggu&success=1");
     exit;
 }
