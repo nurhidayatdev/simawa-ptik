@@ -162,6 +162,16 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Pusat Misi</span>
                             </a>
+                            <a href="<?= $base ?>wrapped" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                                <i class="fa fa-gift w-5 h-5 mr-3 text-indigo-900"></i>
+                                <span class="text-xs font-medium">PTIK C Wrapped</span>
+                                <div class="ml-auto shrink-0">
+                                    <span class="flex h-1.5 w-1.5 relative">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                                    </span>
+                                </div>
+                            </a>
                             <a href="<?= $base ?>views/kuis_harian" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-gamepad w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Kuis Harian</span>
