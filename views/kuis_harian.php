@@ -17,6 +17,7 @@ $nama_panggilan = $user_info['nama_panggilan'] ?? 'User';
 $foto = $user_info['foto'] ?? 'default.png';
 
 include_once '../functions/foto_helpers.php';
+include_once '../functions/helpers.php';
 
 $stmt = $koneksi->prepare("SELECT * FROM kuis_harian_stats WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
@@ -137,16 +138,33 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit_answer') {
         $last_hint_milestone_claimed = $stats['last_hint_milestone_claimed'];
         $last_milestone_claimed = $stats['last_milestone_claimed'];
 
+        $new_milestone_reached = null;
         foreach ($milestone_config as $m_val => $rewards) {
             if ($current_streak >= $m_val && $last_milestone_claimed < $m_val) {
                 $bonus_stock += $rewards['recovery'];
                 $bonus_hint_stock += $rewards['hint'];
                 $last_milestone_claimed = max($last_milestone_claimed, $m_val);
                 $last_hint_milestone_claimed = max($last_hint_milestone_claimed, $m_val);
+                $new_milestone_reached = $m_val;
             }
         }
         $new_recovery_stock += $bonus_stock;
         $new_hint_stock += $bonus_hint_stock;
+
+        // Push WhatsApp Notification for Milestones
+        if ($new_milestone_reached) {
+            $milestone_titles = [
+                200 => 'NOVA 🌌',
+                100 => 'PLASMA 💠',
+                50  => 'INFERNO 🌋',
+                30  => 'BLAZE 🔥',
+                10  => 'EMBER 🎇',
+                3   => 'SPARK ✨'
+            ];
+            $title = $milestone_titles[$new_milestone_reached] ?? 'Legendary';
+            $wa_message = "🏆 *MILESTONE KUIS HARIAN* 🏆\n\nSelamat kepada *@$nama_panggilan* yang telah mencapai milestone *$title* dengan streak sebanyak *{$current_streak} Hari* berturut-turut! 🎉\n\n🎁 *Rewards:* \n- +{$bonus_stock} Recovery Stock\n- +{$bonus_hint_stock} Hint Stock\n\n_Terus asah ilmumu dan jaga api streak-mu!_ 🔥";
+            sendFonnteMessage($wa_message);
+        }
 
         if ($current_streak > $max_streak) $max_streak = $current_streak;
         $now = date('Y-m-d H:i:s');

@@ -310,7 +310,7 @@ function getFireIconAdmin($streak, $isActive = true)
                             <tr class="bg-slate-50 border-b border-slate-200">
                                 <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-16">Rank</th>
                                 <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pemain</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Current</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Games</th>
                                 <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Resources</th>
                                 <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Last Played</th>
                                 <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
@@ -363,7 +363,7 @@ function getFireIconAdmin($streak, $isActive = true)
                                                     <span class="text-base font-bold <?= $isBroken ? 'text-slate-300' : 'text-slate-800' ?>"><?= $fireValue ?></span>
                                                     <i class="fas fa-fire text-base" style="color: <?= $fire['show'] ? $fire['color'] : '#e2e8f0' ?>"></i>
                                                 </div>
-                                                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Current: <?= $row['current_streak'] ?> | Max: <?= $row['max_streak'] ?></div>
+                                                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Games: <?= $row['total_games'] ?> | Max: <?= $row['max_streak'] ?></div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-2 text-center">

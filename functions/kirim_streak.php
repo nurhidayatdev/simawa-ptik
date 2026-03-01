@@ -25,6 +25,16 @@ function kirimStreakReminder($koneksi, $token = null, $chat_id = null)
             $message .= $no . ". " . $row['nama_panggilan'] . " (🔥" . $row['current_streak'] . ")\n";
             $no++;
         }
+
+        // Fetch Today's Question
+        $q_soal = "SELECT pertanyaan FROM kuis_harian_soal WHERE tanggal = '$today' LIMIT 1";
+        $r_soal = mysqli_query($koneksi, $q_soal);
+        if ($r_soal && mysqli_num_rows($r_soal) > 0) {
+            $soal_row = mysqli_fetch_assoc($r_soal);
+            $pertanyaan = $soal_row['pertanyaan'];
+            $message .= "\n📝 *SOAL HARI INI:*\n_" . $pertanyaan . "_\n";
+        }
+
         $message .= "\n_Main sekarang untuk jaga streak!_ 🎮";
 
         $res = sendFonnteMessage($message);
