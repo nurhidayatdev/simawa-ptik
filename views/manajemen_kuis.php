@@ -157,8 +157,8 @@ if (isset($_GET['ajax_soal']) && $_GET['ajax_soal'] == '1') {
             echo '<td class="px-6 py-2 text-[11px] font-bold text-indigo-600">' . htmlspecialchars($row['jawaban']) . '</td>';
             echo '<td class="px-6 py-2 text-right">';
             echo '<div class="flex justify-end gap-1.5">';
-            echo '<a href="../database/actions/edit.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></a>';
-            echo '<a href="../database/actions/hapus.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" onclick="return confirm(\'Hapus soal ini?\')" class="p-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></a>';
+            echo '<a href="../actions/edit.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></a>';
+            echo '<a href="../actions/hapus.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" onclick="return confirm(\'Hapus soal ini?\')" class="p-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></a>';
             echo '</div>';
             echo '</td>';
             echo '</tr>';
@@ -432,7 +432,7 @@ function getFireIconAdmin($streak, $isActive = true)
                         <button id="resetSoal" class="p-2 rounded-xl bg-slate-200 text-slate-600 hover:bg-slate-300 transition-all shadow-sm" title="Reset Filter">
                             <i class="fas fa-sync-alt"></i>
                         </button>
-                        <a href="../database/actions/tambah.php?tabel=kuis_harian_soal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
+                        <a href="../actions/tambah.php?tabel=kuis_harian_soal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
                             <i class="fas fa-plus"></i> TAMBAH SOAL
                         </a>
                     </div>
@@ -461,10 +461,10 @@ function getFireIconAdmin($streak, $isActive = true)
                                         <td class="px-6 py-2 text-[11px] font-bold text-indigo-600"><?= htmlspecialchars($row['jawaban']) ?></td>
                                         <td class="px-6 py-2 text-right">
                                             <div class="flex justify-end gap-1.5">
-                                                <a href="../database/actions/edit.php?tabel=kuis_harian_soal&id=<?= $row['id'] ?>" class="px-1.5 py-0 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">
+                                                <a href="../actions/edit.php?tabel=kuis_harian_soal&id=<?= $row['id'] ?>" class="px-1.5 py-0 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">
                                                     <i class="fas fa-edit text-[10px]"></i>
                                                 </a>
-                                                <a href="../database/actions/hapus.php?tabel=kuis_harian_soal&id=<?= $row['id'] ?>" onclick="return confirm('Hapus soal ini?')" class="px-1.5 py-0 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all">
+                                                <a href="../actions/hapus.php?tabel=kuis_harian_soal&id=<?= $row['id'] ?>" onclick="return confirm('Hapus soal ini?')" class="px-1.5 py-0 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all">
                                                     <i class="fas fa-trash text-[10px]"></i>
                                                 </a>
                                             </div>
