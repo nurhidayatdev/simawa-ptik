@@ -86,6 +86,27 @@ $kuis = mysqli_fetch_assoc($q_kuis);
 $kuis_streak = $kuis['max_streak'] ?? 0;
 $kuis_total = $kuis['total_games'] ?? 0;
 
+// --- 4.5 VIBE CHECK ---
+$q_vibe_most = mysqli_query($koneksi, "SELECT mood, COUNT(*) as cnt FROM vibe_check WHERE user_id = $user_id GROUP BY mood ORDER BY cnt DESC LIMIT 1");
+$vibe_most_data = mysqli_fetch_assoc($q_vibe_most);
+$my_top_vibe = $vibe_most_data['mood'] ?? 'productive';
+
+$q_vibe_total = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM vibe_check WHERE user_id = $user_id");
+$my_vibe_count = mysqli_fetch_assoc($q_vibe_total)['total'] ?? 0;
+
+function getVibeDetails($mood)
+{
+    $details = [
+        'productive' => ['icon' => 'fa-rocket', 'label' => 'Focus', 'desc' => 'Kamu sangat produktif semester ini!', 'color' => 'indigo-400'],
+        'stress' => ['icon' => 'fa-head-side-virus', 'label' => 'Error', 'desc' => 'Banyak tantangan yang kamu lalui.', 'color' => 'red-400'],
+        'relaxed' => ['icon' => 'fa-coffee', 'label' => 'Chill', 'desc' => 'Kamu tahu cara menikmati prosesnya.', 'color' => 'emerald-400'],
+        'tired' => ['icon' => 'fa-battery-quarter', 'label' => 'Low', 'desc' => 'Kadang istirahat itu perlu, lho.', 'color' => 'slate-400'],
+        'hyper' => ['icon' => 'fa-fire', 'label' => 'Fire', 'desc' => 'Semangatmu membara sepanjang waktu!', 'color' => 'orange-400']
+    ];
+    return $details[$mood] ?? $details['productive'];
+}
+$v_details = getVibeDetails($my_top_vibe);
+
 // --- 5. BEST FRIEND ---
 $partners = [];
 
@@ -290,6 +311,19 @@ include_once 'functions/foto_helpers.php';
         .cursor-pointer {
             cursor: pointer;
         }
+
+        .data-card {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        @media (min-width: 768px) {
+            .data-card {
+                min-height: 280px;
+            }
+        }
     </style>
 </head>
 
@@ -304,16 +338,16 @@ include_once 'functions/foto_helpers.php';
         <div class="z-10 scale-in px-4">
             <div class="absolute top-8 left-8 flex items-center gap-3 opacity-60">
                 <img src="assets/image/logo.webp" class="h-8 w-8">
-                <span class="text-xs font-bold tracking-widest uppercase">PTIK C 2024</span>
+                <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em]">PTIK C 2024</span>
             </div>
-            <div class="relative inline-block mb-8">
+            <div class="relative inline-block mb-4">
                 <div class="absolute -inset-4 bg-indigo-500/20 rounded-full blur-xl animate-pulse"></div>
-                <img src="<?= profilePhotoUrl($foto_user, '') ?>" class="w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto border-4 border-indigo-500/30 shadow-2xl relative z-10 object-cover">
+                <img src="<?= profilePhotoUrl($foto_user, '') ?>" class="w-20 h-20 md:w-32 md:h-32 rounded-full mx-auto border-4 border-indigo-500/30 shadow-2xl relative z-10 object-cover">
             </div>
-            <h1 class="text-4xl md:text-7xl font-black mb-4 uppercase tracking-tighter">Halo, <?= htmlspecialchars($nama_panggilan) ?>!</h1>
-            <p class="text-lg md:text-2xl font-medium opacity-70 mb-12 max-w-md mx-auto">Kami telah merangkum perjalanan hebatmu selama satu semester ini.</p>
-            <div class="glass p-5 inline-flex items-center gap-3 animate-bounce shadow-xl">
-                <span class="text-xs font-bold uppercase tracking-widest">Gulir untuk mulai</span>
+            <h1 class="text-2xl md:text-5xl font-black mb-2 uppercase tracking-tighter text-white">Halo, <?= htmlspecialchars($nama_panggilan) ?>!</h1>
+            <p class="text-sm md:text-lg font-medium opacity-70 mb-6 max-w-sm mx-auto text-white">Kami telah merangkum perjalanan hebatmu selama satu semester ini.</p>
+            <div class="glass p-3 inline-flex items-center gap-2 animate-bounce shadow-xl text-white">
+                <span class="text-[9px] md:text-[11px] font-bold uppercase tracking-widest">Gulir untuk mulai</span>
                 <i class="fas fa-arrow-down text-sm"></i>
             </div>
         </div>
@@ -325,14 +359,14 @@ include_once 'functions/foto_helpers.php';
 
     <!-- Slide 2: Kehadiran -->
     <div class="slide slide-hidden-right vibrant-blue" id="slide-1">
-        <div class="z-10 w-full max-w-sm md:max-w-lg px-4">
-            <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em] text-blue-300 mb-4 block">AKADEMIK & KEDISIPLINAN</span>
-            <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Kehadiran Kamu<br><span class="text-blue-400">Konsisten!</span></h2>
-            <div class="glass p-6 md:p-8 mb-8 text-left relative overflow-hidden bg-white/5 border-white/10">
-                <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl md:text-9xl rotate-12">
+        <div class="z-10 w-full max-w-xs md:max-w-md px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-blue-300 mb-2 block">AKADEMIK & KEDISIPLINAN</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight text-white">Kehadiran Kamu<br><span class="text-blue-400">Konsisten!</span></h2>
+            <div class="glass p-4 md:p-6 mb-4 text-left relative overflow-hidden bg-white/5 border-white/10 data-card text-white">
+                <div class="absolute -top-4 -right-4 p-4 opacity-10 text-7xl md:text-8xl rotate-12 text-white">
                     <i class="fas fa-university"></i>
                 </div>
-                <div class="text-5xl md:text-7xl font-black mb-2"><?= $total_hadir ?></div>
+                <div class="text-4xl md:text-6xl font-black mb-1 text-white"><?= $total_hadir ?></div>
                 <div class="text-sm md:text-xl font-bold opacity-60 uppercase tracking-tight">Pertemuan Tercatat</div>
                 <div class="mt-8">
                     <div class="flex justify-between items-end mb-2">
@@ -349,16 +383,16 @@ include_once 'functions/foto_helpers.php';
 
     <!-- Slide 3: Kas -->
     <div class="slide slide-hidden-right vibrant-emerald" id="slide-2">
-        <div class="z-10 w-full max-w-sm md:max-w-lg px-4">
-            <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em] text-emerald-300 mb-4 block">KEUANGAN KELAS</span>
-            <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Urusan Kas?<br><span class="text-emerald-400">Sangat Aman!</span></h2>
-            <div class="glass p-6 md:p-8 mb-8 text-left relative overflow-hidden bg-white/5 border-white/10">
-                <div class="absolute -top-4 -right-4 p-4 opacity-10 text-8xl md:text-9xl rotate-12">
+        <div class="z-10 w-full max-w-xs md:max-w-md px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-emerald-300 mb-2 block">KEUANGAN KELAS</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Urusan Kas?<br><span class="text-emerald-400">Sangat Aman!</span></h2>
+            <div class="glass p-4 md:p-6 mb-4 text-left relative overflow-hidden bg-white/5 border-white/10 data-card">
+                <div class="absolute -top-4 -right-4 p-4 opacity-10 text-7xl md:text-8xl rotate-12">
                     <i class="fas fa-wallet"></i>
                 </div>
-                <div class="text-[10px] md:text-xs font-bold opacity-60 mb-1 uppercase tracking-widest">Total Kontribusi</div>
-                <div class="text-4xl md:text-5xl font-black mb-1">Rp <?= number_format($total_uang_kas, 0, ',', '.') ?></div>
-                <p class="text-sm md:text-lg font-medium opacity-80 mb-8"><?= $total_minggu_kas ?> Minggu Terbayar Lunas</p>
+                <div class="text-[9px] md:text-[10px] font-bold opacity-60 mb-1 uppercase tracking-widest">Total Kontribusi</div>
+                <div class="text-3xl md:text-4xl font-black mb-1">Rp <?= number_format($total_uang_kas, 0, ',', '.') ?></div>
+                <p class="text-xs md:text-base font-medium opacity-80 mb-6"><?= $total_minggu_kas ?> Minggu Terbayar Lunas</p>
 
                 <div class="flex justify-between items-end border-t border-white/10 pt-6">
                     <div>
@@ -375,24 +409,26 @@ include_once 'functions/foto_helpers.php';
 
     <!-- Slide 4: Tugas -->
     <div class="slide slide-hidden-right vibrant-purple" id="slide-3">
-        <div class="z-10 w-full max-w-sm md:max-w-lg px-4">
-            <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em] text-purple-300 mb-4 block">PRODUKTIVITAS</span>
-            <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Pejuang<br><span class="text-purple-400">Ambisius!</span></h2>
-            <div class="grid grid-cols-2 gap-3 md:gap-4 mb-4">
-                <div class="glass p-5 md:p-6 text-center bg-white/5">
-                    <div class="text-3xl md:text-4xl font-black mb-1"><?= $total_global_done ?></div>
-                    <div class="text-[9px] md:text-[10px] font-bold opacity-60 uppercase tracking-widest">Tugas Kelas</div>
+        <div class="z-10 w-full max-w-xs md:max-w-md px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-purple-300 mb-2 block">PRODUKTIVITAS</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Pejuang<br><span class="text-purple-400">Ambisius!</span></h2>
+            <div class="data-card">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div class="glass p-3 md:p-4 text-center bg-white/5">
+                        <div class="text-xl md:text-2xl font-black mb-1"><?= $total_global_done ?></div>
+                        <div class="text-[8px] md:text-[9px] font-bold opacity-60 uppercase tracking-widest">Tugas Kelas</div>
+                    </div>
+                    <div class="glass p-3 md:p-4 text-center bg-white/5">
+                        <div class="text-xl md:text-2xl font-black mb-1"><?= $total_personal_done ?></div>
+                        <div class="text-[8px] md:text-[9px] font-bold opacity-60 uppercase tracking-widest">Tugas Pribadi</div>
+                    </div>
                 </div>
-                <div class="glass p-5 md:p-6 text-center bg-white/5">
-                    <div class="text-3xl md:text-4xl font-black mb-1"><?= $total_personal_done ?></div>
-                    <div class="text-[9px] md:text-[10px] font-bold opacity-60 uppercase tracking-widest">Tugas Pribadi</div>
-                </div>
-            </div>
-            <div class="glass p-6 md:p-8 relative overflow-hidden text-left mb-8 bg-white/5">
-                <div class="text-6xl md:text-8xl font-black leading-none mb-2"><?= $total_tugas_selesai ?></div>
-                <div class="text-lg md:text-xl font-bold opacity-80 uppercase tracking-tighter">Total Misi Terselesaikan</div>
-                <div class="absolute -bottom-8 -right-8 opacity-10 text-[8rem] md:text-[10rem] rotate-12">
-                    <i class="fas fa-check-double"></i>
+                <div class="glass p-4 md:p-6 relative overflow-hidden text-left bg-white/5 flex-1 flex flex-col justify-center">
+                    <div class="text-4xl md:text-6xl font-black leading-none mb-1"><?= $total_tugas_selesai ?></div>
+                    <div class="text-base md:text-xl font-bold opacity-80 uppercase tracking-tighter">Misi Terselesaikan</div>
+                    <div class="absolute -bottom-6 -right-6 opacity-10 text-[6rem] md:text-[8rem] rotate-12">
+                        <i class="fas fa-check-double"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -400,34 +436,65 @@ include_once 'functions/foto_helpers.php';
 
     <!-- Slide 5: Kuis Harian -->
     <div class="slide slide-hidden-right vibrant-amber" id="slide-4">
-        <div class="z-10 w-full max-w-sm md:max-w-lg px-4">
-            <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em] text-amber-300 mb-4 block">KUIS HARIAN</span>
-            <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">Kecerdasan<br><span class="text-amber-400">Teruji!</span></h2>
-            <div class="flex items-center justify-center gap-6 mb-8">
-                <div class="text-6xl md:text-8xl text-orange-400 floating"><i class="fas fa-fire"></i></div>
-                <div class="text-left">
-                    <div class="text-5xl md:text-7xl font-black leading-none"><?= $kuis_streak ?></div>
-                    <div class="text-sm md:text-lg font-bold opacity-60 uppercase tracking-widest">Max Streak</div>
+        <div class="z-10 w-full max-w-xs md:max-w-md px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-amber-300 mb-2 block">KUIS HARIAN</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight">Kecerdasan<br><span class="text-amber-400">Teruji!</span></h2>
+            <div class="data-card">
+                <div class="flex items-center justify-center gap-4 mb-3 flex-1">
+                    <div class="text-5xl md:text-7xl text-orange-400 floating"><i class="fas fa-fire"></i></div>
+                    <div class="text-left">
+                        <div class="text-4xl md:text-6xl font-black leading-none"><?= $kuis_streak ?></div>
+                        <div class="text-xs md:text-base font-bold opacity-60 uppercase tracking-widest">Max Streak</div>
+                    </div>
                 </div>
-            </div>
-            <div class="glass p-6 md:p-8 flex justify-between items-center mb-12 bg-white/5">
-                <div class="text-left border-r border-white/10 pr-6 md:pr-12">
-                    <div class="text-[9px] md:text-[10px] font-bold opacity-60 uppercase mb-1">Total Game</div>
-                    <div class="text-2xl md:text-4xl font-black"><?= $kuis_total ?></div>
-                </div>
-                <div class="text-right">
-                    <div class="text-[9px] md:text-[10px] font-bold opacity-60 uppercase mb-1">Status Kuis</div>
-                    <div class="text-2xl md:text-4xl font-black"><?= $kuis_streak >= 7 ? 'Sifu' : ($kuis_streak >= 3 ? 'Expert' : 'Rookie') ?></div>
+                <div class="glass p-4 md:p-6 flex justify-between items-center bg-white/5">
+                    <div class="text-left border-r border-white/10 pr-6 md:pr-10">
+                        <div class="text-[8px] md:text-[9px] font-bold opacity-60 uppercase mb-1">Total Game</div>
+                        <div class="text-xl md:text-3xl font-black"><?= $kuis_total ?></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[8px] md:text-[9px] font-bold opacity-60 uppercase mb-1">Status Kuis</div>
+                        <div class="text-xl md:text-3xl font-black"><?= $kuis_streak >= 7 ? 'Sifu' : ($kuis_streak >= 3 ? 'Expert' : 'Rookie') ?></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Slide 6: Top 3 Partners -->
-    <div class="slide slide-hidden-right vibrant-rose/80" id="slide-5">
-        <div class="z-10 w-full max-w-sm md:max-w-lg px-4">
-            <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em] text-rose-300 mb-4 block">THE INNER CIRCLE</span>
-            <h2 class="text-4xl md:text-6xl font-black mb-12 leading-tight text-white">Partner Kerja<br><span class="text-rose-400">Terdekat.</span></h2>
+    <!-- Slide 6: Vibe Reveal -->
+    <div class="slide slide-hidden-right vibrant-indigo" id="slide-5">
+        <div class="z-10 w-full max-w-xs md:max-w-md px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-indigo-300 mb-2 block">MOOD TRACKER</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight text-white">Vibe Kamu<br><span class="text-indigo-400">Dominan!</span></h2>
+            <div class="glass p-4 md:p-6 mb-4 text-left relative overflow-hidden bg-white/5 border-white/10 data-card text-white">
+                <div class="absolute -top-4 -right-4 p-4 opacity-10 text-7xl md:text-8xl rotate-12">
+                    <i class="fas <?= $v_details['icon'] ?>"></i>
+                </div>
+                <div class="text-4xl md:text-6xl font-black mb-1 text-white"><?= $v_details['label'] ?></div>
+                <div class="text-[10px] md:text-sm font-bold opacity-60 uppercase tracking-tight text-white">Vibe Paling Sering</div>
+
+                <div class="mt-4">
+                    <p class="text-xs md:text-base font-medium opacity-80 mb-6 text-white">"<?= $v_details['desc'] ?>"</p>
+
+                    <div class="flex justify-between items-end border-t border-white/10 pt-6">
+                        <div>
+                            <div class="text-[9px] md:text-[10px] font-bold opacity-60 uppercase mb-1 text-white">Total Check-In</div>
+                            <div class="text-lg md:text-xl font-black uppercase tracking-wider text-white"><?= $my_vibe_count ?> Hari</div>
+                        </div>
+                        <div class="text-3xl md:text-4xl text-white">
+                            <i class="fas <?= $v_details['icon'] ?> floating"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Top 3 Partners -->
+    <div class="slide slide-hidden-right vibrant-rose/80" id="slide-6">
+        <div class="z-10 w-full max-w-xs md:max-w-md px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-rose-300 mb-2 block">THE INNER CIRCLE</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">Partner Kerja<br><span class="text-rose-400">Terdekat.</span></h2>
 
             <div class="space-y-3">
                 <?php
@@ -449,18 +516,18 @@ include_once 'functions/foto_helpers.php';
         </div>
     </div>
 
-    <!-- Slide 7: Partner Transition -->
-    <div class="slide slide-hidden-right vibrant-rose/90" id="slide-6">
+    <!-- Slide 8: Partner Transition -->
+    <div class="slide slide-hidden-right vibrant-rose/90" id="slide-7">
         <div class="z-10 w-full px-4">
-            <h2 class="text-5xl md:text-7xl font-black mb-4 uppercase tracking-tighter scale-in text-white">Siapakah</h2>
+            <h2 class="text-5xl md:text-7xl font-black mb-4 uppercase tracking-tighter scale-in">Siapakah</h2>
             <h2 class="text-6xl md:text-8xl font-black mb-8 italic scale-in text-rose-300" style="animation-delay: 0.5s">Partner Kerja <span class="text-white">Terbaik?</span></h2>
         </div>
     </div>
 
-    <!-- Slide 8: Best Partner -->
-    <div class="slide slide-hidden-right vibrant-rose text-white" id="slide-7">
-        <div class="z-10 w-full max-w-sm md:max-w-lg px-4 text-center">
-            <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-[0.3em] text-rose-300 mb-8 block">THE REVEAL</span>
+    <!-- Slide 9: Best Partner -->
+    <div class="slide slide-hidden-right vibrant-rose" id="slide-8">
+        <div class="z-10 w-full max-w-sm md:max-w-lg px-4 text-white">
+            <span class="text-[9px] md:text-[10px] font-extrabold uppercase tracking-[0.3em] text-rose-300 mb-3 block">THE REVEAL</span>
 
             <?php if ($best_friend_data): ?>
                 <div class="relative mb-12 inline-block">
@@ -486,50 +553,48 @@ include_once 'functions/foto_helpers.php';
         </div>
     </div>
 
-    <div class="slide slide-hidden-right vibrant-dark" id="slide-8">
-        <div class="z-10 w-full max-w-sm md:max-w-md px-4">
-            <div class="bg-indigo-950/80 border border-white/10 p-6 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden backdrop-blur-xl">
-                <!-- Watermark Logo -->
+    <!-- Final Summary Card -->
+    <div class="slide slide-hidden-right vibrant-dark" id="slide-9">
+        <div class="z-10 w-full max-w-sm px-4">
+            <div class="bg-indigo-950/80 border border-white/10 p-5 md:p-8 rounded-[2rem] shadow-2xl relative overflow-hidden backdrop-blur-xl scale-95 md:scale-100">
                 <div class="absolute -top-6 -right-6 opacity-5 pointer-events-none">
-                    <img src="assets/image/logo.webp" class="w-48">
+                    <img src="assets/image/logo.webp" class="w-36">
                 </div>
 
-                <div class="flex items-center gap-5 mb-10 relative">
+                <div class="flex items-center gap-4 mb-8 relative">
                     <div class="relative">
-                        <img src="<?= profilePhotoUrl($foto_user, '') ?>" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl border-2 border-indigo-500/30 object-cover shadow-lg">
-                        <div class="absolute -top-2 -left-2 bg-indigo-500 text-[8px] font-black px-2 py-1 rounded-md uppercase tracking-tighter">Verified</div>
+                        <img src="<?= profilePhotoUrl($foto_user, '') ?>" class="w-12 h-12 md:w-16 md:h-16 rounded-xl border-2 border-indigo-500/30 object-cover shadow-lg">
                     </div>
                     <div class="text-left">
-                        <h4 class="text-xl md:text-2xl font-black uppercase tracking-tight leading-tight text-white"><?= htmlspecialchars($nama_lengkap) ?></h4>
+                        <h4 class="text-lg md:text-xl font-black uppercase tracking-tight leading-tight text-white"><?= htmlspecialchars($nama_lengkap) ?></h4>
                         <div class="flex items-center gap-2 opacity-50">
-                            <i class="fas fa-id-badge text-[10px]"></i>
-                            <span class="text-[10px] md:text-xs font-bold tracking-widest uppercase"><?= $nim_user ?></span>
+                            <span class="text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-white"><?= $nim_user ?></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-10">
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 group hover:bg-white/10 transition-colors">
-                        <div class="text-xs font-bold uppercase opacity-30 mb-1 tracking-widest">Absensi</div>
-                        <div class="text-2xl font-black text-blue-400 group-hover:scale-110 transition-transform origin-left"><?= $attendance_rate ?>%</div>
+                <div class="grid grid-cols-2 gap-3 mb-8">
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 group transition-colors">
+                        <div class="text-[8px] font-bold uppercase opacity-30 mb-1 tracking-widest text-white">Absensi</div>
+                        <div class="text-xl font-black text-blue-400 group-hover:scale-105 transition-transform origin-left"><?= $attendance_rate ?>%</div>
                     </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 group hover:bg-white/10 transition-colors">
-                        <div class="text-xs font-bold uppercase opacity-30 mb-1 tracking-widest">Kas Lunas</div>
-                        <div class="text-2xl font-black text-emerald-400 group-hover:scale-110 transition-transform origin-left"><?= $total_minggu_kas ?>/16</div>
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 group transition-colors">
+                        <div class="text-[8px] font-bold uppercase opacity-30 mb-1 tracking-widest text-white">Kas</div>
+                        <div class="text-xl font-black text-emerald-400 group-hover:scale-105 transition-transform origin-left"><?= $total_minggu_kas ?>/16</div>
                     </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 group hover:bg-white/10 transition-colors">
-                        <div class="text-xs font-bold uppercase opacity-30 mb-1 tracking-widest">Tugas</div>
-                        <div class="text-2xl font-black text-purple-400 group-hover:scale-110 transition-transform origin-left"><?= $total_tugas_selesai ?></div>
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 group transition-colors">
+                        <div class="text-[8px] font-bold uppercase opacity-30 mb-1 tracking-widest text-white">Tugas</div>
+                        <div class="text-xl font-black text-purple-400 group-hover:scale-105 transition-transform origin-left"><?= $total_tugas_selesai ?></div>
                     </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 group hover:bg-white/10 transition-colors">
-                        <div class="text-xs font-bold uppercase opacity-30 mb-1 tracking-widest">Streak</div>
-                        <div class="text-2xl font-black text-amber-400 group-hover:scale-110 transition-transform origin-left"><?= $kuis_streak ?></div>
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5 group transition-colors">
+                        <div class="text-[8px] font-bold uppercase opacity-30 mb-1 tracking-widest text-white">Streak</div>
+                        <div class="text-xl font-black text-amber-400 group-hover:scale-105 transition-transform origin-left"><?= $kuis_streak ?></div>
                     </div>
                 </div>
 
                 <div class="text-center pt-2 border-t border-white/5">
-                    <div class="text-[9px] font-extrabold uppercase tracking-[0.3em] mb-6 opacity-30">PTIK C 2024 WRAPPED</div>
-                    <a href="dashboard" class="inline-block mt-4 text-[10px] font-bold uppercase opacity-40 hover:opacity-100 transition-opacity tracking-widest">
+                    <div class="text-[8px] font-bold uppercase tracking-[0.2em] mb-4 opacity-30 text-white">PTIK C 2024 WRAPPED</div>
+                    <a href="dashboard" class="inline-block mt-2 text-[9px] font-bold uppercase opacity-40 hover:opacity-100 transition-opacity tracking-widest text-white">
                         Kembali ke Dashboard
                     </a>
                 </div>
@@ -553,7 +618,7 @@ include_once 'functions/foto_helpers.php';
     </div>
 
     <script>
-        const totalSlides = 9;
+        const totalSlides = 10;
         let currentSlide = 0;
         let slideInterval;
         const duration = 8000; // 8 seconds per slide
@@ -597,7 +662,7 @@ include_once 'functions/foto_helpers.php';
             } else {
                 // Stay on last slide
                 clearInterval(slideInterval);
-                document.getElementById(`bar-${totalSlides-1}`).style.width = '100%';
+                document.getElementById(`bar-${totalSlides - 1}`).style.width = '100%';
             }
         }
 

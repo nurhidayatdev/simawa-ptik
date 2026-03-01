@@ -233,7 +233,7 @@ if ($q_memories) {
     </style>
 </head>
 
-<body class="bg-[#020617] min-h-screen w-full flex flex-col items-center font-['Poppins'] scroll-smooth">
+<body class="bg-[#020617] min-h-screen w-full flex flex-col items-center font-['Poppins'] scroll-smooth overflow-x-hidden">
 
     <!-- Background Elements -->
     <div class="fixed inset-0 z-0">
@@ -373,6 +373,90 @@ if ($q_memories) {
             </div>
 
             <!-- Footer Removed for Clean Look -->
+        </div>
+    </div>
+
+    <!-- Integrated Jadwal Kuliah Ramadan Section -->
+    <div id="jadwal-kuliah" class="relative z-10 w-full max-w-5xl px-4 mt-16 md:mt-24 space-y-8 md:space-y-12">
+        <!-- Section Header -->
+        <div class="text-center transform transition-all duration-700" data-aos="fade-up">
+            <h2 class="text-3xl md:text-4xl font-black tracking-tighter mb-3 uppercase gold-text">Jadwal Kuliah Ramadan</h2>
+            <div class="flex flex-col items-center space-y-2">
+                <p class="text-xs uppercase tracking-[0.3em] font-bold text-indigo-400 opacity-80">Penyesuaian Waktu Kuliah Selama Ramadan</p>
+                <div class="h-1 w-20 bg-gradient-to-r from-transparent via-indigo-500 to-transparent rounded-full"></div>
+            </div>
+        </div>
+
+        <div class="relative bg-slate-900/50 rounded-[2.5rem] md:rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-indigo-500/10 backdrop-blur-lg flex flex-col">
+            <div class="overflow-x-auto custom-scrollbar bg-slate-950">
+                <table class="w-full text-left border-collapse min-w-[700px]">
+                    <thead>
+                        <tr class="bg-indigo-950/90 backdrop-blur-md text-white border-b border-indigo-500/20">
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black">Hari</th>
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black">Waktu</th>
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black">Mata Kuliah</th>
+                            <th class="px-6 py-4 text-[10px] uppercase tracking-widest font-black">Ruang & SKS</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-indigo-500/10 text-white">
+                        <!-- SENIN -->
+                        <tr class="hover:bg-indigo-500/5 transition-colors">
+                            <td class="px-6 py-4 text-[11px] font-black text-indigo-400 uppercase">Senin</td>
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono">13.30 – 14.30</td>
+                            <td class="px-6 py-4 text-[11px] font-bold">Rekayasa Perangkat Lunak</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic">📍 Lab ICT 10 (2 SKS)</td>
+                        </tr>
+                        <!-- SELASA -->
+                        <tr class="hover:bg-indigo-500/5 transition-colors group">
+                            <td class="px-6 py-4 text-[11px] font-black text-indigo-400 uppercase" rowspan="3">Selasa</td>
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5">08.00 – 09.00</td>
+                            <td class="px-6 py-4 text-[11px] font-bold">Teori Bahasa dan Otomata</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic">📍 AE 107 (2 SKS)</td>
+                        </tr>
+                        <tr class="hover:bg-indigo-500/5 transition-colors">
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5">10.00 – 11.00</td>
+                            <td class="px-6 py-4 text-[11px] font-bold">Teknologi Multimedia</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic">📍 Lab Animasi (2 SKS)</td>
+                        </tr>
+                        <tr class="hover:bg-indigo-500/5 transition-colors">
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5">13.00 – 14.30</td>
+                            <td class="px-6 py-4 text-[11px] font-bold">Pemrograman Perangkat Mobile</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic">📍 Lab Animasi (3 SKS)</td>
+                        </tr>
+                        <!-- RABU -->
+                        <tr class="hover:bg-indigo-500/5 transition-colors group">
+                            <td class="px-6 py-4 text-[11px] font-black text-indigo-400 uppercase border-t border-indigo-500/10" rowspan="2">Rabu</td>
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5 border-t border-indigo-500/10">08.00 – 09.00</td>
+                            <td class="px-6 py-4 text-[11px] font-bold border-t border-indigo-500/10">Pengolahan Citra Digital</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic border-t border-indigo-500/10">📍 AE 102 (2 SKS)</td>
+                        </tr>
+                        <tr class="hover:bg-indigo-500/5 transition-colors">
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5">09.00 – 10.00</td>
+                            <td class="px-6 py-4 text-[11px] font-bold">Sistem Mikroprosesor</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic">📍 Lab ICT 5 (2 SKS)</td>
+                        </tr>
+                        <!-- KAMIS -->
+                        <tr class="hover:bg-indigo-500/5 transition-colors group">
+                            <td class="px-6 py-4 text-[11px] font-black text-indigo-400 uppercase border-t border-indigo-500/10" rowspan="2">Kamis</td>
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5 border-t border-indigo-500/10">08.00 – 09.30</td>
+                            <td class="px-6 py-4 text-[11px] font-bold border-t border-indigo-500/10">Pemrograman Berorientasi Objek</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic border-t border-indigo-500/10">📍 Lab Pemrograman (3 SKS)</td>
+                        </tr>
+                        <tr class="hover:bg-indigo-500/5 transition-colors">
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-l border-indigo-500/5">09.30 – 11.00</td>
+                            <td class="px-6 py-4 text-[11px] font-bold">Analisis Desain Sistem Informasi</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic">📍 AE 105 (3 SKS)</td>
+                        </tr>
+                        <!-- JUMAT -->
+                        <tr class="hover:bg-indigo-500/5 transition-colors">
+                            <td class="px-6 py-4 text-[11px] font-black text-indigo-400 uppercase border-t border-indigo-500/10">Jumat</td>
+                            <td class="px-6 py-4 text-[11px] font-bold font-mono border-t border-indigo-500/10 border-l border-indigo-500/5">08.00 – 09.30</td>
+                            <td class="px-6 py-4 text-[11px] font-bold border-t border-indigo-500/10">Evaluasi Pembelajaran</td>
+                            <td class="px-6 py-4 text-[11px] opacity-70 italic border-t border-indigo-500/10">📍 Lab ICT 10 (3 SKS)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -523,10 +607,6 @@ if ($q_memories) {
             slidesPerView: 1,
             spaceBetween: 30,
             loop: true,
-            autoplay: {
-                delay: 4000,
-                disableOnInteraction: false,
-            },
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true,

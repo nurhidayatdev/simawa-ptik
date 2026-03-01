@@ -284,6 +284,31 @@ while ($current <= $last) {
     $current = strtotime("+1 day", $current);
 }
 
+// 7. VIBE CHECK LOGIC
+$today_vibe = date('Y-m-d');
+$q_vibe_user = mysqli_query($koneksi, "SELECT * FROM vibe_check WHERE user_id = '$user_id' AND DATE(created_at) = '$today_vibe'");
+$vibe_user = mysqli_fetch_assoc($q_vibe_user);
+
+$q_vibe_stats = mysqli_query($koneksi, "SELECT mood, COUNT(*) as cnt FROM vibe_check WHERE DATE(created_at) = '$today_vibe' GROUP BY mood");
+$vibe_stats = ['productive' => 0, 'stress' => 0, 'relaxed' => 0, 'tired' => 0, 'hyper' => 0];
+$total_vibe = 0;
+while ($vs = mysqli_fetch_assoc($q_vibe_stats)) {
+    $vibe_stats[$vs['mood']] = (int)$vs['cnt'];
+    $total_vibe += (int)$vs['cnt'];
+}
+
+function getVibeConfig($mood)
+{
+    $configs = [
+        'productive' => ['icon' => 'fa-rocket', 'color' => 'indigo-500', 'bg' => 'indigo-50', 'label' => 'Focus'],
+        'stress' => ['icon' => 'fa-head-side-virus', 'color' => 'red-500', 'bg' => 'red-50', 'label' => 'Error'],
+        'relaxed' => ['icon' => 'fa-coffee', 'color' => 'emerald-500', 'bg' => 'emerald-50', 'label' => 'Chill'],
+        'tired' => ['icon' => 'fa-battery-quarter', 'color' => 'slate-500', 'bg' => 'slate-50', 'label' => 'Low'],
+        'hyper' => ['icon' => 'fa-fire', 'color' => 'orange-500', 'bg' => 'orange-50', 'label' => 'Fire']
+    ];
+    return $configs[$mood] ?? $configs['productive'];
+}
+
 function getFireColor($streak)
 {
     if ($streak >= 200) return '#A020F0';
@@ -294,8 +319,6 @@ function getFireColor($streak)
     if ($streak >= 3) return '#FFC300';
     return null;
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -676,8 +699,44 @@ function getFireColor($streak)
                 </div>
             </div>
 
+            <!-- --- SECTION: VIBE CHECK --- -->
+            <div class="mt-8 mb-6">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
+                    <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa fa-smile text-amber-500"></i>
+                        Vibe Kelas Hari Ini
+                    </h2>
+                    <?php if (!$vibe_user): ?>
+                        <button onclick="document.getElementById('vibeModal').classList.remove('hidden')" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold hover:bg-amber-200 transition-all">
+                            <i class="fa fa-plus-circle mr-1"></i> Check-in Mood
+                        </button>
+                    <?php endif; ?>
+                </div>
+
+                <div class="grid grid-cols-5 gap-2 md:gap-4">
+                    <?php
+                    $moods_list = ['productive', 'stress', 'relaxed', 'tired', 'hyper'];
+                    foreach ($moods_list as $m):
+                        $cfg = getVibeConfig($m);
+                        $count = $vibe_stats[$m];
+                        $percent = $total_vibe > 0 ? round(($count / $total_vibe) * 100) : 0;
+                    ?>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center text-<?= $cfg['color'] ?>">
+                            <div class="h-10 w-10 bg-<?= $cfg['bg'] ?> rounded-full flex items-center justify-center mb-2">
+                                <i class="fa <?= $cfg['icon'] ?> text-lg"></i>
+                            </div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
+                            <div class="text-lg font-black text-slate-800"><?= $percent ?>%</div>
+                            <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                                <div class="bg-<?= $cfg['color'] ?> h-full" style="width: <?= $percent ?>%"></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
             <!-- --- SECTION 2: AKADEMIK --- -->
-            <div class="mt-12 border-b border-slate-200 pb-2 mb-6">
+            <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
                 <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     <i class="fa fa-graduation-cap text-indigo-900"></i>
                     Akademik & Tugas
@@ -1079,6 +1138,78 @@ function getFireColor($streak)
             }
         });
     </script>
+    <!-- VIBE MODAL -->
+    <div id="vibeModal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
+            <div class="bg-indigo-600 p-5 text-white relative">
+                <button onclick="document.getElementById('vibeModal').classList.add('hidden')" class="absolute top-4 right-4 text-white/50 hover:text-white transition-all">
+                    <i class="fa fa-times text-lg"></i>
+                </button>
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fa fa-smile-beam text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg">Vibe Check!</h3>
+                        <p class="text-xs text-white/80">Gimana kabarmu hari ini?</p>
+                    </div>
+                </div>
+            </div>
+            <form action="actions/tambah_vibe" method="POST" class="p-6">
+                <div class="grid grid-cols-5 gap-2 mb-6">
+                    <?php
+                    $mood_options = [
+                        ['id' => 'productive', 'icon' => 'fa-rocket', 'label' => 'Focus', 'peer' => 'peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600'],
+                        ['id' => 'stress', 'icon' => 'fa-head-side-virus', 'label' => 'Error', 'peer' => 'peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600'],
+                        ['id' => 'relaxed', 'icon' => 'fa-coffee', 'label' => 'Chill', 'peer' => 'peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-600'],
+                        ['id' => 'tired', 'icon' => 'fa-battery-quarter', 'label' => 'Low', 'peer' => 'peer-checked:border-slate-500 peer-checked:bg-slate-50 peer-checked:text-slate-600'],
+                        ['id' => 'hyper', 'icon' => 'fa-fire', 'label' => 'Fire', 'peer' => 'peer-checked:border-orange-500 peer-checked:bg-orange-50 peer-checked:text-orange-600']
+                    ];
+                    foreach ($mood_options as $opt):
+                    ?>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="mood" value="<?= $opt['id'] ?>" class="peer hidden" required>
+                            <div class="flex flex-col items-center p-2 rounded-xl border-2 border-slate-100 group-hover:bg-slate-50 transition-all text-slate-400 <?= $opt['peer'] ?>">
+                                <i class="fa <?= $opt['icon'] ?> text-lg mb-1"></i>
+                                <span class="text-[8px] font-black uppercase"><?= $opt['label'] ?></span>
+                            </div>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2 text-sm">
+                    Kirim Vibe Saya <i class="fa fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .animate-slide-up {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <?php if (!$vibe_user && !isset($_GET['vibe_success'])): ?>
+        <script>
+            setTimeout(() => {
+                document.getElementById('vibeModal').classList.remove('hidden');
+            }, 1000);
+        </script>
+    <?php endif; ?>
+
 </body>
 
 </html>
