@@ -130,30 +130,38 @@ $saldo_sekarang = ($kas_total + $arus_in) - $arus_out;
 
 // Statistik Pembayaran Kas
 $filter_minggu_kas = $_GET['kas_minggu'] ?? '';
+
 if (!empty($filter_minggu_kas)) {
-    $q_kas_stats = mysqli_query($koneksi, "SELECT 
-        (SELECT COUNT(*) FROM mahasiswa) as total,
-        SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
-        FROM kas 
-        WHERE periode_id = '$periode_id' AND minggu_ke = '$filter_minggu_kas'");
-} else {
     $q_kas_stats = mysqli_query($koneksi, "SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
         FROM kas 
-        WHERE periode_id = '$periode_id'");
-}
-$kas_stats_data = mysqli_fetch_assoc($q_kas_stats);
-$total_k = (int)($kas_stats_data['total'] ?? 0);
-$lunas_k = (int)($kas_stats_data['lunas'] ?? 0);
+        WHERE periode_id = '$periode_id' AND minggu_ke = '$filter_minggu_kas'");
+    $kas_stats_data = mysqli_fetch_assoc($q_kas_stats);
+    $lunas_val = (int)($kas_stats_data['lunas'] ?? 0);
+    $total_val = $counts['mahasiswa'] ?? 0;
+    
+    $persen_lunas = $total_val > 0 ? round(($lunas_val / $total_val) * 100) : 0;
+    $display_lunas = "Lunas: " . $lunas_val;
+    $display_belum = "Belum: " . ($total_val - $lunas_val);
+} else {
+    // Sesuai dengan logika di manajemen_kas.php
+    $q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
+    $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
 
-// Jika filter minggu aktif, totalnya adalah jumlah mahasiswa
-if (!empty($filter_minggu_kas)) {
-    $total_k = $counts['mahasiswa'] ?? $total_k;
-}
+    $q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas");
+    $current_week_target = mysqli_fetch_assoc($q_latest_week)['max_week'] ?? 1;
+    if ($current_week_target < 1) $current_week_target = 1;
 
-$belum_k = $total_k - $lunas_k;
-$persen_lunas = $total_k > 0 ? round(($lunas_k / $total_k) * 100) : 0;
+    $q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 LIMIT 1");
+    $fixed_nominal = mysqli_fetch_assoc($q_nominal)['nominal'] ?? 5000;
+
+    $target_kas = $total_students * $current_week_target * $fixed_nominal;
+    $persen_lunas = ($target_kas > 0) ? min(100, round(($kas_total / $target_kas) * 100)) : 0;
+    
+    $display_lunas = "Rp " . number_format($kas_total, 0, ',', '.');
+    $display_belum = "Target: Rp " . number_format($target_kas, 0, ',', '.');
+}
 
 
 // Kalender Akademik untuk Slider
@@ -561,7 +569,41 @@ function getFireColor($streak)
                 </div>
             </div>
 
+            <!-- --- SECTION: VIBE CHECK --- -->
+            <div class="mt-8 mb-6">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
+                    <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa fa-smile text-amber-500"></i>
+                        Vibe Kelas Hari Ini
+                    </h2>
+                    <?php if (!$vibe_user): ?>
+                        <button onclick="document.getElementById('vibeModal').classList.remove('hidden')" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold hover:bg-amber-200 transition-all">
+                            <i class="fa fa-plus-circle mr-1"></i> Check-in Mood
+                        </button>
+                    <?php endif; ?>
+                </div>
 
+                <div class="grid grid-cols-5 gap-2 md:gap-4">
+                    <?php
+                    $moods_list = ['productive', 'stress', 'relaxed', 'tired', 'hyper'];
+                    foreach ($moods_list as $m):
+                        $cfg = getVibeConfig($m);
+                        $count = $vibe_stats[$m];
+                        $percent = $total_vibe > 0 ? round(($count / $total_vibe) * 100) : 0;
+                    ?>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center <?= $cfg['text'] ?>">
+                            <div class="h-10 w-10 <?= $cfg['bg_light'] ?> rounded-full flex items-center justify-center mb-2">
+                                <i class="fa <?= $cfg['icon'] ?> text-lg"></i>
+                            </div>
+                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
+                            <div class="text-lg font-black text-slate-800"><?= $percent ?>%</div>
+                            <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                                <div class="<?= $cfg['bg_main'] ?> h-full" style="width: <?= $percent ?>%"></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
             <!-- --- SECTION 1: DEMOGRAFI & SOSIAL --- -->
             <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
@@ -615,9 +657,9 @@ function getFireColor($streak)
                             <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                                 <div class="bg-indigo-500 h-full rounded-full" style="width: <?= $persen_lunas ?>%"></div>
                             </div>
-                            <div class="flex justify-between mt-1 text-[9px] font-medium">
-                                <span class="text-green-600">Lunas: <?= $lunas_k ?></span>
-                                <span class="text-slate-400">Belum: <?= $belum_k ?></span>
+                             <div class="flex justify-between mt-1 text-[9px] font-medium">
+                                <span class="text-green-600"><?= $display_lunas ?></span>
+                                <span class="text-slate-400"><?= $display_belum ?></span>
                             </div>
                         </div>
                     </div>
@@ -699,41 +741,7 @@ function getFireColor($streak)
                 </div>
             </div>
 
-            <!-- --- SECTION: VIBE CHECK --- -->
-            <div class="mt-8 mb-6">
-                <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
-                    <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa fa-smile text-amber-500"></i>
-                        Vibe Kelas Hari Ini
-                    </h2>
-                    <?php if (!$vibe_user): ?>
-                        <button onclick="document.getElementById('vibeModal').classList.remove('hidden')" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold hover:bg-amber-200 transition-all">
-                            <i class="fa fa-plus-circle mr-1"></i> Check-in Mood
-                        </button>
-                    <?php endif; ?>
-                </div>
-
-                <div class="grid grid-cols-5 gap-2 md:gap-4">
-                    <?php
-                    $moods_list = ['productive', 'stress', 'relaxed', 'tired', 'hyper'];
-                    foreach ($moods_list as $m):
-                        $cfg = getVibeConfig($m);
-                        $count = $vibe_stats[$m];
-                        $percent = $total_vibe > 0 ? round(($count / $total_vibe) * 100) : 0;
-                    ?>
-                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center <?= $cfg['text'] ?>">
-                            <div class="h-10 w-10 <?= $cfg['bg_light'] ?> rounded-full flex items-center justify-center mb-2">
-                                <i class="fa <?= $cfg['icon'] ?> text-lg"></i>
-                            </div>
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
-                            <div class="text-lg font-black text-slate-800"><?= $percent ?>%</div>
-                            <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
-                                <div class="<?= $cfg['bg_main'] ?> h-full" style="width: <?= $percent ?>%"></div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
+            
 
             <!-- --- SECTION 2: AKADEMIK --- -->
             <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
