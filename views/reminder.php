@@ -138,6 +138,11 @@ if (isset($_POST['action'])) {
             ]];
         }
         $response = kirimJadwalReminder($koneksi, null, null, $custom_data, $day);
+        if ($response['status'] === 'success') {
+            $_SESSION['last_custom_payload'] = $_POST['custom_payload'] ?? null;
+            $_SESSION['last_day'] = $day;
+            $_SESSION['show_piket_button'] = true;
+        }
     } elseif ($action === 'tugas') {
         $response = kirimTugasReminder($koneksi);
     } elseif ($action === 'kas') {
@@ -154,7 +159,11 @@ if (isset($_POST['action'])) {
         $response = kirimKelompokReminder($koneksi, $matkul_id, $dosen, $keterangan);
     } elseif ($action === 'piket') {
         $day = $_POST['day'] ?? 'besok';
-        $response = kirimPiketReminder($koneksi, null, null, $day);
+        $custom_data = null;
+        if (isset($_POST['custom_payload'])) {
+            $custom_data = json_decode($_POST['custom_payload'], true);
+        }
+        $response = kirimPiketReminder($koneksi, null, null, $day, $custom_data);
     }
 
     $_SESSION['reminder_msg'] = $response['message'];
@@ -781,7 +790,32 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             form.submit();
         }
 
+        function submitPiketCustom(payload, day) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'reminder';
 
+            const inputAction = document.createElement('input');
+            inputAction.type = 'hidden';
+            inputAction.name = 'action';
+            inputAction.value = 'piket';
+            form.appendChild(inputAction);
+
+            const inputDay = document.createElement('input');
+            inputDay.type = 'hidden';
+            inputDay.name = 'day';
+            inputDay.value = day;
+            form.appendChild(inputDay);
+
+            const inputPayload = document.createElement('input');
+            inputPayload.type = 'hidden';
+            inputPayload.name = 'custom_payload';
+            inputPayload.value = payload;
+            form.appendChild(inputPayload);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
 
         // Response Message with SweetAlert
         <?php if (isset($_SESSION['reminder_msg'])): ?>
@@ -789,11 +823,23 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 icon: '<?= $_SESSION['reminder_type'] === "success" ? "success" : ($_SESSION['reminder_type'] === "error" ? "error" : "info") ?>',
                 title: '<?= $_SESSION['reminder_type'] === "success" ? "Berhasil!" : ($_SESSION['reminder_type'] === "error" ? "Gagal!" : "Informasi") ?>',
                 text: '<?= addslashes($_SESSION['reminder_msg']) ?>',
-                confirmButtonColor: '#3730a3'
+                confirmButtonColor: '#3730a3'<?php if (isset($_SESSION['show_piket_button']) && $_SESSION['show_piket_button']): ?>,
+                showDenyButton: true,
+                denyButtonText: 'Kirim Piket Proyektor',
+                denyButtonColor: '#312e81'<?php endif; ?>
+            }).then((result) => {
+                <?php if (isset($_SESSION['show_piket_button']) && $_SESSION['show_piket_button']): ?>
+                if (result.isDenied) {
+                    submitPiketCustom('<?= addslashes($_SESSION['last_custom_payload']) ?>', '<?= $_SESSION['last_day'] ?>');
+                }
+                <?php endif; ?>
             });
             <?php
             unset($_SESSION['reminder_msg']);
             unset($_SESSION['reminder_type']);
+            unset($_SESSION['show_piket_button']);
+            unset($_SESSION['last_custom_payload']);
+            unset($_SESSION['last_day']);
             ?>
         <?php endif; ?>
     </script>

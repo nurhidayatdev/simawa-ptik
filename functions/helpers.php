@@ -1,17 +1,15 @@
 <?php
-// functions/helpers.php
-
-// functions/helpers.php
+require_once __DIR__ . '/env_loader.php';
 
 // Fonnte Configuration
 if (!defined('FONNTE_TOKEN')) {
-    define('FONNTE_TOKEN', 'nUqX73mNV9B29DG8ixau');
+    define('FONNTE_TOKEN', env('FONNTE_TOKEN'));
 }
 if (!defined('FONNTE_GROUP_ID')) {
-    define('FONNTE_GROUP_ID', '120363403722910475@g.us');
+    define('FONNTE_GROUP_ID', env('FONNTE_GROUP_ID'));
 }
 if (!defined('FONNTE_ANON_GROUP_ID')) {
-    define('FONNTE_ANON_GROUP_ID', '120363422023235984@g.us'); // Ganti dengan ID grup khusus pesan anonim
+    define('FONNTE_ANON_GROUP_ID', env('FONNTE_ANON_GROUP_ID'));
 }
 
 if (!function_exists('sendFonnteMessage')) {

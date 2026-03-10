@@ -1,5 +1,5 @@
 <?php
-function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok')
+function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok', $custom_data = null)
 {
     date_default_timezone_set('Asia/Makassar');
 
@@ -64,18 +64,45 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     $header_label = ($day === 'hari_ini') ? 'Hari Ini' : 'Besok';
     $msg .= "📅 {$header_label}: *{$target_ind}, " . date('d M Y', strtotime($target_date)) . "*\n\n";
 
+    $custom_map = [];
+    if ($custom_data) {
+        foreach ($custom_data as $c) {
+            $custom_map[trim($c['matkul'])] = $c;
+        }
+    }
+
     $piket_grouped = [];
     while ($row = mysqli_fetch_assoc($res)) {
         $jid = $row['jadwal_matkul_id'];
+        $matkul_name = trim($row['nama_matkul']);
+        
+        $jam = date('H:i', strtotime($row['jam_mulai'])) . ' - ' . date('H:i', strtotime($row['jam_selesai']));
+        $ruangan = $row['nama_ruangan'] ?? '-';
+        
+        if ($custom_data) {
+            // Jika ada data custom, matkul harus ada di map dan statusnya harus masuk
+            if (!isset($custom_map[$matkul_name])) continue;
+            if (($custom_map[$matkul_name]['status'] ?? 'masuk') === 'tidak_masuk') continue;
+            
+            // Gunakan jam dan ruangan dari data custom
+            $jam = $custom_map[$matkul_name]['jam'];
+            $ruangan = $custom_map[$matkul_name]['ruangan'];
+        }
+
         if (!isset($piket_grouped[$jid])) {
             $piket_grouped[$jid] = [
-                'matkul' => $row['nama_matkul'],
-                'jam' => date('H:i', strtotime($row['jam_mulai'])) . ' - ' . date('H:i', strtotime($row['jam_selesai'])),
-                'ruangan' => $row['nama_ruangan'] ?? '-',
+                'matkul' => $matkul_name,
+                'jam' => $jam,
+                'ruangan' => $ruangan,
                 'petugas' => []
             ];
         }
         $piket_grouped[$jid]['petugas'][] = $row['nama_lengkap'];
+    }
+
+    if (empty($piket_grouped)) {
+        $day_label = ($day === 'hari_ini') ? 'hari ini' : 'hari besok';
+        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor yang aktif untuk $day_label."];
     }
 
     foreach ($piket_grouped as $data) {

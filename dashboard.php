@@ -300,11 +300,11 @@ while ($vs = mysqli_fetch_assoc($q_vibe_stats)) {
 function getVibeConfig($mood)
 {
     $configs = [
-        'productive' => ['icon' => 'fa-rocket', 'color' => 'indigo-500', 'bg' => 'indigo-50', 'label' => 'Focus'],
-        'stress' => ['icon' => 'fa-head-side-virus', 'color' => 'red-500', 'bg' => 'red-50', 'label' => 'Error'],
-        'relaxed' => ['icon' => 'fa-coffee', 'color' => 'emerald-500', 'bg' => 'emerald-50', 'label' => 'Chill'],
-        'tired' => ['icon' => 'fa-battery-quarter', 'color' => 'slate-500', 'bg' => 'slate-50', 'label' => 'Low'],
-        'hyper' => ['icon' => 'fa-fire', 'color' => 'orange-500', 'bg' => 'orange-50', 'label' => 'Fire']
+        'productive' => ['icon' => 'fa-rocket', 'text' => 'text-indigo-500', 'bg_light' => 'bg-indigo-50', 'bg_main' => 'bg-indigo-500', 'label' => 'Focus'],
+        'stress' => ['icon' => 'fa-head-side-virus', 'text' => 'text-red-500', 'bg_light' => 'bg-red-50', 'bg_main' => 'bg-red-500', 'label' => 'Error'],
+        'relaxed' => ['icon' => 'fa-coffee', 'text' => 'text-emerald-500', 'bg_light' => 'bg-emerald-50', 'bg_main' => 'bg-emerald-500', 'label' => 'Chill'],
+        'tired' => ['icon' => 'fa-battery-quarter', 'text' => 'text-slate-500', 'bg_light' => 'bg-slate-50', 'bg_main' => 'bg-slate-500', 'label' => 'Low'],
+        'hyper' => ['icon' => 'fa-fire', 'text' => 'text-orange-500', 'bg_light' => 'bg-orange-50', 'bg_main' => 'bg-orange-500', 'label' => 'Fire']
     ];
     return $configs[$mood] ?? $configs['productive'];
 }
@@ -721,14 +721,14 @@ function getFireColor($streak)
                         $count = $vibe_stats[$m];
                         $percent = $total_vibe > 0 ? round(($count / $total_vibe) * 100) : 0;
                     ?>
-                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center text-<?= $cfg['color'] ?>">
-                            <div class="h-10 w-10 bg-<?= $cfg['bg'] ?> rounded-full flex items-center justify-center mb-2">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center <?= $cfg['text'] ?>">
+                            <div class="h-10 w-10 <?= $cfg['bg_light'] ?> rounded-full flex items-center justify-center mb-2">
                                 <i class="fa <?= $cfg['icon'] ?> text-lg"></i>
                             </div>
                             <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
                             <div class="text-lg font-black text-slate-800"><?= $percent ?>%</div>
                             <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
-                                <div class="bg-<?= $cfg['color'] ?> h-full" style="width: <?= $percent ?>%"></div>
+                                <div class="<?= $cfg['bg_main'] ?> h-full" style="width: <?= $percent ?>%"></div>
                             </div>
                         </div>
                     <?php endforeach; ?>
