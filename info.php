@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include_once 'functions/foto_helpers.php';
 
 // Ambil periode aktif untuk konteks jika perlu
 $q_periode = mysqli_query($koneksi, "SELECT * FROM periode WHERE status = 'aktif' LIMIT 1");
@@ -60,6 +61,55 @@ $periode = mysqli_fetch_assoc($q_periode);
                 Mengenal lebih dalam simbolisme, filosofi, dan sejarah di balik identitas digital PTIK C Angkatan 2024.
             </p>
         </div>
+
+        <!-- Section: Deskripsi Umum & Struktur -->
+        <section class="mb-16">
+            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                <div class="relative z-10">
+                    <div class="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
+                        Eksplorasi Jati Diri
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Tentang <span class="text-indigo-600">PTIK C 24</span></h2>
+                    
+                    <?php
+                    // Ambil Data Pengurus untuk Narasinya
+                    $ketuaData = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT m.nama_lengkap FROM users u JOIN mahasiswa m ON m.user_id = u.id WHERE u.role = 'Ketua Tingkat' LIMIT 1"));
+                    $namaKetua = $ketuaData['nama_lengkap'] ?? 'Ketua';
+
+                    $sekretaris = [];
+                    $qSek = mysqli_query($koneksi, "SELECT m.nama_lengkap FROM users u JOIN mahasiswa m ON m.user_id = u.id WHERE u.role = 'Sekretaris' ORDER BY m.nama_lengkap");
+                    while($r = mysqli_fetch_assoc($qSek)) $sekretaris[] = $r['nama_lengkap'];
+                    
+                    $bendahara = [];
+                    $qBen = mysqli_query($koneksi, "SELECT m.nama_lengkap FROM users u JOIN mahasiswa m ON m.user_id = u.id WHERE u.role = 'Bendahara' ORDER BY m.nama_lengkap");
+                    while($r = mysqli_fetch_assoc($qBen)) $bendahara[] = $r['nama_lengkap'];
+
+                    $nimMedia = ["240209501052", "240209501055"];
+                    $media = [];
+                    $qMedia = mysqli_query($koneksi, "SELECT nama_lengkap FROM mahasiswa WHERE nim IN ('".implode("','", $nimMedia)."')");
+                    while($r = mysqli_fetch_assoc($qMedia)) $media[] = $r['nama_lengkap'];
+
+                    $nimManager = ["240209500066", "240209501056"];
+                    $manager = [];
+                    $qManager = mysqli_query($koneksi, "SELECT nama_lengkap FROM mahasiswa WHERE nim IN ('".implode("','", $nimManager)."')");
+                    while($r = mysqli_fetch_assoc($qManager)) $manager[] = $r['nama_lengkap'];
+                    ?>
+
+                    <div class="text-slate-500 text-[11px] leading-loose text-justify space-y-4">
+                        <p>
+                            PTIK C Angkatan 2024 bukan sekadar pembagian rombongan belajar dalam struktur akademik Pendidikan Teknik Informatika dan Komputer di Universitas Negeri Makassar. Kami adalah sebuah komunitas yang dikenal luas sebagai <span class="text-indigo-600 font-bold italic">ProTechNoTy Class 24</span>—sebuah identitas digital yang dapat ditemukan melalui akun Instagram resmi kami <a href="https://instagram.com/ptikc_24" target="_blank" class="text-indigo-600 font-bold hover:underline">@ptikc_24</a>. Nama ini merepresentasikan sinergi antara <span class="text-slate-800 font-semibold">Programmer, Technology, Innovation, dan Creativity</span>. Kami berkomitmen untuk menjadi garda terdepan dalam inovasi teknologi, membekali diri dengan kompetensi teknis yang mumpuni serta integritas yang teguh.
+                        </p>
+                        <p>
+                            Dalam menjalankan visi besar ini, rumpang organisasi kami dipimpin oleh <span class="text-slate-800 font-bold"><?= $namaKetua ?></span> sebagai Ketua Tingkat yang mengoordinasi setiap langkah strategis kelas. Kelancaran administrasi dan transparansi finansial dikelola secara profesional oleh tim Sekretaris, yakni <span class="text-indigo-600 font-medium"><?= implode(" dan ", $sekretaris) ?></span>, serta tim Bendahara yang dipercayakan kepada <span class="text-indigo-600 font-medium"><?= implode(" dan ", $bendahara) ?></span>.
+                        </p>
+                        <p>
+                            Eksistensi kami sebagai entitas kreatif juga didukung oleh divisi khusus; tim Media Kreatif yang digawangi oleh <span class="text-indigo-600 font-medium"><?= implode(" dan ", $media) ?></span> memastikan representasi visual kami tetap inovatif, sementara tim Manager Tugas yang beranggotakan <span class="text-indigo-600 font-medium"><?= implode(" dan ", $manager) ?></span> senantiasa menjaga kedisiplinan akademik. Melalui sinergi ini, ProTechNoTy Class 24 terus berupaya menciptakan ekosistem belajar yang kompetitif namun tetap suportif antar sesama anggota.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Section: Penjelasan Nama -->
         <section class="mb-16">
@@ -196,6 +246,72 @@ $periode = mysqli_fetch_assoc($q_periode);
                                 <p class="text-[10px] text-slate-400 mt-1">Ketulusan dalam belajar dan fokus pada tujuan bersama.</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Section: Daftar Nama Seluruh Mahasiswa (List) -->
+        <section class="mb-16">
+            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-200">
+                <div class="text-center mb-8">
+                    <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
+                        Database Anggota
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Daftar Mahasiswa <span class="text-indigo-600">Aktif</span></h2>
+                    <p class="text-slate-400 text-xs mt-2">Seluruh mahasiswa yang tergabung dalam PTIK C 2024</p>
+                </div>
+
+                <?php
+                $qLaki = mysqli_query($koneksi, "SELECT nama_lengkap FROM mahasiswa WHERE jenis_kelamin = 'Laki-laki' ORDER BY nama_lengkap ASC");
+                $qPr = mysqli_query($koneksi, "SELECT nama_lengkap FROM mahasiswa WHERE jenis_kelamin = 'Perempuan' ORDER BY nama_lengkap ASC");
+                ?>
+
+                <div class="space-y-10">
+                    <!-- Deskripsi Mahasiswa Laki-laki -->
+                    <div class="bg-blue-50/30 p-6 md:p-8 rounded-[1.5rem] border border-blue-100/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="h-8 w-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-mars text-sm"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Mahasíswa (Laki-laki)</h3>
+                            <div class="h-px flex-grow bg-blue-100/50"></div>
+                            <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100"><?= mysqli_num_rows($qLaki) ?> Personil</span>
+                        </div>
+                        <p class="text-slate-600 text-[11px] leading-loose text-justify">
+                            Sektor putra kelas ini diperkuat oleh <strong><?= mysqli_num_rows($qLaki) ?> mahasiswa</strong> yang membawa semangat inovasi dan kerja keras, mereka adalah 
+                            <?php 
+                            $listL = [];
+                            while($r = mysqli_fetch_assoc($qLaki)) $listL[] = "<span class='font-bold text-blue-700'>".ucwords(strtolower($r['nama_lengkap']))."</span>";
+                            $lastL = array_pop($listL);
+                            echo implode(", ", $listL) . ", serta " . $lastL;
+                            ?>. 
+                            Setiap individu di barisan ini memiliki tekad yang kuat dalam mendalami dunia teknologi informasi, berkontribusi aktif dalam setiap diskusi teknis, dan senantiasa menjunjung tinggi solidaritas antar sesama rekan di PTIK C 2024.
+                        </p>
+                    </div>
+
+                    <!-- Deskripsi Mahasiswa Perempuan -->
+                    <div class="bg-rose-50/30 p-6 md:p-8 rounded-[1.5rem] border border-rose-100/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="h-8 w-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center">
+                                <i class="fa fa-venus text-sm"></i>
+                            </div>
+                            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Mahasíswi (Perempuan)</h3>
+                            <div class="h-px flex-grow bg-rose-100/50"></div>
+                            <span class="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100"><?= mysqli_num_rows($qPr) ?> Personil</span>
+                        </div>
+                        <p class="text-slate-600 text-[11px] leading-loose text-justify">
+                            Di sisi lain, kehadiran <strong><?= mysqli_num_rows($qPr) ?> mahasiswi</strong> memberikan wajah kreativitas dan ketelitian yang luar biasa bagi kelas ini, yang terdiri dari 
+                            <?php 
+                            $listP = [];
+                            while($r = mysqli_fetch_assoc($qPr)) $listP[] = "<span class='font-bold text-rose-700'>".ucwords(strtolower($r['nama_lengkap']))."</span>";
+                            $lastP = array_pop($listP);
+                            echo implode(", ", $listP) . ", serta " . $lastP;
+                            ?>. 
+                            Keterlibatan mereka tidak hanya memperkaya dinamika akademik di dalam kelas, tetapi juga menjadi penggerak penting dalam berbagai inisiatif kreatif dan pengorganisasian kegiatan, membuktikan bahwa ketekunan dan kecerdasan adalah pondasi utama dalam mengarungi tantangan di Fakultas Teknik.
+                        </p>
                     </div>
                 </div>
             </div>
