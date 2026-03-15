@@ -121,45 +121,33 @@ $periode = mysqli_fetch_assoc($q_periode);
 <body class="bg-mesh min-h-screen">
     <?php include 'includes/header_main.php'; ?>
 
-    <!-- Hero Section -->
-    <section class="relative pt-28 pb-12 overflow-hidden">
-        <div class="container mx-auto px-6 max-w-5xl text-center">
-            <span class="inline-block py-1 px-3 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-widest mb-4">Official Documentation</span>
-            <h1 class="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight plus-jakarta">
-                Panduan <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500">Langkah demi Langkah</span>
-            </h1>
-            <p class="text-slate-500 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
-                Panduan komprehensif untuk membantu Anda menguasai setiap fitur Sistem Informasi PTIK C 24 dengan instruksi praktis dan sistematis.
-            </p>
-        </div>
-    </section>
+    <!-- Spacer -->
+    <div class="h-10"></div>
 
-    <!-- Role Selector -->
-    <section class="container mx-auto px-6 max-w-6xl mb-12">
-        <div class="flex flex-wrap justify-center gap-3">
-            <button onclick="showGuide('mhs')" class="role-btn active glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                <i class="fa fa-user-graduate text-lg"></i> Mahasiswa
-            </button>
-            <button onclick="showGuide('keti')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                <i class="fa fa-crown text-lg"></i> Ketua Tingkat
-            </button>
-            <button onclick="showGuide('sekretaris')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                <i class="fa fa-file-signature text-lg"></i> Sekretaris
-            </button>
-            <button onclick="showGuide('bendahara')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                <i class="fa fa-wallet text-lg"></i> Bendahara
-            </button>
-            <button onclick="showGuide('manager')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                <i class="fa fa-tasks text-lg"></i> Manager Tugas
-            </button>
-            <button onclick="showGuide('admin')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                <i class="fa fa-user-shield text-lg"></i> Administrator
-            </button>
-        </div>
-    </section>
-
-    <!-- Content Sections -->
-    <main class="container mx-auto px-6 max-w-5xl pb-24">
+    <main class="flex-grow py-12">
+        <div class="container mx-auto px-6 pb-24">
+            <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Panduan Penggunaan</h1>
+            <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Pelajari cara pengelolaan tugas, absensi, hingga pengaturan profil untuk memaksimalkan penggunaan sistem informasi.</p>
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button onclick="showGuide('mhs')" class="role-btn active glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
+                    <i class="fa fa-user-graduate text-lg"></i> Mahasiswa
+                </button>
+                <button onclick="showGuide('keti')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
+                    <i class="fa fa-crown text-lg"></i> Ketua Tingkat
+                </button>
+                <button onclick="showGuide('sekretaris')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
+                    <i class="fa fa-file-signature text-lg"></i> Sekretaris
+                </button>
+                <button onclick="showGuide('bendahara')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
+                    <i class="fa fa-wallet text-lg"></i> Bendahara
+                </button>
+                <button onclick="showGuide('manager')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
+                    <i class="fa fa-tasks text-lg"></i> Manager Tugas
+                </button>
+                <button onclick="showGuide('admin')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
+                    <i class="fa fa-user-shield text-lg"></i> Administrator
+                </button>
+            </div>
         
         <!-- PANDUAN MAHASISWA -->
         <div id="guide-mhs" class="guide-section active">
@@ -186,7 +174,7 @@ $periode = mysqli_fetch_assoc($q_periode);
                                 <ul class="space-y-3">
                                     <li class="flex items-start gap-2 text-[13px] text-slate-600">
                                         <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Login Pertama:</strong> Masuk menggunakan NIM sebagai Username dan Password default (Hubungi Sekretaris jika tidak tahu).</span>
+                                        <span><strong>Login Pertama:</strong> Masuk menggunakan NIM sebagai Username dan Password default (Hubungi Administrator Utama jika tidak tahu).</span>
                                     </li>
                                     <li class="flex items-start gap-2 text-[13px] text-slate-600">
                                         <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
@@ -195,7 +183,7 @@ $periode = mysqli_fetch_assoc($q_periode);
                                     <li class="flex items-start gap-2 text-[13px] text-slate-600">
                                         <i class="fa fa-key text-indigo-500 mt-0.5"></i>
                                         <div class="space-y-1">
-                                            <span><strong>Simpan Akun Manual:</strong> Jika pop-up penyimpanan otomatis tidak muncul, ikuti langkah manual ini:</span>
+                                            <span><strong>Simpan Akun Manual:</strong> Karena pop-up penyimpanan otomatis tidak muncul, ikuti langkah manual ini:</span>
                                             <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
                                                 <li>Buka <strong>Settings</strong> di Chrome/Browser Anda.</li>
                                                 <li>Pilih menu <strong>Google Password Manager</strong>.</li>
@@ -885,10 +873,9 @@ $periode = mysqli_fetch_assoc($q_periode);
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
-
-    </main>
+    </div>
+</main>
 
     <?php include 'includes/footer_main.php'; ?>
     <?php include 'includes/script_main.php'; ?>

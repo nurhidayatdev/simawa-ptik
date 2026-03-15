@@ -56,18 +56,12 @@ $periode = mysqli_fetch_assoc($q_periode);
     <?php include 'includes/header_main.php'; ?>
 
     <!-- Spacer -->
-    <div class="h-16"></div>
+    <div class="h-10"></div>
 
-    <main class="container mx-auto px-4 py-8 max-w-4xl">
+    <main class="container mx-auto px-6 py-12 flex-grow">
         <!-- Hero Section -->
-        <div class="text-center mb-8">
-            <h1 class="text-2xl md:text-4xl font-bold text-indigo-950 mb-3 tracking-tight">
-                Resource <span class="text-indigo-600 uppercase">Center</span>
-            </h1>
-            <p class="text-slate-500 max-w-lg mx-auto text-[10px] md:text-xs leading-relaxed">
-                Download aset resmi, template, dan sumber daya lainnya untuk mendukung identitas digital PTIK C Angkatan 2024.
-            </p>
-        </div>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal">Download Assets</h1>
+        <p class="text-gray-500 mb-8 scroll-reveal text-sm">Unduh berbagai aset digital kelas seperti logo resmi, wallpaper, serta dokumen penting lainnya di sini.</p>
 
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Logo Card -->

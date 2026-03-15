@@ -34,8 +34,9 @@ ORDER BY jm.hari, jk_start.jam_mulai");
     <div class="h-10"></div>
 
 
-    <div class="container mx-auto py-6 mt-4 px-6">
-        <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Jadwal Mata Kuliah</h1>
+    <div class="container mx-auto px-6 py-12 flex-grow">
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Jadwal Mata Kuliah</h1>
+        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center">Pantau waktu perkuliahan, ruangan, dan dosen pengampu untuk membantu perencanaan studi harian Anda.</p>
         <!-- Rest of the content remains the same -->
         <div class="mb-4 md:hidden flex justify-end">
             <button id="toggleViewBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-md hover:bg-indigo-700 transition">

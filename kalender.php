@@ -27,29 +27,30 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
 
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <?php include 'includes/header_main.php'; ?>
-
+ 
     <!-- spacer to avoid content hidden under fixed header -->
     <div class="h-10"></div>
-
-    <main class="flex-grow">
-        <section class="py-12 p-6">
-            <div class="container mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <h2 class="text-3xl font-bold text-gray-800">Kalender Akademik</h2>
-
-                    <!-- Filter -->
-                    <form action="" method="GET" class="w-full md:w-auto flex items-center gap-3 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
-                        <label for="periode" class="text-xs font-medium text-gray-500 ml-2">Periode:</label>
-                        <select name="periode_id" id="periode" onchange="this.form.submit()"
-                            class="bg-gray-50 border border-gray-200 rounded-md px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                            <?php while ($p = mysqli_fetch_assoc($periods)): ?>
-                                <option value="<?= $p['id'] ?>" <?= ($periode_id == $p['id']) ? 'selected' : '' ?>>
-                                    <?= $p['tahun_periode'] ?> - <?= $p['semester_nama'] ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </form>
+ 
+    <main class="container mx-auto px-6 py-12 flex-grow">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal">Kalender Akademik</h1>
+                    <p class="text-gray-500 scroll-reveal text-sm">Informasi lengkap agenda akademik semester mulai dari masa perkuliahan hingga jadwal ujian penting.</p>
                 </div>
+
+                <!-- Filter -->
+                <form action="" method="GET" class="w-full md:w-auto flex items-center gap-3 bg-white p-2 rounded-lg shadow-sm border border-gray-200 scroll-reveal">
+                    <label for="periode" class="text-xs font-medium text-gray-500 ml-2">Periode:</label>
+                    <select name="periode_id" id="periode" onchange="this.form.submit()"
+                        class="bg-gray-50 border border-gray-200 rounded-md px-3 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <?php while ($p = mysqli_fetch_assoc($periods)): ?>
+                            <option value="<?= $p['id'] ?>" <?= ($periode_id == $p['id']) ? 'selected' : '' ?>>
+                                <?= $p['tahun_periode'] ?> - <?= $p['semester_nama'] ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </form>
+            </div>
 
                 <!-- Table Layout (Matching pages/dosen.php) -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

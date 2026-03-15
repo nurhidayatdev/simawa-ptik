@@ -125,32 +125,13 @@ $periode = mysqli_fetch_assoc($q_periode);
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .img-placeholder {
-            margin-top: 1.5rem;
-            width: 100%;
-            max-width: 700px;
-            border-radius: 1.25rem;
-            overflow: hidden;
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 16 / 9;
-            position: relative;
-        }
 
-        .img-placeholder i {
-            font-size: 2rem;
-            color: #cbd5e1;
-        }
 
         .img-actual {
             width: 100%;
-            height: 100%;
-            object-fit: contain; /* Agar gambar terlihat full tanpa terpotong */
-            background: #f8fafc; /* Background halus untuk area sisa */
-            display: none;
+            height: auto;
+            display: block;
+            border-radius: 1.25rem;
         }
     </style>
 </head>
@@ -158,18 +139,12 @@ $periode = mysqli_fetch_assoc($q_periode);
 <body class="bg-mesh min-h-screen">
     <?php include 'includes/header_main.php'; ?>
 
-    <section class="relative pt-24 pb-12 overflow-hidden">
-        <div class="container mx-auto px-6 max-w-4xl text-center">
-            <h1 class="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight plus-jakarta">
-                Jejak Langkah <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500">ProTechNoTy</span>
-            </h1>
-            <p class="text-slate-500 text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
-                Menelusuri setiap jejak, memori, dan titik balik yang membentuk identitas kolektif PTIK C Angkatan 2024. Sebuah cerita tentang bagaimana 35 jiwa bersatu dalam visi teknologi.
-            </p>
-        </div>
-    </section>
+    <!-- Spacer -->
+    <div class="h-10"></div>
 
-    <main class="container mx-auto px-6 max-w-4xl pb-16">
+    <main class="container mx-auto px-6 py-12 flex-grow">
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Sejarah & Perjalanan</h1>
+        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Kilas balik perjalanan ProTechNoTy dari awal terbentuk hingga menjadi komunitas digital yang solid.</p>
         <div class="narrative-container">
             <div class="narrative-line"></div>
 
@@ -185,21 +160,12 @@ $periode = mysqli_fetch_assoc($q_periode);
                     <br><br>
                     Tidak butuh waktu lama bagi semangat ini untuk merambah dunia digital. Malam itu juga, grup komunikasi WhatsApp resmi dibentuk, menjadi saksi bisu pecahnya percakapan perdana yang penuh antusiasme. Identitas visual pun langsung digagas; sebuah logo kelas pertama lahir dari tangan dingin <span class="highlight-text">Nur Hidayat</span> yang menjabat di divisi Media Kreatif, memberikan wajah pertama bagi komunitas yang baru berumur hitungan jam ini.
                 </div>
-                <!-- Image Placeholder: Dua Foto (16:9 dan 1:1) -->
                 <div class="flex flex-col md:flex-row gap-4 mt-6">
-                    <div class="img-placeholder flex-[2]">
-                        <img src="storage/gallery/last_day_pkkmb_1771308356_0.jpg" alt="Pembentukan Kelas Landscape ptik c 24" class="img-actual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="flex flex-col items-center gap-2">
-                            <i class="fa fa-image"></i>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Momen Pembentukan (16:9)</span>
-                        </div>
+                    <div class="w-full flex-[2]">
+                        <img src="storage/gallery/last_day_pkkmb_1771308356_0.jpg" alt="Pembentukan Kelas ptik c 24" class="img-actual" onerror="this.style.display='none';">
                     </div>
-                    <div class="img-placeholder flex-1 !max-w-[350px] !aspect-square">
-                        <img src="assets/image/logo_lama.jpeg" alt="Pembentukan Kelas Square ptik c 24" class="img-actual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="flex flex-col items-center gap-2">
-                            <i class="fa fa-image"></i>
-                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Keluarga (1:1)</span>
-                        </div>
+                    <div class="w-full flex-1 !max-w-[350px]">
+                        <img src="assets/image/logo_lama.jpeg" alt="Logo Lama ptik c 24" class="img-actual" onerror="this.style.display='none';">
                     </div>
                 </div>
             </article>
@@ -214,28 +180,12 @@ $periode = mysqli_fetch_assoc($q_periode);
                     <br><br>
                     Logo baru ini tidak hanya sekadar estetika, namun merupakan representasi dari filosofi <span class="italic font-medium">Programmer, Technology, Innovation, and Creativity</span>. Rebranding ini menandai kedewasaan kelas dalam memandang pentingnya <span class="italic">personal branding</span> sebagai entitas digital di lingkungan Fakultas Teknik.
                 </div>
-                <!-- Image Placeholder: Satu Foto (1:1) -->
-                <div class="img-placeholder !max-w-[350px] !aspect-square">
-                    <img src="assets/image/logo_baru.jpeg" alt="Logo Rebranding ptik c 24" class="img-actual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="flex flex-col items-center gap-2">
-                        <i class="fa fa-palette"></i>
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Logo Rebranding (1:1)</span>
-                    </div>
+                <div class="mt-6 !max-w-[350px]">
+                    <img src="assets/image/logo_baru.jpeg" alt="Logo Baru ptik c 24" class="img-actual" onerror="this.style.display='none';">
                 </div>
             </article>
 
-            <!-- Bab 3: Transisi S2 -->
-            <article class="story-block">
-                <div class="story-dot"></div>
-                <span class="story-date">Semester 2 (Awal 2025)</span>
-                <h2 class="story-title">Ujian Daya Tahan: Gelombang Perubahan Keanggotaan</h2>
-                <div class="story-content">
-                    Memasuki Semester 2, dinamika kehidupan kampus mulai menunjukkan sisi realistisnya. Dunia teknik yang penuh tekanan menjadi ujian bagi setiap individu. Dalam fase ini, kelas harus merelakan keberangkatan salah satu personilnya, <span class="highlight-text">Muhammad Rafly Putratama</span>, yang memutuskan untuk tidak melanjutkan kuliah. 
-                    <br><br>
-                    Kejadian ini menjadi momen reflektif bagi kami semua. Angka 37 berkurang menjadi 36, namun di balik pengurangan angka tersebut, terdapat peningkatan kualitas solidaritas. Kami belajar bahwa setiap orang yang bertahan memiliki tanggung bagi moral untuk menjaga semangat rekan-rekan yang sudah tidak lagi bersama dalam barisan akademik.
-                </div>
-                <!-- Foto dihapus sesuai permintaan -->
-            </article>
+
 
             <!-- Bab 4: Estafet Keti -->
             <article class="story-block">
@@ -259,26 +209,12 @@ $periode = mysqli_fetch_assoc($q_periode);
                     <br><br>
                     Meskipun saat itu website tersebut masih bersifat statis—dibangun dengan teknologi dasar HTML, CSS, dan JavaScript oleh Nur Hidayat—platform ini memberikan dampak luar biasa. Untuk pertama kalinya, 36 mahasiswa memiliki akses tunggal untuk mengecek jadwal kuliah, daftar nama, serta daftar tugas yang terus diperbarui secara manual. Inilah bukti nyata bahwa ProTechNoTy siap bertransformasi menjadi kelas digital yang modern.
                 </div>
-                <div class="img-placeholder mt-6">
-                    <img src="assets/image/web_lama.png" alt="Web Statis Vercel ptik c 24" class="img-actual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="flex flex-col items-center gap-2">
-                        <i class="fa fa-laptop-code"></i>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Wajah Pertama Vercel (16:9)</p>
-                    </div>
+                <div class="mt-6 max-w-2xl">
+                    <img src="assets/image/web_lama.png" alt="Web Lama ptik c 24" class="img-actual" onerror="this.style.display='none';">
                 </div>
             </article>
 
-            <!-- Bab 6: S3 & Solidaritas 35 -->
-            <article class="story-block">
-                <div class="story-dot"></div>
-                <span class="story-date">Semester 3 (Akhir 2025)</span>
-                <h2 class="story-title">Penyaringan Alami: Kekuatan dalam Kuantitas 35</h2>
-                <div class="story-content">
-                    Waktu terus berjalan, dan Semester 3 membawa tantangan baru yang lebih kompleks. Di fase ini, barisan kelas kembali mengalami penyesuaian personil setelah <span class="highlight-text">M. Farhan</span> memutuskan untuk berhenti kuliah. Pengurangan ini membawa jumlah anggota kelas ke angka <span class="highlight-text">35 Mahasiswa</span>—sebuah angka yang bertahan hingga hari ini. 
-                    <br><br>
-                    Meskipun kuantitas berkurang, kualitas interaksi antar mahasiswa justru semakin matang. 35 orang inilah yang kemudian menjadi "inti" dari ProTechNoTy, individu-individu yang telah teruji konsistensi dan komitmennya dalam menempuh pendidikan di tengah kerasnya kurikulum Teknik Informatika.
-                </div>
-            </article>
+
 
             <!-- Bab 7: Ekspansi Struktur -->
             <article class="story-block">
@@ -302,12 +238,8 @@ $periode = mysqli_fetch_assoc($q_periode);
                     <br><br>
                     Bukan lagi sekadar halaman pajangan, sistem ini kini mampu mengelola database secara cerdas, mencatat absensi, monitoring tugas secara *real-time*, hingga fitur interaktif lainnya. Sistem ini menjadi tulang punggung aktivitas harian mahasiswa, mempermudah koordinasi, dan meminimalisir kesalahan informasi. Inilah wujud nyata dari kemandirian teknologi yang kita cita-citakan sejak awal.
                 </div>
-                <div class="img-placeholder mt-6">
-                    <img src="assets/image/web_baru.png" alt="Web Dinamis FWH ptik c 24" class="img-actual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="flex flex-col items-center gap-2">
-                        <i class="fa fa-server"></i>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dashboard ptikc24.fwh.is (16:9)</p>
-                    </div>
+                <div class="mt-6 max-w-2xl">
+                    <img src="assets/image/web_baru.png" alt="Web Baru ptik c 24" class="img-actual" onerror="this.style.display='none';">
                 </div>
             </article>
 
@@ -323,12 +255,17 @@ $periode = mysqli_fetch_assoc($q_periode);
                 </div>
             </article>
 
-            <!-- Bab 10: Status Quo (SEKARANG) -->
+            <!-- Bab 10: Kondisi Saat Ini -->
             <article class="story-block">
                 <div class="story-dot"></div>
                 <span class="story-date">Sekarang</span>
-                <h2 class="story-title">Masa Depan Adalah Sekarang: Struktur & Solidaritas</h2>
+                <h2 class="story-title">Solidaritas 35 Mahasiswa</h2>
                 <div class="story-content space-y-6">
+                    
+                    <!-- Paragraf Mengenai Anggota -->
+                    <p>
+                        Hingga saat ini, ProTechNoTy kini resmi beranggotakan <span class="highlight-text">35 Mahasiswa</span>. Dalam perjalanannya, kita telah merelakan rekan-rekan seperti <span class="highlight-text">Muhammad Rafly Putratama</span> dan <span class="highlight-text">M. Farhan</span> yang memutuskan untuk tidak melanjutkan kuliah. Meskipun jumlah personil berkurang, ikatan kekeluargaan di antara kita justru semakin kuat dan solid dalam menghadapi setiap tantangan akademik di PTIK C.
+                    </p>
                     
                     <!-- Paragraf 1: Struktur Pengurus -->
                     <p>
@@ -361,13 +298,8 @@ $periode = mysqli_fetch_assoc($q_periode);
                         Sinergi antara ketekunan akademik and inisiatif kreatif yang dibawa oleh para mahasiswi mahasiswi ini memastikan bahwa setiap langkah kelas tidak hanya fokus pada pencapaian teknis, namun juga harmoni sosial dan estetika organisasi yang matang.
                     </p>
 
-                    <!-- Image Placeholder: Foto Sekarang (16:9) -->
-                    <div class="img-placeholder mt-8">
-                        <img src="storage/gallery/foto_studio_1771304290_0.jpg" alt="Kondisi Sekarang ptik c 24" class="img-actual" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="flex flex-col items-center gap-2">
-                            <i class="fa fa-camera"></i>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kondisi Kelas Saat Ini (16:9)</p>
-                        </div>
+                    <div class="mt-8 max-w-2xl">
+                        <img src="storage/gallery/foto_studio_1771304290_0.jpg" alt="Kondisi Sekarang ptik c 24" class="img-actual" onerror="this.style.display='none';">
                     </div>
 
                 </div>
@@ -397,14 +329,6 @@ $periode = mysqli_fetch_assoc($q_periode);
         document.querySelectorAll('.story-block').forEach((el) => {
             el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-8');
             observer.observe(el);
-        });
-
-        // Pastikan gambar muncul saat berhasil dimuat
-        document.querySelectorAll('.img-actual').forEach(img => {
-            img.onload = function() {
-                this.style.display = 'block';
-                this.nextElementSibling.style.display = 'none';
-            };
         });
     </script>
 </body>

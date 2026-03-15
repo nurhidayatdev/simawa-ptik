@@ -23,18 +23,7 @@ include 'includes/pesan.php';
 			aspect-ratio: 16 / 9;
 		}
 
-		/* Scroll Reveal Animation Styles */
-		.scroll-reveal {
-			opacity: 0;
-			transform: translateY(30px);
-			transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-			will-change: opacity, transform;
-		}
 
-		.scroll-reveal.active {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	</style>
 </head>
 
@@ -46,8 +35,9 @@ include 'includes/pesan.php';
 
 	<main class="flex-grow">
 		<section class="py-12">
-			<div class="container mx-auto px-4">
-				<h2 class="text-3xl font-bold mb-6 text-gray-800 scroll-reveal">Galeri Kegiatan</h2>
+			<div class="container mx-auto px-6">
+				<h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Galeri Kegiatan</h1>
+				<p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Abadikan setiap momen berharga dan keseruan kegiatan kelas dalam dokumentasi visual yang tertata.</p>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					<?php
@@ -69,12 +59,12 @@ include 'includes/pesan.php';
 											if (mysqli_num_rows($result_foto) > 0) {
 												while ($foto = mysqli_fetch_assoc($result_foto)) {
 											?>
-													<img src="storage/gallery/<?= $foto['foto_path'] ?>" class="w-full h-full object-cover flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity gallery-img" alt="<?= $row['judul'] ?>" loading="lazy" onclick="openModal(this)">
+													<img src="storage/gallery/<?= $foto['foto_path'] ?>" class="w-full h-full object-cover flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity gallery-img" alt="<?= $row['judul'] ?> ptik c 24" loading="lazy" onclick="openModal(this)">
 												<?php
 												}
 											} else {
 												?>
-												<img src="assets/image/logo.webp" class="w-full h-full object-cover flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity gallery-img" alt="No image" loading="lazy" onclick="openModal(this)">
+												<img src="assets/image/logo.webp" class="w-full h-full object-cover flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity gallery-img" alt="No image ptik c 24" loading="lazy" onclick="openModal(this)">
 											<?php
 											}
 											?>
@@ -117,7 +107,7 @@ include 'includes/pesan.php';
 
 		<div class="max-w-5xl w-full flex flex-col justify-center items-center gap-4">
 			<div class="relative group w-full flex justify-center">
-				<img id="modalImage" src="" class="max-h-[85vh] max-w-full rounded-lg shadow-2xl transform scale-95 transition-transform duration-300 gallery-img" alt="Preview">
+				<img id="modalImage" src="" class="max-h-[85vh] max-w-full rounded-lg shadow-2xl transform scale-95 transition-transform duration-300 gallery-img" alt="Preview ptik c 24">
 			</div>
 			<!-- Photo Indicator -->
 			<div id="photoIndicator" class="text-white/70 text-sm font-medium bg-white/10 px-4 py-1 rounded-full backdrop-blur-md">
@@ -249,26 +239,7 @@ include 'includes/pesan.php';
 			}
 		});
 
-		// Scroll Reveal Implementation
-		document.addEventListener('DOMContentLoaded', function() {
-			const observerOptions = {
-				threshold: 0.1,
-				rootMargin: '0px 0px -50px 0px'
-			};
 
-			const observer = new IntersectionObserver((entries) => {
-				entries.forEach(entry => {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('active');
-					} else {
-						entry.target.classList.remove('active');
-					}
-				});
-			}, observerOptions);
-
-			const revealElements = document.querySelectorAll('.scroll-reveal');
-			revealElements.forEach(el => observer.observe(el));
-		});
 	</script>
 </body>
 

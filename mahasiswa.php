@@ -41,11 +41,12 @@ while ($r = mysqli_fetch_assoc($result)) {
   <div class="h-10"></div>
 
 
-  <div class="container mx-auto p-6 mt-4">
-    <h1 class="text-2xl font-bold mb-4 text-center text-indigo-950 scroll-reveal">Mahasiswa</h1>
+  <div class="container mx-auto px-6 py-12 flex-grow">
+    <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Data Mahasiswa</h1>
+    <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center italic">Direktori profil seluruh rekan mahasiswa PTIK C 2024, jalin silaturahmi dan kenali lebih dalam setiap jiwa di angkatan kita.</p>
 
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 scroll-reveal">
-      <input id="searchInput" type="search" placeholder="Cari nama, panggilan, NIM" class="w-full sm:w-1/2 px-4 py-2 rounded-full border border-slate-200 shadow-sm" />
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 scroll-reveal">
+      <input id="searchInput" type="search" placeholder="Cari nama, panggilan, NIM..." class="w-full sm:w-1/2 px-5 py-3 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />
     </div>
 
     <!-- Card view (hidden by default) -->

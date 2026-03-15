@@ -49,22 +49,16 @@ $periode = mysqli_fetch_assoc($q_periode);
     <?php include 'includes/header_main.php'; ?>
 
     <!-- Spacer -->
-    <div class="h-16"></div>
+    <div class="h-10"></div>
 
-    <main class="container mx-auto px-4 py-12 max-w-5xl">
+    <main class="container mx-auto px-6 py-12 flex-grow">
         <!-- Hero Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-2xl md:text-4xl font-bold text-indigo-950 mb-3 tracking-tight">
-                Identitas <span class="text-indigo-600 uppercase">Kelas Kita</span>
-            </h1>
-            <p class="text-slate-500 max-w-2xl mx-auto text-xs md:text-sm leading-relaxed">
-                Mengenal lebih dalam simbolisme, filosofi, dan sejarah di balik identitas digital PTIK C Angkatan 2024.
-            </p>
-        </div>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Informasi Kelas</h1>
+        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Temukan filosofi di balik nama ProTechNoTy, struktur kepengurusan kelas, serta visi dan misi yang kami bawa.</p>
 
         <!-- Section: Penjelasan Nama -->
         <section class="mb-16">
-            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-200 flex flex-col md:flex-row gap-10 items-stretch">
+            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-200 flex flex-col md:flex-row gap-8 items-stretch">
                 <!-- Explanation List -->
                 <div class="w-full md:w-7/12 flex flex-col justify-center py-2 order-1 md:order-1">
                     <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 w-max">
@@ -139,7 +133,7 @@ $periode = mysqli_fetch_assoc($q_periode);
             <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px]"></div>
 
-            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div class="flex flex-col items-center">
                     <div class="p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] mb-6 group hover:bg-white/10 transition-colors shadow-2xl">
                         <img src="assets/image/logo.webp" alt="Logo PTIK C 24" class="w-48 h-48 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(79,70,229,0.3)] group-hover:scale-105 transition-transform duration-500">

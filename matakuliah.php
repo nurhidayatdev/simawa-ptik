@@ -27,8 +27,9 @@ $beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8
     <div class="h-10"></div>
 
 
-    <div class="container mx-auto py-6 mt-4 p-6">
-        <h1 class="text-2xl font-bold mb-6 text-center text-indigo-950">Matakuliah PTIK</h1>
+    <div class="container mx-auto px-6 py-12 flex-grow">
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Kurikulum & Mata Kuliah</h1>
+        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center">Daftar lengkap sebaran mata kuliah per semester beserta bobot SKS yang harus ditempuh selama masa studi.</p>
         <!-- Rest of the content remains the same -->
         <?php for ($s = 1; $s <= 8; $s++): ?>
             <h4 class="text-lg font-semibold mt-4 mb-2">Semester <?= $s ?></h4>

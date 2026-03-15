@@ -26,6 +26,19 @@ if (!isset($base)) {
             font-family: "Poppins", sans-serif;
             scroll-behavior: smooth;
         }
+
+        /* Scroll Reveal Animation Styles */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
+        }
+
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y"></script>
     <script>

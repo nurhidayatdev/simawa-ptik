@@ -201,7 +201,8 @@ $today = date('Y-m-d');
     <main class="flex-grow ">
         <section class="py-12 p-6">
             <div class="container mx-auto">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800 scroll-reveal">Berita & Informasi Akademik</h2>
+                <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal">Berita & Informasi Akademik</h1>
+                <p class="text-gray-500 mb-8 scroll-reveal text-sm">Pantau berita kampus terupdate, jadwal perkuliahan harian, serta kalender akademik dalam satu dasbor.</p>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- sample card -->

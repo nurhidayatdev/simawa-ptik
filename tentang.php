@@ -38,18 +38,14 @@ $periode = mysqli_fetch_assoc($q_periode);
     <?php include 'includes/header_main.php'; ?>
 
     <!-- Spacer -->
-    <div class="h-16"></div>
+    <div class="h-10"></div>
 
-    <main class="container mx-auto px-6 py-12 max-w-5xl">
+    <main class="container mx-auto px-6 py-12 flex-grow">
         <!-- Hero Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-2xl md:text-4xl font-black text-slate-900 mb-4">Tentang <span class="text-indigo-600 italic plus-jakarta">Project Ini</span></h1>
-            <p class="text-slate-500 max-w-2xl mx-auto leading-relaxed text-sm">
-                Platform ekosistem digital kelas PTIK C 2024 untuk mempermudah manajemen data, tugas, absensi, dan interaksi antar mahasiswa secara modern dan terpusat.
-            </p>
-        </div>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal">Tentang Project</h1>
+        <p class="text-gray-500 mb-8 scroll-reveal text-sm">Platform digital yang dirancang khusus untuk mempermudah koordinasi dan manajemen data mahasiswa PTIK C 2024.</p>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Deskripsi Project -->
             <div class="md:col-span-2 space-y-6">
                 <section class="glass-card p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
@@ -140,11 +136,11 @@ $periode = mysqli_fetch_assoc($q_periode);
                     <h3 class="text-xs font-bold text-slate-800 mb-3">Versi Aplikasi</h3>
                     <div class="flex items-center justify-between py-2 border-b border-slate-50">
                         <span class="text-[11px] text-slate-500">Current Version</span>
-                        <span class="text-[10px] font-bold text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded">v2.6.5</span>
+                        <span class="text-[10px] font-bold text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded">v2.8.5</span>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-50">
                         <span class="text-[11px] text-slate-500">Last Build</span>
-                        <span class="text-[11px] font-medium text-slate-700">5 Feb 2026</span>
+                        <span class="text-[11px] font-medium text-slate-700">15 Maret 2026</span>
                     </div>
                     <div class="flex items-center justify-between py-2">
                         <span class="text-[11px] text-slate-500">Environment</span>
