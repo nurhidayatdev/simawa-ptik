@@ -14,8 +14,25 @@ $role = $_SESSION['role'];
 
 if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Ketua Tingkat') {
     include '../includes/alert_role.php';
-
     exit();
+}
+
+// Handle WhatsApp Sending Confirmation
+if (isset($_GET['send_wa']) && isset($_SESSION['pending_wa_absensi'])) {
+    include_once '../functions/helpers.php';
+    $res_wa = sendFonnteMessage($_SESSION['pending_wa_absensi']);
+    unset($_SESSION['pending_wa_absensi']);
+    
+    $matkul_id = $_GET['matkul_id'] ?? '';
+    $pertemuan = $_GET['pertemuan'] ?? '';
+
+    if ($res_wa['success']) {
+        $_SESSION['success_msg'] = "Rekap berhasil terkirim ke WhatsApp!";
+    } else {
+        $_SESSION['success_msg'] = "Gagal kirim WA: " . $res_wa['error'];
+    }
+    header("Location: tambah_absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan&wa_sent=1");
+    exit;
 }
 
 
@@ -142,17 +159,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $wa_msg .= "\n_Terima kasih bagi yang telah hadir tepat waktu!_";
 
-    // Kirim Notifikasi
-    $res_wa = sendFonnteMessage($wa_msg);
+    // --- FITUR: WHATSAPP NOTIFICATION PREPARATION ---
+    $_SESSION['pending_wa_absensi'] = $wa_msg;
+    $_SESSION['success_msg'] = "Absensi berhasil disimpan!";
 
-    if ($res_wa['success']) {
-        $_SESSION['success_msg'] = "Absensi berhasil disimpan & Rekap terkirim ke WhatsApp!";
-    } else {
-        $_SESSION['success_msg'] = "Absensi disimpan (Namun gagal kirim WA: " . $res_wa['error'] . ")";
-    }
-
-    // redirect agar tidak double submit
-    header("Location: tambah_absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan&sukses=1");
+    // redirect agar tidak double submit, tambah param tanya_wa
+    header("Location: tambah_absensi.php?matkul_id=$matkul_id&pertemuan=$pertemuan&sukses=1&tanya_wa=1");
     exit;
 }
 
@@ -366,11 +378,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 icon: 'success',
                 title: 'Berhasil!',
                 text: '<?= $_SESSION['success_msg'] ?? "Data absensi telah berhasil disimpan." ?>',
+                confirmButtonColor: '#3730a3',
+                showCancelButton: <?= isset($_GET['tanya_wa']) ? 'true' : 'false' ?>,
+                confirmButtonText: '<?= isset($_GET['tanya_wa']) ? "Kirim WA" : "OK" ?>',
+                cancelButtonText: 'Selesai'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'tambah_absensi.php?send_wa=1&matkul_id=<?= $_GET['matkul_id'] ?? '' ?>&pertemuan=<?= $_GET['pertemuan'] ?? '' ?>';
+                } else {
+                    // Remove parameter from URL
+                    const url = new URL(window.location);
+                    url.searchParams.delete('sukses');
+                    url.searchParams.delete('tanya_wa');
+                    window.history.replaceState({}, document.title, url);
+                }
+            });
+            <?php unset($_SESSION['success_msg']); ?>
+        <?php endif; ?>
+
+        // Show WA Sent Alert
+        <?php if (isset($_GET['wa_sent'])): ?>
+            Swal.fire({
+                icon: 'info',
+                title: 'WhatsApp',
+                text: '<?= $_SESSION['success_msg'] ?? "Proses selesai." ?>',
                 confirmButtonColor: '#3730a3'
             }).then(() => {
-                // Remove parameter from URL
                 const url = new URL(window.location);
-                url.searchParams.delete('sukses');
+                url.searchParams.delete('wa_sent');
                 window.history.replaceState({}, document.title, url);
             });
             <?php unset($_SESSION['success_msg']); ?>

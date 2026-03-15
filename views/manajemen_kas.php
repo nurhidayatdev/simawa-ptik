@@ -562,13 +562,40 @@ $mhs_status = mysqli_query($koneksi, "
             });
         }
 
-        <?php if (isset($_SESSION['success'])): ?>
+        // Show Success Alert
+        <?php if (isset($_GET['success'])): ?>
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',
-                text: '<?= $_SESSION['success'] ?>',
-                timer: 3000,
-                showConfirmButton: false
+                text: '<?= $_SESSION['success'] ?? "Data telah berhasil disimpan." ?>',
+                confirmButtonColor: '#3730a3',
+                showCancelButton: <?= isset($_GET['tanya_wa']) ? 'true' : 'false' ?>,
+                confirmButtonText: '<?= isset($_GET['tanya_wa']) ? "Kirim WA" : "OK" ?>',
+                cancelButtonText: 'Selesai'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../actions/tambah_kas_minggu.php?send_wa=1&minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>';
+                } else {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('success');
+                    url.searchParams.delete('tanya_wa');
+                    window.history.replaceState({}, document.title, url);
+                }
+            });
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        // Show WA Sent Alert
+        <?php if (isset($_GET['wa_sent'])): ?>
+            Swal.fire({
+                icon: 'info',
+                title: 'WhatsApp',
+                text: '<?= $_SESSION['success'] ?? "Proses selesai." ?>',
+                confirmButtonColor: '#3730a3'
+            }).then(() => {
+                const url = new URL(window.location);
+                url.searchParams.delete('wa_sent');
+                window.history.replaceState({}, document.title, url);
             });
             <?php unset($_SESSION['success']); ?>
         <?php endif; ?>

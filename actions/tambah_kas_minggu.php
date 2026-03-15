@@ -17,6 +17,22 @@ if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Ketua Tingkat' |
     exit();
 }
 
+// Handle WhatsApp Sending Confirmation
+if (isset($_GET['send_wa']) && isset($_SESSION['pending_wa_kas'])) {
+    include_once '../functions/helpers.php';
+    $res_wa = sendFonnteMessage($_SESSION['pending_wa_kas']);
+    unset($_SESSION['pending_wa_kas']);
+    
+    if ($res_wa['success']) {
+        $_SESSION['success'] = "Laporan berhasil terkirim ke WhatsApp!";
+    } else {
+        $_SESSION['success'] = "Gagal kirim WA: " . $res_wa['error'];
+    }
+    $minggu = $_GET['minggu_ke'] ?? '';
+    header("Location: ../views/manajemen_kas.php?minggu_ke=$minggu&wa_sent=1");
+    exit;
+}
+
 
 /* =====================
    AMBIL PERIODE AKTIF
@@ -118,18 +134,11 @@ if (isset($_POST['simpan_kas'])) {
         $wa_msg .= "_Belum ada data pembayaran._\n";
     }
 
-    $wa_msg .= "\n⚠️ _Mohon segera melunasi kas tepat waktu untuk kelancaran kegiatan kelas. Terima kasih!_";
+    // --- FITUR: WHATSAPP NOTIFICATION PREPARATION ---
+    $_SESSION['pending_wa_kas'] = $wa_msg;
+    $_SESSION['success'] = "Data kas minggu ke-{$minggu} telah berhasil disimpan!";
 
-    // Kirim Notifikasi
-    $res_wa = sendFonnteMessage($wa_msg);
-
-    if ($res_wa['success']) {
-        $_SESSION['success'] = "Data kas minggu ke-{$minggu} disimpan & Laporan terkirim ke WhatsApp!";
-    } else {
-        $_SESSION['success'] = "Data kas minggu ke-{$minggu} disimpan (Namun gagal kirim WA: " . $res_wa['error'] . ")";
-    }
-
-    header("Location: ../views/manajemen_kas.php?minggu_ke=$minggu&success=1");
+    header("Location: ../views/manajemen_kas.php?minggu_ke=$minggu&success=1&tanya_wa=1");
     exit;
 }
 
