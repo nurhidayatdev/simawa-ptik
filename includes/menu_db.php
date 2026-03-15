@@ -224,7 +224,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 </a>
                             <?php endif; ?>
 
-                            <a href="<?= $base ?>views/tentang" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
+                            <a href="<?= $base ?>tentang" class="flex items-center px-4 py-1 text-slate-800 hover:bg-slate-100 rounded-lg transition-colors">
                                 <i class="fa fa-info-circle w-5 h-5 mr-3 text-indigo-900"></i>
                                 <span class="text-xs font-medium">Tentang</span>
                             </a>
