@@ -30,7 +30,7 @@ function kirimTugasReminder($koneksi, $token = null, $chat_id = null)
         }
         $message .= "_Segera kerjakan!_ 🚀";
 
-        $res = sendFonnteMessage($message);
+        $res = sendFonnteMessage($message, FONNTE_TUGAS_GROUP_ID ?: FONNTE_GROUP_ID);
         if ($res['success']) {
             return ['status' => 'success', 'message' => "Reminder tugas berhasil dikirim ke WhatsApp!"];
         } else {
@@ -55,7 +55,7 @@ function notifyNewTask($token, $chat_id, $nama_matkul, $deadline_tanggal, $deadl
     }
     $message .= "\n_Segera kerjakan tugasmu!_ 💪";
 
-    return sendFonnteMessage($message);
+    return sendFonnteMessage($message, FONNTE_TUGAS_GROUP_ID ?: FONNTE_GROUP_ID);
 }
 
 function notifyUpdateTask($token, $chat_id, $nama_matkul, $deadline_tanggal, $deadline_pukul, $deskripsi, $link_kirim)
@@ -72,7 +72,7 @@ function notifyUpdateTask($token, $chat_id, $nama_matkul, $deadline_tanggal, $de
     }
     $message .= "\n_Perhatikan perubahan tugas ini!_ ⚠️";
 
-    return sendFonnteMessage($message);
+    return sendFonnteMessage($message, FONNTE_TUGAS_GROUP_ID ?: FONNTE_GROUP_ID);
 }
 
 // Standalone execution

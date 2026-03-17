@@ -11,6 +11,9 @@ if (!defined('FONNTE_GROUP_ID')) {
 if (!defined('FONNTE_ANON_GROUP_ID')) {
     define('FONNTE_ANON_GROUP_ID', env('FONNTE_ANON_GROUP_ID'));
 }
+if (!defined('FONNTE_TUGAS_GROUP_ID')) {
+    define('FONNTE_TUGAS_GROUP_ID', env('FONNTE_TUGAS_GROUP_ID'));
+}
 
 if (!function_exists('sendFonnteMessage')) {
     function sendFonnteMessage($message, $target = FONNTE_GROUP_ID)

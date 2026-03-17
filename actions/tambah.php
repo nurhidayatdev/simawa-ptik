@@ -139,36 +139,7 @@ if (isset($_POST['tambah'])) {
 
             $redirect = "../database/db_tugas";
             break;
-        case 'tugas':
-            $matkul_id = $_POST['matkul_id'];
-            $deadline_tanggal = $_POST['deadline_tanggal'];
-            $deadline_pukul = $_POST['deadline_pukul'];
-            $deskripsi = $_POST['deskripsi'];
-            $link_kirim = $_POST['link_kirim'];
 
-            // Handle file upload
-            $file_tugas = '';
-            if (!empty($_FILES['file_tugas']['name'])) {
-                $target_dir = "../storage/tugas/";
-                // Create directory if not exists
-                if (!is_dir($target_dir)) {
-                    mkdir($target_dir, 0777, true);
-                }
-                $file_tugas = time() . "_" . basename($_FILES["file_tugas"]["name"]);
-                $target_file = $target_dir . $file_tugas;
-                move_uploaded_file($_FILES["file_tugas"]["tmp_name"], $target_file);
-            }
-
-            // Get active periode_id
-            $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
-            $periode = mysqli_fetch_assoc($q_periode);
-            $periode_id = $periode['id'] ?? 0;
-
-            mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id)
-                VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
-            $redirect = "../database/db_tugas";
-
-            break;
 
         case 'galeri':
             $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
