@@ -98,6 +98,16 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
         font-size: 0.8rem !important;
       }
     }
+
+    /* Handle Auto-fill background in Dark Mode */
+    .dark input:-webkit-autofill,
+    .dark input:-webkit-autofill:hover,
+    .dark input:-webkit-autofill:focus,
+    .dark input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #020617 inset !important;
+      -webkit-text-fill-color: white !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
   </style>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -105,7 +115,8 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
 
 </head>
 
-<body class="bg-indigo-950 m-0 p-0">
+<body class="bg-indigo-950 m-0 p-0 transition-colors duration-300">
+
   <!-- Main Wrapper with perfect centering -->
   <div class="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden">
 
@@ -117,50 +128,50 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
 
     <!-- Login Card -->
     <div class="w-full max-w-md z-10">
-      <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+      <div class="bg-white/95 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-slate-800 transition-colors">
         <div class="text-center mb-8">
-          <h2 class="text-3xl font-bold text-slate-800">Login</h2>
-          <p class="text-slate-500 text-sm mt-2">Silakan masuk dengan akun anda.</p>
+          <h2 class="text-3xl font-bold text-slate-800 dark:text-white">Login</h2>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mt-2">Silakan masuk dengan akun anda.</p>
         </div>
 
         <form method="POST" id="loginForm" novalidate>
           <div class="space-y-5">
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Email Address</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 dark:text-slate-500">
                   <i class="fas fa-envelope"></i>
                 </span>
-                <input type="email" name="email" id="email" required
-                  class="block w-full rounded-xl border border-slate-200 py-2.5 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                <input type="email" name="email" id="email" required autocomplete="username"
+                  class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white py-2.5 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600"
                   placeholder="nim@ptikc.id">
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Password</label>
               <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 dark:text-slate-500">
                   <i class="fas fa-lock"></i>
                 </span>
-                <input type="password" name="password" id="password" required
-                  class="block w-full rounded-xl border border-slate-200 py-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                <input type="password" name="password" id="password" required autocomplete="current-password"
+                  class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white py-2.5 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600"
                   placeholder="********">
-                <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition-colors">
+                <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   <i class="fas fa-eye" id="eyeIcon"></i>
                 </button>
               </div>
             </div>
 
             <button type="submit"
-              class="w-full bg-indigo-900 text-white py-3 rounded-xl font-bold hover:bg-indigo-800 transition-all shadow-lg shadow-indigo-900/20 active:scale-[0.98]">
+              class="w-full bg-indigo-900 dark:bg-indigo-700 text-white py-3 rounded-xl font-bold hover:bg-indigo-800 dark:hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-900/20 active:scale-[0.98]">
               Masuk Sekarang
             </button>
           </div>
         </form>
 
-        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
-          <p class="text-[10px] text-slate-400 leading-relaxed uppercase tracking-widest font-semibold">
+        <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center transition-colors">
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed uppercase tracking-widest font-semibold">
             &copy; <?php echo date("Y"); ?> Kelas PTIK C<br>Teknik Informatika dan Komputer FT UNM
           </p>
         </div>
@@ -213,13 +224,24 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
 
       // PHP Status Handling
       <?php if ($login_status === 'success'): ?>
+        // Trigger Save Password Prompt via Credential Management API
+        if (window.PasswordCredential) {
+          const cred = new PasswordCredential({
+            id: "<?= addslashes($email) ?>",
+            password: "<?= addslashes($password) ?>",
+            name: "<?= addslashes($data['nama_lengkap']) ?>"
+          });
+          navigator.credentials.store(cred);
+        }
+
         Swal.fire({
           icon: 'success',
           title: 'Berhasil Login!',
           text: '<?= $login_message; ?>',
           timer: 1700,
           showConfirmButton: false,
-          background: '#fff',
+          background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#fff',
+          color: document.documentElement.classList.contains('dark') ? '#fff' : '#64748b',
           iconColor: '#4f46e5'
         }).then(() => {
           window.location.href = "dashboard";
@@ -230,6 +252,8 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
           title: 'Gagal Login!',
           text: '<?= $login_message; ?>',
           confirmButtonColor: '#4f46e5',
+          background: document.documentElement.classList.contains('dark') ? '#0f172a' : '#fff',
+          color: document.documentElement.classList.contains('dark') ? '#fff' : '#64748b',
           iconColor: '#4f46e5'
         });
       <?php endif; ?>

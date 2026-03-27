@@ -18,44 +18,56 @@ if (!isset($base)) {
             <img src="<?= $base ?>assets/image/logo.webp" alt="Logo PTIK C 2024" class="h-10 w-10 mr-3">
             <div>
                 <h1 class="text-lg font-bold">PTIK C 2024</h1>
-                <p class="text-xs">Teknik Informatika dan Komputer - FT UNM</p>
+                <p class="text-xs">ProTechNoTy Class</p>
             </div>
         </div>
 
-        <!-- Hamburger Button -->
-        <button id="menuToggle" class="md:hidden text-2xl focus:outline-none">
-            <i class="fas fa-bars"></i>
-        </button>
+        <!-- Actions & Menu -->
+        <div class="flex items-center gap-4">
+            <!-- Theme Toggle (Visible Always) -->
+            <button id="theme-toggle" class="relative inline-flex items-center h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border border-white/20 bg-white/10 transition-all duration-300 ease-in-out focus:outline-none">
+                <span id="theme-toggle-thumb" class="pointer-events-none absolute left-0.5 h-4.5 w-4.5 transform rounded-full bg-white shadow-md transition duration-300 ease-in-out flex items-center justify-center dark:translate-x-5">
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-[9px] text-orange-500 transition-all duration-300 absolute"></i>
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-[9px] text-indigo-900 transition-all duration-300 absolute opacity-0 scale-0"></i>
+                </span>
+            </button>
 
-        <nav class="hidden md:block">
-            <ul class="flex space-x-6">
-                <li>
-                    <a href="<?= $base ?>index" class="flex items-center hover:text-indigo-200 transition text-sm">
-                        <i class="fas fa-home mr-2"></i>Beranda
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= $base ?>mahasiswa" class="flex items-center hover:text-indigo-200 transition text-sm">
-                        <i class="fas fa-user-graduate mr-2"></i>Mahasiswa
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= $base ?>akademik" class="flex items-center hover:text-indigo-200 transition text-sm">
-                        <i class="fas fa-graduation-cap mr-2"></i>Akademik
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= $base ?>galeri" class="flex items-center hover:text-indigo-200 transition text-sm">
-                        <i class="fas fa-images mr-2"></i>Galeri
-                    </a>
-                </li>
-                <li>
-                    <a href="<?= $base ?>login" class="flex items-center hover:text-indigo-200 transition text-sm">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Login
-                    </a>
-                </li>
-            </ul>
-        </nav>
+            <!-- Hamburger Button (Mobile) -->
+            <button id="menuToggle" class="md:hidden text-2xl focus:outline-none">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:block border-l border-indigo-900/50 pl-4">
+                <ul class="flex space-x-6">
+                    <li>
+                        <a href="<?= $base ?>index" class="flex items-center hover:text-indigo-200 transition text-sm">
+                            <i class="fas fa-home mr-2"></i>Beranda
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= $base ?>mahasiswa" class="flex items-center hover:text-indigo-200 transition text-sm">
+                            <i class="fas fa-user-graduate mr-2"></i>Mahasiswa
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= $base ?>akademik" class="flex items-center hover:text-indigo-200 transition text-sm">
+                            <i class="fas fa-graduation-cap mr-2"></i>Akademik
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= $base ?>galeri" class="flex items-center hover:text-indigo-200 transition text-sm">
+                            <i class="fas fa-images mr-2"></i>Galeri
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= $base ?>login" class="flex items-center hover:text-indigo-200 transition text-sm">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Login
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <nav id="mobileMenu" class="hidden md:hidden absolute top-full left-0 w-full bg-indigo-950 shadow-md z-50">

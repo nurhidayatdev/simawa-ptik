@@ -227,9 +227,48 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #f1f5f9;
+            color: #0f172a;
             font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark body {
+            background-color: #0b0f1a;
+            color: #f8fafc;
+        }
+
+        .navbar-responsive {
+            background-color: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-color: #e2e8f0;
+        }
+
+        .dark .navbar-responsive {
+            background-color: rgba(11, 15, 26, 0.92);
+            border-color: #1e293b;
+        }
+
+        .card-responsive {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .dark .card-responsive {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-color: #1e293b;
+        }
+
+        .leaderboard-header {
+            background-color: #f8fafc;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dark .leaderboard-header {
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
         }
 
         @keyframes fireGlow {
@@ -271,21 +310,30 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
     <div class="fixed inset-0 -z-10 overflow-hidden">
-        <div class="absolute top-10 left-10 w-24 h-24 bg-indigo-600/20 rounded-full blur-3xl"></div>
-        <div class="absolute bottom-20 right-20 w-32 h-32 bg-purple-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-10 left-10 w-24 h-24 bg-indigo-500/10 dark:bg-indigo-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-20 w-32 h-32 bg-purple-500/10 dark:bg-purple-600/20 rounded-full blur-3xl"></div>
     </div>
 
-    <div class="w-full p-3 flex justify-between items-center z-50 border-b border-slate-800">
+    <div class="w-full p-3 flex justify-between items-center z-50 border-b navbar-responsive transition-colors duration-300">
         <div class="flex items-center gap-3">
-            <img src="../assets/image/logo.webp" alt="Logo" class="w-8 h-8 object-contain">
-            <h1 class="text-base font-bold tracking-tight">KuisHarian</h1>
-            <button onclick="showRules()" class="ml-2 w-6 h-6 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors border border-slate-700">
+            <img src="../assets/image/logo.webp" alt="Logo" class="w-8 h-8 object-contain dark:brightness-100 brightness-0 transition-all">
+            <h1 class="text-base font-bold tracking-tight text-slate-900 dark:text-white">KuisHarian</h1>
+            <button onclick="showRules()" class="ml-2 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white flex items-center justify-center transition-colors border border-slate-200 dark:border-slate-700">
                 <i class="fa fa-question text-[10px]"></i>
             </button>
         </div>
-        <a href="../dashboard.php" class="px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg text-xs font-medium border border-slate-700">
-            <i class="fa fa-arrow-left mr-1"></i> Dashboard
-        </a>
+        <div class="flex items-center gap-3">
+            <!-- Theme Toggle -->
+            <button id="theme-toggle" class="relative inline-flex items-center h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-white/10 transition-all duration-300 ease-in-out focus:outline-none">
+                <span id="theme-toggle-thumb" class="pointer-events-none absolute left-0.5 h-5 w-5 transform rounded-full bg-white shadow-md transition duration-300 ease-in-out flex items-center justify-center dark:translate-x-5">
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-[10px] text-orange-500 transition-all duration-300 absolute"></i>
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-[10px] text-indigo-900 transition-all duration-300 absolute opacity-0 scale-0"></i>
+                </span>
+            </button>
+            <a href="../dashboard.php" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700/50 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+                <i class="fa fa-arrow-left mr-1"></i> Dashboard
+            </a>
+        </div>
     </div>
 
     <main class="flex-grow w-full max-w-5xl mx-auto px-3 py-4 grid grid-cols-1 lg:grid-cols-3 gap-4 lg:content-center">
@@ -307,22 +355,22 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                     <div class="text-[12px] font-bold uppercase tracking-widest" style="color: <?= $fireInfo['color'] ?>;"><?= $fireInfo['label'] ?></div>
                 <?php endif; ?>
 
-                <div class="mt-2 inline-flex items-center gap-2 bg-slate-800/80 px-4 py-1.5 rounded-full border border-slate-700 shadow-lg">
-                    <span class="text-xs font-bold text-slate-200">Streak: <span class="text-indigo-400"><?= $display_streak ?></span></span>
-                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-indigo-500/30">
+                <div class="mt-2 inline-flex items-center gap-2 card-responsive px-4 py-1.5 rounded-full border shadow-lg">
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Streak: <span class="text-indigo-600 dark:text-indigo-400"><?= $display_streak ?></span></span>
+                    <span class="text-[10px] bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-indigo-200 dark:border-indigo-500/30">
                         <i class="fa fa-shield"></i> <?= $stats['recovery_stock'] ?>
                     </span>
-                    <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-500/30" title="Hint Stock">
+                    <span class="text-[10px] bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-200 dark:border-amber-500/30" title="Hint Stock">
                         <i class="fa fa-lightbulb"></i> <span id="hint-stock-display"><?= $stats['hint_stock'] ?></span>
                     </span>
                 </div>
             </div>
 
             <?php if ($can_recover): ?>
-                <div class="w-full max-w-sm bg-orange-900/30 border border-orange-500/30 rounded-xl p-3 mb-4 text-center">
+                <div class="w-full max-w-sm bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-500/30 rounded-xl p-3 mb-4 text-center transition-colors">
                     <div class="flex items-center justify-center gap-2 mb-1">
-                        <i class="fa fa-shield text-orange-500 text-sm"></i>
-                        <span class="font-bold text-orange-400 text-sm">Streak Terputus!</span>
+                        <i class="fa fa-shield text-orange-600 dark:text-orange-500 text-sm"></i>
+                        <span class="font-bold text-orange-700 dark:text-orange-400 text-sm">Streak Terputus!</span>
                     </div>
                     <button onclick="useRecovery()" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs transition">
                         <i class="fa fa-heart-pulse mr-1"></i> Pulihkan (Stock: <?= $stats['recovery_stock'] ?>)
@@ -331,39 +379,39 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             <?php endif; ?>
 
             <?php if ($already_played): ?>
-                <div class="bg-slate-800/60 border border-green-500/30 p-5 rounded-2xl w-full max-w-sm text-center shadow-xl relative overflow-hidden">
+                <div class="card-responsive border p-5 rounded-2xl w-full max-w-sm text-center shadow-xl relative overflow-hidden transition-colors">
                     <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-green-500 to-emerald-400"></div>
-                    <div class="w-14 h-14 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                         <i class="fa fa-check"></i>
                     </div>
-                    <h2 class="text-xl font-bold text-white mb-1">Selesai!</h2>
-                    <p class="text-slate-400 text-xs mb-4">Kembali besok untuk lanjut!</p>
-                    <div class="grid grid-cols-2 gap-3 border-t border-slate-700 pt-4">
-                        <div class="bg-slate-900/50 p-3 rounded-lg">
-                            <div class="text-[10px] text-slate-500 uppercase font-bold">Total</div>
-                            <div class="text-lg font-black text-white"><?= $stats['total_games'] ?></div>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Selesai!</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs mb-4">Kembali besok untuk lanjut!</p>
+                    <div class="grid grid-cols-2 gap-3 border-t border-slate-100 dark:border-slate-700 pt-4">
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg">
+                            <div class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold">Total</div>
+                            <div class="text-lg font-black text-slate-900 dark:text-white"><?= $stats['total_games'] ?></div>
                         </div>
-                        <div class="bg-slate-900/50 p-3 rounded-lg">
-                            <div class="text-[10px] text-slate-500 uppercase font-bold">Max</div>
-                            <div class="text-lg font-black text-indigo-400"><?= $stats['max_streak'] ?></div>
+                        <div class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg">
+                            <div class="text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold">Max</div>
+                            <div class="text-lg font-black text-indigo-600 dark:text-indigo-400"><?= $stats['max_streak'] ?></div>
                         </div>
                     </div>
                 </div>
 
             <?php elseif ($has_question && !$already_played && !$can_recover): ?>
-                <div class="w-full max-w-sm bg-slate-800/60 border border-slate-700 p-5 rounded-2xl shadow-xl">
+                <div class="w-full max-w-sm card-responsive border p-5 rounded-2xl shadow-xl transition-colors">
                     <div class="text-center mb-4">
-                        <div class="inline-flex items-center gap-1.5 bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/20 text-[10px] font-extrabold uppercase tracking-tighter mb-4">
+                        <div class="inline-flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full border border-indigo-100 dark:border-indigo-500/20 text-[10px] font-extrabold uppercase tracking-tighter mb-4">
 
                             <span>Kuis#<?= $soal['id'] ?></span>
                         </div>
-                        <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Pertanyaan</h3>
-                        <p class="text-base font-bold text-white leading-snug">"<?= htmlspecialchars($soal['pertanyaan']) ?>"</p>
+                        <h3 class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Pertanyaan</h3>
+                        <p class="text-base font-bold text-slate-900 dark:text-white leading-snug">"<?= htmlspecialchars($soal['pertanyaan']) ?>"</p>
                     </div>
                     <form id="quizForm" class="space-y-3" onsubmit="submitAnswer(event)">
                         <div class="relative">
-                            <input type="text" id="answer" class="w-full bg-slate-900/50 border-2 border-slate-600 text-white text-center text-base font-bold py-3 rounded-lg focus:border-indigo-500 transition placeholder-slate-600 uppercase tracking-widest" placeholder="JAWABAN..." autocomplete="off" required>
-                            <button type="button" onclick="useHint()" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-400 hover:text-amber-300 transition" title="Gunakan Hint (1 Stock)">
+                            <input type="text" id="answer" class="w-full bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white text-center text-base font-bold py-3 rounded-lg focus:border-indigo-500 transition placeholder-slate-400 dark:placeholder-slate-600 uppercase tracking-widest" placeholder="JAWABAN..." autocomplete="off" required>
+                            <button type="button" onclick="useHint()" class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition" title="Gunakan Hint (1 Stock)">
                                 <i class="fa fa-lightbulb text-lg"></i>
                             </button>
                         </div>
@@ -374,15 +422,17 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 </div>
 
             <?php elseif (!$has_question): ?>
-                <div class="text-center p-6 bg-slate-800/50 rounded-2xl border border-slate-700 max-w-sm w-full">
-                    <i class="fa fa-mug-hot text-3xl text-slate-500 mb-3"></i>
-                    <h3 class="text-base font-bold text-white">Istirahat</h3>
-                    <p class="text-slate-400 text-xs mt-1">Belum ada pertanyaan hari ini.</p>
+                <div class="text-center p-8 card-responsive rounded-2xl border max-w-sm w-full transition-colors shadow-sm">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-mug-hot text-2xl text-slate-400 dark:text-slate-500"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Istirahat</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Belum ada pertanyaan hari ini.</p>
                 </div>
             <?php endif; ?>
 
             <div class="mt-5 w-full max-w-sm">
-                <div class="text-[10px] text-slate-500 text-center mb-2 font-bold uppercase tracking-wider">Milestone</div>
+                <div class="text-[10px] text-slate-400 dark:text-slate-500 text-center mb-2 font-bold uppercase tracking-wider">Milestone</div>
                 <div class="flex flex-wrap justify-center gap-1.5">
                     <?php
                     $milestones = [3, 10, 30, 50, 100, 200];
@@ -390,9 +440,9 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                     foreach ($milestones as $i => $m):
                         $achieved = $display_streak >= $m;
                     ?>
-                        <div class="flex items-center gap-0.5 px-1.5 py-0.5 rounded <?= $achieved ? 'bg-slate-700' : 'bg-slate-800/50' ?> border <?= $achieved ? 'border-slate-600' : 'border-slate-700/50' ?>">
-                            <i class="fa fa-fire text-xs" style="color: <?= $achieved ? $colors[$i] : '#4b5563' ?>;"></i>
-                            <span class="text-[10px] font-bold <?= $achieved ? 'text-white' : 'text-slate-600' ?>"><?= $m ?></span>
+                        <div class="flex items-center gap-0.5 px-1.5 py-0.5 rounded <?= $achieved ? 'bg-slate-200 dark:bg-slate-700' : 'bg-slate-100 dark:bg-slate-800/50' ?> border <?= $achieved ? 'border-slate-300 dark:border-slate-600' : 'border-slate-200 dark:border-slate-700/50' ?> transition-colors">
+                            <i class="fa fa-fire text-xs" style="color: <?= $achieved ? $colors[$i] : '#94a3b8' ?>;"></i>
+                            <span class="text-[10px] font-bold <?= $achieved ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600' ?>"><?= $m ?></span>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -401,12 +451,12 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
 
         <!-- Leaderboard -->
         <div class="lg:col-span-1">
-            <div class="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden h-fit sticky top-4">
-                <div class="p-3 border-b border-slate-700 bg-slate-800 flex justify-between items-center">
-                    <h3 class="font-bold text-white text-sm flex items-center gap-1.5">
+            <div class="card-responsive rounded-xl border overflow-hidden h-fit sticky top-4 shadow-sm transition-colors">
+                <div class="p-3 leaderboard-header flex justify-between items-center transition-colors">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
                         <i class="fa fa-trophy text-yellow-500 text-xs"></i> Leaderboard
                     </h3>
-                    <span class="text-[10px] text-slate-500">Top <?= count($leaderboard_data) ?></span>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Top <?= count($leaderboard_data) ?></span>
                 </div>
                 <div id="leaderboard-list" class="p-2 space-y-1 max-h-[400px] overflow-y-auto no-scrollbar transition-all">
                     <?php
@@ -416,16 +466,16 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         $isMe = ($lb['user_id'] == $user_id);
 
                     ?>
-                        <div class="flex items-center gap-3 p-2 rounded-lg <?= $isMe ? 'bg-indigo-500/10 border border-indigo-500/20' : 'hover:bg-slate-700/30' ?> transition-colors">
-                            <span class="text-xs font-black w-4 text-center <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-300' : ($rank == 3 ? 'text-orange-400' : 'text-slate-600')) ?>"><?= $rank++ ?></span>
-                            <div class="w-8 h-8 rounded-full bg-slate-700 overflow-hidden border border-slate-600 shrink-0">
+                        <div class="flex items-center gap-3 p-2 rounded-lg <?= $isMe ? 'bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20' : 'hover:bg-slate-100 dark:hover:bg-slate-700/30' ?> transition-colors">
+                            <span class="text-xs font-black w-4 text-center <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-500' : ($rank == 3 ? 'text-orange-400' : 'text-slate-600')) ?>"><?= $rank++ ?></span>
+                            <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-300 dark:border-slate-600 shrink-0">
                                 <img src="<?= profilePhotoUrl($lb['foto'], '../') ?>" class="w-full h-full object-cover" onerror="this.src='../assets/image/logo.webp'">
                             </div>
                             <div class="flex-grow min-w-0 flex flex-col justify-center">
-                                <div class="text-xs font-bold text-slate-200 truncate leading-tight">
+                                <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">
                                     <?= htmlspecialchars($lb['nama_panggilan']) ?>
                                 </div>
-                                <div class="text-[10px] text-slate-500 font-medium">
+                                <div class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
                                     <?= $lb['total_games'] ?> games
                                 </div>
                             </div>
@@ -444,7 +494,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
 
     </main>
 
-    <footer class="w-full py-6 px-3 border-t border-slate-800 mt-auto">
+    <footer class="w-full py-6 px-3 border-t border-slate-200 dark:border-slate-800 mt-auto transition-colors">
         <div class="max-w-5xl mx-auto text-center">
             <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">© <?php echo date("Y"); ?> Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
         </div>
@@ -456,6 +506,16 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
         const ANS_LENGTH = <?= $has_question ? strlen($soal['jawaban']) : 0 ?>;
         let hintStock = <?= (int)$stats['hint_stock'] ?>;
         let hintsUsed = 0;
+
+        function getSwalConfig() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return {
+                background: isDark ? '#1e293b' : '#ffffff',
+                color: isDark ? '#fff' : '#0f172a',
+                confirmButtonColor: '#6366f1'
+            };
+        }
+
         const MILESTONES = {
             200: {
                 label: 'NOVA',
@@ -536,13 +596,12 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
             const m = getMilestone(streak);
             const isM = isNewMilestone(streak);
             if (isM) triggerConfetti();
+            const cfg = getSwalConfig();
             Swal.fire({
-                html: `<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../assets/image/logo.webp'"></div><div class="text-sm font-bold text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-white mb-1">Streak ${streak}!</div><div class="flex flex-col gap-1 items-center mt-2">${bonus > 0 ? `<div class="text-indigo-400 text-[10px] font-bold"><i class="fa fa-shield mr-1"></i> +${bonus} Recovery Stock</div>` : ''}${bonusHint > 0 ? `<div class="text-amber-400 text-[10px] font-bold"><i class="fa fa-lightbulb mr-1"></i> +${bonusHint} Hint Stock</div>` : ''}</div><div class="text-slate-400 text-xs mt-2">Luar biasa!</div></div>`,
+                html: `<style>@keyframes ff{0%,100%{transform:scale(1)translateY(0)}25%{transform:scale(1.1)translateY(-6px)}50%{transform:scale(1.15)translateY(-10px)}75%{transform:scale(1.1)translateY(-6px)}}@keyframes gw{0%,100%{filter:drop-shadow(0 0 15px ${m?.color||'#ff9500'})}50%{filter:drop-shadow(0 0 30px ${m?.color||'#ff9500'})}}.fc{animation:ff 1s ease-in-out infinite,gw 1s ease-in-out infinite}@keyframes si{0%{transform:scale(0);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}@keyframes bi{0%{transform:scale(0)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.pb{animation:bi .5s ease-out}.mb{animation:si .5s ease-out forwards}</style><div class="text-center py-3"><div class="pb mb-2"><img src="${USER_PHOTO}" class="w-12 h-12 rounded-full mx-auto border-3 shadow-lg" style="border-color:${m?.color||'#ff9500'}" onerror="this.src='../assets/image/logo.webp'"></div><div class="text-sm font-bold text-slate-900 dark:text-white mb-2">${USER_NAME}</div><div class="fc mb-3" style="color:${m?.color||'#ff9500'};font-size:3rem"><i class="fa fa-fire"></i></div>${isM?`<div class="mb inline-block bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-2 shadow-lg">MILESTONE UNLOCKED!</div><div class="text-lg font-black mb-1" style="color:${m?.color}">${m?.label}</div>`:''}<div class="text-2xl font-black text-slate-900 dark:text-white mb-1">Streak ${streak}!</div><div class="flex flex-col gap-1 items-center mt-2">${bonus > 0 ? `<div class="text-indigo-600 dark:text-indigo-400 text-[10px] font-bold"><i class="fa fa-shield mr-1"></i> +${bonus} Recovery Stock</div>` : ''}${bonusHint > 0 ? `<div class="text-amber-600 dark:text-amber-400 text-[10px] font-bold"><i class="fa fa-lightbulb mr-1"></i> +${bonusHint} Hint Stock</div>` : ''}</div><div class="text-slate-500 dark:text-slate-400 text-xs mt-2">Luar biasa!</div></div>`,
                 showConfirmButton: true,
                 confirmButtonText: 'OK',
-                confirmButtonColor: '#6366f1',
-                background: '#1e293b',
-                color: '#fff',
+                ...cfg,
                 allowOutsideClick: false
             }).then(() => location.reload());
         }
@@ -570,8 +629,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         title: 'Salah',
                         text: 'Coba lagi!',
                         icon: 'error',
-                        background: '#1e293b',
-                        color: '#fff',
+                        ...getSwalConfig(),
                         confirmButtonColor: '#ef4444'
                     });
                     i.value = '';
@@ -591,9 +649,8 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Ya',
-                confirmButtonColor: '#ea580c',
-                background: '#1e293b',
-                color: '#fff'
+                ...getSwalConfig(),
+                confirmButtonColor: '#ea580c'
             }).then(r => {
                 if (r.isConfirmed) {
                     const f = new FormData();
@@ -605,8 +662,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                         if (d.status === 'success') Swal.fire({
                             title: 'Berhasil!',
                             icon: 'success',
-                            background: '#1e293b',
-                            color: '#fff'
+                            ...getSwalConfig()
                         }).then(() => location.reload());
                         else Swal.fire('Gagal', '', 'error');
                     });
@@ -620,8 +676,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                     title: 'Stok Habis',
                     text: 'Capai milestone berikutnya untuk mendapat stok hint.',
                     icon: 'warning',
-                    background: '#1e293b',
-                    color: '#fff',
+                    ...getSwalConfig(),
                     confirmButtonColor: '#fbbf24'
                 });
             }
@@ -631,8 +686,7 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                     title: 'Hint Maksimal',
                     text: 'Semua huruf sudah terbuka!',
                     icon: 'info',
-                    background: '#1e293b',
-                    color: '#fff',
+                    ...getSwalConfig(),
                     confirmButtonColor: '#fbbf24'
                 });
             }
@@ -643,9 +697,8 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Gunakan',
-                confirmButtonColor: '#fbbf24',
-                background: '#1e293b',
-                color: '#fff'
+                ...getSwalConfig(),
+                confirmButtonColor: '#fbbf24'
             }).then(r => {
                 if (r.isConfirmed) {
                     const f = new FormData();
@@ -671,9 +724,8 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
 
                             Swal.fire({
                                 title: revealStr.trim(),
-                                html: `<p class="text-slate-400 text-xs mt-4">Simpan baik-baik bantuan ini!</p>`,
-                                background: '#1e293b',
-                                color: '#fff',
+                                html: `<p class="text-slate-500 dark:text-slate-400 text-xs mt-4">Simpan baik-baik bantuan ini!</p>`,
+                                ...getSwalConfig(),
                                 confirmButtonColor: '#fbbf24'
                             });
                         } else {
@@ -685,85 +737,120 @@ $fireInfo = getFireIcon($display_streak, $fire_is_active);
         }
 
         function showRules() {
+            const cfg = getSwalConfig();
+            const isDark = document.documentElement.classList.contains('dark');
             Swal.fire({
                 title: 'Aturan Bermain',
                 html: `
-                    <div class="text-left space-y-4 text-slate-300">
-                        <div class="bg-indigo-500/10 p-3 rounded-lg border border-indigo-500/20">
-                            <h4 class="text-indigo-400 font-bold text-sm mb-1"><i class="fa fa-info-circle mr-2"></i>Mekanisme Dasar</h4>
+                    <div class="text-left space-y-4 ${isDark ? 'text-slate-300' : 'text-slate-600'}">
+                        <div class="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-lg border border-indigo-100 dark:border-indigo-500/20">
+                            <h4 class="text-indigo-600 dark:text-indigo-400 font-bold text-sm mb-1"><i class="fa fa-info-circle mr-2"></i>Mekanisme Dasar</h4>
                             <p class="text-[11px] leading-relaxed">Jawab 1 pertanyaan setiap hari untuk menjaga streak. Pertanyaan diperbarui setiap jam 00:00 WITA. Peringkat <b>Leaderboard</b> ditentukan berdasarkan <b>Streak Tertinggi saat ini</b>, kemudian <b>Total Games</b> sebagai penentu jika skor seri.</p>
                         </div>
                         
-                        <div class="bg-orange-500/10 p-3 rounded-lg border border-orange-500/20">
-                            <h4 class="text-orange-400 font-bold text-sm mb-1"><i class="fa fa-shield mr-2"></i>Sistem Recovery & Hint</h4>
+                        <div class="bg-orange-50 dark:bg-orange-500/10 p-3 rounded-lg border border-orange-100 dark:border-orange-500/20">
+                            <h4 class="text-orange-600 dark:text-orange-400 font-bold text-sm mb-1"><i class="fa fa-shield mr-2"></i>Sistem Recovery & Hint</h4>
                             <p class="text-[11px] leading-relaxed">Gunakan <b>Recovery Stock</b> untuk memulihkan streak. Gunakan <b>Hint Stock</b> (tombol lampu) untuk membuka satu huruf jawaban sebagai bantuan.</p>
                         </div>
 
                         <div>
-                            <h4 class="text-white font-bold text-sm mb-2"><i class="fa fa-fire mr-2"></i>Milestone & Rewards</h4>
+                            <h4 class="text-slate-900 dark:text-white font-bold text-sm mb-2"><i class="fa fa-fire mr-2"></i>Milestone & Rewards</h4>
                             <div class="grid grid-cols-2 gap-2">
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                                     <div class="text-[#FFC300] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#FFC300] font-bold uppercase text-[10px]">SPARK (3)</div>
-                                        <div class="text-indigo-400 text-[9px]">+1 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+3 Hint Stock</div>
+                                        <div class="text-indigo-600 dark:text-indigo-400 text-[9px]">+1 Recovery Stock</div>
+                                        <div class="text-amber-600 dark:text-amber-400 text-[9px]">+3 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                                     <div class="text-[#FF8800] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#FF8800] font-bold uppercase text-[10px]">EMBER (10)</div>
-                                        <div class="text-indigo-400 text-[9px]">+5 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+10 Hint Stock</div>
+                                        <div class="text-indigo-600 dark:text-indigo-400 text-[9px]">+5 Recovery Stock</div>
+                                        <div class="text-amber-600 dark:text-amber-400 text-[9px]">+10 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                                     <div class="text-[#FF3300] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#FF3300] font-bold uppercase text-[10px]">BLAZE (30)</div>
-                                        <div class="text-indigo-400 text-[9px]">+10 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+15 Hint Stock</div>
+                                        <div class="text-indigo-600 dark:text-indigo-400 text-[9px]">+10 Recovery Stock</div>
+                                        <div class="text-amber-600 dark:text-amber-400 text-[9px]">+15 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                                     <div class="text-[#00A2FF] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#00A2FF] font-bold uppercase text-[10px]">INFERNO (50)</div>
-                                        <div class="text-indigo-400 text-[9px]">+15 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+20 Hint Stock</div>
+                                        <div class="text-indigo-600 dark:text-indigo-400 text-[9px]">+15 Recovery Stock</div>
+                                        <div class="text-amber-600 dark:text-amber-400 text-[9px]">+20 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                                     <div class="text-[#0055FF] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#0055FF] font-bold uppercase text-[10px]">PLASMA (100)</div>
-                                        <div class="text-indigo-400 text-[9px]">+20 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+25 Hint Stock</div>
+                                        <div class="text-indigo-600 dark:text-indigo-400 text-[9px]">+20 Recovery Stock</div>
+                                        <div class="text-amber-600 dark:text-amber-400 text-[9px]">+25 Hint Stock</div>
                                     </div>
                                 </div>
-                                <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex items-center gap-3">
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-3 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-3">
                                     <div class="text-[#A020F0] text-2xl shrink-0"><i class="fa fa-fire"></i></div>
                                     <div class="flex-grow">
                                         <div class="text-[#A020F0] font-bold uppercase text-[10px]">NOVA (200)</div>
-                                        <div class="text-indigo-400 text-[9px]">+30 Recovery Stock</div>
-                                        <div class="text-amber-400 text-[9px]">+40 Hint Stock</div>
+                                        <div class="text-indigo-600 dark:text-indigo-400 text-[9px]">+30 Recovery Stock</div>
+                                        <div class="text-amber-600 dark:text-amber-400 text-[9px]">+40 Hint Stock</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-                            <h4 class="text-red-400 font-bold text-sm mb-1"><i class="fa fa-skull mr-2"></i>Peringatan Mati Total</h4>
+                        <div class="bg-red-50 dark:bg-red-500/10 p-3 rounded-lg border border-red-100 dark:border-red-500/20">
+                            <h4 class="text-red-600 dark:text-red-400 font-bold text-sm mb-1"><i class="fa fa-skull mr-2"></i>Peringatan Mati Total</h4>
                             <p class="text-[11px] leading-relaxed italic">Jika streak putus dan anda bermain tanpa memulihkannya, maka <b>semua stok recovery akan hangus (0)</b>.</p>
                         </div>
                     </div>
                 `,
                 confirmButtonText: 'Siap, Mengerti!',
-                confirmButtonColor: '#6366f1',
-                background: '#1e293b',
-                color: '#fff',
+                ...cfg,
                 width: '32rem'
+            });
+        }
+
+        // --- THEME TOGGLE LOGIC ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (themeToggleBtn) {
+            const setToggleState = (isDark) => {
+                if (isDark) {
+                    lightIcon.classList.add('opacity-0', 'scale-0');
+                    darkIcon.classList.remove('opacity-0', 'scale-0');
+                } else {
+                    lightIcon.classList.remove('opacity-0', 'scale-0');
+                    darkIcon.classList.add('opacity-0', 'scale-0');
+                }
+            };
+
+            setToggleState(document.documentElement.classList.contains('dark'));
+
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = !document.documentElement.classList.contains('dark');
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+                setToggleState(isDark);
+                // Reload page to correctly re-initialize charts and JS components
+                setTimeout(() => {
+                    location.reload();
+                }, 150);
             });
         }
 

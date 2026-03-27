@@ -222,25 +222,49 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 transform: translateX(0) !important;
             }
         }
+
+        /* SweetAlert Dark Mode Fix */
+        .dark .swal2-popup {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid #1e293b !important;
+        }
+
+        .dark .swal2-title,
+        .dark .swal2-html-container {
+            color: #f8fafc !important;
+        }
+
+        .dark .swal2-input,
+        .dark .swal2-select,
+        .dark .swal2-textarea {
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+
+        .dark .swal2-confirm {
+            background-color: #312e81 !important;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
-    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen bg-indigo-950/5 dark:bg-slate-950 transition-colors duration-300">
 
 
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 mb-6">
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
                     <i class="fab fa-whatsapp text-white text-2xl"></i>
                 </div>
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">Kirim Reminder ke WhatsApp</h2>
-                    <p class="text-xs text-slate-500">Pilih jenis reminder yang ingin dikirim ke grup WhatsApp PTIK C</p>
+                    <h2 class="text-lg font-bold text-slate-800 dark:text-white">Kirim Reminder ke WhatsApp</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Pilih jenis reminder yang ingin dikirim ke grup WhatsApp PTIK C</p>
                 </div>
             </div>
         </div>
@@ -250,19 +274,19 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 
 
             <!-- KRS Reminder -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="krs">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-university text-xl"></i>
                         <?php if ($krs_count > 0): ?>
                             <span class="absolute -top-1 -right-1 bg-purple-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $krs_count ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Reminder KRS</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan mahasiswa yang belum mengisi KRS</p>
-                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Reminder KRS</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Ingatkan mahasiswa yang belum mengisi KRS</p>
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -270,19 +294,19 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Tugas -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="tugas">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                    <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-tasks text-xl"></i>
                         <?php if ($tugas_count > 0): ?>
                             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $tugas_count ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Tugas Aktif</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim rekap tugas yang belum dikumpulkan</p>
-                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Tugas Aktif</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Kirim rekap tugas yang belum dikumpulkan</p>
+                        <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -290,19 +314,19 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Streak Kuis Harian -->
-            <form method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="streak">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-red-100 text-red-500 rounded-lg flex items-center justify-center flex-shrink-0 relative">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-fire text-xl"></i>
                         <?php if ($streak_count > 0): ?>
                             <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>
                         <?php endif; ?>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Streak Kuis Harian</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
-                        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Streak Kuis Harian</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
+                        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -310,17 +334,17 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Jadwal -->
-            <form id="formJadwal" method="POST" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form id="formJadwal" method="POST" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="jadwal">
                 <input type="hidden" name="day" id="jadwal_day" value="besok">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i class="fa fa-calendar-alt text-xl"></i>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Jadwal Kuliah</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Ingatkan jadwal kuliah hari ini atau besok</p>
-                        <button type="button" onclick="confirmJadwal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Jadwal Kuliah</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Ingatkan jadwal kuliah hari ini atau besok</p>
+                        <button type="button" onclick="confirmJadwal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -328,17 +352,17 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Kas -->
-            <form method="POST" id="formKas" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" id="formKas" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="kas">
                 <input type="hidden" name="minggu_ke" id="kas_minggu_ke" value="1">
                 <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i class="fa fa-wallet text-xl"></i>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Kas Mingguan</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat uang kas yang belum lunas</p>
-                        <button type="button" onclick="confirmKas()" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition">
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Kas Mingguan</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Kirim pengingat uang kas yang belum lunas</p>
+                        <button type="button" onclick="confirmKas()" class="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
                     </div>
@@ -346,7 +370,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             </form>
 
             <!-- Piket proyektor -->
-            <form method="POST" id="formPiket" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 hover:shadow-md transition">
+            <form method="POST" id="formPiket" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="piket">
                 <input type="hidden" name="day" id="piket_day" value="besok">
                 <div class="flex items-start gap-4">
@@ -354,8 +378,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <i class="fa fa-plug text-xl"></i>
                     </div>
                     <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 text-md">Piket Proyektor</h3>
-                        <p class="text-xs text-slate-500 mt-1 mb-3">Kirim pengingat petugas piket hari ini atau besok</p>
+                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Piket Proyektor</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Kirim pengingat petugas piket hari ini, besok, atau sepekan ini</p>
                         <button type="button" onclick="confirmPiket()" class="w-full bg-indigo-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
@@ -387,8 +411,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 title: 'Pilih Minggu Kas',
                 html: `
                     <div class="text-left">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Minggu Ke-</label>
-                        <select id="select_minggu" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500">
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Minggu Ke-</label>
+                        <select id="select_minggu" class="w-full px-3 py-2 border dark:border-slate-800 rounded-lg dark:bg-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-green-500">
                             <?php for ($i = 1; $i <= 16; $i++): ?>
                                 <option value="<?= $i ?>">Minggu <?= $i ?></option>
                             <?php endfor; ?>
@@ -414,23 +438,27 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
 
         function confirmPiket() {
             Swal.fire({
-                title: 'Kirim Pengingat Piket',
-                text: "Pilih piket yang ingin dikirim ke WhatsApp PTIK C.",
-                icon: 'question',
+                title: 'Kirim Notifikasi Piket',
+                text: "Pilih cakupan jadwal piket yang ingin dikirim ke WhatsApp:",
+                input: 'select',
+                inputOptions: {
+                    'hari_ini': 'Piket Hari Ini',
+                    'besok': 'Piket Besok',
+                    'minggu_ini': 'Piket Seluruh Minggu Ini'
+                },
+                inputPlaceholder: 'Pilih tipe pengingat...',
                 showCancelButton: true,
-                showDenyButton: true,
                 confirmButtonColor: '#312e81',
-                denyButtonColor: '#10b981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Piket Besok',
-                denyButtonText: 'Piket Hari Ini',
-                cancelButtonText: 'Batal'
+                confirmButtonText: '<i class="fab fa-whatsapp"></i> Kirim Notifikasi',
+                cancelButtonText: 'Batal',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Anda harus memilih salah satu opsi!'
+                    }
+                }
             }).then((result) => {
-                let day = 'besok';
-                if (result.isDenied) day = 'hari_ini';
-
-                if (result.isConfirmed || result.isDenied) {
-                    document.getElementById('piket_day').value = day;
+                if (result.isConfirmed) {
+                    document.getElementById('piket_day').value = result.value;
                     document.getElementById('formPiket').submit();
                 }
             });
@@ -507,13 +535,12 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                     <i class="fas fa-plus"></i> Tambah Matkul
                 </button>
             </div>`;
-
             if (currentJadwal.length === 0) {
-                html += '<p class="text-slate-400 text-xs text-center py-8">Belum ada jadwal yang ditambahkan.</p>';
+                html += '<p class="text-slate-400 dark:text-slate-600 text-xs text-center py-8">Belum ada jadwal yang ditambahkan.</p>';
             } else {
-                html += `<div class="overflow-x-auto max-h-64 border rounded-lg bg-slate-50">
+                html += `<div class="overflow-x-auto max-h-64 border dark:border-slate-800 rounded-lg bg-slate-50">
                     <table class="w-full text-xs text-left">
-                        <thead class="bg-indigo-900 text-white border-b sticky top-0">
+                        <thead class="bg-indigo-900 text-white border-b dark:border-slate-800 sticky top-0">
                             <tr>
                                 <th class="p-2 w-8 text-center"><i class="fas fa-check-circle"></i></th>
                                 <th class="p-2">Mata Kuliah</th>
@@ -521,20 +548,20 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                                 <th class="p-2 w-16 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y bg-white">`;
-
+                        <tbody class="divide-y dark:divide-slate-800 bg-white dark:bg-slate-950">`;
+ 
                 currentJadwal.forEach((item, index) => {
                     const checked = item.checked ? 'checked' : '';
                     const isAbsent = item.status === 'tidak_masuk';
-                    const statusBadge = isAbsent ? '<span class="text-[8px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-md ml-1.5 font-bold uppercase tracking-tighter">Tidak Masuk</span>' : '';
+                    const statusBadge = isAbsent ? '<span class="text-[8px] bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded-md ml-1.5 font-bold uppercase tracking-tighter">Tidak Masuk</span>' : '';
                     const detailText = isAbsent ? '-' : `${item.jam_text} (${item.ruangan_text})`;
-                    html += `<tr class="${!item.checked ? 'opacity-50' : ''}">
-                        <td class="p-2 text-center"><input type="checkbox" onchange="toggleCheck(${index})" ${checked} class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"></td>
+                    html += `<tr class="${!item.checked ? 'opacity-50' : ''} dark:border-slate-800">
+                        <td class="p-2 text-center"><input type="checkbox" onchange="toggleCheck(${index})" ${checked} class="rounded border-slate-300 dark:border-slate-700 dark:bg-slate-800 text-indigo-600 focus:ring-indigo-500"></td>
                         <td class="p-2">
-                            <div class="font-bold text-slate-800">${item.matkul}</div>
+                            <div class="font-bold text-slate-800 dark:text-slate-200">${item.matkul}</div>
                             ${statusBadge}
                         </td>
-                        <td class="p-2 text-slate-500 font-medium">${detailText}</td>
+                        <td class="p-2 text-slate-500 dark:text-slate-400 font-medium">${detailText}</td>d>
                         <td class="p-2 text-center">
                             <div class="flex gap-1 justify-center">
                                 <button type="button" onclick="showEditForm(${index})" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"><i class="fas fa-edit"></i></button>
@@ -601,12 +628,12 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Mulai</label>
-                                <input type="time" id="new_jam_mulai" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                                <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Jam Mulai</label>
+                                <input type="time" id="new_jam_mulai" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-sm dark:bg-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
                             </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Selesai</label>
-                                <input type="time" id="new_jam_selesai" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                                <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Jam Selesai</label>
+                                <input type="time" id="new_jam_selesai" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-sm dark:bg-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
                             </div>
                         </div>
                         <div>
@@ -687,12 +714,12 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                         <div id="time_fields_container" class="${currentStatus === 'tidak_masuk' ? 'hidden' : 'space-y-4'}">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Mulai</label>
-                                    <input type="time" id="edit_jam_mulai" value="${jamMulai}" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Jam Mulai</label>
+                                    <input type="time" id="edit_jam_mulai" value="${jamMulai}" class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-sm dark:bg-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Jam Selesai</label>
-                                    <input type="time" id="edit_jam_selesai" value="${jamSelesai}" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
+                                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Jam Selesai</label>
+                                    <input type="time" id="edit_jam_selesai" value="${jamSelesai}" class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-sm dark:bg-slate-900 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">
                                 </div>
                             </div>
                             

@@ -27,7 +27,8 @@ ORDER BY jm.hari, jk_start.jam_mulai");
    <?php include 'includes/head.php'; ?>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 dark:bg-slate-950 min-h-screen flex flex-col transition-colors duration-300">
+
     <?php include 'includes/header_main.php'; ?>
 
     <!-- spacer to avoid content hidden under fixed header -->
@@ -35,19 +36,14 @@ ORDER BY jm.hari, jk_start.jam_mulai");
 
 
     <div class="container mx-auto px-6 py-12 flex-grow">
-        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Jadwal Mata Kuliah</h1>
-        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center">Pantau waktu perkuliahan, ruangan, dan dosen pengampu untuk membantu perencanaan studi harian Anda.</p>
-        <!-- Rest of the content remains the same -->
-        <div class="mb-4 md:hidden flex justify-end">
-            <button id="toggleViewBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-md hover:bg-indigo-700 transition">
-                <i class="fas fa-eye mr-2"></i>Lihat Semua
-            </button>
-        </div>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white transition-colors text-center">Jadwal Mata Kuliah</h1>
+        <p class="text-gray-500 dark:text-slate-400 mb-8 transition-colors text-sm text-center">Pantau waktu perkuliahan, ruangan, dan dosen pengampu untuk membantu perencanaan studi harian Anda.</p>
+        
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden transition-colors">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-indigo-900">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead class="bg-indigo-900 dark:bg-indigo-950">
                         <tr>
                             <th class="toggle-col hidden md:table-cell px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
                                 No</th>
@@ -70,30 +66,37 @@ ORDER BY jm.hari, jk_start.jam_mulai");
                         </tr>
 
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200">
+                    <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800 transition-colors">
                         <?php
                         $no = 1;
                         $id = 1;
                         while ($row = mysqli_fetch_assoc($result)) : ?>
-                            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
+                            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100 dark:bg-slate-800/40' : 'bg-white dark:bg-slate-900' ?> hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors">
 
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $no++; ?></td>
 
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['hari']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['hari']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
 
-                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['ruangan']; ?></td>
-                                <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_matkul']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['sks']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_pengampu']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800"><?= $row['dosen_mitra']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['ruangan']; ?></td>
+                                <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['nama_matkul']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['sks']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['dosen_pengampu']; ?></td>
+                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['dosen_mitra']; ?></td>
 
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Rest of the content remains the same -->
+        <div class="mt-4 md:hidden flex justify-end">
+            <button id="toggleViewBtn" class="bg-indigo-600 dark:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-800 transition">
+                <i class="fas fa-eye mr-2"></i>Lihat Semua
+            </button>
         </div>
     </div>
 

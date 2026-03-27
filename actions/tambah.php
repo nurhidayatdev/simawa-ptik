@@ -210,7 +210,7 @@ if (isset($_POST['tambah'])) {
             $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
             $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
             mysqli_query($koneksi, "INSERT INTO kuis_harian_soal (tanggal, pertanyaan, jawaban) VALUES ('$tanggal', '$pertanyaan', '$jawaban')");
-            $redirect = "../views/manajemen_kuis";
+            $redirect = "../database/db_soal";
             break;
     }
     include '../includes/alert_actions.php';
@@ -240,75 +240,75 @@ if (isset($_POST['tambah'])) {
 
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full transition-all">
 
 
             <form class="space-y-6" method="POST" enctype="multipart/form-data">
-                <div class="border-b border-slate-200 pb-6">
+                <div class="border-b border-slate-200 dark:border-slate-800 pb-6">
                     <?php if ($tabel === 'mahasiswa'): ?>
-                        <h3 class="text-xl font-bold mb-6">Mahasiswa</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Mahasiswa</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
                                 <input type="text" name="nama_lengkap"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Panggilan</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Panggilan</label>
                                 <input type="text" name="nama_panggilan"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Email</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
                                 <input type="email" name="email"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">NIM</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">NIM</label>
                                 <input type="number" name="nim"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jenis Kelamin</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jenis Kelamin</label>
                                 <select name="jenis_kelamin"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                                     <option value="">-- Pilih Jenis Kelamin --</option>
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Instagram</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
                                 <input type="text" name="instagram" placeholder="@username"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Biodata</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Biodata</label>
                                 <input type="text" name="bio"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Foto</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto</label>
                                 <input type="file" name="foto" accept="image/*"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
 
                     <?php elseif ($tabel === 'periode'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Periode</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Periode</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Tahun Periode</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tahun Periode</label>
                                 <input type="text" name="tahun_periode"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Semester Nama</label>
-                                <select name="semester_nama" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Semester Nama</label>
+                                <select name="semester_nama" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Semester Nama --</option>
                                     <option value="Ganjil">Ganjil</option>
                                     <option value="Genap">Genap</option>
@@ -317,8 +317,8 @@ if (isset($_POST['tambah'])) {
                             </div>
 
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Semester Ke</label>
-                                <select name="semester_ke" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required">
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Semester Ke</label>
+                                <select name="semester_ke" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required">
                                     <option value="">-- Semester Ke --</option>
                                     <?php for ($i = 1; $i <= 8; $i++): ?>
                                         <option value="<?= $i ?>"><?= $i ?>
@@ -327,8 +327,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Status</label>
-                                <select name="status" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                                <select name="status" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Status --</option>
                                     <option value="aktif">aktif</option>
                                     <option value="non-aktif">non-aktif</option>
@@ -337,21 +337,21 @@ if (isset($_POST['tambah'])) {
                         </div>
 
                     <?php elseif ($tabel === 'mata_kuliah'): ?>
-                        <h3 class="text-xl font-bold mb-6">Mata Kuliah</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Mata Kuliah</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Kode Mata Kuliah</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Kode Mata Kuliah</label>
                                 <input type="text" name="kode_matkul"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Mata Kuliah</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Mata Kuliah</label>
                                 <input type="text" name="nama_matkul"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Semester</label>
-                                <select name="semester" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required">
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Semester</label>
+                                <select name="semester" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required">
                                     <option value="">-- Semester --</option>
                                     <?php for ($i = 1; $i <= 8; $i++): ?>
                                         <option value="<?= $i ?>"><?= $i ?>
@@ -360,8 +360,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">SKS</label>
-                                <select name="sks" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">SKS</label>
+                                <select name="sks" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih SKS --</option>
                                     <option value="2">2</option>
                                     <option value="3">3</option>
@@ -372,11 +372,11 @@ if (isset($_POST['tambah'])) {
                         </div>
 
                     <?php elseif ($tabel === 'jadwal_matkul'): ?>
-                        <h3 class="text-xl font-bold mb-6">Jadwal Mata Kuliah</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Jadwal Mata Kuliah</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Mata Kuliah</label>
-                                <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Mata Kuliah</label>
+                                <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Mata Kuliah --</option>
                                     <?php
                                     // Get active periode_id
@@ -398,8 +398,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Hari</label>
-                                <select name="hari" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Hari</label>
+                                <select name="hari" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Hari --</option>
                                     <option value="Senin">Senin</option>
                                     <option value="Selasa">Selasa</option>
@@ -409,8 +409,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Ruangan</label>
-                                <select name="ruangan_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Ruangan</label>
+                                <select name="ruangan_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Ruangan --</option>
                                     <?php
                                     $query_ruang = mysqli_query($koneksi, "SELECT * FROM ruangan ORDER BY nama_ruangan ASC");
@@ -421,8 +421,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai Ke</label>
-                                <select name="jam_mulai_ke" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Mulai Ke</label>
+                                <select name="jam_mulai_ke" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Jam Mulai --</option>
                                     <?php
                                     $query_jk = mysqli_query($koneksi, "SELECT * FROM jam_kuliah ORDER BY jam_mulai ASC");
@@ -437,8 +437,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai Ke</label>
-                                <select name="jam_selesai_ke" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Selesai Ke</label>
+                                <select name="jam_selesai_ke" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Jam Selesai --</option>
                                     <?php
                                     foreach ($jam_kuliah_data as $jk) {
@@ -450,8 +450,8 @@ if (isset($_POST['tambah'])) {
                             </div>
 
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Dosen Pengampu</label>
-                                <select name="dosen_pengampu_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Dosen Pengampu</label>
+                                <select name="dosen_pengampu_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Dosen Pengampu --</option>
                                     <?php
                                     $query_dp = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
@@ -462,8 +462,8 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Dosen Mitra</label>
-                                <select name="dosen_mitra_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Dosen Mitra</label>
+                                <select name="dosen_mitra_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Dosen Mitra --</option>
                                     <?php
                                     $query_dm = mysqli_query($koneksi, "SELECT * FROM dosen ORDER BY nama_dosen ASC");
@@ -476,25 +476,25 @@ if (isset($_POST['tambah'])) {
                         </div>
 
                     <?php elseif ($tabel === 'dosen'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Dosen</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Dosen</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Dosen</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Dosen</label>
                                 <input type="text" name="nama_dosen"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">No HP</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">No HP</label>
                                 <input type="text" name="no_hp"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'tugas'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Tugas</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Tugas</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Mata Kuliah</label>
-                                <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Mata Kuliah</label>
+                                <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Mata Kuliah --</option>
                                     <?php
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
@@ -510,38 +510,38 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Deadline Tanggal</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Deadline Tanggal</label>
                                 <input type="date" name="deadline_tanggal"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Deadline Pukul</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Deadline Pukul</label>
                                 <input type="time" name="deadline_pukul"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Deskripsi</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Deskripsi</label>
                                 <textarea name="deskripsi" rows="5"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">File Tugas</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">File Tugas</label>
                                 <input type="file" name="file_tugas" accept="file/*"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Link Kirim</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Link Kirim</label>
                                 <input type="text" name="link_kirim"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
 
                     <?php elseif ($tabel === 'users'): ?>
-                        <h3 class="text-xl font-bold mb-6">Users</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Users</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Kode Mata Kuliah</label>
-                                <select name="id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Mahasiswa</label>
+                                <select name="id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Mahasiswa --</option>
                                     <?php
                                     $query_mhs = mysqli_query($koneksi, "SELECT * FROM mahasiswa ORDER BY nim ASC");
@@ -552,13 +552,13 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Password</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
                                 <input type="password" name="password"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Role</label>
-                                <select name="role" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs" required>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
+                                <select name="role" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Role/Peran --</option>
                                     <option value="Administrator Utama">Administrator Utama</option>
                                     <option value="Ketua Tingkat">Ketua Tingkat</option>
@@ -571,50 +571,50 @@ if (isset($_POST['tambah'])) {
                         </div>
 
                     <?php elseif ($tabel === 'galeri'): ?>
-                        <h3 class="text-xl font-bold mb-6">Galeri Kegiatan</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Galeri Kegiatan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Judul Kegiatan</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Judul Kegiatan</label>
                                 <input type="text" name="judul" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Kegiatan</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Kegiatan</label>
                                 <input type="date" name="tanggal_kegiatan" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Foto-foto (Bisa pilih banyak)</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto-foto (Bisa pilih banyak)</label>
                                 <input type="file" name="fotos[]" multiple accept="image/*" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'akademik'): ?>
-                        <h3 class="text-xl font-bold mb-6">Berita & Informasi Akademik</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Berita & Informasi Akademik</h3>
                         <div class="grid grid-cols-1 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Judul Berita</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Judul Berita</label>
                                 <input type="text" name="judul" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Deskripsi</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Deskripsi</label>
                                 <textarea name="deskripsi" rows="3" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Link (Opsional)</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Link (Opsional)</label>
                                 <input type="text" name="link"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'kalender_akademik'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Agenda Kalender Akademik</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Agenda Kalender Akademik</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Periode</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Periode</label>
                                 <select name="periode_id" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                                     <option value="">-- Pilih Periode --</option>
                                     <?php
                                     $q_per = mysqli_query($koneksi, "SELECT * FROM periode ORDER BY id DESC");
@@ -625,66 +625,66 @@ if (isset($_POST['tambah'])) {
                                 </select>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Kegiatan</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Kegiatan</label>
                                 <textarea name="kegiatan" rows="2" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></textarea>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Mulai</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Mulai</label>
                                 <input type="date" name="tanggal_mulai" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal Selesai</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Selesai</label>
                                 <input type="date" name="tanggal_selesai" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'ruangan'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Ruangan</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Ruangan</h3>
                         <div class="grid grid-cols-1 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Nama Ruangan</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Ruangan</label>
                                 <input type="text" name="nama_ruangan" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'jam_kuliah'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Jam Kuliah</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Jam Kuliah</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Ke</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Ke</label>
                                 <input type="number" name="jam_ke" required min="1"
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Mulai</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Mulai</label>
                                 <input type="time" name="jam_mulai" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jam Selesai</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Selesai</label>
                                 <input type="time" name="jam_selesai" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php elseif ($tabel === 'kuis_harian_soal'): ?>
-                        <h3 class="text-xl font-bold mb-6">Tambah Soal Kuis Harian</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Soal Kuis Harian</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Tanggal</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal</label>
                                 <input type="date" name="tanggal" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Pertanyaan</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Pertanyaan</label>
                                 <textarea name="pertanyaan" rows="3" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs"></textarea>
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></textarea>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 mb-1">Jawaban</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jawaban</label>
                                 <input type="text" name="jawaban" required
-                                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>
                     <?php endif; ?>
@@ -693,7 +693,7 @@ if (isset($_POST['tambah'])) {
                 <!-- Form Actions -->
                 <div class="flex justify-end">
                     <button type="submit" name="tambah"
-                        class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
+                        class="px-6 py-2 bg-indigo-800 dark:bg-indigo-700 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 text-xs transition-all shadow-lg shadow-indigo-100 dark:shadow-indigo-950/20">Submit</button>
                 </div>
             </form>
         </div>

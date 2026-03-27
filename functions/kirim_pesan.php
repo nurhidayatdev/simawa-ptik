@@ -1,6 +1,4 @@
 <?php
-// backend/crud/kirim_pesan_telegram.php
-// File ini digunakan untuk mengirim notifikasi Telegram ketika ada pesan anonim baru
 
 function sendWhatsAppPesan($pesan_isi)
 {

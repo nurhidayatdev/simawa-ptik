@@ -105,9 +105,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
         }
     </style>
 
+
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 dark:bg-slate-950 min-h-screen flex flex-col transition-colors duration-300">
     <?php include 'includes/header_main.php'; ?>
 
 
@@ -166,17 +167,17 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
 
     <!-- Profil Kelas -->
-    <section class="py-12 bg-white overflow-hidden">
+    <section class="py-12 bg-white dark:bg-slate-900 overflow-hidden transition-colors">
         <div class="container mx-auto px-8 md:px-16 lg:px-24">
             <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                 <!-- Content Left -->
                 <div class="lg:w-1/2 scroll-reveal">
 
-                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight">
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
                         Membangun Masa Depan <br>
-                        <span class="text-indigo-600 italic">Teknologi Bersama</span>
+                        <span class="text-indigo-600 dark:text-indigo-400 italic">Teknologi Bersama</span>
                     </h2>
-                    <div class="space-y-4 text-slate-600 leading-relaxed max-w-xl md:max-w-2xl text-sm md:text-base">
+                    <div class="space-y-4 text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl md:max-w-2xl text-sm md:text-base">
                         <p>
                             Kelas PTIK C Angkatan 2024 adalah bagian dari Program Studi Teknik Informatika dan Komputer
                             di Fakultas Teknik, Universitas Negeri Makassar. Kami adalah kelompok mahasiswa yang
@@ -193,19 +194,19 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
                     <!-- Modern Stats -->
                     <div class="grid grid-cols-2 gap-6 mt-10">
-                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 relative group overflow-hidden hover:border-indigo-200 transition-colors">
-                            <div class="absolute top-0 right-0 p-3 opacity-5 text-4xl group-hover:scale-110 transition-transform">
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 relative group overflow-hidden hover:border-indigo-200 dark:hover:border-indigo-500 transition-colors">
+                            <div class="absolute top-0 right-0 p-3 opacity-5 dark:opacity-10 text-4xl group-hover:scale-110 transition-transform">
                                 <i class="fa fa-users"></i>
                             </div>
-                            <div class="text-3xl font-black text-indigo-600 mb-1"><?= ($jml['COUNT(*)']) ?></div>
-                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Mahasiswa Aktif</div>
+                            <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1"><?= ($jml['COUNT(*)']) ?></div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Mahasiswa Aktif</div>
                         </div>
-                        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-100 relative group overflow-hidden hover:border-indigo-200 transition-colors">
-                            <div class="absolute top-0 right-0 p-3 opacity-5 text-4xl group-hover:scale-110 transition-transform">
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 relative group overflow-hidden hover:border-indigo-200 dark:hover:border-indigo-500 transition-colors">
+                            <div class="absolute top-0 right-0 p-3 opacity-5 dark:opacity-10 text-4xl group-hover:scale-110 transition-transform">
                                 <i class="fa fa-graduation-cap"></i>
                             </div>
-                            <div class="text-3xl font-black text-indigo-600 mb-1"><?= ($sms['semester_ke']) ?></div>
-                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Semester Berjalan</div>
+                            <div class="text-3xl font-black text-indigo-600 dark:text-indigo-400 mb-1"><?= ($sms['semester_ke']) ?></div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Semester Berjalan</div>
                         </div>
                     </div>
                 </div>
@@ -215,7 +216,7 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     <div class="absolute -top-6 -left-6 w-24 h-24 bg-indigo-600/5 rounded-full blur-2xl"></div>
                     <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-600/10 rounded-full blur-3xl"></div>
 
-                    <div class="relative z-10 p-2 bg-white rounded-[32px] shadow-2xl border border-slate-100">
+                    <div class="relative z-10 p-2 bg-white dark:bg-slate-800 rounded-[32px] shadow-2xl border border-slate-100 dark:border-slate-700">
                         <img src="assets/image/img-2.webp" alt="Foto bersama kelas PTIK C Angkatan 2024" class="rounded-[24px] w-full object-cover">
 
 
@@ -259,10 +260,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
                 <!-- Ketua -->
                 <div class="mb-12 max-w-xs mx-auto scroll-reveal">
-                    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden transition-all group border border-white/5">
+                    <div class="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden transition-all group border border-white/5 dark:border-white/10">
                         <div class="bg-gradient-to-br from-indigo-600 to-indigo-900 h-16 relative">
                             <div class="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-950 group-hover:scale-105 transition-transform">
+                                <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-950 group-hover:scale-105 transition-transform">
                                     <?php if ($ketua && !empty($ketua['foto'])): ?>
                                         <img src="<?php echo htmlspecialchars(profilePhotoUrl($ketua['foto'])); ?>" alt="<?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?>" class="w-full h-full object-cover">
                                     <?php else: ?>
@@ -272,10 +273,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                             </div>
                         </div>
                         <div class="pt-12 pb-6 px-4 text-center">
-                            <div class="inline-block px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full mb-2">
-                                <span class="text-[10px] font-black text-indigo-700 uppercase tracking-widest"><?php echo htmlspecialchars($ketua['role'] ?? ''); ?></span>
+                            <div class="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-full mb-2">
+                                <span class="text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest"><?php echo htmlspecialchars($ketua['role'] ?? ''); ?></span>
                             </div>
-                            <h4 class="text-sm font-bold text-slate-900 mb-0.5"><?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?></h4>
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-0.5"><?php echo htmlspecialchars($ketua['nama_lengkap'] ?? ''); ?></h4>
                         </div>
                     </div>
                 </div>
@@ -302,10 +303,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render sekretaris
                     while ($row = mysqli_fetch_assoc($qSek)) {
                     ?>
-                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-1">
+                        <div class="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 dark:border-white/10 scroll-reveal reveal-delay-1">
                             <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -315,10 +316,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 </div>
                             </div>
                             <div class="pt-10 pb-4 px-3 text-center">
-                                <div class="inline-block px-2 py-0.5 bg-sky-50 border border-sky-100 rounded-full mb-1">
-                                    <span class="text-[10px] font-black text-sky-600 uppercase tracking-widest">Sekretaris</span>
+                                <div class="inline-block px-2 py-0.5 bg-sky-50 dark:bg-sky-900/30 border border-sky-100 dark:border-sky-800 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest">Sekretaris</span>
                                 </div>
-                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
                             </div>
                         </div>
                     <?php
@@ -327,10 +328,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render bendahara
                     while ($row = mysqli_fetch_assoc($qBen)) {
                     ?>
-                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-2">
+                        <div class="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 dark:border-white/10 scroll-reveal reveal-delay-2">
                             <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -340,10 +341,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 </div>
                             </div>
                             <div class="pt-10 pb-4 px-3 text-center">
-                                <div class="inline-block px-2 py-0.5 bg-amber-50 border border-amber-100 rounded-full mb-1">
-                                    <span class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Bendahara</span>
+                                <div class="inline-block px-2 py-0.5 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Bendahara</span>
                                 </div>
-                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
                             </div>
                         </div>
                     <?php
@@ -352,10 +353,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render media kreatif
                     while ($row = mysqli_fetch_assoc($qMedia)) {
                     ?>
-                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-3">
+                        <div class="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 dark:border-white/10 scroll-reveal reveal-delay-3">
                             <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -365,10 +366,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 </div>
                             </div>
                             <div class="pt-10 pb-4 px-3 text-center">
-                                <div class="inline-block px-2 py-0.5 bg-rose-50 border border-rose-100 rounded-full mb-1">
-                                    <span class="text-[10px] font-black text-rose-600 uppercase tracking-widest">Media Kreatif</span>
+                                <div class="inline-block px-2 py-0.5 bg-rose-50 dark:bg-rose-900/30 border border-rose-100 dark:border-rose-800 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Media Kreatif</span>
                                 </div>
-                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
                             </div>
                         </div>
                     <?php
@@ -377,10 +378,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                     // render manager tugas
                     while ($row = mysqli_fetch_assoc($qManager)) {
                     ?>
-                        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 scroll-reveal reveal-delay-4">
+                        <div class="bg-white dark:bg-slate-900/50 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden transition-all group border border-white/5 dark:border-white/10 scroll-reveal reveal-delay-4">
                             <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 h-14 relative">
                                 <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                                         <?php if (!empty($row['foto'])): ?>
                                             <img src="<?php echo htmlspecialchars(profilePhotoUrl($row['foto'])); ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                                         <?php else: ?>
@@ -390,10 +391,10 @@ $sms = mysqli_fetch_assoc($sms_aktif);
                                 </div>
                             </div>
                             <div class="pt-10 pb-4 px-3 text-center">
-                                <div class="inline-block px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full mb-1">
-                                    <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Manager Tugas</span>
+                                <div class="inline-block px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-full mb-1">
+                                    <span class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Manager Tugas</span>
                                 </div>
-                                <h4 class="text-xs font-bold text-slate-900 truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white truncate"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
                             </div>
                         </div>
                     <?php
@@ -407,88 +408,88 @@ $sms = mysqli_fetch_assoc($sms_aktif);
 
 
     <!-- Fitur & Fasilitas Sistem -->
-    <section class="py-12 bg-slate-50 border-t border-slate-100">
+    <section class="py-12 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 transition-colors">
         <div class="container mx-auto px-4 md:px-16 lg:px-24">
             <div class="text-center mb-8 scroll-reveal">
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">Fitur & Fasilitas Sistem</h2>
-                <p class="text-gray-600 text-sm max-w-2xl mx-auto hidden md:block">Platform digital ini dirancang untuk mempermudah segala kebutuhan akademik dalam satu ekosistem yang terintegrasi</p>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-3">Fitur & Fasilitas Sistem</h2>
+                <p class="text-gray-600 dark:text-slate-400 text-sm max-w-2xl mx-auto hidden md:block">Platform digital ini dirancang untuk mempermudah segala kebutuhan akademik dalam satu ekosistem yang terintegrasi</p>
             </div>
 
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                 <!-- Feature 1 -->
-                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-1">
+                <div class="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all scroll-reveal reveal-delay-1">
                     <div class="flex items-center gap-2 md:gap-3 mb-0 md:mb-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base md:text-lg">
                             <i class="fa fa-desktop"></i>
                         </div>
-                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Dashboard Pintar</h3>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 dark:text-slate-200 leading-tight">Dashboard Pintar</h3>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed hidden md:block">
                         Pusat kendali utama yang menyajikan statistik absensi, deadline tugas terdekat, laporan kas terbaru, dan berita akademik dalam satu tampilan bersih.
                     </p>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-2">
+                <div class="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all scroll-reveal">
                     <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base md:text-lg">
                             <i class="fa fa-tasks"></i>
                         </div>
-                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Manajemen Tugas</h3>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 dark:text-slate-200 leading-tight">Manajemen Tugas</h3>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
-                        Tak ada lagi tugas yang terlewat. Dilengkapi pemantau deadline, filter mata kuliah, dan pengiriman notifikasi otomatis via Bot Telegram ke grup kelas.
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed hidden md:block">
+                        Tak ada lagi tugas yang terlewat. Dilengkapi pemantau deadline, filter mata kuliah, dan pengiriman notifikasi otomatis via Bot WhatsApp ke grup kelas.
                     </p>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-3">
+                <div class="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all scroll-reveal reveal-delay-3">
                     <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base md:text-lg">
                             <i class="fa fa-wallet"></i>
                         </div>
-                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Transparansi Kas</h3>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 dark:text-slate-200 leading-tight">Transparansi Kas</h3>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed hidden md:block">
                         Laporan keuangan kelas yang akuntabel. Mahasiswa dapat memantau saldo, tagihan pribadi, riwayat pemasukan, dan detail pengeluaran secara real-time.
                     </p>
                 </div>
 
                 <!-- Feature 4 -->
-                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-1">
+                <div class="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all scroll-reveal reveal-delay-1">
                     <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base md:text-lg">
                             <i class="fa fa-calendar-check"></i>
                         </div>
-                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Absensi Digital</h3>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 dark:text-slate-200 leading-tight">Absensi Digital</h3>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed hidden md:block">
                         Pencatatan kehadiran harian yang mempermudah admin dalam rekapitulasi. Menampilkan persentase kehadiran masing-masing mahasiswa untuk evaluasi.
                     </p>
                 </div>
 
                 <!-- Feature 5 -->
-                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-2">
+                <div class="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all scroll-reveal reveal-delay-2">
                     <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base md:text-lg">
                             <i class="fab fa-whatsapp"></i>
                         </div>
-                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Bot WhatsApp</h3>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 dark:text-slate-200 leading-tight">Bot WhatsApp</h3>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed hidden md:block">
                         Terhubung langsung ke grup kelas untuk pengingat tugas harian setiap pagi, notifikasi berita/jadwal, dan penerusan pesan anonim secara instan.
                     </p>
                 </div>
 
                 <!-- Feature 6 -->
-                <div class="bg-white p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all scroll-reveal reveal-delay-3">
+                <div class="bg-white dark:bg-slate-900 p-3 md:p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all scroll-reveal reveal-delay-3">
                     <div class="flex items-center md:items-center gap-2 md:gap-3 mb-0 md:mb-4">
-                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-base md:text-lg">
+                        <div class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-base md:text-lg">
                             <i class="fa fa-calendar-alt"></i>
                         </div>
-                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 leading-tight">Kalender Pintar</h3>
+                        <h3 class="text-[11px] md:text-base font-bold text-slate-800 dark:text-slate-200 leading-tight">Kalender Pintar</h3>
                     </div>
-                    <p class="text-slate-600 text-sm leading-relaxed hidden md:block">
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed hidden md:block">
                         Sinkronisasi antara jadwal kuliah rutin dengan kalender akademik UNM. Memberikan gambaran agenda kelas selama satu semester penuh.
                     </p>
                 </div>

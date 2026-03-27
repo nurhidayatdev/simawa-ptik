@@ -35,30 +35,35 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $no = 1;
     $id = 1;
     while ($row = mysqli_fetch_assoc($result)) {
-        $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
+        $isEven = ($id++ % 2 == 0);
+        $rowClass = ($isEven ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors';
         echo '<tr class="' . $rowClass . '">';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-        echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['judul']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . date('d M Y', strtotime($row['tanggal_kegiatan'])) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium">' . ($no++) . '</td>';
+        echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100">' . htmlspecialchars($row['judul']) . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">' . date('d M Y', strtotime($row['tanggal_kegiatan'])) . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">';
         $gal_id = $row['id'];
         $q_foto = mysqli_query($koneksi, "SELECT foto_path FROM galeri_foto WHERE galeri_id = $gal_id LIMIT 1");
         $f_row = mysqli_fetch_assoc($q_foto);
         if ($f_row) {
-            echo '<img src="../storage/gallery/' . htmlspecialchars($f_row['foto_path']) . '" class="h-8 w-8 object-cover rounded" />';
+            echo '<div class="h-8 w-8 rounded border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">';
+            echo '<img src="../storage/gallery/' . htmlspecialchars($f_row['foto_path']) . '" class="w-full h-full object-cover" />';
+            echo '</div>';
         } else {
-            echo '<span class="text-xs text-gray-400">No image</span>';
+            echo '<span class="text-[10px] text-slate-400 dark:text-slate-600 italic">No image</span>';
         }
         echo '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
-        echo '<a href="../actions/download_galeri.php?id=' . $row['id'] . '" class="text-indigo-600 hover:text-indigo-900" title="Download Semua Foto">';
-        echo '<i class="fa fa-download"></i> Download';
+        echo '<a href="../actions/download_galeri.php?id=' . $row['id'] . '" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium transition-colors" title="Download Semua Foto">';
+        echo '<i class="fa fa-download mr-1"></i> Download';
         echo '</a>';
         echo '</td>';
         if ($role === 'Administrator Utama'):
-            echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
-            echo '<a href="../actions/edit.php?tabel=galeri&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
-            echo '<a href="../actions/hapus.php?tabel=galeri&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus kegiatan ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+            echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
+            echo '<div class="flex items-center justify-center gap-3">';
+            echo '<a href="../actions/edit.php?tabel=galeri&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
+            echo '<a href="../actions/hapus.php?tabel=galeri&id=' . $row['id'] . '" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"><i class="fa fa-trash"></i></a>';
+            echo '</div>';
             echo '</td>';
         endif;
         echo '</tr>';
@@ -88,20 +93,26 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h3 class="text-xl font-bold text-slate-800">Data Galeri Kegiatan</h3>
-                <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <form method="GET" class="w-full">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Data Galeri Kegiatan</h1>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form method="GET" class="w-full sm:w-64">
                         <div class="flex flex-row gap-2 items-center">
-                            <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="Cari Kegiatan..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            <div class="relative w-full">
+                                <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="Cari Kegiatan..."
+                                    class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
+                                <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
+                            </div>
                             <?php if ($role === 'Administrator Utama'): ?>
-                                <a href="../actions/tambah.php?tabel=galeri" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
-                                    <i class="fa fa-plus"></i>
+                                <a href="../actions/tambah.php?tabel=galeri" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
+                                    <i class="fa fa-plus text-xs"></i>
                                 </a>
                             <?php endif; ?>
                         </div>
@@ -109,54 +120,61 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-indigo-900">
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead class="bg-indigo-900 dark:bg-slate-800">
                         <tr>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Judul</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Tanggal</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Foto</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Download</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">No</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Judul</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Tanggal</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Foto</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Download</th>
                             <?php if ($role === 'Administrator Utama'): ?>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Actions</th>
+                                <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200">
+                    <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
                         <?php
                         $no = 1;
                         $id = 1;
-                        while ($row = mysqli_fetch_assoc($result)) : ?>
-                            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-                                <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['judul']); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= date('d M Y', strtotime($row['tanggal_kegiatan'])); ?></td>
+                        while ($row = mysqli_fetch_assoc($result)) : 
+                            $isEven = ($id++ % 2 == 0);
+                            $rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors';
+                        ?>
+                            <tr class="<?= $rowClass ?>">
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++; ?></td>
+                                <td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100"><?= htmlspecialchars($row['judul']); ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400"><?= date('d M Y', strtotime($row['tanggal_kegiatan'])); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
                                     <?php
                                     $gal_id = $row['id'];
                                     $q_foto = mysqli_query($koneksi, "SELECT foto_path FROM galeri_foto WHERE galeri_id = $gal_id LIMIT 1");
                                     $f_row = mysqli_fetch_assoc($q_foto);
                                     if ($f_row) {
-                                        echo '<img src="../storage/gallery/' . htmlspecialchars($f_row['foto_path']) . '" class="h-8 w-8 object-cover rounded" />';
+                                        echo '<div class="h-8 w-8 rounded border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">';
+                                        echo '<img src="../storage/gallery/' . htmlspecialchars($f_row['foto_path']) . '" class="w-full h-full object-cover" />';
+                                        echo '</div>';
                                     } else {
-                                        echo '<span class="text-xs text-gray-400">No image</span>';
+                                        echo '<span class="text-[10px] text-slate-400 dark:text-slate-600 italic">No image</span>';
                                     }
                                     ?>
                                 </td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-                                    <a href="../actions/download_galeri.php?id=<?= $row['id']; ?>" class="text-indigo-600 hover:text-indigo-900" title="Download Semua Foto">
-                                        <i class="fa fa-download"></i> Download
+                                <td class="px-3 py-2 whitespace-nowrap text-xs">
+                                    <a href="../actions/download_galeri.php?id=<?= $row['id']; ?>" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium transition-colors" title="Download Semua Foto">
+                                        <i class="fa fa-download mr-1"></i> Download
                                     </a>
                                 </td>
                                 <?php if ($role === 'Administrator Utama'): ?>
-                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
-                                        <a href="../actions/edit.php?tabel=galeri&id=<?= $row['id']; ?>" title="Edit">
-                                            <i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i>
-                                        </a>
-                                        <a href="../actions/hapus.php?tabel=galeri&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus kegiatan ini?');">
-                                            <i class="fa fa-trash text-red-600 hover:text-red-900"></i>
-                                        </a>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
+                                        <div class="flex items-center justify-center gap-3">
+                                            <a href="../actions/edit.php?tabel=galeri&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="../actions/hapus.php?tabel=galeri&id=<?= $row['id']; ?>" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 <?php endif; ?>
                             </tr>

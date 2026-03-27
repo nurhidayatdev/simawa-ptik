@@ -150,15 +150,15 @@ if (isset($_GET['ajax_soal']) && $_GET['ajax_soal'] == '1') {
     $no = 1;
     if (mysqli_num_rows($result_soal) > 0) {
         while ($row = mysqli_fetch_assoc($result_soal)) {
-            echo '<tr class="hover:bg-slate-50 transition-all border-b border-slate-100">';
-            echo '<td class="px-6 py-2 text-[11px] font-bold text-slate-400 text-center">' . ($no++) . '</td>';
-            echo '<td class="px-6 py-2 text-[11px] font-bold text-slate-800">' . htmlspecialchars($row['tanggal']) . '</td>';
-            echo '<td class="px-6 py-2 text-[11px] font-medium text-slate-600">' . htmlspecialchars($row['pertanyaan']) . '</td>';
-            echo '<td class="px-6 py-2 text-[11px] font-bold text-indigo-600">' . htmlspecialchars($row['jawaban']) . '</td>';
+            echo '<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all border-b border-slate-100 dark:border-slate-800">';
+            echo '<td class="px-6 py-2 text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center">' . ($no++) . '</td>';
+            echo '<td class="px-6 py-2 text-[11px] font-bold text-slate-800 dark:text-white uppercase">' . htmlspecialchars($row['tanggal']) . '</td>';
+            echo '<td class="px-6 py-2 text-[11px] font-medium text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['pertanyaan']) . '</td>';
+            echo '<td class="px-6 py-2 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">' . htmlspecialchars($row['jawaban']) . '</td>';
             echo '<td class="px-6 py-2 text-right">';
             echo '<div class="flex justify-end gap-1.5">';
-            echo '<a href="../actions/edit.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" class="p-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></a>';
-            echo '<a href="../actions/hapus.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" onclick="return confirm(\'Hapus soal ini?\')" class="p-1.5 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></a>';
+            echo '<a href="../actions/edit.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" class="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 hover:bg-blue-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></a>';
+            echo '<a href="../actions/hapus.php?tabel=kuis_harian_soal&id=' . $row['id'] . '" class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800/50 hover:bg-rose-600 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></a>';
             echo '</div>';
             echo '</td>';
             echo '</tr>';
@@ -216,7 +216,7 @@ function getFireIconAdmin($streak, $isActive = true)
     </style>
 </head>
 
-<body class="bg-slate-50">
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
@@ -225,8 +225,8 @@ function getFireIconAdmin($streak, $isActive = true)
             <!-- Header section -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h3 class="text-2xl font-bold text-slate-800 tracking-tight">Kuis Harian Player Stats</h3>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">Global Leaderboard & Resource Management</p>
+                    <h3 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Kuis Harian Player Stats</h3>
+                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Global Leaderboard & Resource Management</p>
                 </div>
                 <div class="flex flex-wrap gap-2 md:gap-3">
                     <button onclick="sendReminder()" class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-rose-500/20 active:scale-95">
@@ -242,81 +242,79 @@ function getFireIconAdmin($streak, $isActive = true)
             </div>
 
             <!-- Quick Navigation Tabs -->
-            <div class="flex gap-2 mb-8 bg-white/50 p-1.5 rounded-2xl border border-slate-200 w-fit">
-                <button onclick="scrollToSection('sec-overview')" class="px-5 py-2 rounded-xl text-[10px] font-bold text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all uppercase tracking-widest">Overview</button>
-                <div class="w-px h-4 bg-slate-200 self-center"></div>
-                <button onclick="scrollToSection('sec-players')" class="px-5 py-2 rounded-xl text-[10px] font-bold text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all uppercase tracking-widest">Statistik Pemain</button>
-                <div class="w-px h-4 bg-slate-200 self-center"></div>
-                <button onclick="scrollToSection('sec-questions')" class="px-5 py-2 rounded-xl text-[10px] font-bold text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all uppercase tracking-widest">Bank Soal Kuis</button>
+            <div class="flex gap-2 mb-8 bg-white/50 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 w-fit">
+                <button onclick="scrollToSection('sec-overview')" class="px-5 py-2 rounded-xl text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 hover:shadow-sm transition-all uppercase tracking-widest">Overview</button>
+                <div class="w-px h-4 bg-slate-200 dark:bg-slate-800 self-center"></div>
+                <button onclick="scrollToSection('sec-players')" class="px-5 py-2 rounded-xl text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-indigo-600 hover:shadow-sm transition-all uppercase tracking-widest">Statistik Pemain</button>
             </div>
 
             <!-- Stats Overview - Mini Cards -->
             <div id="sec-overview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 scroll-mt-24">
                 <!-- Card 1: Kuis Hari Ke -->
-                <div class="bg-indigo-600 p-4 rounded-3xl shadow-lg shadow-indigo-600/10 flex flex-col justify-center items-center text-center border border-indigo-500">
+                <div class="bg-indigo-600 dark:bg-indigo-900 p-4 rounded-3xl shadow-lg shadow-indigo-600/10 flex flex-col justify-center items-center text-center border border-indigo-500 dark:border-indigo-800">
                     <div class="text-[9px] font-bold text-indigo-100 uppercase tracking-widest mb-1">KUIS HARI KE</div>
                     <div class="text-2xl font-black text-white"><?= $hari_ke ?></div>
                 </div>
 
                 <!-- Card 2: Jumlah Bank Soal -->
-                <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center items-center text-center">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">BANK SOAL</div>
-                    <div class="text-xl font-bold text-slate-800"><?= $total_soal_bank ?> <span class="text-[10px] text-slate-400">Items</span></div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center items-center text-center">
+                    <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">BANK SOAL</div>
+                    <div class="text-xl font-bold text-slate-800 dark:text-white"><?= $total_soal_bank ?> <span class="text-[10px] text-slate-400 dark:text-slate-500">Items</span></div>
                 </div>
 
                 <!-- Card 3: Total Games Played -->
-                <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center items-center text-center">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">TOTAL GAMES</div>
-                    <div class="text-xl font-bold text-slate-800"><?= number_format($total_games_played) ?></div>
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center items-center text-center">
+                    <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">TOTAL GAMES</div>
+                    <div class="text-xl font-bold text-slate-800 dark:text-white"><?= number_format($total_games_played) ?></div>
                 </div>
 
                 <!-- Card 4: Global Hint -->
-                <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center items-center text-center">
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center items-center text-center">
                     <div class="text-[9px] font-bold text-amber-500 uppercase tracking-widest mb-1">GLOBAL HINTS</div>
-                    <div class="text-xl font-bold text-slate-800"><?= number_format($total_hint) ?></div>
+                    <div class="text-xl font-bold text-slate-800 dark:text-white"><?= number_format($total_hint) ?></div>
                 </div>
 
                 <!-- Card 5: Global Recovery -->
-                <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center items-center text-center">
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center items-center text-center">
                     <div class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest mb-1">GLOBAL RECOVERY</div>
-                    <div class="text-xl font-bold text-slate-800"><?= number_format($total_recovery) ?></div>
+                    <div class="text-xl font-bold text-slate-800 dark:text-white"><?= number_format($total_recovery) ?></div>
                 </div>
 
                 <!-- Card 6: Total Streak Hidup -->
-                <div class="bg-orange-500 p-4 rounded-3xl shadow-xl shadow-orange-500/10 flex flex-col justify-center items-center text-center border border-orange-400">
+                <div class="bg-orange-500 dark:bg-orange-900/80 p-4 rounded-3xl shadow-xl shadow-orange-500/10 flex flex-col justify-center items-center text-center border border-orange-400 dark:border-orange-800">
                     <div class="text-[9px] font-bold text-orange-100 uppercase tracking-widest mb-1">STREAK AKTIF</div>
                     <div class="text-xl font-bold text-white"><?= number_format($total_active_streak) ?>🔥</div>
                 </div>
             </div>
 
             <!-- Player Table Card -->
-            <div id="sec-players" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-12 scroll-mt-24">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div id="sec-players" class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-12 scroll-mt-24">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
+                        <div class="w-10 h-10 rounded-xl bg-slate-900 dark:bg-indigo-600 flex items-center justify-center text-white">
                             <i class="fas fa-list-ol text-sm"></i>
                         </div>
-                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest">Daftar Progres Pemain</h4>
+                        <h4 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-widest">Daftar Progres Pemain</h4>
                     </div>
                     <div class="relative">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                        <input type="text" id="playerSearch" placeholder="Cari pemain..." class="bg-slate-100 border-0 rounded-2xl pl-9 pr-4 py-2 text-[11px] font-semibold focus:ring-2 focus:ring-indigo-500/20 w-48 md:w-64 transition-all shadow-sm">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[10px]"></i>
+                        <input type="text" id="playerSearch" placeholder="Cari pemain..." class="bg-slate-100 dark:bg-slate-800 border-0 rounded-2xl pl-9 pr-4 py-2 text-[11px] text-slate-800 dark:text-slate-200 font-semibold focus:ring-2 focus:ring-indigo-500/20 w-48 md:w-64 transition-all shadow-sm">
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left" id="playerTable">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-16">Rank</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pemain</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Games</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Resources</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Last Played</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                            <tr class="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center w-16">Rank</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pemain</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Games</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Resources</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Last Played</th>
+                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             <?php if (empty($all_stats)): ?>
                                 <tr>
                                     <td colspan="6" class="px-6 py-20 text-center">
@@ -338,68 +336,82 @@ function getFireIconAdmin($streak, $isActive = true)
                                     $fire = getFireIconAdmin($row['current_streak'], !$isBroken);
                                     $isToday = $row['last_played_date'] === $today;
                                 ?>
-                                    <tr class="hover:bg-slate-50/80 transition-all player-row">
+                                <?php
+                                    // Rank Class Determination
+                                    if ($rank <= 3) {
+                                        $rank_pill_class = $isBroken 
+                                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500' 
+                                            : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20';
+                                    } else {
+                                        $rank_pill_class = 'text-slate-400 dark:text-slate-500';
+                                    }
+                                ?>
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-all player-row">
                                         <td class="px-6 py-2 text-center">
-                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg font-bold text-xs <?= $rank <= 3 ? ($isBroken ? 'bg-slate-200 text-slate-400' : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20') : 'text-slate-400' ?>">
+                                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg font-bold text-xs <?= $rank_pill_class ?>">
                                                 <?= $rank++ ?>
                                             </span>
                                         </td>
                                         <td class="px-6 py-2">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-slate-100 shadow-sm shrink-0 bg-slate-50">
+                                                <div class="w-10 h-10 rounded-xl overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-sm shrink-0 bg-slate-50 dark:bg-slate-850">
                                                     <img src="<?= profilePhotoUrl($row['foto'], '../') ?>"
                                                         class="w-full h-full object-cover"
                                                         onerror="this.src='../assets/image/logo.webp'">
                                                 </div>
                                                 <div>
-                                                    <div class="text-[11px] font-bold text-slate-700 leading-tight player-name uppercase"><?= htmlspecialchars($row['nama_lengkap']) ?></div>
-                                                    <div class="text-[10px] text-slate-400 font-semibold tracking-tight mt-0.5"><?= $row['nim'] ?> • @<?= htmlspecialchars($row['nama_panggilan']) ?></div>
+                                                    <div class="text-[11px] font-bold text-slate-700 dark:text-white leading-tight player-name uppercase"><?= htmlspecialchars($row['nama_lengkap']) ?></div>
+                                                    <div class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold tracking-tight mt-0.5"><?= $row['nim'] ?> • @<?= htmlspecialchars($row['nama_panggilan']) ?></div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-2 text-center">
                                             <div class="flex flex-col items-center justify-center gap-0.5">
                                                 <div class="flex items-center gap-1.5">
-                                                    <span class="text-base font-bold <?= $isBroken ? 'text-slate-300' : 'text-slate-800' ?>"><?= $fireValue ?></span>
+                                                    <span class="text-base font-bold <?= $isBroken ? 'text-slate-300 dark:text-slate-700' : 'text-slate-800 dark:text-white' ?>"><?= $fireValue ?></span>
                                                     <i class="fas fa-fire text-base" style="color: <?= $fire['show'] ? $fire['color'] : '#e2e8f0' ?>"></i>
                                                 </div>
-                                                <div class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Games: <?= $row['total_games'] ?> | Max: <?= $row['max_streak'] ?></div>
+                                                <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter">Games: <?= $row['total_games'] ?> | Max: <?= $row['max_streak'] ?></div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-2 text-center">
                                             <div class="flex justify-center gap-4">
                                                 <div class="text-center">
-                                                    <div class="text-amber-500 text-sm font-bold"><?= $row['hint_stock'] ?></div>
-                                                    <div class="text-[8px] font-bold text-slate-400 uppercase">Hints</div>
+                                                    <div class="text-amber-500 dark:text-amber-400 text-sm font-bold"><?= $row['hint_stock'] ?></div>
+                                                    <div class="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase">Hints</div>
                                                 </div>
                                                 <div class="text-center">
-                                                    <div class="text-indigo-600 text-sm font-bold"><?= $row['recovery_stock'] ?></div>
-                                                    <div class="text-[8px] font-bold text-slate-400 uppercase">Recovery</div>
+                                                    <div class="text-indigo-600 dark:text-indigo-400 text-sm font-bold"><?= $row['recovery_stock'] ?></div>
+                                                    <div class="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase">Recovery</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-2 text-center">
-                                            <?php if ($row['last_played_date']): ?>
-                                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border <?= $isToday ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100' ?>">
-                                                    <div class="w-1.5 h-1.5 rounded-full <?= $isToday ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300' ?>"></div>
+                                            <?php if ($row['last_played_date']): 
+                                                $status_class = $isToday 
+                                                    ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50' 
+                                                    : 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-700';
+                                            ?>
+                                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border <?= $status_class ?>">
+                                                    <div class="w-1.5 h-1.5 rounded-full <?= $isToday ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300 dark:bg-slate-600' ?>"></div>
                                                     <span class="text-[10px] font-black uppercase"><?= $isToday ? 'TODAY' : $row['last_played_date'] ?></span>
                                                 </div>
                                             <?php else: ?>
-                                                <span class="text-[10px] font-bold text-slate-300 italic uppercase">Never Played</span>
+                                                <span class="text-[10px] font-bold text-slate-300 dark:text-slate-700 italic uppercase">Never Played</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="px-6 py-2 text-right">
                                             <div class="flex justify-end gap-1.5">
                                                 <button onclick="manageResources(<?= $row['user_id'] ?>, '<?= htmlspecialchars($row['nama_panggilan']) ?>', 'hint')"
-                                                    class="p-2 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 hover:bg-amber-500 hover:text-white transition-all shadow-sm">
+                                                    class="p-2 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800/50 hover:bg-amber-500 hover:text-white transition-all shadow-sm">
                                                     <i class="fas fa-lightbulb text-[10px]"></i>
                                                 </button>
                                                 <button onclick="manageResources(<?= $row['user_id'] ?>, '<?= htmlspecialchars($row['nama_panggilan']) ?>', 'recovery')"
-                                                    class="p-2 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
+                                                    class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/50 hover:bg-indigo-600 hover:text-white transition-all shadow-sm">
                                                     <i class="fas fa-shield-alt text-[10px]"></i>
                                                 </button>
                                                 <button onclick="manageStreak(<?= $row['user_id'] ?>, '<?= htmlspecialchars($row['nama_panggilan']) ?>', <?= $row['current_streak'] ?>)"
-                                                    class="p-2 rounded-lg bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-500 hover:text-white transition-all shadow-sm">
+                                                    class="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300 border border-orange-100 dark:border-orange-800/50 hover:bg-orange-500 hover:text-white transition-all shadow-sm">
                                                     <i class="fas fa-fire text-[10px]"></i>
                                                 </button>
                                             </div>
@@ -412,74 +424,7 @@ function getFireIconAdmin($streak, $isActive = true)
                 </div>
             </div>
 
-            <!-- Bank Soal Kuis Section -->
-            <div id="sec-questions" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-12 scroll-mt-24">
-                <div class="px-6 py-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-900 flex items-center justify-center text-white">
-                            <i class="fas fa-database text-sm"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest">Bank Soal Kuis</h4>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">Daftar pertanyaan kuis harian</p>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                        <div class="relative w-full md:w-auto flex-grow">
-                            <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                            <input type="date" id="soalFilter" class="bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-[11px] font-semibold focus:ring-2 focus:ring-indigo-500/20 w-full md:w-48 transition-all shadow-sm">
-                        </div>
-                        <button id="resetSoal" class="p-2 rounded-xl bg-slate-200 text-slate-600 hover:bg-slate-300 transition-all shadow-sm" title="Reset Filter">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <a href="../actions/tambah.php?tabel=kuis_harian_soal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-[11px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
-                            <i class="fas fa-plus"></i> TAMBAH SOAL
-                        </a>
-                    </div>
-                </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-16">No</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-32">Tanggal</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pertanyaan</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-40">Jawaban</th>
-                                <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right w-32">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="soalTableBody">
-                            <?php
-                            $no_soal = 1;
-                            if (mysqli_num_rows($result_soal) > 0):
-                                while ($row = mysqli_fetch_assoc($result_soal)): ?>
-                                    <tr class="hover:bg-slate-50 transition-all border-b border-slate-100">
-                                        <td class="px-6 py-2 text-[11px] font-bold text-slate-400 text-center"><?= $no_soal++ ?></td>
-                                        <td class="px-6 py-2 text-[11px] font-bold text-slate-800 tracking-tight"><?= htmlspecialchars($row['tanggal']) ?></td>
-                                        <td class="px-6 py-2 text-[11px] font-medium text-slate-600 leading-relaxed"><?= htmlspecialchars($row['pertanyaan']) ?></td>
-                                        <td class="px-6 py-2 text-[11px] font-bold text-indigo-600"><?= htmlspecialchars($row['jawaban']) ?></td>
-                                        <td class="px-6 py-2 text-right">
-                                            <div class="flex justify-end gap-1.5">
-                                                <a href="../actions/edit.php?tabel=kuis_harian_soal&id=<?= $row['id'] ?>" class="px-1.5 py-0 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-600 hover:text-white transition-all">
-                                                    <i class="fas fa-edit text-[10px]"></i>
-                                                </a>
-                                                <a href="../actions/hapus.php?tabel=kuis_harian_soal&id=<?= $row['id'] ?>" onclick="return confirm('Hapus soal ini?')" class="px-1.5 py-0 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-600 hover:text-white transition-all">
-                                                    <i class="fas fa-trash text-[10px]"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endwhile;
-                            else: ?>
-                                <tr>
-                                    <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-xs font-bold italic uppercase">Belum ada data soal</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
         <?php include '../includes/footer_db.php'; ?>
     </main>

@@ -133,7 +133,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
     </style>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
@@ -141,8 +141,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
             <!-- Header section -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h3 class="text-2xl font-bold text-slate-800 tracking-tight">Manajemen Absensi</h3>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">Attendance Tracking & Management</p>
+                    <h3 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight text-center md:text-left">Manajemen Absensi</h3>
+                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 text-center md:text-left">Attendance Tracking & Management</p>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="confirmExport()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
@@ -156,38 +156,38 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
 
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                             <i class="fas fa-users text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Total Mahasiswa</div>
-                            <div class="text-xl font-bold text-slate-800 leading-none"><?= $total_students ?></div>
+                            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Total Mahasiswa</div>
+                            <div class="text-xl font-bold text-slate-800 dark:text-white leading-none"><?= $total_students ?></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50 group-hover:bg-emerald-600 group-hover:text-white transition-all">
                             <i class="fas fa-check-double text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Total Hadir</div>
-                            <div class="text-xl font-bold text-emerald-600 leading-none"><?= $total_hadir ?></div>
+                            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Total Hadir</div>
+                            <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 leading-none"><?= $total_hadir ?></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100 group-hover:bg-amber-600 group-hover:text-white transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 group-hover:bg-amber-600 group-hover:text-white transition-all">
                             <i class="fas fa-clipboard-list text-xl"></i>
                         </div>
                         <div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Total Entri</div>
-                            <div class="text-xl font-bold text-amber-600 leading-none"><?= $total_entries ?></div>
+                            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Total Entri</div>
+                            <div class="text-xl font-bold text-amber-600 dark:text-amber-400 leading-none"><?= $total_entries ?></div>
                         </div>
                     </div>
                 </div>
@@ -208,17 +208,17 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
 
             <!-- Filter Row -->
             <div class="mb-8">
-                <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+                <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-indigo-600"></div>
-                    <h3 class="text-xs font-bold text-slate-800 mb-4 flex items-center gap-2 uppercase tracking-widest">
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2 uppercase tracking-widest">
                         <i class="fas fa-filter text-indigo-600"></i>
                         Filter Data Absensi
                     </h3>
 
                     <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                         <div class="md:col-span-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 px-1">Mata Kuliah</label>
-                            <select name="matkul_id" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm" required>
+                            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5 px-1">Mata Kuliah</label>
+                            <select name="matkul_id" onchange="this.form.submit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm" required>
                                 <option value="">-- Pilih Matkul --</option>
                                 <?php foreach ($matkul_list as $ml): ?>
                                     <option value="<?= $ml['matkul_id'] ?>" <?= $f_matkul == $ml['matkul_id'] ? 'selected' : '' ?>><?= $ml['nama_matkul'] ?></option>
@@ -227,8 +227,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
                         </div>
 
                         <div class="md:col-span-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 px-1">Pertemuan</label>
-                            <select name="pertemuan" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm" required>
+                            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5 px-1">Pertemuan</label>
+                            <select name="pertemuan" onchange="this.form.submit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm" required>
                                 <option value="">-- Pertemuan --</option>
                                 <?php for ($i = 1; $i <= 16; $i++): ?>
                                     <option value="<?= $i ?>" <?= $f_pertemuan == $i ? 'selected' : '' ?>>Pertemuan <?= $i ?></option>
@@ -237,8 +237,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
                         </div>
 
                         <div class="md:col-span-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 px-1">Status Kehadiran</label>
-                            <select name="filter" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm">
+                            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5 px-1">Status Kehadiran</label>
+                            <select name="filter" onchange="this.form.submit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm">
                                 <option value="all" <?= $f_status == 'all' ? 'selected' : '' ?>>Semua Status</option>
                                 <option value="Hadir" <?= $f_status == 'Hadir' ? 'selected' : '' ?>>Hadir</option>
                                 <option value="Izin" <?= $f_status == 'Izin' ? 'selected' : '' ?>>Izin</option>
@@ -249,8 +249,8 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
 
                         <div class="md:col-span-1">
                             <div class="relative w-full">
-                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                                <input type="text" id="mhsSearchInput" placeholder="Cari nama mahasiswa..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-2.5 text-[11px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm font-semibold">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[10px]"></i>
+                                <input type="text" id="mhsSearchInput" placeholder="Cari nama mahasiswa..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-4 py-2.5 text-[11px] text-slate-800 dark:text-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm font-semibold">
                             </div>
                         </div>
                     </form>
@@ -258,35 +258,35 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
             </div>
 
             <!-- Attendance Table Card -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-12">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-12">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50">
+                    <h4 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2">
                         <i class="fas fa-table text-slate-400"></i>
                         Daftar Kehadiran Mahasiswa
                     </h4>
                     <?php if ($f_matkul && $f_pertemuan): ?>
-                        <span class="text-[10px] font-bold text-indigo-600 uppercase bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">P<?= $f_pertemuan ?> Terpilih</span>
+                        <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1 rounded-full border border-indigo-100 dark:border-indigo-950/50">P<?= $f_pertemuan ?> Terpilih</span>
                     <?php endif; ?>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left" id="attendanceTable">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-16 text-center">No</th>
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mahasiswa</th>
-                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Status</th>
+                            <tr class="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-16 text-center">No</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Mahasiswa</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             <?php if (empty($attendance_data)): ?>
                                 <tr>
                                     <td colspan="3" class="px-6 py-20 text-center">
                                         <div class="flex flex-col items-center gap-3">
-                                            <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
-                                                <i class="fas fa-filter text-2xl text-slate-200"></i>
+                                            <div class="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                                                <i class="fas fa-filter text-2xl text-slate-200 dark:text-slate-700"></i>
                                             </div>
-                                            <p class="text-sm font-semibold text-slate-400">Silakan pilih mata kuliah & pertemuan untuk menampilkan data.</p>
+                                            <p class="text-sm font-semibold text-slate-400 dark:text-slate-500">Silakan pilih mata kuliah & pertemuan untuk menampilkan data.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -294,29 +294,29 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
                                 <?php $no = 1;
                                 foreach ($attendance_data as $row):
                                     $statusClass = match ($row['status']) {
-                                        'Hadir' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
-                                        'Izin'  => 'bg-amber-100 text-amber-800 border-amber-200',
-                                        'Sakit' => 'bg-sky-100 text-sky-800 border-sky-200',
-                                        'Alpha' => 'bg-rose-100 text-rose-800 border-rose-200',
-                                        default => 'bg-slate-100 text-slate-400 border-slate-200 italic'
+                                        'Hadir' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50',
+                                        'Izin'  => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/50',
+                                        'Sakit' => 'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300 border-sky-200 dark:border-sky-800/50',
+                                        'Alpha' => 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400 border-rose-200 dark:border-rose-800/50',
+                                        default => 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 border-slate-200 dark:border-slate-700 italic'
                                     };
                                 ?>
-                                    <tr class="hover:bg-slate-50/80 transition-all mhs-row">
-                                        <td class="px-6 py-4 text-[11px] font-bold text-slate-400 text-center"><?= $no++ ?></td>
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-all mhs-row">
+                                        <td class="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center"><?= $no++ ?></td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-4">
-                                                <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 shrink-0 bg-white">
+                                                <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800">
                                                     <?php if (!empty($row['foto'])): ?>
                                                         <img src="<?= profilePhotoUrl($row['foto'], '../') ?>" class="w-full h-full object-cover">
                                                     <?php else: ?>
-                                                        <div class="w-full h-full flex items-center justify-center text-slate-200">
+                                                        <div class="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-700">
                                                             <i class="fas fa-user text-lg"></i>
                                                         </div>
                                                     <?php endif; ?>
                                                 </div>
                                                 <div>
-                                                    <div class="text-[11px] font-bold text-slate-700 leading-tight uppercase mhs-name"><?= htmlspecialchars($row['nama_lengkap']) ?></div>
-                                                    <div class="text-[9px] text-slate-400 font-semibold tracking-tighter mt-0.5"><?= $row['nim'] ?></div>
+                                                    <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 leading-tight uppercase mhs-name"><?= htmlspecialchars($row['nama_lengkap']) ?></div>
+                                                    <div class="text-[9px] text-slate-400 dark:text-slate-500 font-semibold tracking-tighter mt-0.5"><?= $row['nim'] ?></div>
                                                 </div>
                                             </div>
                                         </td>

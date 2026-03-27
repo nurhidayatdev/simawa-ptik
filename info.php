@@ -17,6 +17,12 @@ $periode = mysqli_fetch_assoc($q_periode);
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .text-gradient {
@@ -33,6 +39,16 @@ $periode = mysqli_fetch_assoc($q_periode);
                 radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
                 radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
+            transition: background-color 0.3s;
+        }
+
+        .dark .bg-mesh {
+            background-color: #020617;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
         }
 
         .hover-scale {
@@ -45,7 +61,8 @@ $periode = mysqli_fetch_assoc($q_periode);
     </style>
 </head>
 
-<body class="bg-mesh min-h-screen text-slate-800">
+<body class="bg-mesh min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-300">
+
     <?php include 'includes/header_main.php'; ?>
 
     <!-- Spacer -->
@@ -53,40 +70,40 @@ $periode = mysqli_fetch_assoc($q_periode);
 
     <main class="container mx-auto px-6 py-12 flex-grow">
         <!-- Hero Section -->
-        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Informasi Kelas</h1>
-        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Temukan filosofi di balik nama ProTechNoTy, struktur kepengurusan kelas, serta visi dan misi yang kami bawa.</p>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white scroll-reveal text-center transition-colors">Informasi Kelas</h1>
+        <p class="text-gray-500 dark:text-slate-400 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Temukan filosofi di balik nama ProTechNoTy, struktur kepengurusan kelas, serta visi dan misi yang kami bawa.</p>
 
         <!-- Section: Penjelasan Nama -->
         <section class="mb-16">
-            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-200 flex flex-col md:flex-row gap-8 items-stretch">
+            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-8 items-stretch">
                 <!-- Explanation List -->
                 <div class="w-full md:w-7/12 flex flex-col justify-center py-2 order-1 md:order-1">
-                    <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 w-max">
+                    <div class="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 w-max transition-colors">
                         Etimologi
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Arti <span class="text-indigo-600">PTIK C 24</span></h2>
-                    <p class="text-slate-400 text-xs mb-8">Simbol perjuangan dan identitas kolektif kita.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 transition-colors">Arti <span class="text-indigo-600 dark:text-indigo-400">PTIK C 24</span></h2>
+                    <p class="text-slate-400 dark:text-slate-500 text-xs mb-8 transition-colors">Simbol perjuangan dan identitas kolektif kita.</p>
 
                     <div class="space-y-4">
-                        <div class="flex gap-5 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm transition-all hover:border-indigo-200">
-                            <div class="h-10 w-10 shrink-0 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-black text-sm">P</div>
+                        <div class="flex gap-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-200 dark:hover:border-indigo-500">
+                            <div class="h-10 w-10 shrink-0 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">P</div>
                             <div>
-                                <p class="text-xs font-bold text-slate-700 leading-none">Pendidikan Teknik Informatika & Komputer</p>
-                                <p class="text-[11px] text-slate-400 mt-1.5">Program Studi kita di Universitas Negeri Makassar.</p>
+                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Pendidikan Teknik Informatika & Komputer</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Program Studi kita di Universitas Negeri Makassar.</p>
                             </div>
                         </div>
-                        <div class="flex gap-5 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm transition-all hover:border-cyan-200">
-                            <div class="h-10 w-10 shrink-0 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center font-black text-sm">C</div>
+                        <div class="flex gap-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500">
+                            <div class="h-10 w-10 shrink-0 bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">C</div>
                             <div>
-                                <p class="text-xs font-bold text-slate-700 leading-none">Kelas C</p>
-                                <p class="text-[11px] text-slate-400 mt-1.5">Identitas rombongan belajar angkatan kita.</p>
+                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Kelas C</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Identitas rombongan belajar angkatan kita.</p>
                             </div>
                         </div>
-                        <div class="flex gap-5 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm transition-all hover:border-slate-200">
-                            <div class="h-10 w-10 shrink-0 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-black text-sm">24</div>
+                        <div class="flex gap-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-slate-200 dark:hover:border-slate-600">
+                            <div class="h-10 w-10 shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">24</div>
                             <div>
-                                <p class="text-xs font-bold text-slate-700 leading-none">Angkatan 2024</p>
-                                <p class="text-[11px] text-slate-400 mt-1.5">Tahun dimulainya perjalanan akademik kita.</p>
+                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Angkatan 2024</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Tahun dimulainya perjalanan akademik kita.</p>
                             </div>
                         </div>
                     </div>
@@ -196,20 +213,19 @@ $periode = mysqli_fetch_assoc($q_periode);
             </div>
         </section>
 
-        <!-- Section: Download Assets Link -->
         <section class="max-w-2xl mx-auto px-4 sm:px-0">
             <a href="download.php" class="block group">
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-8 text-center sm:text-left">
+                <div class="glass-card p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-500 transition-all flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-8 text-center sm:text-left">
                     <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
-                        <div class="w-14 h-14 md:w-16 md:h-16 bg-indigo-600 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-indigo-200 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shrink-0">
+                        <div class="w-14 h-14 md:w-16 md:h-16 bg-indigo-600 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-indigo-200 dark:shadow-indigo-900/40 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shrink-0">
                             <i class="fa fa-cloud-arrow-down text-xl md:text-2xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-base md:text-lg font-bold text-slate-900">Download Official Assets</h3>
-                            <p class="text-[11px] md:text-xs text-slate-500 mt-1">Dapatkan Logo, Virtual Background, dan Resources kelas lainnya dalam kualitas HD.</p>
+                            <h3 class="text-base md:text-lg font-bold text-slate-900 dark:text-white transition-colors">Download Official Assets</h3>
+                            <p class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">Dapatkan Logo, Virtual Background, dan Resources kelas lainnya dalam kualitas HD.</p>
                         </div>
                     </div>
-                    <div class="hidden sm:flex h-10 w-10 rounded-full bg-slate-50 items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shrink-0">
+                    <div class="hidden sm:flex h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-800 items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shrink-0">
                         <i class="fa fa-chevron-right text-sm"></i>
                     </div>
                 </div>

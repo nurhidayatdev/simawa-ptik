@@ -10,7 +10,7 @@ $periode = mysqli_fetch_assoc($q_periode);
 <html lang="id">
 
 <head>
-    <title>Jejak Langkah - PTIK C 2024</title>
+    <title>Sejarah & Perjalanan - PTIK C 2024</title>
     <?php include 'includes/head.php'; ?>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -36,6 +36,16 @@ $periode = mysqli_fetch_assoc($q_periode);
                 radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
                 radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
+            transition: background-color 0.3s;
+        }
+
+        .dark .bg-mesh {
+            background-color: #020617;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
         }
 
         .narrative-container {
@@ -59,6 +69,11 @@ $periode = mysqli_fetch_assoc($q_periode);
             opacity: 0.3;
         }
 
+        .dark .narrative-line {
+            background: linear-gradient(to bottom, #6366f1 0%, #1e1b4b 100%);
+            opacity: 0.5;
+        }
+
         .story-block {
             position: relative;
             margin-bottom: 7rem;
@@ -68,13 +83,20 @@ $periode = mysqli_fetch_assoc($q_periode);
             position: absolute;
             left: -2.35rem;
             top: 0.4rem;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             background: #4f46e5;
             border-radius: 50%;
             border: 2px solid white;
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
             z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .dark .story-dot {
+            background: #6366f1;
+            border-color: #0f172a;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
         }
 
         @media (min-width: 1024px) {
@@ -92,6 +114,11 @@ $periode = mysqli_fetch_assoc($q_periode);
             color: #6366f1;
             margin-bottom: 0.5rem;
             display: block;
+            transition: color 0.3s;
+        }
+
+        .dark .story-date {
+            color: #818cf8;
         }
 
         .story-title {
@@ -101,6 +128,11 @@ $periode = mysqli_fetch_assoc($q_periode);
             margin-bottom: 1.25rem;
             line-height: 1.3;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: color 0.3s;
+        }
+
+        .dark .story-title {
+            color: #f8fafc;
         }
 
         .story-content {
@@ -108,11 +140,21 @@ $periode = mysqli_fetch_assoc($q_periode);
             line-height: 1.8;
             color: #475569;
             text-align: justify;
+            transition: color 0.3s;
+        }
+
+        .dark .story-content {
+            color: #94a3b8;
         }
 
         .highlight-text {
             color: #1e1b4b;
             font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .dark .highlight-text {
+            color: #818cf8;
         }
 
         .dropcap::first-letter {
@@ -123,6 +165,11 @@ $periode = mysqli_fetch_assoc($q_periode);
             margin-right: 0.6rem;
             color: #4f46e5;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: color 0.3s;
+        }
+
+        .dark .dropcap::first-letter {
+            color: #6366f1;
         }
 
 
@@ -136,15 +183,16 @@ $periode = mysqli_fetch_assoc($q_periode);
     </style>
 </head>
 
-<body class="bg-mesh min-h-screen">
+<body class="bg-mesh min-h-screen transition-colors duration-300">
+
     <?php include 'includes/header_main.php'; ?>
 
     <!-- Spacer -->
     <div class="h-10"></div>
 
     <main class="container mx-auto px-6 py-12 flex-grow">
-        <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Sejarah & Perjalanan</h1>
-        <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Kilas balik perjalanan ProTechNoTy dari awal terbentuk hingga menjadi komunitas digital yang solid.</p>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white scroll-reveal text-center transition-colors">Sejarah & Perjalanan</h1>
+        <p class="text-gray-500 dark:text-slate-400 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto transition-colors">Kilas balik perjalanan ProTechNoTy dari awal terbentuk hingga menjadi komunitas digital yang solid.</p>
         <div class="narrative-container">
             <div class="narrative-line"></div>
 
@@ -306,9 +354,9 @@ $periode = mysqli_fetch_assoc($q_periode);
             </article>
         </div>
 
-        <div class="text-center opacity-30">
-            <img src="assets/image/icon.webp" class="h-12 w-12 mx-auto grayscale mb-4">
-            <p class="text-[9px] font-bold tracking-[0.3em] uppercase">ProTechNoTy Class 24 • Since 2024</p>
+        <div class="text-center opacity-30 dark:opacity-20 mt-20">
+            <img src="assets/image/icon.webp" class="h-12 w-12 mx-auto grayscale invert dark:invert-0 mb-4 opacity-50">
+            <p class="text-[9px] font-bold tracking-[0.3em] uppercase dark:text-slate-400 transition-colors">ProTechNoTy Class 24 • Since 2024</p>
         </div>
 
     </main>

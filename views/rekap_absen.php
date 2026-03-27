@@ -146,11 +146,21 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             color: #166534;
             border: 1px solid #bbf7d0;
         }
+        .dark .abs-H {
+            background-color: rgba(22, 101, 52, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(22, 101, 52, 0.4);
+        }
 
         .abs-I {
             background-color: #fffbeb;
             color: #92400e;
             border: 1px solid #fde68a;
+        }
+        .dark .abs-I {
+            background-color: rgba(146, 64, 14, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(146, 64, 14, 0.4);
         }
 
         .abs-S {
@@ -158,11 +168,21 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             color: #075985;
             border: 1px solid #bae6fd;
         }
+        .dark .abs-S {
+            background-color: rgba(7, 89, 133, 0.2);
+            color: #38bdf8;
+            border: 1px solid rgba(7, 89, 133, 0.4);
+        }
 
         .abs-A {
             background-color: #fef2f2;
             color: #991b1b;
             border: 1px solid #fecaca;
+        }
+        .dark .abs-A {
+            background-color: rgba(153, 27, 27, 0.2);
+            color: #f87171;
+            border: 1px solid rgba(153, 27, 27, 0.4);
         }
 
         .abs-null {
@@ -170,11 +190,17 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             color: #cbd5e1;
             border: 1px solid #f1f5f9;
         }
+        .dark .abs-null {
+            background-color: #1e293b;
+            color: #475569;
+            border: 1px solid #334155;
+        }
 
         /* Sticky Column for Name */
         .sticky-col {
             background: white;
             z-index: 5;
+            transition: background 0.2s;
         }
 
         @media (min-width: 768px) {
@@ -186,22 +212,47 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
             }
         }
 
+        .dark .sticky-col {
+            background: #0f172a;
+            border-right: 1px solid #1e293b;
+        }
+
         tr:hover .sticky-col {
             background: #f8fafc;
+        }
+
+        .dark tr:hover .sticky-col {
+            background: #1e293b;
+        }
+
+        /* SweetAlert Dark Mode Fix */
+        .dark .swal2-popup {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid #1e293b !important;
+        }
+
+        .dark .swal2-title,
+        .dark .swal2-html-container {
+            color: #f8fafc !important;
+        }
+
+        .dark .swal2-confirm {
+            background-color: #312e81 !important;
         }
     </style>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
-    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen bg-indigo-950/5 dark:bg-slate-950 transition-colors duration-300">
         <div class="max-w-full mx-auto w-full">
             <!-- Header Section -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h3 class="text-2xl font-bold text-slate-800 tracking-tight">Rekap Absensi</h3>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest mt-1">Monitoring Attendance Matrix (P1-P16)</p>
+                    <h3 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Rekap Absensi</h3>
+                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Monitoring Attendance Matrix (P1-P16)</p>
                 </div>
                 <div class="flex gap-2">
                     <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
@@ -218,36 +269,36 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
 
             <!-- Stats Mini Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kehadiran Rata-rata</div>
-                    <div class="text-lg font-bold text-indigo-600"><?= $attendance_rate ?>%</div>
+                <div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Kehadiran Rata-rata</div>
+                    <div class="text-lg font-bold text-indigo-600 dark:text-indigo-400"><?= $attendance_rate ?>%</div>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Input</div>
-                    <div class="text-lg font-bold text-slate-800"><?= $total_entries ?> <span class="text-[10px] font-semibold text-slate-400 ml-1">Entri</span></div>
+                <div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Total Input</div>
+                    <div class="text-lg font-bold text-slate-800 dark:text-slate-200"><?= $total_entries ?> <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-600 ml-1">Entri</span></div>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Legenda Status</div>
+                <div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Legenda Status</div>
                     <div class="flex gap-1 mt-1">
-                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-H">H</span>
-                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-I">I</span>
-                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-S">S</span>
-                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-A">A</span>
+                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-H shadow-sm">H</span>
+                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-I shadow-sm">I</span>
+                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-S shadow-sm">S</span>
+                        <span class="w-4 h-4 rounded text-[8px] font-bold flex items-center justify-center abs-A shadow-sm">A</span>
                     </div>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mata Kuliah Aktif</div>
-                    <div class="text-lg font-bold text-slate-800"><?= count($matkul_list) ?></div>
+                <div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Mata Kuliah Aktif</div>
+                    <div class="text-lg font-bold text-slate-800 dark:text-slate-200"><?= count($matkul_list) ?></div>
                 </div>
             </div>
 
             <!-- Filter Card -->
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 relative overflow-hidden">
+            <div class="bg-white dark:bg-slate-900/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm mb-6 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1 h-full bg-indigo-600"></div>
                 <form method="GET" class="flex flex-col md:flex-row gap-4 items-end">
                     <div class="flex-grow">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5 px-1">Pilih Mata Kuliah untuk Melihat Rekap</label>
-                        <select name="matkul_id" onchange="this.form.submit()" class="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm">
+                        <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5 px-1">Pilih Mata Kuliah untuk Melihat Rekap</label>
+                        <select name="matkul_id" onchange="this.form.submit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 rounded-xl px-4 py-2.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer shadow-sm">
                             <?php foreach ($matkul_list as $ml): ?>
                                 <option value="<?= $ml['matkul_id'] ?>" <?= $f_matkul == $ml['matkul_id'] ? 'selected' : '' ?>><?= $ml['nama_matkul'] ?></option>
                             <?php endforeach; ?>
@@ -255,44 +306,44 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                     </div>
                     <div class="w-full md:w-64">
                         <div class="relative w-full">
-                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                            <input type="text" id="mhsSearchInput" placeholder="Cari nama mahasiswa..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-2.5 text-[11px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm font-semibold">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-[10px]"></i>
+                            <input type="text" id="mhsSearchInput" placeholder="Cari nama mahasiswa..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-4 py-2.5 text-[11px] text-slate-700 dark:text-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-600">
                         </div>
                     </div>
                 </form>
             </div>
 
             <!-- Attendance Matrix Card -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-12">
-                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fas fa-columns text-slate-400"></i>
+            <div class="bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden mb-12">
+                <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-950">
+                    <h4 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-columns text-slate-400 dark:text-slate-600"></i>
                         Matrix Kehadiran Mahasiswa
                     </h4>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase">Periode: <?= $periode['tahun_periode'] ?></span>
+                    <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Periode: <?= $periode['tahun_periode'] ?></span>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse" id="matrixTable">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest w-12 text-center">No</th>
-                                <th class="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest min-w-[250px] sticky-col">Mahasiswa</th>
+                            <tr class="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
+                                <th class="px-4 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest w-12 text-center">No</th>
+                                <th class="px-4 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest min-w-[250px] sticky-col">Mahasiswa</th>
                                 <?php for ($i = 1; $i <= 16; $i++): ?>
-                                    <th class="px-1 py-3 text-[9px] font-bold text-slate-400 uppercase text-center w-10">P<?= $i ?></th>
+                                    <th class="px-1 py-3 text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase text-center w-10">P<?= $i ?></th>
                                 <?php endfor; ?>
-                                <th class="px-4 py-3 text-[10px] font-bold text-slate-400 uppercase text-center w-20">%</th>
+                                <th class="px-4 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase text-center w-20">%</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                             <?php if (empty($student_list)): ?>
                                 <tr>
                                     <td colspan="19" class="px-5 py-20 text-center">
                                         <div class="flex flex-col items-center gap-3">
-                                            <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
-                                                <i class="fas fa-users-slash text-2xl text-slate-200"></i>
+                                            <div class="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                                                <i class="fas fa-users-slash text-2xl text-slate-200 dark:text-slate-700"></i>
                                             </div>
-                                            <p class="text-sm font-semibold text-slate-400 capitalize">Belum ada mahasiswa terdaftar di mata kuliah ini.</p>
+                                            <p class="text-sm font-semibold text-slate-400 dark:text-slate-500 capitalize">Belum ada mahasiswa terdaftar di mata kuliah ini.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -302,22 +353,22 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                                     $hadir_count = 0;
                                     $total_p = 0;
                                 ?>
-                                    <tr class="hover:bg-slate-50/80 transition-colors mhs-row">
-                                        <td class="px-4 py-3 text-[11px] font-bold text-slate-400 text-center"><?= $no++ ?></td>
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors mhs-row">
+                                        <td class="px-4 py-3 text-[11px] font-bold text-slate-400 dark:text-slate-600 text-center"><?= $no++ ?></td>
                                         <td class="px-4 py-3 sticky-col">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 shrink-0">
+                                                <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 shrink-0">
                                                     <?php if (!empty($s['foto'])): ?>
                                                         <img src="<?= profilePhotoUrl($s['foto'], '../') ?>" class="w-full h-full object-cover">
                                                     <?php else: ?>
-                                                        <div class="w-full h-full flex items-center justify-center text-slate-200">
+                                                        <div class="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-700">
                                                             <i class="fas fa-user text-[10px]"></i>
                                                         </div>
                                                     <?php endif; ?>
                                                 </div>
                                                 <div class="truncate">
-                                                    <div class="text-[10px] font-bold text-slate-700 truncate leading-tight uppercase mhs-name"><?= htmlspecialchars($s['nama_lengkap']) ?></div>
-                                                    <div class="text-[8px] text-slate-400 font-semibold tracking-tighter mt-0.5"><?= $s['nim'] ?></div>
+                                                    <div class="text-[10px] font-bold text-slate-700 dark:text-slate-200 truncate leading-tight uppercase mhs-name"><?= htmlspecialchars($s['nama_lengkap']) ?></div>
+                                                    <div class="text-[8px] text-slate-400 dark:text-slate-600 font-semibold tracking-tighter mt-0.5"><?= $s['nim'] ?></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -355,23 +406,23 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                     </table>
                 </div>
 
-                <div class="p-4 bg-slate-50 border-t border-slate-100">
+                <div class="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800">
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
                         <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded-sm abs-H"></span>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Hadir</span>
+                            <span class="w-3 h-3 rounded-sm abs-H shadow-sm"></span>
+                            <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Hadir</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded-sm abs-I"></span>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Izin</span>
+                            <span class="w-3 h-3 rounded-sm abs-I shadow-sm"></span>
+                            <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Izin</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded-sm abs-S"></span>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Sakit</span>
+                            <span class="w-3 h-3 rounded-sm abs-S shadow-sm"></span>
+                            <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Sakit</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded-sm abs-A"></span>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Alpha</span>
+                            <span class="w-3 h-3 rounded-sm abs-A shadow-sm"></span>
+                            <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Alpha</span>
                         </div>
                     </div>
                 </div>

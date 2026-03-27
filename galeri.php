@@ -27,7 +27,8 @@ include 'includes/pesan.php';
 	</style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 dark:bg-slate-950 min-h-screen flex flex-col transition-colors duration-300">
+
 	<?php include 'includes/header_main.php'; ?>
 
 	<!-- spacer to avoid content hidden under fixed header -->
@@ -36,8 +37,8 @@ include 'includes/pesan.php';
 	<main class="flex-grow">
 		<section class="py-12">
 			<div class="container mx-auto px-6">
-				<h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Galeri Kegiatan</h1>
-				<p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Abadikan setiap momen berharga dan keseruan kegiatan kelas dalam dokumentasi visual yang tertata.</p>
+				<h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white scroll-reveal text-center transition-colors">Galeri Kegiatan</h1>
+				<p class="text-gray-500 dark:text-slate-400 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Abadikan setiap momen berharga dan keseruan kegiatan kelas dalam dokumentasi visual yang tertata.</p>
 
 				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					<?php
@@ -49,7 +50,7 @@ include 'includes/pesan.php';
 							$galeri_id = $row['id'];
 							$slider_id = "s" . $galeri_id;
 					?>
-							<div class="bg-white rounded-xl shadow-md overflow-hidden flex flex-col scroll-reveal">
+							<div class="bg-white dark:bg-slate-900 rounded-xl shadow-md overflow-hidden flex flex-col scroll-reveal border border-transparent dark:border-slate-800">
 								<div class="relative group aspect-16-9 overflow-hidden">
 									<div class="slider h-full overflow-hidden relative" data-slider-id="<?= $slider_id ?>">
 										<div class="slides h-full flex transition-transform duration-500">
@@ -70,18 +71,18 @@ include 'includes/pesan.php';
 											?>
 										</div>
 									</div>
-									<button data-prev data-slider="<?= $slider_id ?>" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block transition-all hover:bg-white z-10"><i class="fas fa-chevron-left text-indigo-800"></i></button>
-									<button data-next data-slider="<?= $slider_id ?>" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-md hidden group-hover:block transition-all hover:bg-white z-10"><i class="fas fa-chevron-right text-indigo-800"></i></button>
+									<button data-prev data-slider="<?= $slider_id ?>" class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 dark:bg-slate-800/80 rounded-full p-2 shadow-md hidden group-hover:block transition-all hover:bg-white dark:hover:bg-slate-700 z-10"><i class="fas fa-chevron-left text-indigo-800 dark:text-indigo-400"></i></button>
+									<button data-next data-slider="<?= $slider_id ?>" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 dark:bg-slate-800/80 rounded-full p-2 shadow-md hidden group-hover:block transition-all hover:bg-white dark:hover:bg-slate-700 z-10"><i class="fas fa-chevron-right text-indigo-800 dark:text-indigo-400"></i></button>
 								</div>
 								<div class="p-3">
-									<h3 class="font-semibold text-sm mb-1 truncate"><?= $row['judul'] ?></h3>
-									<p class="text-[10px] text-gray-400"><i class="far fa-calendar-alt mr-1"></i><?= date('d M Y', strtotime($row['tanggal_kegiatan'])) ?></p>
+									<h3 class="font-semibold text-sm mb-1 truncate dark:text-white"><?= $row['judul'] ?></h3>
+									<p class="text-[10px] text-gray-400 dark:text-slate-500"><i class="far fa-calendar-alt mr-1"></i><?= date('d M Y', strtotime($row['tanggal_kegiatan'])) ?></p>
 								</div>
 							</div>
 					<?php
 						}
 					} else {
-						echo "<p class='text-center text-gray-500 col-span-full'>Belum ada galeri kegiatan.</p>";
+						echo "<p class='text-center text-gray-500 dark:text-slate-400 col-span-full py-20'>Belum ada galeri kegiatan.</p>";
 					}
 					?>
 				</div>

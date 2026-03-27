@@ -117,6 +117,27 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                 print-color-adjust: exact !important;
             }
 
+            /* Force Light Mode on Print even if .dark class is active */
+            .dark {
+                background-color: white !important;
+                color-scheme: light !important;
+            }
+
+            .dark #printableArea {
+                background-color: white !important;
+                color: #1e293b !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                box-shadow: none !important;
+            }
+
+            .dark #printableArea * {
+                border-color: #e2e8f0 !important;
+                --tw-ring-color: transparent !important;
+            }
+
             .no-print,
             aside,
             nav,
@@ -125,7 +146,8 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
             #mobile-menu-button,
             .swal2-container,
             button,
-            .flex.gap-2.no-print {
+            .flex.gap-2.no-print,
+            .absolute.top-0.right-0.bg-indigo-900\/20 {
                 display: none !important;
             }
 
@@ -144,7 +166,6 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                 box-shadow: none !important;
             }
 
-            /* Force elements to be side-by-side in print even on mobile */
             .print-row {
                 display: flex !important;
                 flex-direction: row !important;
@@ -173,6 +194,7 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                 width: 60px !important;
                 height: 60px !important;
                 margin-right: 1.5rem !important;
+                filter: brightness(0) saturate(100%) invert(8%) sepia(35%) saturate(5462%) hue-rotate(229deg) brightness(94%) contrast(100%) !important;
             }
 
             .print-student-info {
@@ -185,25 +207,69 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                 border-radius: 0.75rem !important;
             }
 
+            .dark .print-student-info {
+                background-color: #f8fafc !important;
+            }
+
+            .dark .print-student-info span:not(.text-slate-400):not(.text-slate-500) {
+                color: #1e293b !important;
+            }
+
+            .dark .print-student-info .text-slate-400,
+            .dark .print-student-info .text-slate-500 {
+                color: #64748b !important;
+            }
+
             .print-total-sks {
                 min-width: 100px !important;
                 padding: 0.75rem !important;
                 background-color: #312e81 !important;
                 color: white !important;
             }
+
+            .dark thead {
+                background-color: #1e293b !important;
+                color: white !important;
+            }
+
+            .dark tbody,
+            .dark tbody tr,
+            .dark tfoot,
+            .dark tfoot tr {
+                background-color: white !important;
+            }
+
+            .dark tbody td,
+            .dark tfoot td {
+                color: #334155 !important;
+            }
+
+            .dark .print-total-sks {
+                background-color: #f8fafc !important;
+                color: #312e81 !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+
+            .dark .print-total-sks span:first-child {
+                color: #64748b !important;
+            }
+
+            .dark .print-total-sks span:last-child {
+                color: #312e81 !important;
+            }
         }
     </style>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div id="printableArea" class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div id="printableArea" class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full transition-colors duration-300">
 
             <!-- KSM Header Logo -->
-            <div class="hidden print:flex print-header items-center justify-center text-center md:text-left gap-4 mb-8 pb-6 border-b-2 border-slate-200">
-                <img src="<?= $base ?>assets/image/logo.webp" alt="Logo UNM" class="w-20 h-20 object-contain" style="filter: brightness(0) saturate(100%) invert(8%) sepia(35%) saturate(5462%) hue-rotate(229deg) brightness(94%) contrast(100%);">
+            <div class="hidden print:flex print-header items-center justify-center text-center md:text-left gap-4 mb-8 pb-6 border-b-2 border-slate-200 dark:border-slate-800">
+                <img src="<?= $base ?>assets/image/logo.webp" alt="Logo UNM" class="w-20 h-20 object-contain dark:brightness-200" style="filter: brightness(0) saturate(100%) invert(8%) sepia(35%) saturate(5462%) hue-rotate(229deg) brightness(94%) contrast(100%);">
                 <div class="flex-1">
                     <h2 class="text-xl font-black text-indigo-950 uppercase tracking-tight">Universitas Negeri Makassar</h2>
                     <h3 class="text-lg font-bold text-slate-700 uppercase">Fakultas Teknik</h3>
@@ -213,7 +279,7 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
 
             <div class="flex flex-col md:flex-row print-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Kartu Studi Mahasiswa (KSM)</h1>
+                    <h1 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Kartu Studi Mahasiswa (KSM)</h1>
                 </div>
                 <div class="flex gap-2 no-print">
                     <?php if ($status_validasi !== 'approved'): ?>
@@ -233,42 +299,42 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
             </div>
 
             <!-- Student Info Block -->
-            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-6 flex flex-col md:flex-row print-student-info gap-4 items-center md:items-start relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-bl-full -mr-12 -mt-12 opacity-50 no-print"></div>
-                <img src="<?= profilePhotoUrl($foto, '../') ?>" alt="Foto Profil" class="w-20 h-20 rounded-lg object-cover border-2 border-white shadow-md z-10">
+            <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700 mb-6 flex flex-col md:flex-row print-student-info gap-4 items-center md:items-start relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50 dark:bg-indigo-900/20 rounded-bl-full -mr-12 -mt-12 opacity-50 no-print"></div>
+                <img src="<?= profilePhotoUrl($foto, '../') ?>" alt="Foto Profil" class="w-20 h-20 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-md z-10">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-x-8 gap-y-3 text-sm w-full z-10">
                     <div class="flex flex-col">
-                        <span class="text-slate-400 text-[9px] uppercase tracking-widest font-black mb-0.5">Nama Mahasiswa</span>
-                        <span class="text-slate-800 font-black text-base"><?= htmlspecialchars($nama_lengkap) ?></span>
+                        <span class="text-slate-400 dark:text-slate-500 text-[9px] uppercase tracking-widest font-black mb-0.5">Nama Mahasiswa</span>
+                        <span class="text-slate-800 dark:text-white font-black text-base"><?= htmlspecialchars($nama_lengkap) ?></span>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-slate-400 text-[9px] uppercase tracking-widest font-black mb-0.5">NIM</span>
-                        <span class="text-slate-800 font-bold text-base"><?= htmlspecialchars($nim) ?></span>
+                        <span class="text-slate-400 dark:text-slate-500 text-[9px] uppercase tracking-widest font-black mb-0.5">NIM</span>
+                        <span class="text-slate-800 dark:text-slate-200 font-bold text-base"><?= htmlspecialchars($nim) ?></span>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-slate-400 text-[9px] uppercase tracking-widest font-black mb-0.5">Periode Akademik</span>
-                        <span class="text-indigo-600 font-bold"><?= htmlspecialchars($periode_label) ?></span>
+                        <span class="text-slate-400 dark:text-slate-500 text-[9px] uppercase tracking-widest font-black mb-0.5">Periode Akademik</span>
+                        <span class="text-indigo-600 dark:text-indigo-400 font-bold"><?= htmlspecialchars($periode_label) ?></span>
                     </div>
                     <div class="flex flex-col">
-                        <span class="text-slate-400 text-[9px] uppercase tracking-widest font-black mb-0.5">Kelas</span>
-                        <span class="text-slate-800 font-bold text-base">PTIK C 2024</span>
+                        <span class="text-slate-400 dark:text-slate-500 text-[9px] uppercase tracking-widest font-black mb-0.5">Kelas</span>
+                        <span class="text-slate-800 dark:text-slate-200 font-bold text-base">PTIK C 2024</span>
                     </div>
                 </div>
-                <div class="bg-indigo-900 text-white p-3 px-6 rounded-xl shadow-lg text-center min-w-[120px] z-10 print-total-sks">
-                    <span class="block text-indigo-200 text-[9px] uppercase font-black tracking-widest mb-0.5">Total SKS</span>
+                <div class="bg-indigo-900 dark:bg-indigo-950 text-white p-3 px-6 rounded-xl shadow-lg text-center min-w-[120px] z-10 print-total-sks">
+                    <span class="block text-indigo-200 dark:text-indigo-400 text-[9px] uppercase font-black tracking-widest mb-0.5">Total SKS</span>
                     <span class="block text-3xl font-black"><?= $total_sks ?></span>
                 </div>
             </div>
 
             <!-- Warning if Pending/Rejected -->
             <?php if ($status_validasi !== 'approved'): ?>
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 mb-6">
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <i class="fas fa-exclamation-triangle text-yellow-400"></i>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm text-yellow-700">
+                            <p class="text-sm text-yellow-700 dark:text-yellow-400">
                                 KRS Anda saat ini berstatus <strong><?= ucfirst($status_validasi) ?></strong>.
                                 <?php if ($status_validasi === 'pending' && $total_sks > 0): ?>
                                     Anda sedang mengajukan perubahan KRS. Data di bawah adalah KSM yang telah disetujui sebelumnya.
@@ -284,9 +350,9 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
             <?php endif; ?>
 
             <!-- Table KSM -->
-            <div class="overflow-x-auto rounded-lg border border-slate-200">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-slate-800 text-white">
+            <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead class="bg-slate-800 dark:bg-slate-950 text-white">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider w-10">No</th>
                             <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">Kode</th>
@@ -294,7 +360,7 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                             <th class="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider">SKS</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200">
+                    <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
                         <?php
                         $no = 1;
                         if (!empty($ksm_data)):
@@ -310,25 +376,25 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                                     $jadwal = "{$row['hari']}, {$waktu}{$ruangan}";
                                 }
                         ?>
-                                <tr class="hover:bg-indigo-50 transition-colors">
-                                    <td class="px-4 py-3 text-xs text-slate-700 text-center"><?= $no++ ?></td>
-                                    <td class="px-4 py-3 text-xs text-slate-600 font-mono"><?= htmlspecialchars($row['kode_matkul']) ?></td>
-                                    <td class="px-4 py-3 text-xs text-slate-800 font-bold"><?= htmlspecialchars($row['nama_matkul']) ?></td>
-                                    <td class="px-4 py-3 text-xs text-slate-700 text-center font-semibold"><?= htmlspecialchars($row['sks']) ?></td>
+                                <tr class="hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors">
+                                    <td class="px-4 py-3 text-xs text-slate-700 dark:text-slate-400 text-center"><?= $no++ ?></td>
+                                    <td class="px-4 py-3 text-xs text-slate-600 dark:text-slate-500 font-mono"><?= htmlspecialchars($row['kode_matkul']) ?></td>
+                                    <td class="px-4 py-3 text-xs text-slate-800 dark:text-slate-200 font-bold"><?= htmlspecialchars($row['nama_matkul']) ?></td>
+                                    <td class="px-4 py-3 text-xs text-slate-700 dark:text-slate-400 text-center font-semibold"><?= htmlspecialchars($row['sks']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="px-6 py-8 text-center text-slate-400 text-xs italic">
+                                <td colspan="4" class="px-6 py-8 text-center text-slate-400 dark:text-slate-500 text-xs italic">
                                     Anda belum memprogramkan KRS atau KRS belum disetujui.
                                 </td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
-                    <tfoot class="bg-slate-100">
+                    <tfoot class="bg-slate-100 dark:bg-slate-900/50">
                         <tr>
-                            <td colspan="3" class="px-4 py-3 text-xs font-bold text-slate-700 text-right uppercase">Total SKS</td>
-                            <td class="px-4 py-3 text-xs font-black text-indigo-700 text-center"><?= $total_sks ?></td>
+                            <td colspan="3" class="px-4 py-3 text-xs font-bold text-slate-700 dark:text-slate-400 text-right uppercase">Total SKS</td>
+                            <td class="px-4 py-3 text-xs font-black text-indigo-700 dark:text-indigo-400 text-center"><?= $total_sks ?></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -353,9 +419,9 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                     ];
                     $tgl = date('d') . ' ' . $bulan_indo[date('F')] . ' ' . date('Y');
                     ?>
-                    <p class="text-xs text-slate-600 mb-16">Makassar, <?= $tgl ?></p>
-                    <p class="text-xs font-bold text-slate-800 underline"><?= htmlspecialchars($nama_lengkap) ?></p>
-                    <p class="text-[10px] text-slate-500">NIM. <?= htmlspecialchars($nim) ?></p>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-16">Makassar, <?= $tgl ?></p>
+                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200 underline"><?= htmlspecialchars($nama_lengkap) ?></p>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-500">NIM. <?= htmlspecialchars($nim) ?></p>
                 </div>
             </div>
 
@@ -371,14 +437,14 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Permintaan validasi telah dikirim ke Admin melalui Telegram.',
+                    text: 'Permintaan validasi telah dikirim ke Admin melalui WhatsApp.',
                     confirmButtonColor: '#3730a3'
                 });
             <?php elseif ($_GET['msg'] === 'notif_error'): ?>
                 Swal.fire({
                     icon: 'error',
                     title: 'Gagal!',
-                    text: 'Gagal mengirim notifikasi ke Telegram.',
+                    text: 'Gagal mengirim notifikasi ke WhatsApp.',
                     confirmButtonColor: '#3730a3'
                 });
             <?php endif; ?>

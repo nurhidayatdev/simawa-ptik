@@ -24,15 +24,18 @@ if (isset($_POST['kirim_pesan'])) {
         }
     }
 
-    $pesan_raw = $_POST['pesan_anonim'];
-    $pesan_db = mysqli_real_escape_string($koneksi, $pesan_raw);
+    $pesan_raw = trim($_POST['pesan_anonim']);
+    $pesan_clean = strip_tags($pesan_raw);
 
-    if (!empty($pesan_raw)) {
-        $query_pesan = "INSERT INTO pesan (isi_pesan) VALUES ('$pesan_db')";
-        if (mysqli_query($koneksi, $query_pesan)) {
+    if (!empty($pesan_clean)) {
+        // Use Prepared Statements for security and proper character handling
+        $stmt = $koneksi->prepare("INSERT INTO pesan (isi_pesan) VALUES (?)");
+        $stmt->bind_param("s", $pesan_clean);
+
+        if ($stmt->execute()) {
             // Kirim notifikasi ke WhatsApp
             include_once 'functions/kirim_pesan.php';
-            sendWhatsAppPesan($pesan_raw);
+            sendWhatsAppPesan($pesan_clean);
 
             // Redirect back with success
             $redirect_url = $_SERVER['HTTP_REFERER'] ?? 'index.php';
@@ -46,8 +49,11 @@ if (isset($_POST['kirim_pesan'])) {
             $final_url = strtok($redirect_url, '#') . $separator . "status=success#footer_form";
 
             $_SESSION['last_send'] = time(); // Simpan waktu terakhir kirim
+            $stmt->close();
             header("Location: $final_url");
             exit;
         }
+        $stmt->close();
     }
 }
+?>

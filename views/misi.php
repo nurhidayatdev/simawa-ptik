@@ -24,6 +24,19 @@ $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'akti
 $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'] ?? 0;
 
+/* =====================
+   TENTUKAN RENTANG TANGGAL SEMESTER (OTOMATIS)
+   ===================== */
+// Ambil tanggal mulai kuliah (Kuliah Bagian Pertama)
+$q_start = mysqli_query($koneksi, "SELECT tanggal_mulai FROM kalender_akademik WHERE periode_id = '$periode_id' AND kegiatan LIKE '%Kuliah Bagian Pertama%' ORDER BY tanggal_mulai ASC LIMIT 1");
+$start_res = mysqli_fetch_assoc($q_start);
+$semester_start = $start_res['tanggal_mulai'] ?? "2026-01-19";
+
+// Ambil tanggal selesai kuliah (Kuliah Bagian Kedua)
+$q_end = mysqli_query($koneksi, "SELECT tanggal_selesai FROM kalender_akademik WHERE periode_id = '$periode_id' AND kegiatan LIKE '%Kuliah Bagian Kedua%' ORDER BY tanggal_selesai DESC LIMIT 1");
+$end_res = mysqli_fetch_assoc($q_end);
+$semester_end = $end_res['tanggal_selesai'] ?? date('Y-12-31');
+
 // --- HITUNG PROGRES MISI ---
 
 // 1. Misi Kas
@@ -52,6 +65,20 @@ $q_nim = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE id = '$mhs_id'"
 $nim_mhs = mysqli_fetch_assoc($q_nim)['nim'] ?? '';
 $res_kelompok = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kelompok WHERE FIND_IN_SET('$nim_mhs', REPLACE(anggota, ' ', '')) OR anggota LIKE '%$nim_mhs%'");
 $count_kelompok = mysqli_fetch_assoc($res_kelompok)['total'] ?? 0;
+
+// 7. Misi Login (Vibe Check) - Filtered by Semester Range
+$res_vibe = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM vibe_check WHERE user_id = '$user_id' AND DATE(created_at) BETWEEN '$semester_start' AND '$semester_end'");
+$count_vibe = mysqli_fetch_assoc($res_vibe)['total'] ?? 0;
+
+// 8. Misi Koleksi Vibe (Pilih Semua Vibe) - Filtered by Semester Range
+$res_vibe_sets = mysqli_query($koneksi, "SELECT mood, COUNT(*) as cnt FROM vibe_check WHERE user_id = '$user_id' AND DATE(created_at) BETWEEN '$semester_start' AND '$semester_end' GROUP BY mood");
+$mood_counts = ['productive' => 0, 'stress' => 0, 'relaxed' => 0, 'tired' => 0, 'hyper' => 0];
+while ($vs = mysqli_fetch_assoc($res_vibe_sets)) {
+    if (isset($mood_counts[$vs['mood']])) {
+        $mood_counts[$vs['mood']] = (int)$vs['cnt'];
+    }
+}
+$count_vibe_sets = min($mood_counts);
 
 // Definisi Misi
 $missions = [
@@ -89,6 +116,28 @@ $missions = [
         ]
     ],
     [
+        'category' => 'Konsistensi',
+        'title' => 'Si Paling Login',
+        'icon' => 'fa-door-open',
+        'color' => 'cyan',
+        'levels' => [
+            ['name' => '10 Login', 'target' => 10, 'current' => $count_vibe, 'desc' => 'Lakukan login sebanyak 10 kali'],
+            ['name' => '30 Login', 'target' => 30, 'current' => $count_vibe, 'desc' => 'Lakukan login sebanyak 30 kali'],
+            ['name' => '60 Login', 'target' => 60, 'current' => $count_vibe, 'desc' => 'Lakukan login sebanyak 60 kali']
+        ]
+    ],
+    [
+        'category' => 'Konsistensi',
+        'title' => 'Kolektor Mood',
+        'icon' => 'fa-palette',
+        'color' => 'yellow',
+        'levels' => [
+            ['name' => 'Satu Putaran', 'target' => 1, 'current' => $count_vibe_sets, 'desc' => 'Pilih semua jenis vibe setidaknya masing-masing 1 kali'],
+            ['name' => 'Tiga Putaran', 'target' => 3, 'current' => $count_vibe_sets, 'desc' => 'Pilih semua jenis vibe setidaknya masing-masing 3 kali'],
+            ['name' => 'Tujuh Putaran', 'target' => 7, 'current' => $count_vibe_sets, 'desc' => 'Pilih semua jenis vibe setidaknya masing-masing 7 kali']
+        ]
+    ],
+    [
         'category' => 'Sosial',
         'title' => 'Warga Kelas Aktif',
         'icon' => 'fa-user-check',
@@ -96,7 +145,7 @@ $missions = [
         'levels' => [
             ['name' => 'KRS Terisi', 'target' => 1, 'current' => ($count_krs > 0 ? 1 : 0), 'desc' => 'Selesaikan pengisian KRS semester ini'],
             ['name' => 'Profil Lengkap', 'target' => 1, 'current' => $profil_lengkap, 'desc' => 'Lengkapi foto (bukan default), instagram & bio'],
-            ['name' => 'Si Paling Kelompok', 'target' => 9, 'current' => $count_kelompok, 'desc' => 'Terjalin dalam 9 kelompok mata kuliah']
+            ['name' => 'Si Paling Kelompok', 'target' => 5, 'current' => $count_kelompok, 'desc' => 'Terjalin dalam 5 kelompok mata kuliah']
         ]
     ]
 ];
@@ -107,7 +156,8 @@ $color_filters = [
     'blue'    => 'brightness(0) saturate(100%) invert(51%) sepia(85%) saturate(2394%) hue-rotate(201deg) brightness(99%) contrast(94%)',
     'orange'  => 'brightness(0) saturate(100%) invert(62%) sepia(77%) saturate(3143%) hue-rotate(352deg) brightness(101%) contrast(96%)',
     'purple'  => 'brightness(0) saturate(100%) invert(43%) sepia(72%) saturate(3085%) hue-rotate(244deg) brightness(102%) contrast(95%)',
-    'yellow'  => 'brightness(0) saturate(100%) invert(91%) sepia(96%) saturate(1313%) hue-rotate(359deg) brightness(101%) contrast(101%)'
+    'yellow'  => 'brightness(0) saturate(100%) invert(91%) sepia(96%) saturate(1313%) hue-rotate(359deg) brightness(101%) contrast(101%)',
+    'cyan'    => 'brightness(0) saturate(100%) invert(75%) sepia(50%) saturate(2000%) hue-rotate(150deg) brightness(100%) contrast(100%)'
 ];
 ?>
 <!DOCTYPE html>
@@ -126,6 +176,12 @@ $color_filters = [
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .mission-card:hover {
@@ -148,28 +204,28 @@ $color_filters = [
 
 </head>
 
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300 min-h-screen">
     <?php include '../includes/menu_db.php'; ?>
 
-    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen bg-indigo-950/5">
+    <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen bg-indigo-950/5 dark:bg-slate-950 transition-colors duration-300">
         <div class="max-w-6xl mx-auto w-full">
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Pusat Misi & Pencapaian</h1>
-                <p class="text-slate-500 text-sm mt-1">Selesaikan misi untuk mendapatkan lencana prestisius!</p>
+                <h1 class="text-3xl font-bold text-slate-800 dark:text-white tracking-tight">Pusat Misi & Pencapaian</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Selesaikan misi untuk mendapatkan lencana prestisius!</p>
             </div>
 
 
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <?php foreach ($missions as $cat): ?>
-                    <div class="glass p-6 rounded-2xl shadow-xl transition-all mission-card">
+                    <div class="glass dark:bg-slate-900/80 p-6 rounded-2xl shadow-xl dark:shadow-slate-950/20 border border-white/30 dark:border-slate-800 transition-all mission-card">
                         <div class="flex items-center gap-4 mb-6">
-                            <div class="w-14 h-14 rounded-2xl bg-<?= $cat['color'] ?>-100 flex items-center justify-center text-<?= $cat['color'] ?>-600 shadow-inner">
+                            <div class="w-14 h-14 rounded-2xl bg-<?= $cat['color'] ?>-100 dark:bg-<?= $cat['color'] ?>-900/30 flex items-center justify-center text-<?= $cat['color'] ?>-600 dark:text-<?= $cat['color'] ?>-400 shadow-inner">
                                 <i class="fa <?= $cat['icon'] ?> text-2xl"></i>
                             </div>
                             <div>
-                                <span class="text-[10px] uppercase font-bold tracking-widest text-<?= $cat['color'] ?>-600"><?= $cat['category'] ?></span>
-                                <h3 class="text-xl font-semibold text-slate-800"><?= $cat['title'] ?></h3>
+                                <span class="text-[10px] uppercase font-bold tracking-widest text-<?= $cat['color'] ?>-600 dark:text-<?= $cat['color'] ?>-400"><?= $cat['category'] ?></span>
+                                <h3 class="text-xl font-semibold text-slate-800 dark:text-slate-200"><?= $cat['title'] ?></h3>
                             </div>
                         </div>
 
@@ -178,10 +234,10 @@ $color_filters = [
                                 $progress = min(100, ($level['current'] / $level['target']) * 100);
                                 $is_completed = ($level['current'] >= $level['target']);
                             ?>
-                                <div class="bg-white/50 p-4 rounded-xl border border-white/80 shadow-sm">
+                                <div class="bg-white/50 dark:bg-slate-800/50 p-4 rounded-xl border border-white/80 dark:border-slate-700/50 shadow-sm">
                                     <div class="flex justify-between items-start mb-2">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full flex items-center justify-center <?= $is_completed ? 'bg-' . $cat['color'] . '-100 completed' : 'bg-slate-100 text-slate-400 locked' ?>">
+                                            <div class="w-10 h-10 rounded-full flex items-center justify-center <?= $is_completed ? 'bg-' . $cat['color'] . '-100 dark:bg-' . $cat['color'] . '-900/20 completed' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 locked' ?>">
                                                 <?php if ($is_completed): ?>
                                                     <img src="../assets/image/logo.webp" class="w-6 h-6 object-contain" style="filter: <?= $color_filters[$cat['color']] ?? $color_filters['yellow'] ?>;">
                                                 <?php else: ?>
@@ -189,21 +245,21 @@ $color_filters = [
                                                 <?php endif; ?>
                                             </div>
                                             <div>
-                                                <h4 class="font-semibold text-sm text-slate-700"><?= $level['name'] ?></h4>
-                                                <p class="text-[10px] text-slate-500"><?= $level['desc'] ?></p>
+                                                <h4 class="font-semibold text-sm text-slate-700 dark:text-slate-200"><?= $level['name'] ?></h4>
+                                                <p class="text-[10px] text-slate-500 dark:text-slate-400"><?= $level['desc'] ?></p>
                                             </div>
                                         </div>
                                         <div class="text-right">
-                                            <span class="text-xs font-bold text-slate-700"><?= $level['current'] ?> / <?= $level['target'] ?></span>
+                                            <span class="text-xs font-bold text-slate-700 dark:text-slate-200"><?= $level['current'] ?> / <?= $level['target'] ?></span>
                                         </div>
                                     </div>
 
-                                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden mt-3 shadow-inner">
+                                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden mt-3 shadow-inner">
                                         <div class="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-<?= $cat['color'] ?>-400 to-<?= $cat['color'] ?>-600" style="width: <?= $progress ?>%"></div>
                                     </div>
 
                                     <?php if ($is_completed): ?>
-                                        <div class="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-green-600 uppercase">
+                                        <div class="mt-3 flex items-center gap-1.5 text-[10px] font-semibold text-green-600 dark:text-emerald-400 uppercase">
                                             <i class="fa fa-check-circle"></i> Berhasil Dicapai!
                                         </div>
                                     <?php endif; ?>

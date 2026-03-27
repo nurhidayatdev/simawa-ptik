@@ -120,39 +120,75 @@ $total_done = $count_personal_done + $count_global_done;
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* SweetAlert Dark Mode Fix */
+        .dark .swal2-popup {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+            border: 1px solid #1e293b !important;
+        }
+
+        .dark .swal2-title,
+        .dark .swal2-html-container {
+            color: #f8fafc !important;
+        }
+
+        .dark .swal2-input,
+        .dark .swal2-select,
+        .dark .swal2-textarea {
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            border-color: #334155 !important;
+        }
+
+        .dark .swal2-confirm {
+            background-color: #312e81 !important;
+        }
     </style>
 </head>
 
-<body class="bg-slate-50">
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="max-w-5xl mx-auto w-full">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800">Tugas Saya</h2>
-                    <p class="text-sm text-slate-500">Kelola tugas kuliah dan tugas pribadi Anda di sini.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Tugas Saya</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Kelola tugas kuliah dan tugas pribadi Anda di sini.</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="flex bg-white/50 backdrop-blur-sm p-1 rounded-2xl border border-slate-200 shadow-sm">
-                        <a href="tugas_saya" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 <?= !$show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
+                    <div class="flex bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-1 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <a href="tugas_saya" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 <?= !$show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-indigo-900/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' ?>">
                             Tugas Aktif
                             <?php if ($total_active > 0): ?>
-                                <span class="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[8px] font-extrabold <?= !$show_done ? 'bg-white text-indigo-600' : 'bg-slate-200 text-slate-600' ?>">
+                                <span class="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[8px] font-extrabold <?= !$show_done ? 'bg-white text-indigo-600' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' ?>">
                                     <?= $total_active ?>
                                 </span>
                             <?php endif; ?>
                         </a>
-                        <a href="tugas_saya?show_done=1" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 <?= $show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'text-slate-500 hover:text-slate-700' ?>">
+                        <a href="tugas_saya?show_done=1" class="px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 <?= $show_done ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-indigo-900/20' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200' ?>">
                             Tugas Selesai
                             <?php if ($total_done > 0): ?>
-                                <span class="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[8px] font-extrabold <?= $show_done ? 'bg-white text-indigo-600' : 'bg-slate-200 text-slate-600' ?>">
+                                <span class="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[8px] font-extrabold <?= $show_done ? 'bg-white text-indigo-600' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' ?>">
                                     <?= $total_done ?>
                                 </span>
                             <?php endif; ?>
                         </a>
                     </div>
-                    <button onclick="showAddModal()" class="bg-white hover:bg-slate-50 text-indigo-600 border border-indigo-100 w-10 h-10 rounded-2xl shadow-sm transition-all flex items-center justify-center">
+                    <button onclick="showAddModal()" class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 w-10 h-10 rounded-2xl shadow-sm transition-all flex items-center justify-center">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -162,13 +198,13 @@ $total_done = $count_personal_done + $count_global_done;
                 <!-- Global Tasks (From Admin) -->
                 <div>
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                            <i class="fas fa-university text-indigo-600"></i> Tugas Kelas
+                        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                            <i class="fas fa-university text-indigo-600 dark:text-indigo-400"></i> Tugas Kelas
                         </h3>
                         <?php if (!$show_done && $count_global_active > 0): ?>
                             <form id="form-complete-global" method="POST">
                                 <input type="hidden" name="action" value="complete_all_global">
-                                <button type="button" onclick="confirmCompleteAll('global')" class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1.5 rounded-xl hover:bg-indigo-100 transition-all border border-indigo-100/50 flex items-center gap-1.5 ring-offset-2 focus:ring-2 focus:ring-indigo-100 outline-none">
+                                <button type="button" onclick="confirmCompleteAll('global')" class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1.5 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all border border-indigo-100/50 dark:border-indigo-800/50 flex items-center gap-1.5 ring-offset-2 focus:ring-2 focus:ring-indigo-100 outline-none">
                                     <i class="fas fa-check-double"></i> Selesaikan Semua
                                 </button>
                             </form>
@@ -182,41 +218,51 @@ $total_done = $count_personal_done + $count_global_done;
                                 $deadline_ts = strtotime($row['deadline_tanggal'] . ' ' . $row['deadline_pukul']);
                                 $is_overdue = ($deadline_ts < time() && !$row['is_done']);
                                 $json_data = htmlspecialchars(json_encode($row));
+
+                                // Determine dynamic classes
+                                $is_special = $is_overdue && !$row['is_done'];
+                                $card_bg = $is_special ? "bg-rose-50/20 dark:bg-rose-900/10" : "bg-white dark:bg-slate-900";
+                                $card_border = $is_special ? "border-rose-200 dark:border-rose-900/50" : "border-slate-200 dark:border-slate-800";
+                                
+                                $card_class = "$card_bg $card_border";
+                                if ($row['is_done']) $card_class .= " opacity-60 grayscale-[0.5]";
+                                
+                                $title_class = $row['is_done'] ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-800 dark:text-slate-200";
                             ?>
-                                <div onclick="showDetail('global', <?= $json_data ?>)" class="bg-white p-5 rounded-3xl border shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['is_done'] ? 'border-slate-200 opacity-60 grayscale-[0.5]' : ($is_overdue ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200') ?>">
+                                <div onclick="showDetail('global', <?= $json_data ?>)" class="p-5 rounded-3xl border shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $card_class ?>">
                                     <div class="flex items-start gap-4">
                                         <form method="POST" class="mt-1" onclick="event.stopPropagation()">
                                             <input type="hidden" name="action" value="toggle_global">
                                             <input type="hidden" name="tugas_id" value="<?= $row['id'] ?>">
-                                            <button type="submit" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all <?= $row['is_done'] ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-200 text-transparent hover:border-indigo-400' ?>">
+                                            <button type="submit" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all <?= $row['is_done'] ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-200 dark:border-slate-700 text-transparent hover:border-indigo-400' ?>">
                                                 <i class="fas fa-check text-xs"></i>
                                             </button>
                                         </form>
                                         <div class="flex-1">
                                             <div class="flex justify-between items-start mb-1">
-                                                <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-widest"><?= htmlspecialchars($row['nama_matkul']) ?></span>
+                                                <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest"><?= htmlspecialchars($row['nama_matkul']) ?></span>
                                                 <div class="flex flex-col items-end">
                                                     <div class="flex items-center gap-1.5">
                                                         <?php if ($is_overdue): ?>
                                                             <span class="bg-rose-500 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded-md animate-pulse">TERLEWAT</span>
                                                         <?php endif; ?>
-                                                        <span class="text-[10px] font-semibold text-slate-500"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
+                                                        <span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400"><?= date('d M Y', strtotime($row['deadline_tanggal'])) ?></span>
                                                     </div>
                                                     <span class="text-[9px] font-medium text-rose-400 uppercase tracking-tighter"><?= date('H:i', strtotime($row['deadline_pukul'])) ?> WITA</span>
                                                 </div>
                                             </div>
-                                            <h4 class="text-sm font-semibold text-slate-800 leading-tight <?= $row['is_done'] ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['nama_matkul']) ?></h4>
-                                            <div class="text-[11px] text-slate-500 mt-2 leading-relaxed line-clamp-2"><?= $row['deskripsi_clean'] ?></div>
-
+                                            <h4 class="text-sm font-semibold leading-tight <?= $title_class ?>"><?= htmlspecialchars($row['nama_matkul']) ?></h4>
+                                            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed line-clamp-2"><?= $row['deskripsi_clean'] ?></div>
+ 
                                             <div class="flex flex-wrap gap-2 mt-4" onclick="event.stopPropagation()">
                                                 <?php if (!empty($row['file_tugas'])): ?>
-                                                    <a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-semibold border border-blue-100 hover:bg-blue-100 transition-colors">
+                                                    <a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-semibold border border-blue-100 dark:border-blue-900/50 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
                                                         <i class="fas fa-file-download"></i> Unduh File
                                                     </a>
                                                 <?php endif; ?>
-
+ 
                                                 <?php if (!empty($row['link_kirim'])): ?>
-                                                    <a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-semibold border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                                                    <a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-semibold border border-indigo-100 dark:border-indigo-900/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
                                                         <i class="fas fa-paper-plane"></i> Kirim Tugas
                                                     </a>
                                                 <?php endif; ?>
@@ -226,9 +272,9 @@ $total_done = $count_personal_done + $count_global_done;
                                 </div>
                             <?php endwhile; ?>
                         <?php else: ?>
-                            <div class="bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center">
-                                <i class="fas fa-check-circle text-slate-300 text-3xl mb-2"></i>
-                                <p class="text-xs text-slate-400 font-medium"><?= $show_done ? 'Belum ada tugas kelas.' : 'Semua tugas kelas telah selesai! ✨' ?></p>
+                            <div class="bg-slate-100/50 dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center">
+                                <i class="fas fa-check-circle text-slate-300 dark:text-slate-700 text-3xl mb-2"></i>
+                                <p class="text-xs text-slate-400 dark:text-slate-500 font-medium"><?= $show_done ? 'Belum ada tugas kelas.' : 'Semua tugas kelas telah selesai! ✨' ?></p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -237,13 +283,13 @@ $total_done = $count_personal_done + $count_global_done;
                 <!-- Personal Tasks -->
                 <div>
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                            <i class="fas fa-user text-indigo-600"></i> Tugas Pribadi
+                        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                            <i class="fas fa-user text-indigo-600 dark:text-indigo-400"></i> Tugas Pribadi
                         </h3>
                         <?php if (!$show_done && $count_personal_active > 0): ?>
                             <form id="form-complete-personal" method="POST">
                                 <input type="hidden" name="action" value="complete_all_personal">
-                                <button type="button" onclick="confirmCompleteAll('personal')" class="text-[9px] font-bold text-rose-600 bg-rose-50 px-2.5 py-1.5 rounded-xl hover:bg-rose-100 transition-all border border-rose-100/50 flex items-center gap-1.5 ring-offset-2 focus:ring-2 focus:ring-rose-100 outline-none">
+                                <button type="button" onclick="confirmCompleteAll('personal')" class="text-[9px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-2.5 py-1.5 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-all border border-rose-100/50 dark:border-rose-800/50 flex items-center gap-1.5 ring-offset-2 focus:ring-2 focus:ring-rose-100 outline-none">
                                     <i class="fas fa-check-double"></i> Selesaikan Semua
                                 </button>
                             </form>
@@ -256,49 +302,59 @@ $total_done = $count_personal_done + $count_global_done;
                                 $deadline_ts = $row['deadline'] ? strtotime($row['deadline']) : null;
                                 $is_overdue = ($deadline_ts && $deadline_ts < time() && $row['status'] == 'belum');
                                 $json_data = htmlspecialchars(json_encode($row));
+
+                                // Determine dynamic classes
+                                $is_special = $is_overdue && $row['status'] == 'belum';
+                                $card_bg = $is_special ? "bg-rose-50/20 dark:bg-rose-900/10" : "bg-white dark:bg-slate-900";
+                                $card_border = $is_special ? "border-rose-200 dark:border-rose-900/50" : "border-slate-200 dark:border-slate-800";
+                                
+                                $card_class = "$card_bg $card_border";
+                                if ($row['status'] == 'selesai') $card_class .= " opacity-60 grayscale-[0.5]";
+                                
+                                $title_class = $row['status'] == 'selesai' ? "line-through text-slate-400 dark:text-slate-500" : "text-slate-800 dark:text-slate-200";
                             ?>
-                                <div onclick="showDetail('personal', <?= $json_data ?>)" class="bg-white p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $row['status'] == 'selesai' ? 'border-slate-200 opacity-60 grayscale-[0.5]' : ($is_overdue ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200') ?>">
+                                <div onclick="showDetail('personal', <?= $json_data ?>)" class="p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all cursor-pointer group <?= $card_class ?>">
                                     <div class="flex items-start gap-3">
                                         <form method="POST" class="mt-1" onclick="event.stopPropagation()">
                                             <input type="hidden" name="action" value="toggle_personal">
                                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
                                             <input type="hidden" name="status" value="<?= $row['status'] ?>">
-                                            <button type="submit" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all <?= $row['status'] == 'selesai' ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 text-transparent hover:border-indigo-400' ?>">
+                                            <button type="submit" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all <?= $row['status'] == 'selesai' ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-slate-300 dark:border-slate-700 text-transparent hover:border-indigo-400' ?>">
                                                 <i class="fas fa-check text-[10px]"></i>
                                             </button>
                                         </form>
                                         <div class="flex-1">
                                             <div class="flex justify-between items-start">
-                                                <span class="text-[10px] font-bold text-rose-500 uppercase tracking-widest">Pribadi</span>
-                                                <div class="flex items-center gap-2 text-slate-400" onclick="event.stopPropagation()">
+                                                <span class="text-[10px] font-bold text-rose-500 dark:text-rose-400 uppercase tracking-widest">Pribadi</span>
+                                                <div class="flex items-center gap-2 text-slate-400 dark:text-slate-500" onclick="event.stopPropagation()">
                                                     <?php if ($is_overdue): ?>
                                                         <span class="bg-rose-500 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded-md animate-pulse">TERLEWAT</span>
                                                     <?php endif; ?>
                                                     <span class="text-[10px] font-semibold"><?= $row['deadline'] ? date('d M Y, H:i', strtotime($row['deadline'])) : '' ?></span>
-                                                    <button type="button" onclick="event.stopPropagation(); showEditModal(<?= $json_data ?>)" class="hover:text-indigo-500 transition-colors">
+                                                    <button type="button" onclick="event.stopPropagation(); showEditModal(<?= $json_data ?>)" class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">
                                                         <i class="fas fa-edit text-[10px]"></i>
                                                     </button>
                                                     <form id="delete-form-<?= $row['id'] ?>" method="POST">
                                                         <input type="hidden" name="action" value="delete_personal">
                                                         <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                                                        <button type="button" onclick="confirmDelete(<?= $row['id'] ?>)" class="hover:text-red-500 transition-colors">
+                                                        <button type="button" onclick="confirmDelete(<?= $row['id'] ?>)" class="hover:text-red-500 dark:hover:text-red-400 transition-colors">
                                                             <i class="fas fa-trash-alt text-[10px]"></i>
                                                         </button>
                                                     </form>
                                                 </div>
                                             </div>
-                                            <h4 class="text-sm font-semibold text-slate-800 mt-1 <?= $row['status'] == 'selesai' ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($row['judul']) ?></h4>
+                                            <h4 class="text-sm font-semibold mt-1 <?= $title_class ?>"><?= htmlspecialchars($row['judul']) ?></h4>
                                             <?php if ($row['deskripsi']): ?>
-                                                <p class="text-[10px] text-slate-500 mt-1 line-clamp-2"><?= htmlspecialchars($row['deskripsi']) ?></p>
+                                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2"><?= htmlspecialchars($row['deskripsi']) ?></p>
                                             <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
                             <?php endwhile; ?>
                         <?php else: ?>
-                            <div class="bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center">
-                                <i class="fas fa-plus-circle text-slate-300 text-3xl mb-2 cursor-pointer" onclick="showAddModal()"></i>
-                                <p class="text-xs text-slate-400 font-medium"><?= $show_done ? 'Belum ada tugas pribadi.' : 'Tugas pribadi sudah beres semua! 🚀' ?></p>
+                            <div class="bg-slate-100/50 dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center">
+                                <i class="fas fa-plus-circle text-slate-300 dark:text-slate-700 text-3xl mb-2 cursor-pointer" onclick="showAddModal()"></i>
+                                <p class="text-xs text-slate-400 dark:text-slate-500 font-medium"><?= $show_done ? 'Belum ada tugas pribadi.' : 'Tugas pribadi sudah beres semua! 🚀' ?></p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -310,38 +366,38 @@ $total_done = $count_personal_done + $count_global_done;
     </main>
 
     <!-- Modal Tambah Tugas -->
-    <div id="addModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up">
-            <div class="bg-indigo-600 p-6 text-white text-center">
+    <div id="addModal" class="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up border border-slate-100 dark:border-slate-800">
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-6 text-white text-center">
                 <h3 class="text-xl font-bold">Tambah Tugas</h3>
                 <p class="text-xs text-indigo-100 mt-1 opacity-80">Rencanakan tugas harian Anda.</p>
             </div>
             <form method="POST" class="p-6 space-y-4">
                 <input type="hidden" name="action" value="add_personal">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
-                    <input type="text" name="judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium">
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
+                    <input type="text" name="judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium dark:text-slate-200">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
-                    <input type="datetime-local" name="deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium">
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
+                    <input type="datetime-local" name="deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium dark:text-slate-200">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
-                    <textarea name="deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium resize-none"></textarea>
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
+                    <textarea name="deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all text-sm font-medium resize-none dark:text-slate-200"></textarea>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-colors">Batal</button>
-                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all">Simpan</button>
+                    <button type="button" onclick="closeAddModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20 transition-all">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Modal Edit Tugas -->
-    <div id="editModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up">
-            <div class="bg-amber-500 p-6 text-white text-center">
+    <div id="editModal" class="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl animate-fade-in-up border border-slate-100 dark:border-slate-800">
+            <div class="bg-amber-500 dark:bg-amber-600 p-6 text-white text-center">
                 <h3 class="text-xl font-bold">Edit Tugas</h3>
                 <p class="text-xs text-amber-100 mt-1 opacity-80">Perbarui rencana tugas Anda.</p>
             </div>
@@ -349,20 +405,20 @@ $total_done = $count_personal_done + $count_global_done;
                 <input type="hidden" name="action" value="edit_personal">
                 <input type="hidden" name="id" id="edit_id">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
-                    <input type="text" name="judul" id="edit_judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium">
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Judul Tugas</label>
+                    <input type="text" name="judul" id="edit_judul" required placeholder="Contoh: Belajar PHP Dasar" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium dark:text-slate-200">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
-                    <input type="datetime-local" name="deadline" id="edit_deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium">
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Deadline (Opsional)</label>
+                    <input type="datetime-local" name="deadline" id="edit_deadline" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium dark:text-slate-200">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
-                    <textarea name="deskripsi" id="edit_deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium resize-none"></textarea>
+                    <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Keterangan</label>
+                    <textarea name="deskripsi" id="edit_deskripsi" rows="3" placeholder="Tambahkan catatan jika perlu..." class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all text-sm font-medium resize-none dark:text-slate-200"></textarea>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest hover:bg-slate-200 transition-colors">Batal</button>
-                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-amber-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-amber-600 shadow-lg shadow-amber-200 transition-all">Update</button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-bold uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-3 rounded-xl bg-amber-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-amber-600 shadow-lg shadow-amber-200 dark:shadow-amber-900/20 transition-all">Update</button>
                 </div>
             </form>
         </div>
@@ -370,15 +426,15 @@ $total_done = $count_personal_done + $count_global_done;
 
     <!-- Detail Task Modal -->
     <div id="detailModal" class="fixed inset-0 bg-black/50 z-[150] hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="detailModalContent">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300 border border-slate-100 dark:border-slate-800" id="detailModalContent">
             <!-- Modal Header -->
-            <div id="detailHeader" class="p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl transition-colors duration-300">
+            <div id="detailHeader" class="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-indigo-50/50 dark:bg-indigo-900/20 rounded-t-2xl transition-colors duration-300">
                 <div>
                     <span id="detailBadge" class="inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2"></span>
-                    <h3 id="detailTitle" class="text-xl font-bold text-gray-900 leading-snug"></h3>
-                    <p id="detailSubtitle" class="text-[10px] text-gray-500 font-medium mt-1"></p>
+                    <h3 id="detailTitle" class="text-xl font-bold text-gray-900 dark:text-white leading-snug"></h3>
+                    <p id="detailSubtitle" class="text-[10px] text-gray-500 dark:text-slate-400 font-medium mt-1"></p>
                 </div>
-                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 transition p-1 hover:bg-gray-100 rounded-full">
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 transition p-1 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
@@ -386,38 +442,38 @@ $total_done = $count_personal_done + $count_global_done;
             <!-- Modal Body -->
             <div class="p-6 overflow-y-auto">
                 <div class="mb-6">
-                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Deskripsi Tugas</h4>
-                    <div id="detailDesc" class="text-sm text-gray-700 whitespace-pre-line leading-relaxed"></div>
+                    <h4 class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-2">Deskripsi Tugas</h4>
+                    <div id="detailDesc" class="text-sm text-gray-700 dark:text-slate-300 whitespace-pre-line leading-relaxed"></div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <div class="grid grid-cols-1 gap-4 bg-gray-50 dark:bg-slate-950 p-4 rounded-xl border border-gray-100 dark:border-slate-800">
                     <div class="flex items-start">
-                        <div id="deadlineIcon" class="bg-indigo-100 p-2 rounded-lg mr-3">
-                            <i class="far fa-clock text-indigo-600 text-sm"></i>
+                        <div id="deadlineIcon" class="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg mr-3">
+                            <i class="far fa-clock text-indigo-600 dark:text-indigo-400 text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase">Tenggat Waktu</p>
-                            <p id="detailDeadline" class="text-sm font-semibold text-gray-800"></p>
+                            <p class="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Tenggat Waktu</p>
+                            <p id="detailDeadline" class="text-sm font-semibold text-gray-800 dark:text-slate-200"></p>
                         </div>
                     </div>
 
                     <div id="detailStatusContainer" class="flex items-start">
-                        <div id="statusIcon" class="bg-emerald-100 p-2 rounded-lg mr-3">
-                            <i class="fas fa-info-circle text-emerald-600 text-sm"></i>
+                        <div id="statusIcon" class="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg mr-3">
+                            <i class="fas fa-info-circle text-emerald-600 dark:text-emerald-400 text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase">Status</p>
-                            <p id="detailStatusText" class="text-sm font-semibold text-gray-800"></p>
+                            <p class="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Status</p>
+                            <p id="detailStatusText" class="text-sm font-semibold text-gray-800 dark:text-slate-200"></p>
                         </div>
                     </div>
 
                     <div id="modalFileContainer" class="items-start hidden">
-                        <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                            <i class="far fa-file-alt text-blue-600 text-sm"></i>
+                        <div class="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg mr-3">
+                            <i class="far fa-file-alt text-blue-600 dark:text-blue-400 text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase">Lampiran File</p>
-                            <a id="modalFileLink" href="#" target="_blank" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center">
+                            <p class="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase">Lampiran File</p>
+                            <a id="modalFileLink" href="#" target="_blank" class="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline flex items-center">
                                 Unduh Dokumen <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
                             </a>
                         </div>
@@ -426,8 +482,8 @@ $total_done = $count_personal_done + $count_global_done;
             </div>
 
             <!-- Modal Footer -->
-            <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
-                <button onclick="closeDetailModal()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition">
+            <div class="p-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 rounded-b-2xl flex justify-end gap-3">
+                <button onclick="closeDetailModal()" class="px-4 py-2 bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-800 text-gray-700 dark:text-slate-300 text-xs font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition">
                     Tutup
                 </button>
                 <div id="detailActions" class="flex gap-2">
@@ -489,24 +545,24 @@ $total_done = $count_personal_done + $count_global_done;
             fileContainer.classList.add('hidden');
 
             if (type === 'global') {
-                header.className = 'p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl transition-colors duration-300';
-                badge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-indigo-100 text-indigo-700';
+                header.className = 'p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-indigo-50/50 dark:bg-indigo-900/20 rounded-t-2xl transition-colors duration-300';
+                badge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400';
                 badge.innerText = 'Tugas Kelas';
                 title.innerText = data.nama_matkul;
                 subtitle.innerText = 'Tugas dari Dosen / Admin';
                 desc.innerText = data.deskripsi || 'Tidak ada deskripsi detail untuk tugas ini.';
                 deadline.innerText = data.deadline_fmt;
 
-                deadlineIcon.className = 'bg-indigo-100 p-2 rounded-lg mr-3';
-                deadlineIcon.querySelector('i').className = 'far fa-clock text-indigo-600 text-sm';
+                deadlineIcon.className = 'bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-lg mr-3';
+                deadlineIcon.querySelector('i').className = 'far fa-clock text-indigo-600 dark:text-indigo-400 text-sm';
 
                 if (data.is_done) {
-                    statusIcon.className = 'bg-emerald-100 p-2 rounded-lg mr-3';
-                    statusIcon.querySelector('i').className = 'fas fa-check-circle text-emerald-600 text-sm';
+                    statusIcon.className = 'bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-check-circle text-emerald-600 dark:text-emerald-400 text-sm';
                     statusText.innerText = 'Selesai';
                 } else {
-                    statusIcon.className = 'bg-amber-100 p-2 rounded-lg mr-3';
-                    statusIcon.querySelector('i').className = 'fas fa-clock text-amber-600 text-sm';
+                    statusIcon.className = 'bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-clock text-amber-600 dark:text-amber-400 text-sm';
                     statusText.innerText = 'Belum Selesai';
                 }
 
@@ -524,30 +580,30 @@ $total_done = $count_personal_done + $count_global_done;
                     `;
                 } else {
                     actions.innerHTML = `
-                        <span class="px-4 py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed flex items-center">
+                        <span class="px-4 py-2 bg-gray-200 dark:bg-slate-800 text-gray-500 dark:text-slate-400 text-xs font-semibold rounded-lg cursor-not-allowed flex items-center">
                             <i class="fas fa-lock mr-2"></i> Tidak ada link
                         </span>
                     `;
                 }
             } else {
-                header.className = 'p-6 border-b border-gray-100 flex justify-between items-start bg-rose-50/50 rounded-t-2xl transition-colors duration-300';
-                badge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-rose-100 text-rose-700';
+                header.className = 'p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-rose-50/50 dark:bg-rose-900/20 rounded-t-2xl transition-colors duration-300';
+                badge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-400';
                 badge.innerText = 'Tugas Pribadi';
                 title.innerText = data.judul;
                 subtitle.innerText = 'Catatan Tugas Mandiri';
                 desc.innerText = data.deskripsi || 'Tidak ada catatan tambahan.';
                 deadline.innerText = data.deadline_fmt;
 
-                deadlineIcon.className = 'bg-rose-100 p-2 rounded-lg mr-3';
-                deadlineIcon.querySelector('i').className = 'far fa-clock text-rose-600 text-sm';
+                deadlineIcon.className = 'bg-rose-100 dark:bg-rose-900/30 p-2 rounded-lg mr-3';
+                deadlineIcon.querySelector('i').className = 'far fa-clock text-rose-600 dark:text-rose-400 text-sm';
 
                 if (data.status === 'selesai') {
-                    statusIcon.className = 'bg-emerald-100 p-2 rounded-lg mr-3';
-                    statusIcon.querySelector('i').className = 'fas fa-check-circle text-emerald-600 text-sm';
+                    statusIcon.className = 'bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-check-circle text-emerald-600 dark:text-emerald-400 text-sm';
                     statusText.innerText = 'Selesai';
                 } else {
-                    statusIcon.className = 'bg-amber-100 p-2 rounded-lg mr-3';
-                    statusIcon.querySelector('i').className = 'fas fa-clock text-amber-600 text-sm';
+                    statusIcon.className = 'bg-amber-100 dark:bg-amber-900/30 p-2 rounded-lg mr-3';
+                    statusIcon.querySelector('i').className = 'fas fa-clock text-amber-600 dark:text-amber-400 text-sm';
                     statusText.innerText = 'Dalam Proses';
                 }
             }
@@ -576,6 +632,7 @@ $total_done = $count_personal_done + $count_global_done;
         }
 
         function confirmCompleteAll(type) {
+            const isDark = document.documentElement.classList.contains('dark');
             const title = type === 'global' ? 'Selesaikan Semua Tugas Kelas?' : 'Selesaikan Semua Tugas Pribadi?';
             const color = type === 'global' ? '#4f46e5' : '#e11d48';
 
@@ -585,7 +642,7 @@ $total_done = $count_personal_done + $count_global_done;
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: color,
-                cancelButtonColor: '#f1f5f9',
+                cancelButtonColor: isDark ? '#1e293b' : '#f1f5f9',
                 confirmButtonText: 'Ya, Selesaikan!',
                 cancelButtonText: 'Batal',
                 reverseButtons: true,
@@ -593,7 +650,7 @@ $total_done = $count_personal_done + $count_global_done;
                 customClass: {
                     popup: 'rounded-[2rem]',
                     confirmButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest',
-                    cancelButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest text-slate-600'
+                    cancelButton: `rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-300' : 'text-slate-600'}`
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -603,13 +660,14 @@ $total_done = $count_personal_done + $count_global_done;
         }
 
         function confirmDelete(id) {
+            const isDark = document.documentElement.classList.contains('dark');
             Swal.fire({
                 title: 'Hapus Tugas?',
                 text: "Tugas yang dihapus tidak dapat dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#f1f5f9',
+                cancelButtonColor: isDark ? '#1e293b' : '#f1f5f9',
                 confirmButtonText: 'Ya, Hapus!',
                 cancelButtonText: 'Batal',
                 reverseButtons: true,
@@ -617,7 +675,7 @@ $total_done = $count_personal_done + $count_global_done;
                 customClass: {
                     popup: 'rounded-[2rem]',
                     confirmButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest',
-                    cancelButton: 'rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest text-slate-600'
+                    cancelButton: `rounded-xl px-6 py-3 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-slate-300' : 'text-slate-600'}`
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -638,6 +696,7 @@ $total_done = $count_personal_done + $count_global_done;
         });
 
         <?php if (isset($_SESSION['success'])): ?>
+            const isDarkSuccess = document.documentElement.classList.contains('dark');
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil!',

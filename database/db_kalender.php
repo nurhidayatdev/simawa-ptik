@@ -41,23 +41,26 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $id = 1;
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
+            $isEven = ($id++ % 2 == 0);
+            $rowClass = ($isEven ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
             echo '<tr class="' . $rowClass . '">';
-            echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-            echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800">' . htmlspecialchars($row['kegiatan']) . '</td>';
-            echo '<td class="px-3 py-2 text-xs text-slate-600">' . date('d/m/Y', strtotime($row['tanggal_mulai'])) . '</td>';
-            echo '<td class="px-3 py-2 text-xs text-slate-600">' . date('d/m/Y', strtotime($row['tanggal_selesai'])) . '</td>';
-            echo '<td class="px-3 py-2 text-xs text-slate-600">' . htmlspecialchars($row['tahun_periode']) . ' - ' . htmlspecialchars($row['semester_nama']) . '</td>';
+            echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium">' . ($no++) . '</td>';
+            echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100">' . htmlspecialchars($row['kegiatan']) . '</td>';
+            echo '<td class="px-3 py-2 text-xs font-mono text-slate-600 dark:text-slate-400">' . date('d/m/Y', strtotime($row['tanggal_mulai'])) . '</td>';
+            echo '<td class="px-3 py-2 text-xs font-mono text-slate-600 dark:text-slate-400">' . date('d/m/Y', strtotime($row['tanggal_selesai'])) . '</td>';
+            echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 font-medium">' . htmlspecialchars($row['tahun_periode']) . ' - ' . htmlspecialchars($row['semester_nama']) . '</td>';
             if ($role === 'Administrator Utama'):
-                echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">';
-                echo '<a href="../actions/edit.php?tabel=kalender_akademik&id=' . $row['id'] . '" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3"><i class="fa fa-edit"></i></a>';
-                echo '<a href="../actions/hapus.php?tabel=kalender_akademik&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus agenda ini?\');" class="text-red-600 hover:text-red-900"><i class="fa fa-trash"></i></a>';
+                echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm">';
+                echo '<div class="flex items-center justify-center gap-3">';
+                echo '<a href="../actions/edit.php?tabel=kalender_akademik&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors"><i class="fa fa-edit"></i></a>';
+                echo '<a href="../actions/hapus.php?tabel=kalender_akademik&id=' . $row['id'] . '" title="Hapus"  class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors"><i class="fa fa-trash"></i></a>';
+                echo '</div>';
                 echo '</td>';
             endif;
             echo '</tr>';
         }
     } else {
-        echo '<tr><td colspan="6" class="px-6 py-10 text-center text-xs text-gray-500 italic">Data kalender tidak ditemukan.</td></tr>';
+        echo '<tr><td colspan="6" class="px-6 py-10 text-center text-xs text-slate-500 dark:text-slate-500 italic">Data kalender tidak ditemukan.</td></tr>';
     }
     exit;
 }
@@ -84,81 +87,82 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
-
-
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800">Kalender Akademik</h1>
-                    <p class="text-xs text-gray-500">Kelola agenda dan jadwal perkuliahan.</p>
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Kalender Akademik</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Kelola agenda dan jadwal perkuliahan.</p>
                 </div>
                 <div class="flex flex-row gap-2 items-center w-full sm:w-auto">
-                    <form action="" method="GET" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
-                        <label for="periode" class="text-[10px] font-medium text-slate-500">Periode:</label>
+                    <form action="" method="GET" class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <label for="periode" class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Periode:</label>
                         <select name="periode_id" id="periode" onchange="this.form.submit()"
-                            class="bg-transparent border-none text-xs focus:outline-none focus:ring-0 p-0 pr-6">
+                            class="bg-transparent border-none text-xs text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-0 p-0 pr-6 cursor-pointer font-bold">
                             <?php while ($p = mysqli_fetch_assoc($periods_res)): ?>
-                                <option value="<?= $p['id'] ?>" <?= ($periode_id == $p['id']) ? 'selected' : '' ?>>
+                                <option value="<?= $p['id'] ?>" <?= ($periode_id == $p['id']) ? 'selected' : '' ?> class="dark:bg-slate-800">
                                     <?= $p['tahun_periode'] ?> - <?= $p['semester_nama'] ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
                     </form>
                     <?php if ($role === 'Administrator Utama'): ?>
-                        <a href="../actions/tambah.php?tabel=kalender_akademik" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center transition-colors" title="Tambah">
-                            <i class="fa fa-plus"></i>
+                        <a href="../actions/tambah.php?tabel=kalender_akademik" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
+                            <i class="fa fa-plus text-xs"></i>
                         </a>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-indigo-900">
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead class="bg-indigo-900 dark:bg-slate-800">
                         <tr>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Kegiatan</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Mulai</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Selesai</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Periode</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">No</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Kegiatan</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Mulai</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Selesai</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Periode</th>
                             <?php if ($role === 'Administrator Utama'): ?>
-                                <th class="px-3 py-3 text-xs font-bold text-white uppercase tracking-wider text-center">Actions</th>
+                                <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200">
+                    <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
                         <?php
                         $no = 1;
                         $id = 1;
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
-                                $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
+                                $isEven = ($id++ % 2 == 0);
+                                $rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
                         ?>
                                 <tr class="<?= $rowClass ?>">
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++ ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['kegiatan']) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= date('d/m/Y', strtotime($row['tanggal_mulai'])) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= date('d/m/Y', strtotime($row['tanggal_selesai'])) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['tahun_periode']) ?> - <?= htmlspecialchars($row['semester_nama']) ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++ ?></td>
+                                    <td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100"><?= htmlspecialchars($row['kegiatan']) ?></td>
+                                    <td class="px-3 py-2 text-xs font-mono text-slate-600 dark:text-slate-400"><?= date('d/m/Y', strtotime($row['tanggal_mulai'])) ?></td>
+                                    <td class="px-3 py-2 text-xs font-mono text-slate-600 dark:text-slate-400"><?= date('d/m/Y', strtotime($row['tanggal_selesai'])) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 font-medium"><?= htmlspecialchars($row['tahun_periode']) ?> - <?= htmlspecialchars($row['semester_nama']) ?></td>
                                     <?php if ($role === 'Administrator Utama'): ?>
-                                        <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
-                                            <a href="../actions/edit.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a href="../actions/hapus.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Hapus" onclick="return confirm('Hapus agenda ini?');" class="text-red-600 hover:text-red-900">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                        <td class="px-3 py-2 whitespace-nowrap text-center text-sm">
+                                            <div class="flex items-center justify-center gap-3">
+                                                <a href="../actions/edit.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="../actions/hapus.php?tabel=kalender_akademik&id=<?= $row['id'] ?>" title="Hapus"  class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
                         <?php
                             }
                         } else {
-                            echo '<tr><td colspan="6" class="px-6 py-10 text-center text-xs text-gray-500 italic">Data kalender tidak ditemukan.</td></tr>';
+                            echo '<tr><td colspan="6" class="px-6 py-10 text-center text-xs text-slate-500 dark:text-slate-500 italic">Data kalender tidak ditemukan.</td></tr>';
                         }
                         ?>
                     </tbody>

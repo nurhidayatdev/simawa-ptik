@@ -40,10 +40,51 @@ include_once 'functions/foto_helpers.php';
     <title>Random Picker - PTIK C 2024</title>
     <?php include 'includes/head.php'; ?>
     <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark body {
+            background-color: #0b0f1a;
+            color: #f8fafc;
+        }
+
+        .navbar-responsive {
+            background-color: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-color: #e2e8f0;
+        }
+
+        .dark .navbar-responsive {
+            background-color: rgba(11, 15, 26, 0.92);
+            border-color: #1e293b;
+        }
+
+        .card-responsive {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .dark .card-responsive {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-color: #1e293b;
+        }
+
         .picker-container {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dark .picker-container {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .spin-card {
@@ -90,17 +131,57 @@ include_once 'functions/foto_helpers.php';
             background-color: #f00;
             border-radius: 50%;
         }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 20px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1e293b;
+        }
     </style>
 </head>
 
-<body class="bg-slate-50 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute top-10 left-10 w-24 h-24 bg-indigo-500/10 dark:bg-indigo-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-20 w-32 h-32 bg-purple-500/10 dark:bg-purple-600/20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="w-full p-3 flex justify-between items-center z-50 border-b navbar-responsive transition-colors duration-300">
+        <div class="flex items-center gap-3">
+            <img src="assets/image/logo.webp" alt="Logo" class="w-8 h-8 object-contain dark:brightness-100 brightness-0 transition-all">
+            <h1 class="text-base font-bold tracking-tight text-slate-900 dark:text-white">RandomPicker</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="theme-toggle" class="relative inline-flex items-center h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-white/10 transition-all duration-300 ease-in-out focus:outline-none">
+                <span id="theme-toggle-thumb" class="pointer-events-none absolute left-0.5 h-5 w-5 transform rounded-full bg-white shadow-md transition duration-300 ease-in-out flex items-center justify-center dark:translate-x-5">
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-[10px] text-orange-500 transition-all duration-300 absolute"></i>
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-[10px] text-indigo-900 transition-all duration-300 absolute opacity-0 scale-0"></i>
+                </span>
+            </button>
+            <a href="dashboard.php" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-medium text-white transition-colors">
+                <i class="fa fa-arrow-left mr-1"></i> Kembali
+            </a>
+        </div>
+    </div>
 
     <div class="container mx-auto px-4 py-8 flex-grow flex items-center justify-center">
         <div class="max-w-6xl mx-auto w-full grid lg:grid-cols-10 gap-8 items-stretch">
 
             <!-- Kolom Kiri: Roda (70%) -->
             <div class="order-2 lg:order-1 lg:col-span-7 flex justify-center">
-                <div onclick="startSpin()" class="relative picker-container rounded-[3rem] p-6 w-full max-w-[650px] flex flex-col items-center justify-center shadow-2xl border-2 border-indigo-100 bg-gradient-to-br from-white to-indigo-50/30 overflow-hidden cursor-pointer group h-full">
+                <div onclick="startSpin()" class="relative picker-container rounded-[3rem] p-6 w-full max-w-[650px] flex flex-col items-center justify-center shadow-2xl border-2 border-indigo-100 dark:border-slate-800 bg-gradient-to-br from-white to-indigo-50/30 dark:from-slate-900/50 dark:to-slate-800/30 overflow-hidden cursor-pointer group h-full">
                     <!-- Pointer -->
                     <div class="absolute top-12 left-1/2 -translate-x-1/2 z-20">
                         <div class="w-10 h-10 bg-indigo-600 shadow-lg border-4 border-white rotate-45 rounded-sm"></div>
@@ -109,8 +190,8 @@ include_once 'functions/foto_helpers.php';
                     <canvas id="wheelCanvas" width="500" height="500" class="max-w-full h-auto drop-shadow-2xl transition-transform duration-[4000ms] cubic-bezier(0.1, 0, 0, 1)"></canvas>
 
                     <!-- Center Circle Overlay (Static) -->
-                    <div id="center-circle" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-inner border-4 border-indigo-100 flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
-                        <div id="countdown-display" class="w-8 h-8 bg-indigo-600 rounded-full animate-pulse shadow-indigo-200 shadow-lg flex items-center justify-center text-white text-[10px] font-bold"></div>
+                    <div id="center-circle" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white dark:bg-slate-800 rounded-full shadow-inner border-4 border-indigo-100 dark:border-slate-700 flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
+                        <div id="countdown-display" class="w-8 h-8 bg-indigo-600 rounded-full animate-pulse shadow-indigo-200 dark:shadow-indigo-900/40 shadow-lg flex items-center justify-center text-white text-[10px] font-bold"></div>
                     </div>
 
                     <!-- Click Hint -->
@@ -122,29 +203,28 @@ include_once 'functions/foto_helpers.php';
 
             <!-- Kolom Kanan: Judul & Pengaturan (30%) -->
             <div class="order-1 lg:order-2 lg:col-span-3">
-                <div class="bg-white/80 backdrop-blur-sm p-8 rounded-[2.5rem] shadow-xl shadow-indigo-100/50 border border-white h-full flex flex-col">
-                    <div class="mb-10 text-center lg:text-left">
-                        <h1 class="text-3xl lg:text-4xl font-extrabold text-indigo-950 mb-3 tracking-tight">Random Picker</h1>
-                        <p class="text-slate-500 text-sm">Pilih mahasiswa atau kelompok secara acak dalam satu putaran roda.</p>
+                <div class="card-responsive backdrop-blur-sm p-8 rounded-[2.5rem] shadow-xl shadow-indigo-100/50 dark:shadow-none border h-full flex flex-col">
+                    <div class="mb-5 text-center lg:text-left">
+                        
+                        <p class="text-slate-500 dark:text-gray-400 text-sm">Pilih mahasiswa atau kelompok secara acak dalam satu putaran.</p>
                     </div>
 
-                    <!-- Mode Selector -->
-                    <div class="flex p-1.5 bg-slate-200/60 rounded-2xl mb-6">
-                        <button onclick="setMode('mahasiswa')" id="btn-mhs" class="flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm border border-slate-100">
+                    <div class="flex p-1.5 bg-slate-200/60 dark:bg-slate-800/60 rounded-2xl mb-6">
+                        <button onclick="setMode('mahasiswa')" id="btn-mhs" class="flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm border border-slate-100 dark:border-slate-600">
                             <i class="fas fa-user-graduate mr-2"></i>Mahasiswa
                         </button>
-                        <button onclick="setMode('kelompok')" id="btn-klp" class="flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 border border-transparent">
+                        <button onclick="setMode('kelompok')" id="btn-klp" class="flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-transparent">
                             <i class="fas fa-users mr-2"></i>Kelompok
                         </button>
                     </div>
 
                     <!-- Filters -->
-                    <div id="filter-mahasiswa" class="picker-container p-4 rounded-2xl mb-6 shadow-sm border border-slate-100">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Filter Jenis Kelamin</label>
+                    <div id="filter-mahasiswa" class="picker-container p-4 rounded-2xl mb-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                        <label class="block text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-4">Filter Jenis Kelamin</label>
                         <div class="grid grid-cols-4 gap-2">
                             <label class="cursor-pointer">
                                 <input type="radio" name="gender" value="all" checked class="hidden peer">
-                                <div class="text-center py-2.5 px-1 rounded-xl border border-slate-100 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all text-[10px] font-semibold">
+                                <div class="text-center py-2.5 px-1 rounded-xl border border-slate-100 dark:border-slate-700 peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all text-[10px] font-semibold dark:text-slate-400">
                                     Semua
                                 </div>
                             </label>
@@ -162,7 +242,7 @@ include_once 'functions/foto_helpers.php';
                             </label>
                             <label class="cursor-pointer">
                                 <input type="radio" name="gender" value="custom" class="hidden peer">
-                                <div class="text-center py-2.5 px-1 rounded-xl border border-slate-100 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 transition-all text-[10px] font-semibold">
+                                <div class="text-center py-2.5 px-1 rounded-xl border border-slate-100 dark:border-slate-700 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 transition-all text-[10px] font-semibold dark:text-slate-400">
                                     Pilih
                                 </div>
                             </label>
@@ -177,10 +257,10 @@ include_once 'functions/foto_helpers.php';
                         </div>
                     </div>
 
-                    <div id="filter-kelompok" class="picker-container p-4 rounded-2xl mb-6 shadow-sm border border-slate-100 hidden">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Pilih Mata Kuliah / Set</label>
+                    <div id="filter-kelompok" class="picker-container p-4 rounded-2xl mb-6 shadow-sm border border-slate-100 dark:border-slate-700 hidden">
+                        <label class="block text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2">Pilih Mata Kuliah / Set</label>
                         <div class="relative">
-                            <select id="select-kelompok" class="w-full p-3 pr-8 rounded-xl border border-slate-100 bg-white text-[11px] font-medium focus:ring-2 focus:ring-indigo-500 outline-none appearance-none cursor-pointer">
+                            <select id="select-kelompok" class="w-full p-3 pr-8 rounded-xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-medium dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none cursor-pointer">
                                 <option value="">-- Pilih Set --</option>
                                 <?php foreach ($kelompok_data as $setName => $groups): ?>
                                     <option value="<?= htmlspecialchars($setName) ?>"><?= htmlspecialchars($setName) ?></option>
@@ -193,68 +273,70 @@ include_once 'functions/foto_helpers.php';
                     </div>
 
                     <div class="mb-6">
-                        <button onclick="shuffleList()" class="w-full py-3 bg-white text-indigo-600 rounded-2xl border border-indigo-100 shadow-sm hover:shadow-md hover:bg-indigo-50 transition-all font-bold text-xs flex items-center justify-center gap-2 group">
+                        <button onclick="shuffleList()" class="w-full py-3 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-slate-700 shadow-sm hover:shadow-md hover:bg-indigo-50 dark:hover:bg-slate-700 transition-all font-bold text-xs flex items-center justify-center gap-2 group">
                             <i class="fas fa-random group-hover:rotate-180 transition-transform duration-500"></i>
                             Acak Urutan Wheel
                         </button>
-                        <p class="mt-4 text-[10px] text-slate-400 italic leading-relaxed text-center lg:text-left">
-                            Klik tombol di atas untuk mengacak ulang posisi peserta pada roda tanpa mengubah daftar yang terpilih. Perubahan urutan dapat meningkatkan sensasi kebetulan saat diputar.
-                        </p>
+                       
                     </div>
 
-                    <!-- Tombol Kembali -->
-                    <div class="pt-6 border-t border-slate-100 mt-auto">
-                        <a href="dashboard.php" class="flex items-center justify-center gap-3 w-full py-3.5 bg-slate-50 text-slate-600 rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all font-bold text-xs">
-                            <i class="fas fa-th-large"></i>
-                            Kembali ke Dashboard
-                        </a>
+                    <div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 overflow-hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Riwayat Terpilih</h3>
+                            <span id="history-count" class="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 text-[9px] font-bold px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="history-container" class="space-y-2 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div id="history-empty" class="text-center py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
+                                <i class="fas fa-history text-slate-200 dark:text-slate-700 text-2xl mb-2"></i>
+                                <p class="text-[10px] text-slate-400">Belum ada yang terpilih</p>
+                            </div>
+                            <div id="history-list" class="space-y-2 hidden"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
 
     <!-- Custom Selection Modal -->
     <div id="customSelectionModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
-        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCustomSelection()"></div>
-        <div class="relative bg-white rounded-[2.5rem] w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-300" id="customContent">
-            <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="fixed inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm" onclick="closeCustomSelection()"></div>
+        <div class="relative bg-white dark:bg-slate-900 rounded-[2.5rem] w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl overflow-hidden scale-95 opacity-0 transition-all duration-300 border dark:border-slate-800" id="customContent">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-900">Pilih Mahasiswa</h2>
-                    <p class="text-xs text-slate-500">Pilih mahasiswa yang ingin dimasukkan ke dalam roda</p>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white">Pilih Mahasiswa</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Pilih mahasiswa yang ingin dimasukkan ke dalam roda</p>
                 </div>
                 <button onclick="closeCustomSelection()" class="w-10 h-10 rounded-full hover:bg-slate-200 flex items-center justify-center transition-colors">
                     <i class="fas fa-times text-slate-400"></i>
                 </button>
             </div>
 
-            <div class="flex-grow overflow-y-auto p-6 bg-white">
+            <div class="flex-grow overflow-y-auto p-6 bg-white dark:bg-slate-900 custom-scrollbar">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="selection-list">
                     <?php foreach ($mahasiswa as $mhs): ?>
-                        <label class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-all group">
-                            <input type="checkbox" value="<?= $mhs['id'] ?>" class="mhs-checkbox w-5 h-5 rounded-lg border-2 border-slate-200 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer">
+                        <label class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-all group">
+                            <input type="checkbox" value="<?= $mhs['id'] ?>" class="mhs-checkbox w-5 h-5 rounded-lg border-2 border-slate-200 dark:border-slate-700 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer bg-transparent">
                             <div class="flex flex-col">
-                                <span class="text-xs font-bold text-slate-700 group-hover:text-indigo-600 transition-colors"><?= htmlspecialchars($mhs['nama_panggilan'] ?: $mhs['nama_lengkap']) ?></span>
-                                <span class="text-[10px] text-slate-400 uppercase"><?= htmlspecialchars($mhs['nama_lengkap']) ?></span>
+                                <span class="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 transition-colors"><?= htmlspecialchars($mhs['nama_panggilan'] ?: $mhs['nama_lengkap']) ?></span>
+                                <span class="text-[10px] text-slate-400 dark:text-slate-500 uppercase"><?= htmlspecialchars($mhs['nama_lengkap']) ?></span>
                             </div>
                         </label>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
-                <button onclick="selectAll(true)" class="flex-grow py-3 px-4 rounded-xl border border-slate-200 bg-white text-xs font-bold hover:bg-slate-100 transition-all">Pilih Semua</button>
-                <button onclick="selectAll(false)" class="flex-grow py-3 px-4 rounded-xl border border-slate-200 bg-white text-xs font-bold hover:bg-slate-100 transition-all">Hapus Semua</button>
-                <button onclick="closeCustomSelection()" class="flex-[2] py-3 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">Simpan Pilihan</button>
+            <div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex gap-3">
+                <button onclick="selectAll(true)" class="flex-grow py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">Pilih Semua</button>
+                <button onclick="selectAll(false)" class="flex-grow py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">Hapus Semua</button>
+                <button onclick="closeCustomSelection()" class="flex-[2] py-3 px-4 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-none transition-all">Simpan Pilihan</button>
             </div>
         </div>
     </div>
 
-    <!-- Result Modal (Hidden) -->
     <div id="resultModal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div class="fixed inset-0 bg-indigo-950/40 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="relative bg-white rounded-[3rem] p-10 max-w-sm w-full shadow-2xl scale-90 opacity-0 transition-all duration-300" id="resultContent">
+        <div class="fixed inset-0 bg-indigo-950/40 dark:bg-slate-950/80 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative bg-white dark:bg-slate-900 rounded-[3rem] p-10 max-w-sm w-full shadow-2xl scale-90 opacity-0 transition-all duration-300 border border-slate-100 dark:border-slate-800" id="resultContent">
             <button onclick="closeModal()" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
                 <i class="fas fa-times text-xl"></i>
             </button>
@@ -268,10 +350,10 @@ include_once 'functions/foto_helpers.php';
                     <!-- Image or Initials -->
                 </div>
 
-                <h3 id="result-name" class="text-2xl font-bold text-slate-900 line-clamp-2">NAMA LENGKAP</h3>
-                <p id="result-sub" class="text-slate-500 mt-2 mb-8">NIM / KETERANGAN</p>
+                <h3 id="result-name" class="text-2xl font-bold text-slate-900 dark:text-white line-clamp-2">NAMA LENGKAP</h3>
+                <p id="result-sub" class="text-slate-500 dark:text-slate-400 mt-2 mb-8">NIM / KETERANGAN</p>
 
-                <button onclick="closeModal()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all">
+                <button onclick="closeModal()" class="w-full bg-slate-900 dark:bg-indigo-600 text-white py-4 rounded-2xl mt-5 font-bold hover:bg-slate-800 dark:hover:bg-indigo-500 transition-all shadow-lg dark:shadow-none">
                     Tutup
                 </button>
             </div>
@@ -370,15 +452,16 @@ include_once 'functions/foto_helpers.php';
             ctx.clearRect(0, 0, rect.width, rect.height);
 
             if (list.length === 0) {
+                const isDark = document.documentElement.classList.contains('dark');
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#f8fafc';
+                ctx.fillStyle = isDark ? '#1e293b' : '#f8fafc';
                 ctx.fill();
-                ctx.strokeStyle = '#e2e8f0';
+                ctx.strokeStyle = isDark ? '#334155' : '#e2e8f0';
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                ctx.fillStyle = '#94a3b8';
+                ctx.fillStyle = isDark ? '#64748b' : '#94a3b8';
                 ctx.font = 'bold 16px Poppins';
                 ctx.textAlign = 'center';
                 ctx.fillText('Data Kosong / Selesai', centerX, centerY);
@@ -436,17 +519,19 @@ include_once 'functions/foto_helpers.php';
             const filterKlp = document.getElementById('filter-kelompok');
 
             if (mode === 'mahasiswa') {
-                btnMhs.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm border border-slate-100";
-                btnKlp.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 border border-transparent";
+                btnMhs.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm border border-slate-100 dark:border-slate-600";
+                btnKlp.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-transparent";
                 filterMhs.classList.remove('hidden');
                 filterKlp.classList.add('hidden');
             } else {
-                btnKlp.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all bg-white text-indigo-600 shadow-sm border border-slate-100";
-                btnMhs.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 border border-transparent";
+                btnKlp.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all bg-white dark:bg-slate-700 text-indigo-600 dark:text-white shadow-sm border border-slate-100 dark:border-slate-600";
+                btnMhs.className = "flex-1 py-2.5 text-[11px] font-bold rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-transparent";
                 filterMhs.classList.add('hidden');
                 filterKlp.classList.remove('hidden');
             }
             drawWheel();
+            resetLists();
+            clearHistory();
         }
 
         function removeWinner(winner) {
@@ -505,12 +590,10 @@ include_once 'functions/foto_helpers.php';
 
             setTimeout(() => {
                 showResult(winnerData);
-
-                // REMOVE WINNER from logic
+                addToHistory(winnerData);
                 removeWinner(winnerData);
-
                 isSpinning = false;
-            }, 4800); // Bertambah dari 4100ms untuk memberikan jeda dramatis 0.8 detik
+            }, 4800);
         }
 
         function showResult(winner) {
@@ -528,7 +611,9 @@ include_once 'functions/foto_helpers.php';
             if (currentMode === 'mahasiswa') {
                 badge.textContent = 'MAHASISWA TERPILIH';
                 badge.className = 'inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border ' +
-                    (winner.jenis_kelamin === 'Laki-laki' ? 'bg-sky-50 text-sky-600 border-sky-100' : 'bg-pink-50 text-pink-600 border-pink-100');
+                    (winner.jenis_kelamin === 'Laki-laki' ?
+                        'bg-sky-50 text-sky-600 border-sky-100 dark:bg-sky-900/30 dark:text-sky-400 dark:border-sky-800' :
+                        'bg-pink-50 text-pink-600 border-pink-100 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-800');
                 sub.textContent = winner.nama_panggilan || 'Mahasiswa PTIK C 2024';
                 imgContainer.classList.remove('hidden');
 
@@ -540,7 +625,7 @@ include_once 'functions/foto_helpers.php';
                 }
             } else {
                 badge.textContent = 'KELOMPOK TERPILIH';
-                badge.className = 'inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border bg-amber-50 text-amber-600 border-amber-100';
+                badge.className = 'inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800';
                 sub.textContent = ''; // Matkul dan Dosen dihilangkan
                 imgContainer.classList.add('hidden');
 
@@ -554,13 +639,13 @@ include_once 'functions/foto_helpers.php';
                 // Menampilkan daftar anggota
                 if (winner.anggota) {
                     const membersDiv = document.createElement('div');
-                    membersDiv.className = 'mt-5 p-5 bg-slate-50 rounded-2xl border border-slate-100 text-left';
+                    membersDiv.className = 'mt-5 p-5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-800 text-left';
                     membersDiv.innerHTML = `
-                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Anggota Kelompok</div>
+                        <div class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Anggota Kelompok</div>
                         <div class="space-y-2">
                             ${winner.anggota.split(',').map((m, i) => `
-                                <div class="flex items-center gap-2 text-[11px] text-slate-700 font-medium">
-                                    <span class="w-4 h-4 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[8px] text-slate-400 font-bold">${i + 1}</span>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-700 dark:text-slate-300 font-medium">
+                                    <span class="w-4 h-4 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[8px] text-slate-400 font-bold">${i + 1}</span>
                                     ${resolveMemberName(m)}
                                 </div>
                             `).join('')}
@@ -693,6 +778,8 @@ include_once 'functions/foto_helpers.php';
                     trigger.classList.add('hidden');
                 }
                 drawWheel();
+                resetLists();
+                clearHistory();
             });
         });
 
@@ -700,10 +787,77 @@ include_once 'functions/foto_helpers.php';
             cb.addEventListener('change', updateSelectedFromUI);
         });
 
-        document.getElementById('select-kelompok').addEventListener('change', drawWheel);
+        document.getElementById('select-kelompok').addEventListener('change', () => {
+            drawWheel();
+            resetLists();
+            clearHistory();
+        });
 
         window.addEventListener('load', drawWheel);
         window.addEventListener('resize', drawWheel);
+
+        // --- HISTORY LOGIC ---
+        let pickedHistory = [];
+
+        function addToHistory(winner) {
+            const item = {
+                name: winner.nama_lengkap,
+                sub: currentMode === 'mahasiswa' ? (winner.nama_panggilan || winner.nim) : winner.keterangan || '',
+                mode: currentMode,
+                timestamp: new Date().toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+            pickedHistory.unshift(item);
+            renderHistory();
+        }
+
+        function clearHistory() {
+            pickedHistory = [];
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            const emptyState = document.getElementById('history-empty');
+            const countBadge = document.getElementById('history-count');
+
+            countBadge.innerText = pickedHistory.length;
+
+            if (pickedHistory.length > 0) {
+                emptyState.classList.add('hidden');
+                container.classList.remove('hidden');
+
+                container.innerHTML = pickedHistory.map((item, index) => `
+                    <div class="flex items-center gap-2 p-1.5 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-800 animate-in slide-in-from-right-4 duration-300">
+                        <div class="w-5 h-5 rounded-md bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
+                            <span class="text-[8px] font-bold text-indigo-600 dark:text-indigo-400 leading-none">${pickedHistory.length - index}</span>
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-bold text-slate-700 dark:text-slate-300 truncate">${item.name}</h4>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                emptyState.classList.remove('hidden');
+                container.classList.add('hidden');
+            }
+        }
+
+        // --- THEME RELOAD LOGIC ---
+        // spin.php needs a reload to redraw the wheel with new theme colors.
+        // The actual class toggling is already handled by includes/script_main.php.
+        (function() {
+            const themeBtn = document.getElementById('theme-toggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    setTimeout(() => {
+                        location.reload();
+                    }, 150);
+                });
+            }
+        })();
     </script>
     <?php include 'includes/footer_db.php'; ?>
     <div class="mt-5"></div>

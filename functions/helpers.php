@@ -52,8 +52,8 @@ if (!function_exists('sendFonnteMessage')) {
 }
 
 // Deprecated: Replaced by sendFonnteMessage
-if (!function_exists('sendTelegramMessage')) {
-    function sendTelegramMessage($token, $chat_id, $message)
+if (!function_exists('sendWhatsAppMessage')) {
+    function sendWhatsAppMessage($token, $chat_id, $message)
     {
         // For compatibility, we redirect to WhatsApp via Fonnte
         // We ignore token and chat_id and use the global Fonnte config

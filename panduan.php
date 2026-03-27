@@ -27,6 +27,12 @@ $periode = mysqli_fetch_assoc($q_periode);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .bg-mesh {
@@ -36,6 +42,16 @@ $periode = mysqli_fetch_assoc($q_periode);
                 radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
                 radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
+            transition: background-color 0.3s;
+        }
+
+        .dark .bg-mesh {
+            background-color: #020617;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
         }
 
         .role-btn {
@@ -44,25 +60,22 @@ $periode = mysqli_fetch_assoc($q_periode);
 
         .role-btn.active {
             background: #4f46e5;
-            color: white;
+            color: white !important;
             transform: scale(1.05);
             box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+            border-color: #4f46e5 !important;
         }
 
-        .step-badge {
-            width: 28px;
-            height: 28px;
-            background: #4f46e5;
-            color: white;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            font-weight: 800;
-            flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+        .dark .role-btn:not(.active) {
+            color: #94a3b8;
         }
+
+        .dark .role-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+
 
         .guide-section {
             display: none;
@@ -87,25 +100,27 @@ $periode = mysqli_fetch_assoc($q_periode);
             position: relative;
         }
 
+        @media (max-width: 640px) {
+            .step-card {
+                padding: 1.25rem;
+            }
+        }
+
+        .dark .step-card {
+            background: #0f172a;
+            border-color: #1e293b;
+        }
+
         .step-card:hover {
             box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
             transform: translateY(-3px);
             border-color: #e2e8f0;
         }
 
-        .step-card::before {
-            content: '';
-            position: absolute;
-            left: 29px;
-            top: 50px;
-            bottom: -30px;
-            width: 2px;
-            background: #f1f5f9;
-            z-index: 0;
-        }
+        .dark .step-card:hover { border-color: #334155; }
 
-        .step-card:last-child::before {
-            display: none;
+        .step-card:last-child {
+            margin-bottom: 0;
         }
 
         .tip-box {
@@ -114,76 +129,121 @@ $periode = mysqli_fetch_assoc($q_periode);
             padding: 1.25rem;
             border-radius: 1rem;
             margin-top: 1.5rem;
+            transition: all 0.3s;
+        }
+        .dark .tip-box {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-color: #4f46e5;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        @media (max-width: 640px) {
+            .role-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
         }
     </style>
 </head>
 
-<body class="bg-mesh min-h-screen">
+<body class="bg-mesh min-h-screen transition-colors duration-300">
+
     <?php include 'includes/header_main.php'; ?>
 
     <!-- Spacer -->
     <div class="h-10"></div>
 
-    <main class="flex-grow py-12">
-        <div class="container mx-auto px-6 pb-24">
-            <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Panduan Penggunaan</h1>
-            <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Pelajari cara pengelolaan tugas, absensi, hingga pengaturan profil untuk memaksimalkan penggunaan sistem informasi.</p>
-            <div class="flex flex-wrap justify-center gap-3 mb-12">
-                <button onclick="showGuide('mhs')" class="role-btn active glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                    <i class="fa fa-user-graduate text-lg"></i> Mahasiswa
+    <main class="flex-grow pt-12 pb-0">
+        <div class="container mx-auto px-6 pb-8">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <!-- Sidebar Navigation -->
+                <aside class="w-full md:w-64 md:sticky md:top-24 flex-shrink-0 z-20">
+                    <div class="mb-6 md:mb-6">
+                        <h1 class="text-2xl md:text-3xl font-bold mb-2 text-gray-800 dark:text-white transition-colors text-center md:text-left">Panduan <span class="text-indigo-600">Penggunaan</span></h1>
+                        <p class="text-gray-500 dark:text-slate-400 transition-colors text-xs text-center md:text-left max-w-2xl mx-auto md:mx-0 leading-relaxed font-medium">Pelajari pengelolaan tugas, absensi, hingga pengaturan profil secara maksimal.</p>
+                    </div>
+                    <div class="flex flex-nowrap md:flex-col justify-start items-center md:items-stretch gap-2 md:gap-3 overflow-x-auto md:overflow-visible no-scrollbar -mx-6 px-6 md:mx-0 md:px-0 scroll-smooth">
+                <button onclick="showGuide('mhs')" class="role-btn active glass-card px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fa fa-user-graduate text-sm"></i> Mahasiswa
                 </button>
-                <button onclick="showGuide('keti')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                    <i class="fa fa-crown text-lg"></i> Ketua Tingkat
+                <button onclick="showGuide('keti')" class="role-btn glass-card px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fa fa-crown text-sm"></i> Ketua Tingkat
                 </button>
-                <button onclick="showGuide('sekretaris')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                    <i class="fa fa-file-signature text-lg"></i> Sekretaris
+                <button onclick="showGuide('sekretaris')" class="role-btn glass-card px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fa fa-file-signature text-sm"></i> Sekretaris
                 </button>
-                <button onclick="showGuide('bendahara')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                    <i class="fa fa-wallet text-lg"></i> Bendahara
+                <button onclick="showGuide('bendahara')" class="role-btn glass-card px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fa fa-wallet text-sm"></i> Bendahara
                 </button>
-                <button onclick="showGuide('manager')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                    <i class="fa fa-tasks text-lg"></i> Manager Tugas
+                <button onclick="showGuide('manager')" class="role-btn glass-card px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fa fa-tasks text-sm"></i> Manager Tugas
                 </button>
-                <button onclick="showGuide('admin')" class="role-btn glass-card px-6 py-4 rounded-2xl flex items-center gap-3 text-xs font-bold text-slate-600 hover:bg-white transition-all shadow-sm">
-                    <i class="fa fa-user-shield text-lg"></i> Administrator
+                <button onclick="showGuide('admin')" class="role-btn glass-card px-3.5 md:px-4 py-2 md:py-2.5 rounded-xl flex items-center gap-2 text-[10px] md:text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-sm">
+                    <i class="fa fa-user-shield text-sm"></i> Administrator
                 </button>
+                    </div>
+                </aside>
+
+                <!-- Right Side Content -->
+                <div class="flex-1 w-full">
+
+            <!-- SEARCH BAR -->
+            <div class="max-w-full mx-auto mb-8 relative group">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
+                    <i class="fa fa-search text-xs text-indigo-600 group-focus-within:text-indigo-500 transition-colors"></i>
+                </div>
+                <input type="text" id="guide-search" onkeyup="searchGuide(this.value)" placeholder="Cari judul panduan..." 
+                    class="w-full pl-10 pr-6 py-2.5 bg-white/70 dark:bg-slate-900/50 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-200/20 dark:shadow-black/20 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 dark:text-white transition-all outline-none text-xs font-semibold plus-jakarta">
+                <div id="search-status" class="hidden absolute top-full left-0 right-0 mt-4 text-center">
+                    <p class="text-xs text-slate-400 italic">Tidak menemukan panduan yang cocok...</p>
+                </div>
             </div>
         
         <!-- PANDUAN MAHASISWA -->
         <div id="guide-mhs" class="guide-section active">
-            <div class="glass-card p-8 md:p-16 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <div class="flex items-center gap-5 mb-12">
-                    <div class="h-16 w-16 bg-indigo-600 text-white rounded-[1.5rem] flex items-center justify-center text-2xl shadow-xl shadow-indigo-200">
+            <div class="glass-card p-6 md:p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/20">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
+                    <div class="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-colors">
                         <i class="fa fa-user-graduate"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 plus-jakarta">Panduan Mahasiswa</h2>
-                        <p class="text-[11px] text-indigo-500 font-extrabold uppercase tracking-[0.2em] mt-1">Starting Your Digital Journey</p>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 dark:text-white plus-jakarta transition-colors">Mahasiswa</h2>
+                        <p class="text-[11px] text-indigo-500 dark:text-indigo-400 font-extrabold uppercase tracking-[0.2em] mt-1 transition-colors">Starting Your Digital Journey</p>
                     </div>
                 </div>
 
-                <div class="space-y-12 relative">
+                <div class="space-y-8 relative">
 
                     <!-- Setup Profil -->
                     <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">1</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Persiapan & Setup Profil Awal</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Langkah pertama yang wajib dilakukan oleh setiap mahasiswa baru sistem:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Persiapan & Setup Profil Awal</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Langkah pertama yang wajib dilakukan oleh setiap mahasiswa baru sistem:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Login Pertama:</strong> Masuk menggunakan NIM sebagai Username dan Password default (Hubungi Administrator Utama jika tidak tahu).</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-right-to-bracket text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Login Pertama:</strong> <strong>Masuk</strong> menggunakan <strong>NIM</strong> sebagai <strong>Username</strong> dan <strong>Password</strong> default (Hubungi Administrator Utama jika tidak tahu).</span>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Ubah Password:</strong> Masuk ke menu <strong>Profil</strong> > <strong>Edit Profil</strong>. Di halaman inilah Anda dapat mengupdate password baru demi keamanan akun.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-shield text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Ubah Password:</strong> Masuk ke menu <strong>Profil</strong> > <strong>Edit Profil</strong>. Di halaman inilah Anda dapat mengupdate <strong>password baru</strong> demi keamanan akun.</span>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
                                         <i class="fa fa-key text-indigo-500 mt-0.5"></i>
                                         <div class="space-y-1">
-                                            <span><strong>Simpan Akun Manual:</strong> Karena pop-up penyimpanan otomatis tidak muncul, ikuti langkah manual ini:</span>
+                                            <span><strong>Simpan Akun Manual:</strong> Jika pop-up penyimpanan otomatis tidak muncul, ikuti langkah manual ini:</span>
                                             <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
                                                 <li>Buka <strong>Settings</strong> di Chrome/Browser Anda.</li>
                                                 <li>Pilih menu <strong>Google Password Manager</strong>.</li>
@@ -194,304 +254,41 @@ $periode = mysqli_fetch_assoc($q_periode);
                                             </ol>
                                         </div>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Unggah Foto:</strong> Pilih menu <strong>Update Profil</strong>, klik area foto, dan unggah foto terbaik Anda (Maks 2MB).</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-camera-retro text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Unggah Foto:</strong> Pilih menu <strong>Update Profil</strong>, klik area foto, dan <strong>unggah foto</strong> terbaik Anda (Maks 2MB).</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Monitoring Kas -->
+                    <!-- Data Master -->
                     <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">2</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Memantau Kewajiban Keuangan (Kas)</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Agar tidak ada tunggakan yang menumpuk di akhir semester:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Kas Saya</strong> dari Sidebar.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Cek tab <strong>Status Pembayaran</strong> untuk melihat baris berwarna merah (Tunggakan).</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Segera lakukan pembayaran ke Bendahara dan pastikan data Anda diupdate di sistem.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Memantau Absensi -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">3</span>
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Monitoring Absensi & Kehadiran</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Pastikan record kehadiran Anda selalu akurat:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Data Master</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Menu Master merupakan pusat data utama yang berisi informasi identitas mahasiswa, pengajar, dan detail perkuliahan.</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Absensi</strong> > <strong>Riwayat Saya</strong>.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-sitemap text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Buka Menu Utama:</strong> Klik menu <strong>Master</strong> (dengan ikon gedung/bank) pada <strong>sidebar</strong> untuk memunculkan daftar sub-menu yang tersedia.</span>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Pantau persentase kehadiran Anda (Pastikan tetap di atas 80% untuk syarat ujian).</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Lakukan klaim ke Sekretaris jika ada ketidaksesuaian data absen.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Melacak Tugas -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">4</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Melacak Daftar Tugas</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Pusat informasi akademik harian Anda:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Lihat <strong>Dashboard Utama</strong> untuk deadline tugas terdekat.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Klik <strong>Detail Tugas</strong> untuk melihat instruksi lengkap dan file referensi.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mengikuti Kuis -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">5</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Mengikuti Kuis Kelas</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Asah kemampuan Anda sebelum ujian resmi:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Kuis Kelas</strong> untuk melihat kuis yang aktif.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Ikuti kuis dan lihat skor Anda secara instan setelah selesai.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Piket Proyektor -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">6</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Jadwal Piket Proyektor</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Kontribusi rutin untuk kelancaran perkuliahan:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Cek menu <strong>Piket Proyektor</strong> untuk melihat jadwal mingguan.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Jika jadwal Anda tiba, Anda bertanggung jawab mengambil proyektor di Lab dan mengembalikannya setelah kuliah selesai.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Vibe Kelas -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">7</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Mengatur 'Vibe' Kelas</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Ekspresikan perasaan Anda hari ini untuk dikumpulkan sebagai statistik kelas:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Cari widget <strong>'How's the Vibe Today?'</strong> di Dashboard atau Sidebar.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Pilih salah satu emoji yang paling mewakili perasaan Anda (Senang, Capek, Semangat, dll).</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Liat Mahasiswa & Dosen -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">8</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Daftar Mahasiswa & Dosen</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Mengenal lebih dekat seluruh personil kelas dan pengajar:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Database</strong> > <strong>Mahasiswa</strong> untuk melihat daftar teman sekelas, sosial media, dan keahlian mereka.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Dosen</strong> untuk melihat daftar dosen pengampu mata kuliah beserta informasi kontak yang tersedia.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mata Kuliah & Jadwal -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">9</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Mata Kuliah & Jadwal Perkuliahan</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Manajemen waktu kuliah yang lebih disiplin:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Pilih menu <strong>Mata Kuliah</strong> untuk melihat daftar SKS dan deskripsi singkat setiap pembelajaran.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka <strong>Jadwal Kuliah</strong> untuk melihat jam masuk, ruang kelas, dan link grup WhatsApp mata kuliah (jika tersedia).</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Berita & Info -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">10</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Berita & Informasi Kelas</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Pusat kabar terbaru dari internal ProTechNoTy:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Akses menu <strong>Berita</strong> untuk membaca artikel, ringkasan rapat kelas, atau berita luar kampus yang relevan.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kalender Akademik -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">11</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Kalender Akademik & Agenda</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Jangan lewatkan tanggal-tanggal penting:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Kalender</strong> untuk melihat jadwal UTS, UAS, libur semester, dan agenda penting kelas lainnya.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Galeri Kelas -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">12</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Galeri Memori Kelas</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Menelusuri jejak dokumentasi kebersamaan:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Masuk ke menu <strong>Galeri</strong> untuk melihat album foto dokumentasi kegiatan yang diunggah Sekretaris.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pembagian Kelompok -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">13</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Manajemen Kelompok Belajar</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Cek rekan tim Anda untuk setiap tugas besar:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Pilih menu <strong>Kelompok</strong>, cari mata kuliahnya, dan lihat di kelompok mana nama Anda terdaftar.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pusat Misi -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">14</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Mission Center (Pusat Misi)</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Selesaikan tantangan untuk mendapatkan poin atau pencapaian:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Buka <strong>Pusat Misi</strong> untuk melihat daftar misi harian atau mingguan yang diberikan sistem/pengurus.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pesan Anonim -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">15</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Anonymous Message (Pesan Anonim)</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Curhat atau kirim kritik/saran tanpa diketahui identitasnya:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Gunakan fitur <strong>Pesan Anonim</strong> untuk mengirim pesan rahasia ke teman sekelas atau pengurus secara aman.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Random Picker -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">16</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Random Student Picker</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Alat bantu pemilihan nama yang adil:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Gunakan <strong>Random Picker</strong> di menu Alat (Tools) jika bosan dengan urutan absen saat presentasi atau piket.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-layer-group text-indigo-500 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Pilih Kategori Data:</strong> Anda dapat memilih salah satu dari daftar berikut sesuai kebutuhan:</span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li><strong>Mahasiswa:</strong> Untuk melihat daftar nama dan profil teman sekelas.</li>
+                                                <li><strong>Dosen:</strong> Untuk melihat daftar dosen pengampu mata kuliah.</li>
+                                                <li><strong>Mata Kuliah:</strong> Untuk melihat list mata kuliah pada kurikulum.</li>
+                                                <li><strong>Jadwal Kuliah:</strong> Untuk melihat jadwal perkuliahan pada kelas.</li>
+                                                <li><strong>Berita & Info:</strong> Untuk update informasi terbaru seputar kelas.</li>
+                                                <li><strong>Kalender Akademik:</strong> Untuk memantau jadwal penting semester ini.</li>
+                                                <li><strong>Galeri Kelas:</strong> Untuk melihat dokumentasi atau foto-foto kegiatan kelas.</li>
+                                            </ol>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -501,74 +298,554 @@ $periode = mysqli_fetch_assoc($q_periode);
                     <!-- KRS & KSM -->
                     <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge">17</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Manajemen Dokumen (KRS & KSM)</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Arsip mandiri untuk dokumen penting universitas:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Manajemen Dokumen (KRS & KSM)</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Arsip mandiri untuk dokumen penting universitas:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Unggah PDF atau Screenshot <strong>KRS</strong> dan <strong>KSM</strong> Anda di menu Dokumen sebagai cadangan jika sistem kampus mengalami gangguan.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-file-signature text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Pengisian KRS:</strong> Akses <strong>Sidebar</strong> > <strong>Akun</strong> > <strong>KRS Mahasiswa</strong>. Pilih <strong>mata kuliah</strong> yang diprogramkan pada <strong>semester</strong> berjalan (tersedia tombol <strong>Pilih Semua</strong> untuk mempercepat). Klik <strong>Simpan KRS</strong> dan tunggu persetujuan dari Administrator Utama.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-user-check text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Validasi & KSM:</strong> Cek status di menu <strong>Akun</strong> > <strong>KSM Mahasiswa</strong>. Jika belum disetujui, klik <strong>Minta Validasi</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-file-pdf text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Unduh Dokumen:</strong> Setelah status berubah menjadi <strong>Approved</strong>, Anda dapat melihat <strong>Kartu Studi Mahasiswa (KSM)</strong> dan mengunduhnya dalam format <strong>PDF</strong> melalui tombol <strong>Cetak</strong>.</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Melacak Tugas -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Melacak Daftar Tugas</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Pusat informasi akademik harian Anda:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-chart-line text-indigo-500 mt-0.5"></i>
+                                        <span>Lihat <strong>Dashboard Utama</strong> untuk melihat jumlah <strong>tugas aktif</strong> atau <strong>deadline tugas</strong> terdekat.</span>
+                                    </li>
+                                    
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-circle-question text-indigo-500 mt-0.5"></i>
+                                        <span>Ada dua metode untuk mengelola tugas Anda:</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-list-ul text-indigo-500 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Metode A:</strong> <strong>Tugas Kuliah</strong> (Pantau Status):</span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses melalui <strong>Sidebar</strong> > <strong>Tugas</strong> > <strong>Tugas Kuliah</strong>.</li>
+                                                <li>Daftar tugas aktif akan langsung muncul. Gunakan fitur <strong>Pencarian</strong> untuk akses cepat.</li>
+                                                <li>Klik ikon <strong>Info</strong> untuk melihat instruksi lengkap.</li>
+                                                <li>Ingin melihat riwayat? Ubah filter pada <strong>dropdown</strong> dari <strong>Belum Selesai</strong> menjadi <strong>Selesai</strong>.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-list-check text-indigo-500 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Metode B:</strong> <strong>Tugas Saya</strong> (Kelola Progres):</span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses melalui <strong>Sidebar</strong> > <strong>Tugas</strong> > <strong>Tugas Saya</strong>.</li>
+                                                <li>Di sini tersedia dua kategori: <strong>Tugas Kuliah</strong> dan <strong>Tugas Pribadi</strong>.</li>
+                                                <li>Fitur Spesial: Anda bisa menambah <strong>tugas mandiri</strong> dengan klik ikon <strong>(+)</strong>.</li>
+                                                <li>Centang tugas yang sudah selesai dikerjakan.</li>
+                                                <li>Gunakan fitur <strong>Selesaikan Semua</strong> untuk membersihkan daftar sekaligus.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kelompok -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Cek Kelompok & Rekan Tim</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Kelola koordinasi tim Anda dengan langkah mudah berikut:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-folder-tree text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Buka <strong>Sidebar</strong> > <strong>Kelompok</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-filter text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Filter Mata Kuliah:</strong> Pilih <strong>mata kuliah</strong> yang diinginkan pada menu <strong>dropdown</strong> yang tersedia.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-people-arrows text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Variasi Kelompok:</strong> Jika ada perbedaan pembagian tim antar dosen, Anda bisa mengganti <strong>Set Kelompok</strong> melalui <strong>dropdown</strong> tambahan.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-group text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Cek Riwayat:</strong> Tekan tombol <strong>Kelompok Saya</strong> untuk melihat daftar semua kelompok di mana Anda terdaftar di semester ini.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Piket Proyektor -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Jadwal Piket Proyektor</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Kontribusi rutin untuk kelancaran perkuliahan:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-tv text-indigo-500 mt-0.5"></i>
+                                        <span>Periksa jadwal piket secara berkala melalui menu <strong>Sidebar</strong> > <strong>Piket Proyektor</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-calendar-week text-indigo-500 mt-0.5"></i>
+                                        <span>Gunakan <strong>dropdown</strong> Minggu Perkuliahan untuk melihat siapa yang bertugas pada minggu tertentu.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-clock text-indigo-500 mt-0.5"></i>
+                                        <span>Klik tombol <strong>Piket Saya</strong> untuk melihat seluruh daftar jadwal tugas Anda selama satu semester.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-handshake-angle text-indigo-500 mt-0.5"></i>
+                                        <span>Jika jadwal Anda tiba, Anda bertanggung jawab mengambil proyektor di Lab dan mengembalikannya setelah kuliah selesai.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kalender Akademik -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Kalender Akademik Terintegrasi</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Jangan lewatkan tanggal-tanggal penting:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-calendar-days text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Pilih menu <strong>Kalender</strong> pada <strong>sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-network-wired text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Satu Untuk Semua:</strong> Kalender ini otomatis menggabungkan data <strong>Jadwal Akademik</strong>, <strong>Tugas Kuliah</strong>, <strong>Tugas Pribadi</strong>, hingga <strong>Jadwal Piket Proyektor</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-layer-group text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Ringkasan Bulanan:</strong> Cek bagian bawah kalender untuk melihat daftar seluruh <strong>event</strong> yang terjadi pada bulan tersebut.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-calendar-check text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Interaktif:</strong> Tekan tanggal yang memiliki tanda <strong>event</strong> untuk melihat rincian lengkap, atau ganti bulan untuk memantau agenda mendatang.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Memantau Absensi -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Monitoring Absensi & Kehadiran</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Pastikan record kehadiran Anda selalu akurat:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-check text-indigo-500 mt-0.5"></i>
+                                        <span>Buka menu <strong>Absensi</strong> > <strong>Rekap Absen</strong> pada <strong>sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-table-cells text-indigo-500 mt-0.5"></i>
+                                        <span>Lihat tab <strong>Matrix Kehadiran Mahasiswa</strong> untuk meninjau riwayat <strong>minggu 1–16</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-magnifying-glass text-indigo-500 mt-0.5"></i>
+                                        <span>Gunakan fitur <strong>Pencarian Nama</strong> untuk pengecekan yang lebih instan.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-percent text-indigo-500 mt-0.5"></i>
+                                        <span>Pantau <strong>persentase</strong> kehadiran Anda (Pastikan tetap di atas <strong>80%</strong> untuk syarat ujian).</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-handshake-angle text-indigo-500 mt-0.5"></i>
+                                        <span>Lakukan klaim ke <strong>Sekretaris</strong> jika ada ketidaksesuaian data absen.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monitoring Kas -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Memantau Kewajiban Keuangan (Kas)</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Agar tidak ada tunggakan yang menumpuk di akhir semester:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-vault text-indigo-500 mt-0.5"></i>
+                                        <span>Buka menu <strong>Keuangan > Rekap Kas</strong> dari <strong>Sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-invoice-dollar text-indigo-500 mt-0.5"></i>
+                                        <span>Lihat tab <strong>Matrix Pembayaran Kas</strong> untuk meninjau riwayat <strong>minggu 1–16</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-magnifying-glass-dollar text-indigo-500 mt-0.5"></i>
+                                        <span>Gunakan fitur <strong>Pencarian Nama</strong> untuk pengecekan yang lebih instan.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-comments-dollar text-indigo-500 mt-0.5"></i>
+                                        <span>Segera lakukan pembayaran ke <strong>Bendahara</strong> dan pastikan data Anda diupdate di sistem.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pusat Misi -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Pusat Misi dan Pencapaian</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Selesaikan tantangan untuk mendapatkan poin atau pencapaian:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-trophy text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Pilih <strong>Pusat Misi</strong> pada <strong>sidebar</strong> untuk meninjau daftar misi yang tersedia.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-clipboard-list text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Status Misi:</strong> Selesaikan setiap instruksi untuk mendapatkan apresiasi sistem.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-medal text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Inventori Lencana:</strong> Anda dapat melihat seluruh <strong>badge</strong> atau <strong>lencana</strong> yang telah diraih dengan menggulir halaman hingga ke bagian paling bawah.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mengikuti Kuis -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Mengikuti Kuis Harian</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Asah kemampuan Anda sebelum ujian resmi:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-brain text-indigo-500 mt-0.5"></i>
+                                        <span>Buka menu <strong>Kuis Harian</strong> melalui <strong>Sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-circle-info text-indigo-500 mt-0.5"></i>
+                                        <span>Pastikan memahami tata cara bermain dengan menekan ikon <strong>?</strong> sebelum mulai mengerjakan.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-keyboard text-indigo-500 mt-0.5"></i>
+                                        <span>Masukkan jawaban Anda pada kolom yang tersedia dan klik <strong>submit</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-lightbulb text-indigo-500 mt-0.5"></i>
+                                        <span>Gunakan <strong>Hint</strong> (ikon lampu) jika mengalami kesulitan. Fitur ini akan membuka satu karakter jawaban selama <strong>HintStock</strong> tersedia.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-fire text-indigo-500 mt-0.5"></i>
+                                        <span>Jika melewatkan satu hari, gunakan <strong>RecoveryStock</strong> agar status keaktifan (<strong>"Api"</strong>) tetap terjaga.</span>
+                                    </li>
+                                     <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-trophy text-indigo-500 mt-0.5"></i>
+                                        <span>Lihat skor Anda dan cek posisi di <strong>Leaderboard</strong> kelas.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pesan Anonim -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Aspirasi Pesan Anonim</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Curhat atau kirim kritik/saran tanpa diketahui identitasnya:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-user-secret text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Akses Sidebar:</strong> Pilih menu <strong>Pesan Anonim</strong> untuk menampilkan <strong>feed</strong> pesan publik.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-image text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Download Pesan:</strong> Anda dapat mengunduh pesan tertentu sebagai <strong>file gambar</strong> dengan cara mengkliknya.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Kirim Pesan:</strong> Gunakan fitur <strong>Kirim</strong> untuk membagikan pemikiran atau kritik secara rahasia.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Random Picker -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Random Student Picker</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Alat bantu pemilihan nama yang adil:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-circle-dot text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Buka <strong>Sidebar</strong> > <strong>Random Picker</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-dice text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Pilih Kategori:</strong> Tentukan objek <strong>undian</strong> (Mahasiswa atau Kelompok) melalui menu Random Picker di sidebar.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-sliders text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Filter Kustom:</strong> Untuk kategori mahasiswa, Anda dapat menyaring daftar berdasarkan jenis kelamin atau memilih nama-nama tertentu saja. Untuk kelompok, silakan pilih berdasarkan set mata kuliah.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-rotate text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Mekanisme Undian:</strong> Tekan area <strong>roda putar</strong> untuk memulai putaran. Hasil akan muncul secara otomatis setelah 4 detik.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
+                                        <i class="fa fa-clock-rotate-left text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Log & Pengaturan:</strong> Pantau daftar nama yang sudah keluar pada bagian <strong>Riwayat</strong> dan gunakan fitur <strong>Acak Urutan</strong> untuk merombak posisi pada roda putar.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bot WhatsApp -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Integrasi Bot WhatsApp Kelas</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Nikmati kemudahan akses informasi akademik langsung melalui aplikasi WhatsApp Anda.</p>
+                                <ul class="space-y-5">
+                                    <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-300">
+                                        <i class="fa fa-check-circle text-indigo-500 mt-1"></i>
+                                        <span><strong>Cara Akses:</strong> Anda bisa mengirim pesan ke grup kelas atau langsung melalui <a href="https://wa.me/6287816244448" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">Chat Pribadi Bot Di Sini</a>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-300">
+                                        <i class="fa fa-check-circle text-indigo-500 mt-1"></i>
+                                        <span><strong>Perintah Utama:</strong> Cukup ketik <code class="text-indigo-600 dark:text-indigo-400 font-bold">.menu</code> untuk menampilkan seluruh daftar perintah yang tersedia.</span>
+                                    </li>
+                                    <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-300">
+                                        <i class="fa fa-list-ul text-indigo-500 mt-1"></i>
+                                        <div class="space-y-4 w-full">
+                                            <span><strong>Daftar Perintah:</strong> Silakan tinjau daftar command lengkap di bawah ini untuk bantuan lebih spesifik.</span>
+                                            
+                                            
+                                        </div>
+                                    </li>
+                                    <li class="items-start gap-3 text-xs text-slate-600 dark:text-slate-300">
+                                        <div class="space-y-5 bg-slate-50 dark:bg-slate-900/50 p-5 mt-2 rounded-2xl border border-slate-100 dark:border-slate-800">
+                                                <!-- Akademik -->
+                                                <div class="space-y-1.5">
+                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-book-open text-indigo-500"></i> AKADEMIK & KULIAH</p>
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.akademik</code> : Portal info akademik</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.tugas</code> : Cek deadline & list tugas</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.jadwal</code> : Jadwal kuliah & ruangan</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.kalender</code> : Kalender akademik kampus</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.kurikulum</code> : Struktur matkul & SKS</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Identitas -->
+                                                <div class="space-y-1.5">
+                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-image text-indigo-500"></i> IDENTITAS & SEJARAH</p>
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.info</code> : Identitas kelas & makna logo</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.sejarah</code> : Jejak terbentuknya kelas</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.download</code> : Unduh logo & bg zoom</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.galeri</code> : Dokumentasi foto kelas</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Tools -->
+                                                <div class="space-y-1.5">
+                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-screwdriver-wrench text-indigo-500"></i> TOOLS & PORTAL</p>
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.tentang</code> : Tech stack & versi website</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.panduan</code> : Panduan penggunaan web</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.spin</code> : Random picker terintegrasi</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.pesan</code> : Kirim pesan anonim</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.login</code> : Akses portal member</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Mahasiswa -->
+                                                <div class="space-y-1.5">
+                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-users text-indigo-500"></i> DAFTAR MAHASISWA</p>
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs</code> : Daftar seluruh mahasiswa</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs-co</code> : Command tambahan mhs</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs-nim</code> : Nama & NIM seluruh mhs</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs-l</code> : Nama mahasiswa</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs-l-nim</code> : Nama & NIM mahasiswa</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs-p</code> : Nama mahasiswi</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.mhs-p-nim</code> : Nama & NIM mahasiswi</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Bantuan -->
+                                                <div class="space-y-1.5">
+                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-comments text-indigo-500"></i> INTERAKSI & BANTUAN</p>
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.menu</code> : Menampilkan menu utama ini</p>
+                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.p / .hai / .halo</code> : Menyapa ProtyBot</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- PANDUAN KETUA TINGKAT -->
         <div id="guide-keti" class="guide-section">
-            <div class="glass-card p-8 md:p-16 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <div class="flex items-center gap-5 mb-12">
-                    <div class="h-16 w-16 bg-amber-500 text-white rounded-[1.5rem] flex items-center justify-center text-2xl shadow-xl shadow-amber-200">
+            <div class="glass-card p-6 md:p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/20">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
+                    <div class="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-colors">
                         <i class="fa fa-crown"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 plus-jakarta">Ketua Tingkat (Keti)</h2>
-                        <p class="text-[11px] text-amber-600 font-extrabold uppercase tracking-[0.2em] mt-1">Decision Making & Monitoring</p>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 dark:text-white plus-jakarta transition-colors">Ketua Tingkat</h2>
+                        <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-[0.2em] mt-1 transition-colors">Decision Making & Monitoring</p>
                     </div>
                 </div>
 
-                <div class="space-y-12">
+                <div class="space-y-8">
                     <!-- Pembagian Kelompok -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-amber-500">1</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Manajemen Pembagian Kelompok</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Mengatur distribusi anggota untuk tugas besar atau project:</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Buka menu <strong>Kelola Kelompok</strong>.</li>
-                                    <li>Pilih Mata Kuliah yang memerlukan pembagian tim.</li>
-                                    <li>Gunakan fitur <strong>Auto-Generate</strong> untuk pembagian acak, atau <strong>Custom dragging</strong> untuk menyusun anggota secara manual.</li>
-                                    <li>Klik <strong>Simpan & Publikasikan</strong> agar mahasiswa dapat melihat kelompok mereka masing-masing.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Manajemen Pembagian Kelompok</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Kelola pembentukan kelompok belajar atau tugas mahasiswa secara sistematis:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-users-gear text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Buka menu <strong>Kelompok</strong> pada <strong>sidebar</strong> dan pilih <strong>Atur Kelompok Baru</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-shuffle text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Logika Pengacakan:</strong> Pilih metode yang diinginkan: <strong>Acak Murni</strong> (acak total), <strong>Acak Berimbang</strong> (distribusi gender), atau <strong>Acak Sejenis</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-sliders text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Konfigurasi:</strong> Tentukan <strong>Mata Kuliah</strong>, <strong>Dosen Pengampu</strong>, <strong>Keterangan Tugas</strong>, serta jumlah <strong>Anggota</strong> per kelompok.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-wand-magic-sparkles text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Eksekusi:</strong> Tekan tombol <strong>Acak Murni</strong> untuk memulai proses pengacakan sistem.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-floppy-disk text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Finalisasi:</strong> Jika sudah sesuai, klik <strong>Simpan Kelompok</strong> agar mahasiswa bisa melihat tim mereka.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-pen text-indigo-600 mt-0.5"></i>
+                                        <span>Gunakan fitur <strong>Atur Manual</strong> jika perlu melakukan penyesuaian posisi anggota.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Kelompok -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Modifikasi Pembagian Kelompok</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Gunakan fitur ini jika perlu mengubah anggota atau data pada set kelompok yang sudah ada:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-folder-open text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Buka menu <strong>Kelompok</strong> pada <strong>sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-list-check text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Pilih Data:</strong> Tentukan <strong>Mata Kuliah</strong> dan <strong>Set Kelompok</strong> yang ingin diubah melalui menu dropdown.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-pen-to-square text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Aksi:</strong> Klik tombol <strong>Edit</strong> untuk masuk ke mode pengaturan.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-arrows-rotate text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Proses Perubahan:</strong> Lakukan langkah penyesuaian yang sama seperti saat pembuatan kelompok baru (mengatur ulang anggota atau deskripsi tugas).</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-cloud-arrow-up text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Simpan:</strong> Pastikan mengklik tombol <strong>simpan kembali</strong> agar perubahan terupdate di sistem mahasiswa.</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
                     <!-- Reminder WhatsApp -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-amber-500">2</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Mengirim Pengingat (Reminder) ke WhatsApp</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Memastikan tidak ada mahasiswa yang ketinggalan informasi krusial:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Mengirim Pengingat ke WhatsApp</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Memastikan tidak ada mahasiswa yang ketinggalan informasi krusial:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-paper-plane text-amber-500 mt-0.5"></i>
-                                        <span>Cari menu <strong>WhatsApp Bomber/Reminder</strong> di panel Keti.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-bell text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Buka <strong>Sidebar > Notifikasi</strong> untuk masuk ke dashboard <strong>Kirim Reminder ke WhatsApp</strong>.</span>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-paper-plane text-amber-500 mt-0.5"></i>
-                                        <span>Pilih kategori pengingat (Tugas Mendatang / Belum Bayar Kas / Absensi Rendah).</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-layer-group text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Pilih Jenis Pengingat:</strong> Tersedia 6 kategori pengingat utama yang bisa dikirimkan:</span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li><strong>Reminder KRS:</strong> Mengingatkan mahasiswa yang belum melakukan pengisian atau validasi <strong>KRS</strong>.</li>
+                                                <li><strong>Tugas Aktif:</strong> Mengirimkan rekap daftar <strong>tugas aktif</strong> yang mendekati deadline.</li>
+                                                <li><strong>Streak Kuis Harian:</strong> Mengingatkan teman-teman yang belum mengerjakan <strong>kuis harian</strong> agar "Api" mereka tidak mati.</li>
+                                                <li><strong>Jadwal Kuliah:</strong> Mengirimkan info <strong>jadwal kuliah</strong> untuk hari ini atau esok hari.</li>
+                                                <li><strong>Kas Mingguan:</strong> Memberikan teguran halus bagi mahasiswa yang memiliki tunggakan <strong>uang kas</strong>.</li>
+                                                <li><strong>Piket Proyektor:</strong> Mengingatkan petugas <strong>piket proyektor</strong> yang bertanggung jawab hari ini, besok, atau selama sepekan ke depan.</li>
+                                            </ol>
+                                        </div>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-paper-plane text-amber-500 mt-0.5"></i>
-                                        <span>Klik tombol <strong>Kirim ke Grup/Personal</strong>. Sistem akan mengarahkan ke API WhatsApp untuk mengirimkan pesan pengingat otomatis.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-comment-sms text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Kirim Notifikasi:</strong> Tekan tombol Kirim (<strong>ikon WhatsApp</strong>) pada kartu kategori yang diinginkan.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Verifikasi:</strong> Sistem akan memproses data dan mengirimkan pesan secara otomatis ke grup tujuan.</span>
                                     </li>
                                 </ul>
                             </div>
@@ -580,50 +857,111 @@ $periode = mysqli_fetch_assoc($q_periode);
 
         <!-- PANDUAN SEKRETARIS -->
         <div id="guide-sekretaris" class="guide-section">
-            <div class="glass-card p-8 md:p-16 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <div class="flex items-center gap-5 mb-12">
-                    <div class="h-16 w-16 bg-cyan-500 text-white rounded-[1.5rem] flex items-center justify-center text-2xl shadow-xl shadow-cyan-200">
+            <div class="glass-card p-6 md:p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/20 transition-all">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
+                    <div class="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-colors">
                         <i class="fa fa-file-signature"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 plus-jakarta">Peran Sekretaris</h2>
-                        <p class="text-[11px] text-cyan-600 font-extrabold uppercase tracking-[0.2em] mt-1">Daily Administrative Ops</p>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 dark:text-white plus-jakarta transition-colors">Sekretaris</h2>
+                        <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-[0.2em] mt-1 transition-colors">Daily Administrative Ops</p>
                     </div>
                 </div>
 
-                <div class="space-y-12">
+                <div class="space-y-8">
                     <!-- Kelola Absensi -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-cyan-500">1</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Langkah Membuka Absensi Digital</h3>
-                                <p class="text-[13px] text-slate-600 leading-relaxed mb-4">Lakukan ini setiap kali mata kuliah dimulai:</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Buka menu <strong>Manajemen Absensi</strong>.</li>
-                                    <li>Klik tombol <strong>Buka Sesi Baru</strong>.</li>
-                                    <li>Pilih Mata Kuliah dan Dosen Pengajar.</li>
-                                    <li>Atur durasi absensi (Misal: 15 Menit).</li>
-                                    <li>Klik <strong>Simpan</strong>. Sistem akan membuka sesi absen dan <strong>secara otomatis mengirimkan pesan pengumuman ke Grup WhatsApp</strong> kelas.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Langkah Membuka Absensi Digital</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Lakukan ini setiap kali mata kuliah dimulai:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-fingerprint text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Navigasi:</strong> Pilih menu <strong>Input Absen</strong> di bawah kategori Absensi pada <strong>sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-clipboard-list text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Identifikasi:</strong> Pilih <strong>Mata Kuliah</strong> dan sesi pertemuan hari ini.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-check text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Update Status:</strong> Sistem otomatis menandai semua <strong>"Hadir"</strong>. Ubah hanya mahasiswa yang tidak hadir sesuai keterangan masing-masing.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-save text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Validasi:</strong> Klik <strong>Simpan</strong> dan setujui konfirmasi keamanan yang muncul.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Notifikasi:</strong> Pilih "Ya" pada popup jika ingin membagikan <strong>laporan kehadiran</strong> ke Grub.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Absensi -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Manajemen Unduh Dokumen Absensi</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Gunakan fitur ini untuk keperluan pengarsipan atau pelaporan data kehadiran dalam format Excel.</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-excel text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Rekap Absensi Semester (Minggu 1–16):</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses <strong>Sidebar > Absensi > Rekap Absen</strong>.</li>
+                                                <li>Pilih Mata Kuliah yang diinginkan melalui menu dropdown.</li>
+                                                <li>Klik tombol <strong>Export Rekap</strong> di bagian atas, konfirmasi validasi, dan dokumen akan otomatis terunduh dalam format <strong>Excel (.xlsx)</strong>.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-lines text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Data Absensi Per Pertemuan:</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses <strong>Sidebar > Absensi > Data Absen</strong>.</li>
+                                                <li>Gunakan filter untuk memilih Mata Kuliah, nomor Pertemuan, and Status kehadiran tertentu.</li>
+                                                <li>Klik tombol <strong>Export Rekap</strong> dan selujui validasi untuk mendapatkan file <strong>Excel</strong>-nya.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
                     <!-- Membuat Tugas -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-cyan-500">2</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Membuat & Mengelola Tugas Kuliah</h3>
-                                <p class="text-[13px] text-slate-600 leading-relaxed mb-4">Mendata tugas dari dosen agar terdokumentasi dengan baik:</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Masuk ke menu <strong>Manajemen Tugas</strong>.</li>
-                                    <li>Klik tombol <strong>Tambah Tugas</strong>.</li>
-                                    <li>Pilih Mata Kuliah, isi Judul Tugas, dan Deskripsi instruksi dari dosen.</li>
-                                    <li>Tentukan <strong>Deadline</strong> (Tanggal & Waktu pengumpulan).</li>
-                                    <li>Klik <strong>Publish</strong> untuk memunculkan tugas di dashboard seluruh mahasiswa.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Membuat & Mengelola Tugas Kuliah</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Mendata tugas dari dosen agar terdokumentasi dengan baik:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-plus-circle text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Input:</strong> Buka menu <strong>Tugas Kuliah</strong>, klik <strong>(+)</strong>, lengkapi form tugas, dan simpan. Notifikasi otomatis akan langsung masuk ke <strong>grup WA</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-pen-to-square text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Edit:</strong> Klik <strong>ikon Pensil</strong> pada list tugas, sesuaikan isinya, dan simpan kembali untuk mengirim notifikasi update.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-trash-can text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Hapus:</strong> Klik <strong>ikon Sampah</strong> dan konfirmasi jika tugas tersebut ingin dibatalkan atau dihapus.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Reminder:</strong> Klik <strong>ikon Pesawat</strong> (di bagian atas) untuk mengirimkan ringkasan seluruh tugas aktif ke grup WhatsApp kelas secara instan.</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -633,67 +971,109 @@ $periode = mysqli_fetch_assoc($q_periode);
 
         <!-- PANDUAN BENDAHARA -->
         <div id="guide-bendahara" class="guide-section">
-            <div class="glass-card p-8 md:p-16 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <div class="flex items-center gap-5 mb-12">
-                    <div class="h-16 w-16 bg-emerald-500 text-white rounded-[1.5rem] flex items-center justify-center text-2xl shadow-xl shadow-emerald-200">
+            <div class="glass-card p-6 md:p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/20 transition-colors">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
+                    <div class="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-colors">
                         <i class="fa fa-wallet"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 plus-jakarta">Peran Bendahara</h2>
-                        <p class="text-[11px] text-emerald-600 font-extrabold uppercase tracking-[0.2em] mt-1">Financial Data Entry</p>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 dark:text-white plus-jakarta transition-colors">Bendahara</h2>
+                        <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-[0.2em] mt-1 transition-colors">Financial Data Entry</p>
                     </div>
                 </div>
 
-                <div class="space-y-12">
+                <div class="space-y-8">
                     <!-- Tambah Kas Perminggu -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-emerald-500">1</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Tambah Kas Kolektif (Per Minggu)</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Fitur cepat untuk menginput pembayaran seluruh kelas dalam satu minggu:</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Buka menu <strong>Manajemen Kas</strong> > <strong>Tambah Kas Mingguan</strong>.</li>
-                                    <li>Pilih Periode/Minggu yang ingin diisi.</li>
-                                    <li>Centang nama-nama mahasiswa yang sudah membayar.</li>
-                                    <li>Klik <strong>Simpan Kolektif</strong>. Saldo kelas akan bertambah sesuai jumlah mahasiswa yang membayar.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Tambah Kas Per Minggu</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Fitur cepat untuk menginput pembayaran seluruh kelas dalam satu minggu:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-calendar-check text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Navigasi:</strong> Masuk ke menu <strong>Input Per Minggu</strong> di bawah kategori Keuangan pada <strong>sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-calendar-week text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Pilih Periode:</strong> Tentukan <strong>minggu 1–16</strong> yang ingin diproses.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-circle-check text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Update Pembayaran:</strong> Klik status Belum hingga berubah menjadi <strong>Lunas</strong>. Kamu tidak perlu mengisi tanggal secara manual karena sistem akan otomatis mengambil data hari ini.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-save text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Update Saldo:</strong> Tekan tombol <strong>Simpan Kas</strong> untuk memperbarui saldo kas kelas di <strong>dashboard utama</strong> secara otomatis.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Notifikasi:</strong> Pilih "Ya" pada popup jika ingin membagikan laporan kehadiran ke <strong>Grub</strong>.</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tambah Kas Per Individu -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-emerald-500">2</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Tambah Kas Per Individu</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Mencatat pembayaran mahasiswa secara spesifik (misal rapel atau cicilan):</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Cari nama Mahasiswa di menu <strong>Database Kas</strong>.</li>
-                                    <li>Klik tombol <strong>Detail/Bayar</strong> pada baris nama tersebut.</li>
-                                    <li>Tentukan jumlah minggu yang dibayar dan nominalnya.</li>
-                                    <li>Simpan. Status pembayaran individu tersebut akan otomatis berubah menjadi "Lunas" untuk periode terkait.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Tambah Kas Per Individu</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Mencatat pembayaran mahasiswa secara spesifik (misal rapel atau cicilan):</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-tag text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Navigasi:</strong> Masuk ke menu <strong>Input Per Individu</strong> di bawah kategori Keuangan pada <strong>sidebar</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-magnifying-glass text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Cari Nama:</strong> Pilih nama mahasiswa yang ingin membayar pada kolom <strong>dropdown</strong> yang tersedia.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-circle-check text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Konfirmasi Lunas:</strong> Klik status Belum hingga berubah menjadi <strong>Lunas</strong> pada kolom minggu yang diinginkan. Tanggal bayar akan terisi otomatis oleh sistem.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-save text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Update Saldo:</strong> Tekan tombol <strong>Simpan Kas</strong> untuk memvalidasi penambahan saldo kelas.</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
                     <!-- Catat Pemasukan & Pengeluaran -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-emerald-500">3</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Pencatatan Pemasukan & Pengeluaran Lainnya</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Mengelola sirkulasi uang selain iuran kas rutin:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Pencatatan Pemasukan & Pengeluaran Lainnya</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Mengelola sirkulasi uang selain iuran kas rutin:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-plus-circle text-emerald-500 mt-0.5"></i>
-                                        <span><strong>Pemasukan:</strong> Gunakan menu <strong>Transaksi Lain</strong> > <strong>Pemasukan</strong> untuk mencatat dana masuk seperti sumbangan atau sisa uang kegiatan.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-tag text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Navigasi:</strong> Masuk ke menu <strong>Data Kas</strong> di bawah kategori Keuangan pada <strong>sidebar</strong>.</span>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-minus-circle text-rose-500 mt-0.5"></i>
-                                        <span><strong>Pengeluaran:</strong> Masuk ke tab <strong>Catat Pengeluaran</strong> untuk isi nominal dan keperluan belanja kelas (Misal: Spidol, Konsumsi, dll).</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-list-ol text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Input Transaksi:</strong> Pada bagian Catat Transaksi Baru, pilih jenis:</span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li><strong>Pemasukan:</strong> Jika ada dana masuk selain kas.</li>
+                                                <li><strong>Pengeluaran:</strong> Jika ada dana yang terpakai.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-calendar-plus text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Lengkapi Data:</strong> Isi keterangan, nominal uang, dan tanggal, lalu klik tombol <strong>(+)</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-arrows-rotate text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Update Otomatis:</strong> <strong>Saldo</strong> akhir di dashboard akan otomatis menyesuaikan dengan transaksi yang baru saja kamu buat.</span>
                                     </li>
                                 </ul>
                             </div>
@@ -701,17 +1081,79 @@ $periode = mysqli_fetch_assoc($q_periode);
                     </div>
 
                     <!-- Reminder Kas WA -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-emerald-500">4</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Kirim Pengingat Kas ke WhatsApp</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Menagih tunggakan secara otomatis melalui WhatsApp:</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Buka menu <strong>Laporan Kas</strong> > <strong>Tunggakan Mahasiswa</strong>.</li>
-                                    <li>Klik tombol <strong>Kirim Pesan ke Grup WA</strong>.</li>
-                                    <li>Sistem akan men-generate daftar nama yang belum bayar beserta total tagihannya dan mengirimkannya ke Grup WhatsApp kelas.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Kirim Pengingat Kas ke WhatsApp</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Menagih tunggakan secara otomatis melalui WhatsApp:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-magnifying-glass-dollar text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Navigasi:</strong> Masuk ke menu <strong>Data Kas</strong> di sidebar, lalu scroll ke bagian bawah pada tabel Status Pembayaran.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-calendar-days text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Pilih Periode:</strong> Tentukan minggu yang ingin dicek.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Klik Ikon Pesawat:</strong> Tekan <strong>ikon pesawat</strong> untuk menyiapkan draf pengingat otomatis.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-comment-sms text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Konfirmasi:</strong> Klik Kirim Pesan ke <strong>Grup WA</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-whatsapp text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Hasil:</strong> <strong>Grup WhatsApp</strong> akan menerima pesan rapi berisi siapa saja yang belum bayar dan berapa nominal yang harus mereka lunasi.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Keuangan -->
+                    <div class="step-card group">
+                        <div class="flex gap-6 relative z-10">
+
+                            <div class="flex-1">
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Manajemen Unduh Dokumen Keuangan</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Gunakan fitur ini untuk keperluan pengarsipan atau pelaporan data keuangan dalam format Excel.</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-excel text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Rekap Kas (Minggu 1–16):</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses <strong>Sidebar > Keuangan > Rekap Kas</strong>.</li>
+                                                <li>Klik tombol <strong>Export Rekap</strong> di bagian atas, konfirmasi validasi, and dokumen akan otomatis terunduh dalam format <strong>Excel (.xlsx)</strong>.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-invoice-dollar text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Data Kas Per Minggu:</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses <strong>Sidebar > Keuangan > Data Kas</strong>.</li>
+                                                <li>Scroll ke bagian bawah pada tabel Status Pembayaran.</li>
+                                                <li>Gunakan filter untuk memilih Minggu and Status keuangan tertentu.</li>
+                                                <li>Klik tombol dengan <strong>icon Excel</strong> and selujui validasi untuk mendapatkan file Excel-nya.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-import text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Data Arus Kas (Pemasukan dan Pengeluaran):</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Akses <strong>Sidebar > Keuangan > Data Kas</strong>.</li>
+                                                <li>Klik tombol <strong>Export Arus</strong> and selujui validasi untuk mendapatkan file <strong>Excel</strong>-nya.</li>
+                                            </ol>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -721,45 +1163,43 @@ $periode = mysqli_fetch_assoc($q_periode);
 
         <!-- PANDUAN MANAGER TUGAS -->
         <div id="guide-manager" class="guide-section">
-            <div class="glass-card p-8 md:p-16 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <div class="flex items-center gap-5 mb-12">
-                    <div class="h-16 w-16 bg-rose-500 text-white rounded-[1.5rem] flex items-center justify-center text-2xl shadow-xl shadow-rose-200">
+            <div class="glass-card p-6 md:p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/20 text-slate-800 dark:text-white transition-colors">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
+                    <div class="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-colors">
                         <i class="fa fa-tasks"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 plus-jakarta">Peran Manager Tugas</h2>
-                        <p class="text-[11px] text-rose-600 font-extrabold uppercase tracking-[0.2em] mt-1">Assignment & Deadline Management</p>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 dark:text-white plus-jakarta transition-colors">Manager Tugas</h2>
+                        <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-[0.2em] mt-1 transition-colors">Assignment & Deadline Management</p>
                     </div>
                 </div>
 
-                <div class="space-y-12">
-                    <div class="step-card">
+                <div class="space-y-8">
+                    <!-- Membuat Tugas -->
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-rose-500">1</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Langkah Menambahkan Tugas Baru</h3>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Buka menu <strong>Kelola Tugas</strong>.</li>
-                                    <li>Pilih Mata Kuliah yang bersangkutan.</li>
-                                    <li>Tulis Judul Tugas dan Deskripsi singkat instruksinya.</li>
-                                    <li>Atur <strong>Deadline</strong> (Tanggal & Jam).</li>
-                                    <li>Klik <strong>Publish</strong>. Notifikasi akan muncul di dashboard semua orang.</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="step-card">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-rose-500">2</span>
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Melampirkan File Pendukung</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed italic mb-2">"Sangat membantu untuk teman-teman yang ketinggalan info"</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Setelah tugas dibuat, klik tombol <strong>Edit/Lampiran</strong>.</li>
-                                    <li>Masukkan Link (Misal dari Google Drive atau Link Blog Dosen).</li>
-                                    <li>Simpan. Tombol "Cek Materi" akan muncul di tugas tersebut.</li>
-                                </ol>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Membuat & Mengelola Tugas Kuliah</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Mendata tugas dari dosen agar terdokumentasi dengan baik:</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-folder-plus text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Input:</strong> Buka menu <strong>Tugas Kuliah</strong>, klik <strong>(+)</strong>, lengkapi form tugas, dan simpan. Notifikasi otomatis akan langsung masuk ke <strong>grup WA</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-pen-to-square text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Edit:</strong> Klik <strong>ikon Pensil</strong> pada list tugas, sesuaikan isinya, dan simpan kembali untuk mengirim notifikasi update.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-trash-can text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Hapus:</strong> Klik <strong>ikon Sampah</strong> dan konfirmasi jika tugas tersebut ingin dibatalkan atau dihapus.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-paper-plane text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Reminder:</strong> Klik <strong>ikon Pesawat</strong> (di bagian atas) untuk mengirimkan ringkasan seluruh tugas aktif ke grup WhatsApp kelas secara instan.</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -769,33 +1209,41 @@ $periode = mysqli_fetch_assoc($q_periode);
 
         <!-- PANDUAN ADMINISTRATOR -->
         <div id="guide-admin" class="guide-section">
-            <div class="glass-card p-8 md:p-16 rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50">
-                <div class="flex items-center gap-5 mb-12">
-                    <div class="h-16 w-16 bg-slate-900 text-white rounded-[1.5rem] flex items-center justify-center text-2xl shadow-xl shadow-slate-300">
+            <div class="glass-card p-6 md:p-8 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/20 transition-colors">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
+                    <div class="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-colors">
                         <i class="fa fa-user-shield"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-black text-slate-800 plus-jakarta">Super Administrator</h2>
-                        <p class="text-[11px] text-slate-500 font-extrabold uppercase tracking-[0.2em] mt-1">Core System Maintenance</p>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-800 dark:text-white plus-jakarta transition-colors">Administrator Utama</h2>
+                        <p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-[0.2em] mt-1 transition-colors">Core System Maintenance</p>
                     </div>
                 </div>
 
-                <div class="space-y-12">
+                <div class="space-y-8">
                     <!-- Full Access & Database Control -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-slate-900">1</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Full Access & Database Control</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Administrator menyatukan seluruh fungsi role sebelumnya (Mhs, Keti, Sekre, Bendahara) dan memiliki wewenang penuh untuk:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Full Control & Database Management</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Administrator menyatukan seluruh fungsi role sebelumnya dan memiliki wewenang penuh untuk:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-database text-slate-900 mt-0.5"></i>
-                                        <span><strong>Edit Database:</strong> Mengubah, menghapus, atau memperbaiki data salah (Nama, NIM, Saldo Kas, Kehadiran) melalui menu <strong>Master Data</strong>.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-database text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Edit Database:</strong> Mengubah, menghapus, atau memperbaiki data (Nama, NIM, Saldo Kas, Kehadiran) melalui kategori <strong>Database</strong> di <strong>sidebar</strong>.</span>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-user-gear text-slate-900 mt-0.5"></i>
-                                        <span><strong>User Role Management:</strong> Menunjuk atau mencopot jabatan pengurus (Role) di sistem.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-gear text-indigo-600 mt-0.5"></i>
+                                        <span><strong>User Role Management:</strong> Menunjuk atau mencopot jabatan pengurus (<strong>Role</strong>) langsung melalui tabel <strong>Users</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-eye text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Log Aktivitas:</strong> Pantau seluruh rekam jejak aksi pengguna secara <strong>real-time</strong> untuk menjaga keamanan sistem.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-triangle-exclamation text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Peringatan Keamanan:</strong> Gunakan fitur ini dengan bijak karena setiap perubahan data pada database bersifat <strong>permanen</strong>.</span>
                                     </li>
                                 </ul>
                             </div>
@@ -803,53 +1251,64 @@ $periode = mysqli_fetch_assoc($q_periode);
                     </div>
 
                     <!-- Manajemen Kuis & Gift -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-slate-900">2</span>
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Manajemen Kuis & Reward System</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Mengelola konten edukasi dan apresiasi pengguna:</p>
-                                <ol class="list-decimal list-inside space-y-2 text-[13px] text-slate-500">
-                                    <li>Buka menu <strong>Quiz Management</strong> > <strong>Add Questions</strong> untuk menambah soal kuis baru (teks/gambar).</li>
-                                    <li>Gunakan fitur <strong>Gift Coins/Points</strong> untuk memberikan hadiah manual kepada mahasiswa yang berprestasi atau aktif dalam kuis.</li>
-                                    <li>Atur jadwal kuis agar aktif pada jam-jam tertentu saja.</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Validasi KRS & KSM -->
-                    <div class="step-card">
-                        <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-slate-900">3</span>
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Validasi Berkas (KRS & KSM)</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Memetakan dan memverifikasi dokumen akademik mahasiswa:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Kuis Harian & Reward System</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Mengelola konten edukasi dan apresiasi keaktifan mahasiswa:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-file-circle-check text-slate-900 mt-0.5"></i>
-                                        <span>Masuk ke menu <strong>Pusat Dokumen</strong> > <strong>Validasi KRS</strong>.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-microchip text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Pengelolaan Statistik & Hadiah:</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Buka <strong>Website > Manajemen Stats Kuis</strong>.</li>
+                                                <li>Gunakan fitur <strong>Global Hint/Recovery</strong> untuk membagikan bonus stok bantuan ke seluruh mahasiswa secara serentak.</li>
+                                                <li>Berikan <strong>HintStock/RecoveryStock</strong> secara spesifik ke pemain tertentu untuk apresiasi individu.</li>
+                                            </ol>
+                                        </div>
                                     </li>
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-file-circle-check text-slate-900 mt-0.5"></i>
-                                        <span>Periksa file yang diunggah mahasiswa, jika benar, klik <strong>Verifikasi</strong> agar muncul tanda centang hijau di profil mereka.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-book-medical text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Pengelolaan Bank Soal:</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li>Buka <strong>Website > Data Soal Kuis</strong>.</li>
+                                                <li>Input pertanyaan, kunci jawaban, dan tentukan <strong>tanggal tayang</strong> kuis melalui ikon <strong>(+)</strong>.</li>
+                                            </ol>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Global WhatsApp Notification -->
-                    <div class="step-card">
+                    <!-- Validasi KRS & KSM -->
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-slate-900">4</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">Notifikasi Global ke Grup WhatsApp</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Mirip dengan Ketua Tingkat, Admin dapat melakukan siaran langsung:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Validasi Berkas (KRS & KSM)</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Memetakan dan memverifikasi dokumen akademik mahasiswa:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-comment-sms text-slate-900 mt-0.5"></i>
-                                        <span>Gunakan menu <strong>System Broadcaster (WA)</strong> untuk mengirim agenda semester atau pengumuman maintenance sistem ke Grup WhatsApp utama kelas secara otomatis.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-user-check text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Akses Menu:</strong> Buka <strong>Website > Validasi KRS</strong> melalui sidebar.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-file-invoice text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Peninjauan Data:</strong> Periksa daftar mata kuliah yang diinput mahasiswa dengan menekan tombol <strong>Detail</strong>.</span>
+                                    </li>
+                                     <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-signature text-indigo-600 mt-0.5"></i>
+                                        <div class="space-y-1">
+                                            <span><strong>Tindakan Verifikasi:</strong></span>
+                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
+                                                <li><strong>Setujui (Verify):</strong> Klik Ikon Centang jika data sudah sesuai dengan KRS resmi.</li>
+                                                <li><strong>Tolak (Reject):</strong> Klik Ikon Silang jika terdapat kesalahan agar mahasiswa dapat memperbaikinya.</li>
+                                            </ol>
+                                        </div>
                                     </li>
                                 </ul>
                             </div>
@@ -857,24 +1316,35 @@ $periode = mysqli_fetch_assoc($q_periode);
                     </div>
 
                     <!-- System Maintenance -->
-                    <div class="step-card">
+                    <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
-                            <span class="step-badge !bg-slate-900">5</span>
+
                             <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 mb-3 plus-jakarta">System Maintenance & Maintenance Mode</h3>
-                                <p class="text-[13px] text-slate-500 leading-relaxed mb-4">Menjaga keberlangsungan sistem informasi:</p>
+                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">System Settings & Maintenance</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Menjaga stabilitas dan keberlangsungan portal:</p>
                                 <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-[13px] text-slate-600">
-                                        <i class="fa fa-screwdriver-wrench text-slate-900 mt-0.5"></i>
-                                        <span>Kelola <strong>Periode Semester</strong> (Arsip data lama) dan aktifkan <strong>Maintenance Mode</strong> jika sedang ada pengembangan kode agar data tidak bentrok.</span>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-gears text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Konfigurasi Global:</strong> Atur Info Web, No WA Bot, dan Link Grup melalui menu <strong>Pengaturan</strong>.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-screwdriver-wrench text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Maintenance Mode:</strong> Aktifkan mode perbaikan untuk mencegah bentrok data saat melakukan update besar pada sistem.</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
+                                        <i class="fa fa-broom text-indigo-600 mt-0.5"></i>
+                                        <span><strong>Reset Data:</strong> Gunakan fitur <strong>Reset Semester</strong> (Absensi, Kas, Log) untuk membersihkan database saat memasuki semester baru.</span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
     </div>
+</div>
+</div>
 </main>
 
     <?php include 'includes/footer_main.php'; ?>
@@ -882,6 +1352,10 @@ $periode = mysqli_fetch_assoc($q_periode);
 
     <script>
         function showGuide(role) {
+            // Reset search input
+            document.getElementById('guide-search').value = "";
+            searchGuide("");
+
             // Hide all guides
             document.querySelectorAll('.guide-section').forEach(el => {
                 el.classList.remove('active');
@@ -900,6 +1374,69 @@ $periode = mysqli_fetch_assoc($q_periode);
                 top: document.querySelector('main').offsetTop - 120,
                 behavior: 'smooth'
             });
+        }
+
+        function searchGuide(query) {
+            const q = query.toLowerCase();
+            const sections = document.querySelectorAll('.guide-section');
+            const status = document.getElementById('search-status');
+            let totalVisibleCount = 0;
+
+            if (q === "") {
+                // Jika input kosong, kembalikan ke kategori yang aktif
+                const activeBtn = document.querySelector('.role-btn.active');
+                // Mengambil parameter role dari atribut onclick (e.g. showGuide('mhs'))
+                const match = activeBtn ? activeBtn.getAttribute('onclick').match(/'([^']+)'/) : null;
+                const activeRole = match ? match[1] : 'mhs';
+
+                sections.forEach(section => {
+                    if (section.id === 'guide-' + activeRole) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                    // Reset visibilitas seluruh card di dalam section
+                    section.querySelectorAll('.step-card').forEach(card => card.style.display = "block");
+                });
+                status.classList.add('hidden');
+                return;
+            }
+
+            // Pencarian global di seluruh kategori
+            sections.forEach(section => {
+                const cards = section.querySelectorAll('.step-card');
+                const h2 = section.querySelector('h2').innerText.toLowerCase();
+                let sectionVisibleCount = 0;
+
+                cards.forEach(card => {
+                    const h3 = card.querySelector('h3').innerText.toLowerCase();
+                    const text = card.innerText.toLowerCase();
+                    
+                    // Cek apakan query ada di judul section, judul langkah, atau isi konten
+                    if (h2.includes(q) || h3.includes(q) || text.includes(q)) {
+                        card.style.display = "block";
+                        card.style.animation = "fadeIn 0.3s ease-out forwards";
+                        sectionVisibleCount++;
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+
+                // Tampilkan section jika ada card yang cocok di dalamnya
+                if (sectionVisibleCount > 0) {
+                    section.classList.add('active');
+                    totalVisibleCount += sectionVisibleCount;
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+
+            // Tampilkan pesan jika tidak ada hasil sama sekali
+            if (totalVisibleCount === 0) {
+                status.classList.remove('hidden');
+            } else {
+                status.classList.add('hidden');
+            }
         }
     </script>
 </body>

@@ -166,29 +166,29 @@ if (mysqli_num_rows($krs) > 0) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm transition-all">
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div class="flex items-center gap-4">
                     <div>
-                        <h3 class="text-2xl font-bold">Kartu Rencana Studi (KRS)</h3>
-                        <p class="text-xs text-slate-500 font-medium mt-1">Periode Aktif: <span class="text-indigo-600"><?= htmlspecialchars($periode_info) ?></span></p>
+                        <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Kartu Rencana Studi (KRS)</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Periode Aktif: <span class="text-indigo-600 dark:text-indigo-400"><?= htmlspecialchars($periode_info) ?></span></p>
                     </div>
-                    <button type="button" onclick="showKrsRules()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 transition-colors flex items-center justify-center shadow-sm border border-slate-200" title="Informasi Aturan">
+                    <button type="button" onclick="showKrsRules()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-700" title="Informasi Aturan">
                         <i class="fas fa-info-circle"></i>
                     </button>
                 </div>
-                <div class="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                <div class="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50 rounded-xl px-4 py-2 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 dark:bg-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-950/20">
                         <i class="fas fa-book-open"></i>
                     </div>
                     <div>
-                        <p class="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">Total SKS Terpilih</p>
-                        <p class="text-lg font-black text-indigo-950"><span id="total-sks-display">0</span> <span class="text-xs font-normal text-slate-500">/ 24 SKS</span></p>
+                        <p class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider">Total SKS Terpilih</p>
+                        <p class="text-lg font-black text-indigo-950 dark:text-indigo-100"><span id="total-sks-display">0</span> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">/ 24 SKS</span></p>
                     </div>
                 </div>
             </div>
@@ -196,35 +196,35 @@ if (mysqli_num_rows($krs) > 0) {
             <!-- Success logic handled by SweetAlert -->
 
             <?php if ($status_validasi === 'approved'): ?>
-                <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                <div class="bg-green-50/50 dark:bg-green-900/20 border border-green-200 dark:border-green-900/50 text-green-800 dark:text-green-300 px-4 py-3 rounded-xl mb-6 flex items-start shadow-sm transition-all">
                     <i class="fas fa-check-circle mt-1 mr-3"></i>
                     <div>
                         <p class="font-bold text-sm">Approved</p>
-                        <p class="text-xs">KRS Anda telah <strong>disetujui</strong>. Jika Anda melakukan perubahan dan menyimpannya kembali, status akan berubah menjadi <strong>Menunggu Persetujuan</strong>.</p>
+                        <p class="text-xs leading-relaxed">KRS Anda telah <strong>disetujui</strong>. Jika Anda melakukan perubahan dan menyimpannya kembali, status akan berubah menjadi <strong>Menunggu Persetujuan</strong>.</p>
                     </div>
                 </div>
             <?php elseif ($status_validasi === 'pending'): ?>
-                <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                <div class="bg-yellow-50/50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-900/50 text-yellow-800 dark:text-yellow-300 px-4 py-3 rounded-xl mb-6 flex items-start shadow-sm transition-all">
                     <i class="fas fa-clock mt-1 mr-3"></i>
                     <div>
                         <p class="font-bold text-sm">Menunggu Persetujuan</p>
-                        <p class="text-xs">Draft KRS Anda sedang menunggu validasi oleh Admin. Anda masih dapat mengubahnya selama belum disetujui.</p>
+                        <p class="text-xs leading-relaxed">Draft KRS Anda sedang menunggu validasi oleh Admin. Anda masih dapat mengubahnya selama belum disetujui.</p>
                     </div>
                 </div>
             <?php elseif ($status_validasi === 'rejected'): ?>
-                <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                <div class="bg-red-50/50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 text-red-800 dark:text-red-300 px-4 py-3 rounded-xl mb-6 flex items-start shadow-sm transition-all">
                     <i class="fas fa-times-circle mt-1 mr-3"></i>
                     <div>
                         <p class="font-bold text-sm">Ditolak</p>
-                        <p class="text-xs">KRS Anda ditolak. Silakan perbaiki pilihan mata kuliah Anda dan simpan kembali.</p>
+                        <p class="text-xs leading-relaxed">KRS Anda ditolak. Silakan perbaiki pilihan mata kuliah Anda dan simpan kembali.</p>
                     </div>
                 </div>
             <?php else: ?>
-                <div class="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6 flex items-start">
+                <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 text-blue-800 dark:text-blue-300 px-4 py-3 rounded-xl mb-6 flex items-start shadow-sm transition-all">
                     <i class="fas fa-info-circle mt-1 mr-3"></i>
                     <div>
                         <p class="font-bold text-sm">Silakan Isi KRS</p>
-                        <p class="text-xs">Pilih mata kuliah dan klik Simpan. Data akan dikirim untuk divalidasi.</p>
+                        <p class="text-xs leading-relaxed">Pilih mata kuliah dan klik Simpan. Data akan dikirim untuk divalidasi.</p>
                     </div>
                 </div>
             <?php endif; ?>
@@ -233,14 +233,14 @@ if (mysqli_num_rows($krs) > 0) {
 
                 <?php for ($s = $semester_aktif; $s <= $semester_aktif; $s++): ?>
                     <div class="flex justify-between items-end mt-4 mb-2">
-                        <h4 class="text-lg font-semibold">Semester <?= $s ?></h4>
-                        <button type="button" onclick="toggleSelectAll()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-200 hover:bg-indigo-100 transition-colors font-semibold flex items-center shadow-sm">
+                        <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Semester <?= $s ?></h4>
+                        <button type="button" onclick="toggleSelectAll()" class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors font-semibold flex items-center shadow-sm">
                             <i class="fas fa-check-double mr-2"></i> Pilih Semua
                         </button>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-indigo-900">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                            <thead class="bg-indigo-900 dark:bg-indigo-950">
                                 <tr>
                                     <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">Ambil</th>
                                     <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Kode</th>
@@ -248,20 +248,20 @@ if (mysqli_num_rows($krs) > 0) {
                                     <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">SKS</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-slate-200">
+                            <tbody class="bg-white dark:bg-slate-900/50 divide-y divide-slate-200 dark:divide-slate-800">
                                 <?php
                                 $found = false;
                                 foreach ($matkul_rows as $m) {
                                     if ((int)$m['semester'] !== $s) continue;
                                     $found = true;
                                 ?>
-                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100 transition-colors">
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center">
-                                            <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" data-sks="<?= $m['sks'] ?>" class="sks-checkbox rounded text-indigo-600 focus:ring-indigo-500" <?= in_array($m['id'], $diambil) ? 'checked' : '' ?>>
+                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900/20' ?> hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-colors group">
+                                        <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center">
+                                            <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" data-sks="<?= $m['sks'] ?>" class="sks-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:bg-slate-800" <?= in_array($m['id'], $diambil) ? 'checked' : '' ?>>
                                         </td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                        <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($m['nama_matkul']) ?></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 text-center"><?= htmlspecialchars($m['sks']) ?></td>
+                                        <td class="px-3 py-3 whitespace-nowrap text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors"><?= htmlspecialchars($m['kode_matkul']) ?></td>
+                                        <td class="px-3 py-3 text-xs text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors font-medium"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                        <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-700 dark:text-slate-300 text-center"><?= htmlspecialchars($m['sks']) ?></td>
                                     </tr>
                                 <?php } ?>
                                 <?php if (!$found): ?>
@@ -274,11 +274,11 @@ if (mysqli_num_rows($krs) > 0) {
                     </div>
                 <?php endfor; ?>
 
-                <div class="mt-8 pt-5 border-t border-slate-200 flex flex-col items-center">
-                    <p class="text-[10px] text-slate-500 mb-4 italic">Pastikan mata kuliah yang dipilih sudah sesuai sebelum melakukan penyimpanan.</p>
+                <div class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col items-center">
+                    <p class="text-[10px] text-slate-500 dark:text-slate-500 mb-6 italic">Pastikan mata kuliah yang dipilih sudah sesuai sebelum melakukan penyimpanan.</p>
                     <button type="button" onclick="confirmSaveKRS()"
-                        class="px-6 py-2.5 bg-indigo-800 text-white rounded-lg hover:bg-indigo-950 text-xs font-semibold shadow-lg shadow-indigo-900/20 transition-all active:scale-95 flex items-center">
-                        <i class="fa fa-save mr-2"></i> Simpan KRS
+                        class="px-10 py-3 bg-indigo-800 dark:bg-indigo-700 text-white rounded-xl hover:bg-indigo-950 dark:hover:bg-indigo-600 text-xs font-bold shadow-lg shadow-indigo-900/20 dark:shadow-indigo-950/40 transition-all active:scale-95 flex items-center gap-2">
+                        <i class="fa fa-save"></i> Simpan KRS
                     </button>
                 </div>
             </form>
@@ -290,24 +290,25 @@ if (mysqli_num_rows($krs) > 0) {
     <script>
         // Reusable function for KRS rules
         function showKrsRules() {
+            const isDark = document.documentElement.classList.contains('dark');
             Swal.fire({
-                title: '<span class="text-indigo-950">Aturan Pengisian KRS</span>',
+                title: `<span class="${isDark ? 'text-indigo-300' : 'text-indigo-950'} font-bold">Aturan Pengisian KRS</span>`,
                 html: `
                     <div class="text-left text-xs space-y-3 p-2">
                         <div class="flex gap-3">
-                            <div class="mt-1"><i class="fas fa-check-circle text-indigo-600"></i></div>
-                            <p class="text-slate-700">Maksimal beban studi yang dapat diambil adalah <strong>24 SKS</strong>.</p>
+                            <div class="mt-1"><i class="fas fa-check-circle text-indigo-500"></i></div>
+                            <p class="${isDark ? 'text-slate-300' : 'text-slate-700'}">Maksimal beban studi yang dapat diambil adalah <strong>24 SKS</strong>.</p>
                         </div>
                         <div class="flex gap-3">
-                            <div class="mt-1"><i class="fas fa-check-circle text-indigo-600"></i></div>
-                            <p class="text-slate-700">Hanya mengambil mata kuliah yang <strong>diprogramkan bersama kelas PTIK C 24</strong>.</p>
+                            <div class="mt-1"><i class="fas fa-check-circle text-indigo-500"></i></div>
+                            <p class="${isDark ? 'text-slate-300' : 'text-slate-700'}">Hanya mengambil mata kuliah yang <strong>diprogramkan bersama kelas PTIK C 24</strong>.</p>
                         </div>
                         <div class="flex gap-3">
                             <div class="mt-1"><i class="fas fa-exclamation-triangle text-amber-500"></i></div>
-                            <p class="text-slate-700">Dilarang mengambil mata kuliah dari kelas lain.</p>
+                            <p class="${isDark ? 'text-slate-300' : 'text-slate-700'}">Dilarang mengambil mata kuliah dari kelas lain.</p>
                         </div>
-                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mt-4">
-                            <p class="text-[10px] text-indigo-900 leading-relaxed italic">
+                        <div class="${isDark ? 'bg-indigo-950/40 border-indigo-800' : 'bg-indigo-50 border-indigo-100'} p-3 rounded-lg border mt-4">
+                            <p class="text-[10px] ${isDark ? 'text-indigo-200' : 'text-indigo-900'} leading-relaxed italic">
                                 *Sistem KRS ini digunakan secara otomatis sebagai filter pada sistem <strong>Absensi, Pembagian Kelompok</strong>, dan fitur akademik lainnya di dashboard ini.
                             </p>
                         </div>
@@ -316,7 +317,8 @@ if (mysqli_num_rows($krs) > 0) {
                 icon: 'info',
                 confirmButtonText: 'Saya Mengerti',
                 confirmButtonColor: '#3730a3',
-                background: '#ffffff',
+                background: isDark ? '#0f172a' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#0f172a',
                 allowOutsideClick: false
             });
         }
@@ -374,25 +376,32 @@ if (mysqli_num_rows($krs) > 0) {
             const currentTotal = parseInt(totalSksDisplay.innerText);
 
             if (currentTotal > 24) {
+                const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
                     icon: 'error',
                     title: 'Batas SKS Terlampaui',
                     text: 'Total SKS yang Anda pilih (' + currentTotal + ') melebihi batas maksimal 24 SKS.',
-                    confirmButtonColor: '#3730a3'
+                    confirmButtonColor: '#3730a3',
+                    background: isDark ? '#0f172a' : '#ffffff',
+                    color: isDark ? '#f1f5f9' : '#0f172a'
                 });
                 return;
             }
 
             if (currentTotal === 0) {
+                const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({
                     icon: 'warning',
                     title: 'Belum Ada Matkul',
                     text: 'Silakan pilih minimal satu mata kuliah.',
-                    confirmButtonColor: '#3730a3'
+                    confirmButtonColor: '#3730a3',
+                    background: isDark ? '#0f172a' : '#ffffff',
+                    color: isDark ? '#f1f5f9' : '#0f172a'
                 });
                 return;
             }
 
+            const isDark = document.documentElement.classList.contains('dark');
             Swal.fire({
                 title: 'Simpan KRS?',
                 text: "Total SKS terpilih: " + currentTotal + ". Pastikan pilihan Anda sudah benar.",
@@ -401,7 +410,9 @@ if (mysqli_num_rows($krs) > 0) {
                 confirmButtonColor: '#3730a3',
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Ya, Simpan!',
-                cancelButtonText: 'Batal'
+                cancelButtonText: 'Batal',
+                background: isDark ? '#0f172a' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#0f172a'
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.querySelector('form').submit();
@@ -422,24 +433,34 @@ if (mysqli_num_rows($krs) > 0) {
 
         // Show Success Alert
         <?php if (isset($_GET['sukses'])): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil Disimpan!',
-                text: 'Draft KRS Anda berhasil disimpan dan menunggu persetujuan.',
-                confirmButtonColor: '#3730a3'
-            }).then(() => {
-                window.location.href = '../views/ksm.php';
-            });
+            (() => {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disimpan!',
+                    text: 'Draft KRS Anda berhasil disimpan dan menunggu persetujuan.',
+                    confirmButtonColor: '#3730a3',
+                    background: isDark ? '#0f172a' : '#ffffff',
+                    color: isDark ? '#f1f5f9' : '#0f172a'
+                }).then(() => {
+                    window.location.href = '../views/ksm.php';
+                });
+            })();
         <?php endif; ?>
 
         // Show Error Alert for SKS Limit
         <?php if (isset($_GET['error']) && $_GET['error'] === 'sks_limit'): ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal Menyimpan!',
-                text: 'Total SKS melebihi batas maksimal 24 SKS.',
-                confirmButtonColor: '#3730a3'
-            });
+            (() => {
+                const isDark = document.documentElement.classList.contains('dark');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Menyimpan!',
+                    text: 'Total SKS melebihi batas maksimal 24 SKS.',
+                    confirmButtonColor: '#3730a3',
+                    background: isDark ? '#0f172a' : '#ffffff',
+                    color: isDark ? '#f1f5f9' : '#0f172a'
+                });
+            })();
         <?php endif; ?>
     </script>
 </body>

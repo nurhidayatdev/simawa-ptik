@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             mysqli_stmt_bind_param($insert, 'iisiss', $mata_kuliah_id, $kel_count, $anggotaStr, $periode_id, $dosen_name, $keterangan);
             mysqli_stmt_execute($insert);
 
-            // Format message for Telegram
+            // Format message for WhatsApp
             $namesArr = array_map(function ($s) {
                 return "• " . $s['nama_lengkap'];
             }, $anggotaArr);
@@ -173,17 +173,17 @@ if ($selected_matkul && !empty($selected_dosen)) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full shadow-sm">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm transition-all">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-800">Edit Kelompok</h3>
-                    <p class="text-xs text-slate-500 mt-1">Ubah atau acak ulang pembagian kelompok mahasiswa.</p>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Edit Kelompok</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ubah atau acak ulang pembagian kelompok mahasiswa.</p>
                 </div>
-                <a href="../views/kelompok?matkul_id=<?= $selected_matkul ?>&dosen=<?= urlencode($selected_dosen) ?>&keterangan=<?= urlencode($selected_keterangan) ?>" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-200 text-xs font-bold transition-all">
+                <a href="../views/kelompok?matkul_id=<?= $selected_matkul ?>&dosen=<?= urlencode($selected_dosen) ?>&keterangan=<?= urlencode($selected_keterangan) ?>" class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-4 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-all shadow-sm">
                     <i class="fa fa-arrow-left mr-2"></i> Kembali
                 </a>
             </div>
@@ -199,28 +199,28 @@ if ($selected_matkul && !empty($selected_dosen)) {
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Dosen Pengampu</label>
+                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2 px-1">Dosen Pengampu</label>
                                 <div class="relative">
-                                    <select name="dosen" id="dosen" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-indigo-700 rounded-lg px-4 py-3 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm transition-all" required>
+                                    <select name="dosen" id="dosen" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-indigo-700 dark:text-indigo-400 rounded-lg px-4 py-3 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm transition-all" required>
                                         <option value="">-- Pilih Dosen --</option>
                                         <?php foreach ($lecturers as $l): ?>
                                             <option value="<?= htmlspecialchars($l) ?>" <?= ($l == $selected_dosen) ? 'selected' : '' ?>><?= htmlspecialchars($l) ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400 dark:text-slate-600">
                                         <i class="fa fa-chevron-down text-[10px]"></i>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Keterangan (Opsional)</label>
-                                <input name="keterangan" id="keterangan" type="text" value="<?= htmlspecialchars($selected_keterangan) ?>" placeholder="Contoh: Tugas 1" class="w-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all" />
+                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2 px-1">Keterangan (Opsional)</label>
+                                <input name="keterangan" id="keterangan" type="text" value="<?= htmlspecialchars($selected_keterangan) ?>" placeholder="Contoh: Tugas 1" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-600/20 focus:border-indigo-500 shadow-sm transition-all" />
                             </div>
 
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2 px-1">Anggota per Kelompok</label>
-                                <input id="per_group" type="number" min="1" max="15" value="3" class="w-full bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all" />
+                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2 px-1">Anggota per Kelompok</label>
+                                <input id="per_group" type="number" min="1" max="15" value="3" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-600/20 focus:border-indigo-500 shadow-sm transition-all" />
                             </div>
                         </div>
 
@@ -277,19 +277,19 @@ if ($selected_matkul && !empty($selected_dosen)) {
 
             groups.forEach((g, idx) => {
                 const div = document.createElement('div');
-                div.className = 'bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all group-card flex flex-col';
+                div.className = 'bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all group-card flex flex-col';
 
                 let membersHtml = '';
                 g.forEach((s, si) => {
                     membersHtml += `
                         <li class="flex items-center justify-between gap-3 group/item">
                             <div class="flex items-center gap-3 truncate">
-                                <div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 shrink-0 shadow-sm">
+                                <div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm">
                                     <img src="${s.foto_url}" class="w-full h-full object-cover">
                                 </div>
-                                <span class="text-[11px] font-semibold text-slate-700 truncate">${s.nama_lengkap}</span>
+                                <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate">${s.nama_lengkap}</span>
                             </div>
-                            <button type="button" onclick="removeMember(${idx}, ${si})" class="text-red-400 hover:text-red-600 transition-colors p-1 opacity-0 group-hover/item:opacity-100">
+                            <button type="button" onclick="removeMember(${idx}, ${si})" class="text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 opacity-0 group-hover/item:opacity-100">
                                 <i class="fa fa-times-circle"></i>
                             </button>
                         </li>
@@ -297,17 +297,17 @@ if ($selected_matkul && !empty($selected_dosen)) {
                 });
 
                 div.innerHTML = `
-                    <div class="bg-slate-50 px-4 py-3 border-b border-slate-100">
-                        <h4 class="font-bold text-indigo-900 text-sm">Kelompok ${idx+1}</h4>
+                    <div class="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                        <h4 class="font-bold text-indigo-900 dark:text-indigo-400 text-sm">Kelompok ${idx+1}</h4>
                     </div>
                     <div class="p-4 flex-grow">
                         <ul class="space-y-3 mb-4">
                             ${membersHtml}
                         </ul>
                     </div>
-                    <div class="p-3 bg-slate-50 border-t border-slate-100">
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700">
                         <div class="flex flex-col gap-2">
-                            <select class="student-select w-full bg-white border border-slate-200 text-[10px] font-medium text-slate-700 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all">
+                            <select class="student-select w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-medium text-slate-700 dark:text-slate-300 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-sm transition-all">
                                 <option value="">+ Tambah Anggota</option>
                                 ${available.map(s => `<option value="${s.nim}">${s.nama_lengkap}</option>`).join('')}
                             </select>

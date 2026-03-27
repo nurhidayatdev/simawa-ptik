@@ -167,24 +167,24 @@ if (isset($_POST['simpan_kas'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
             <!-- Modified this section for better mobile responsiveness -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h3 class="text-xl font-bold text-slate-800">Bayar Kas</h3>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Bayar Kas</h3>
                 <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <form method="GET" class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        <a href="tambah_kas_individu.php" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs">Input Individu</a>
-                        <a href="../views/manajemen_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-slate-600 text-white px-4 py-2 rounded-lg text-xs text-center">Kembali</a>
+                        <a href="tambah_kas_individu.php" class="bg-indigo-600 dark:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm text-center font-semibold">Input Individu</a>
+                        <a href="../views/manajemen_kas.php?minggu_ke=<?= $_GET['minggu_ke'] ?? '' ?>" class="bg-slate-600 dark:bg-slate-700 text-white px-4 py-2 rounded-lg text-xs hover:bg-slate-700 dark:hover:bg-slate-600 transition-colors shadow-sm text-center font-semibold">Kembali</a>
                     </form>
                 </div>
 
             </div>
             <form method="GET" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <select name="minggu_ke" required onchange="this.form.submit()" class="border p-2 rounded-lg text-xs">
+                <select name="minggu_ke" required onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 p-2 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 transition-colors">
                     <option value="">-- Pilih Minggu --</option>
                     <?php for ($i = 1; $i <= 16; $i++): ?>
                         <option value="<?= $i ?>" <?= ($_GET['minggu_ke'] ?? '') == $i ? 'selected' : '' ?>>Minggu <?= $i ?></option>
@@ -192,13 +192,11 @@ if (isset($_POST['simpan_kas'])) {
                 </select>
 
                 <label class="sr-only">Filter</label>
-                <select name="filter" onchange="this.form.submit()" class="border p-2 rounded-lg text-xs">
+                <select name="filter" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-200 p-2 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 transition-colors">
                     <option value="all" <?= ($_GET['filter'] ?? 'all') == 'all' ? 'selected' : '' ?>>Semua</option>
                     <option value="Lunas" <?= ($_GET['filter'] ?? '') == 'Lunas' ? 'selected' : '' ?>>Lunas</option>
                     <option value="Belum" <?= ($_GET['filter'] ?? '') == 'Belum' ? 'selected' : '' ?>>Belum</option>
                 </select>
-
-
             </form>
 
             <!-- filter links removed; filter dropdown will be next to save button -->
@@ -211,26 +209,19 @@ if (isset($_POST['simpan_kas'])) {
 
                 <!-- Rest of the content remains the same -->
                 <form method="POST">
-                    <div class="overflow-x-auto">
-
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
                         <input type="hidden" name="minggu_ke" value="<?= $minggu ?>">
-
-                        <table class="min-w-full divide-y divide-slate-200">
-                            <thead class="bg-indigo-900">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                            <thead class="bg-indigo-900 dark:bg-indigo-950">
                                 <tr>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                        No</th>
-                                    <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                        NIM</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                        Nama Lengkap</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                        Status</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-                                        Tanggal Bayar</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
+                                    <th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">NIM</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Lengkap</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Status</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Tanggal Bayar</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-slate-200">
+                            <tbody class="bg-white dark:bg-slate-900/50 divide-y divide-slate-200 dark:divide-slate-800">
                                 <?php
                                 $no = 1;
                                 $id = 1;
@@ -260,39 +251,35 @@ if (isset($_POST['simpan_kas'])) {
     ORDER BY m.nim ASC
     ");
                                 while ($row = mysqli_fetch_assoc($mhs)) : ?>
-                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-                                        <td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $row['nim']; ?></td>
-                                        <td class="px-3 py-2 text-xs text-slate-800"><?= $row['nama_lengkap']; ?></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900/20' ?> hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-colors group">
+                                        <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-700 dark:text-slate-300"><?= $no++; ?></td>
+                                        <td class="hidden md:table-cell px-3 py-3 whitespace-nowrap text-xs text-slate-700 dark:text-slate-300"><?= $row['nim']; ?></td>
+                                        <td class="px-3 py-3 text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors"><?= $row['nama_lengkap']; ?></td>
+                                        <td class="px-3 py-3 whitespace-nowrap text-xs">
                                             <?php $status_current = $row['status'] ?? 'Belum'; ?>
                                             <select name="status[<?= $row['mahasiswa_id'] ?>]"
-                                                class="border p-1 rounded status-select" data-mhs-id="<?= $row['mahasiswa_id'] ?>">
+                                                class="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 p-1 rounded text-xs focus:ring-1 focus:ring-indigo-500 transition-colors status-select" data-mhs-id="<?= $row['mahasiswa_id'] ?>">
                                                 <option value="Lunas" <?= $status_current == 'Lunas' ? 'selected' : '' ?>>Lunas</option>
                                                 <option value="Belum" <?= $status_current == 'Belum' ? 'selected' : '' ?>>Belum</option>
                                             </select>
                                         </td>
-
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+                                        <td class="px-3 py-3 whitespace-nowrap text-xs">
                                             <?php $tanggal_current = $row['tanggal_bayar'] ?? ''; ?>
                                             <input type="date" name="tanggal[<?= $row['mahasiswa_id'] ?>]"
                                                 id="tanggal_<?= $row['mahasiswa_id'] ?>"
                                                 value="<?= htmlspecialchars($tanggal_current) ?>"
-                                                class="border p-1 rounded text-xs date-input"
+                                                class="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 p-1 rounded text-xs date-input focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50 dark:disabled:bg-slate-900/50"
                                                 <?= ($status_current == 'Belum') ? 'disabled' : '' ?>>
                                         </td>
-
-
                                     </tr>
                                 <?php endwhile; ?>
                             </tbody>
 
                         </table>
-                        <div class="mt-8 pt-5 border-t border-slate-200 flex flex-col items-center">
-                            <p class="text-[10px] text-slate-500 mb-4 italic">Pastikan status pembayaran dan tanggal bayar sudah benar.</p>
-                            <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 hover:bg-indigo-800 text-white rounded-lg px-6 py-2.5 text-xs font-semibold shadow-lg shadow-indigo-900/20 transition-all active:scale-95 flex items-center">
-                                <i class="fa fa-save mr-2"></i> Simpan Kas
+                        <div class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col items-center">
+                            <p class="text-[10px] text-slate-500 dark:text-slate-500 mb-6 italic font-medium leading-relaxed">Pastikan status pembayaran dan tanggal bayar sudah benar.</p>
+                            <button type="button" onclick="confirmSaveKas()" class="bg-indigo-900 dark:bg-indigo-800 hover:bg-indigo-800 dark:hover:bg-indigo-700 text-white rounded-xl px-10 mb-5 py-3 text-xs font-bold shadow-lg shadow-indigo-900/20 dark:shadow-indigo-950/40 transition-all active:scale-95 flex items-center gap-2">
+                                <i class="fa fa-save"></i> Simpan Kas
                             </button>
                         </div>
                 </form>

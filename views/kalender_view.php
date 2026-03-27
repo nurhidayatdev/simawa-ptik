@@ -235,9 +235,17 @@ $today = date('Y-m-d');
         .event-piket {
             background: #1e1b4b;
         }
+        
+        .dark .event-piket {
+            background: #818cf8;
+        }
 
         .event-done {
             background: #94a3b8 !important;
+        }
+
+        .dark .event-done {
+            background: #475569 !important;
         }
 
         /* Mobile-only: show dots in a row */
@@ -265,28 +273,28 @@ $today = date('Y-m-d');
 
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 md:p-6">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 md:p-6 transition-colors duration-300">
             <!-- Header with Navigation -->
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800">Kalender Kelas</h1>
-                    <p class="text-slate-500 text-sm mt-1">Informasi akademik terintegrasi</p>
+                    <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Kalender Kelas</h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Informasi akademik terintegrasi</p>
                 </div>
 
                 <!-- Month Navigation -->
-                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
-                    <a href="?month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
-                        <i class="fa fa-chevron-left text-slate-600"></i>
+                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                    <a href="?month=<?= $prev_month ?>&year=<?= $prev_year ?>" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors">
+                        <i class="fa fa-chevron-left text-slate-600 dark:text-slate-400"></i>
                     </a>
-                    <span class="px-4 font-bold text-indigo-900 text-sm min-w-[140px] text-center">
+                    <span class="px-4 font-bold text-indigo-900 dark:text-indigo-400 text-sm min-w-[140px] text-center">
                         <?= $month_names[$month] ?> <?= $year ?>
                     </span>
-                    <a href="?month=<?= $next_month ?>&year=<?= $next_year ?>" class="p-2 hover:bg-white rounded-md transition-colors">
-                        <i class="fa fa-chevron-right text-slate-600"></i>
+                    <a href="?month=<?= $next_month ?>&year=<?= $next_year ?>" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors">
+                        <i class="fa fa-chevron-right text-slate-600 dark:text-slate-400"></i>
                     </a>
                 </div>
             </div>
@@ -295,46 +303,46 @@ $today = date('Y-m-d');
             <div class="flex flex-wrap gap-4 mb-4 text-xs">
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-kalender"></span>
-                    <span class="text-slate-600">Kalender Akademik</span>
+                    <span class="text-slate-600 dark:text-slate-400">Kalender Akademik</span>
                 </div>
 
 
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-tugas"></span>
-                    <span class="text-slate-600">Tugas Kuliah</span>
+                    <span class="text-slate-600 dark:text-slate-400">Tugas Kuliah</span>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-personal"></span>
-                    <span class="text-slate-600">Tugas Pribadi</span>
+                    <span class="text-slate-600 dark:text-slate-400">Tugas Pribadi</span>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-piket"></span>
-                    <span class="text-slate-600">Piket Proyektor</span>
+                    <span class="text-slate-600 dark:text-slate-400">Piket Proyektor</span>
                 </div>
 
                 <div class="flex items-center gap-2">
                     <span class="event-dot event-done"></span>
-                    <span class="text-slate-600">Sudah Selesai</span>
+                    <span class="text-slate-600 dark:text-slate-400">Sudah Selesai</span>
                 </div>
             </div>
 
             <!-- Calendar Grid -->
-            <div class="border border-slate-200 rounded-lg overflow-hidden">
+            <div class="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
                 <!-- Day Headers -->
-                <div class="calendar-grid bg-indigo-900 text-white">
+                <div class="calendar-grid bg-indigo-900 dark:bg-indigo-950 text-white">
                     <?php foreach ($day_names as $dn): ?>
                         <div class="p-2 md:p-3 text-center text-xs font-bold uppercase"><?= $dn ?></div>
                     <?php endforeach; ?>
                 </div>
 
                 <!-- Calendar Days -->
-                <div class="calendar-grid bg-white">
+                <div class="calendar-grid bg-white dark:bg-slate-900">
                     <?php
                     // Empty cells before first day
                     for ($i = 0; $i < $start_day; $i++): ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
+                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
                     <?php endfor; ?>
 
                     <?php for ($d = 1; $d <= $days_in_month; $d++):
@@ -343,12 +351,12 @@ $today = date('Y-m-d');
                         $day_events = $events[$date_key] ?? [];
                         $has_events = !empty($day_events);
                     ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 min-h-[60px] sm:min-h-[80px] md:min-h-[100px] <?= $is_today ? 'bg-indigo-50 ring-2 ring-indigo-400 ring-inset' : '' ?> <?= $has_events ? 'cursor-pointer hover:bg-slate-50 transition-colors' : '' ?>"
+                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 dark:border-slate-800 min-h-[60px] sm:min-h-[80px] md:min-h-[100px] <?= $is_today ? 'bg-indigo-50 dark:bg-indigo-900/30 ring-2 ring-indigo-400 ring-inset' : '' ?> <?= $has_events ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors' : '' ?>"
                             <?php if ($has_events): ?>
                             onclick="showDatePopup('<?= $date_key ?>', <?= $d ?>)"
                             <?php endif; ?>>
                             <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs sm:text-sm font-bold <?= $is_today ? 'text-indigo-700' : 'text-slate-700' ?>"><?= $d ?></span>
+                                <span class="text-xs sm:text-sm font-bold <?= $is_today ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300' ?>"><?= $d ?></span>
                                 <?php if ($is_today): ?>
                                     <span class="hidden sm:inline text-[8px] bg-indigo-600 text-white px-1 rounded">HARI INI</span>
                                 <?php endif; ?>
@@ -369,7 +377,7 @@ $today = date('Y-m-d');
                                         $dot_class = 'event-done';
                                     }
                                 ?>
-                                    <div class="flex items-center gap-1 text-[10px] text-slate-600" title="<?= htmlspecialchars($evt['title']) ?>">
+                                    <div class="flex items-center gap-1 text-[10px] text-slate-600 dark:text-slate-400" title="<?= htmlspecialchars($evt['title']) ?>">
                                         <span class="event-dot <?= $dot_class ?>"></span>
                                         <span class="event-text truncate hidden sm:inline"><?= htmlspecialchars(mb_strimwidth($evt['title'], 0, 12, '..')) ?></span>
                                     </div>
@@ -387,7 +395,7 @@ $today = date('Y-m-d');
                     $total_cells = $start_day + $days_in_month;
                     $remaining = (7 - ($total_cells % 7)) % 7;
                     for ($i = 0; $i < $remaining; $i++): ?>
-                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 bg-slate-50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
+                        <div class="calendar-cell p-1 sm:p-2 md:p-3 border-t border-l border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 min-h-[60px] sm:min-h-[80px] md:min-h-[100px]"></div>
                     <?php endfor; ?>
                 </div>
             </div>
@@ -395,8 +403,8 @@ $today = date('Y-m-d');
             <!-- Rekap Agenda Sections -->
             <div class="mt-6 space-y-4">
                 <!-- 1. Tugas Kuliah -->
-                <div class="p-4 bg-indigo-50/50 border border-indigo-100 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
+                <div class="p-4 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/50 rounded-xl">
+                    <h3 class="font-bold text-indigo-900 dark:text-indigo-400 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-tugas" style="width:10px;height:10px;"></span>
                         Tugas Kuliah
                     </h3>
@@ -414,13 +422,13 @@ $today = date('Y-m-d');
                             foreach ($tugas_kuliah as $t):
                                 $is_done = ($t['status'] === 'selesai');
                         ?>
-                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-indigo-100 flex items-center gap-3 <?= $is_done ? 'opacity-60' : '' ?>">
-                                    <div class="font-bold text-indigo-700 w-12 text-center leading-tight">
+                                <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg text-xs border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-3 <?= $is_done ? 'opacity-60' : '' ?>">
+                                    <div class="font-bold text-indigo-700 dark:text-indigo-400 w-12 text-center leading-tight">
                                         <?= date('d', strtotime($t['date'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($t['date'])) ?></span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="text-slate-800 font-bold truncate mb-0.5 <?= $is_done ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($t['title']) ?></div>
-                                        <div class="text-[10px] text-slate-500 font-medium"><?= $t['time'] ?: 'No Time' ?></div>
+                                        <div class="font-bold truncate mb-0.5 <?= $is_done ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200' ?>"><?= htmlspecialchars($t['title']) ?></div>
+                                        <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium"><?= $t['time'] ?: 'No Time' ?></div>
                                     </div>
                                     <?php if ($is_done): ?>
                                         <i class="fa fa-check-circle text-indigo-500"></i>
@@ -434,8 +442,8 @@ $today = date('Y-m-d');
                 </div>
 
                 <!-- 2. Tugas Pribadi -->
-                <div class="p-4 bg-rose-50/50 border border-rose-100 rounded-xl">
-                    <h3 class="font-bold text-rose-900 mb-3 flex items-center gap-2 text-sm">
+                <div class="p-4 bg-rose-50/50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/40 rounded-xl">
+                    <h3 class="font-bold text-rose-900 dark:text-rose-400 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-personal" style="width:10px;height:10px;"></span>
                         Tugas Pribadi
                     </h3>
@@ -453,13 +461,13 @@ $today = date('Y-m-d');
                             foreach ($tugas_pribadi as $t):
                                 $is_done = ($t['status'] === 'selesai');
                         ?>
-                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-rose-100 flex items-center gap-3 <?= $is_done ? 'opacity-60' : '' ?>">
-                                    <div class="font-bold text-rose-600 w-12 text-center leading-tight">
+                                <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg text-xs border border-rose-100 dark:border-rose-900/40 flex items-center gap-3 <?= $is_done ? 'opacity-60' : '' ?>">
+                                    <div class="font-bold text-rose-600 dark:text-rose-400 w-12 text-center leading-tight">
                                         <?= date('d', strtotime($t['date'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($t['date'])) ?></span>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="text-slate-800 font-bold truncate mb-0.5 <?= $is_done ? 'line-through text-slate-400' : '' ?>"><?= htmlspecialchars($t['title']) ?></div>
-                                        <div class="text-[10px] text-slate-500 font-medium"><?= $t['time'] ?: 'No Time' ?></div>
+                                        <div class="font-bold truncate mb-0.5 <?= $is_done ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200' ?>"><?= htmlspecialchars($t['title']) ?></div>
+                                        <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium"><?= $t['time'] ?: 'No Time' ?></div>
                                     </div>
                                     <?php if ($is_done): ?>
                                         <i class="fa fa-check-circle text-rose-500"></i>
@@ -473,8 +481,8 @@ $today = date('Y-m-d');
                 </div>
 
                 <!-- 3. Piket Proyektor -->
-                <div class="p-4 bg-slate-900/[0.03] border border-slate-200 rounded-xl">
-                    <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2 text-sm">
+                <div class="p-4 bg-slate-100/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-piket" style="width:10px;height:10px;"></span>
                         Jadwal Piket Saya
                     </h3>
@@ -491,14 +499,14 @@ $today = date('Y-m-d');
                         if (!empty($piket_saya)):
                             foreach ($piket_saya as $p):
                         ?>
-                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-slate-200">
+                                <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg text-xs border border-slate-200 dark:border-slate-700">
                                     <div class="flex items-center gap-3">
-                                        <div class="font-bold text-slate-700 w-12 text-center leading-tight">
+                                        <div class="font-bold text-slate-700 dark:text-slate-400 w-12 text-center leading-tight">
                                             <?= date('d', strtotime($p['date'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($p['date'])) ?></span>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <div class="text-slate-800 font-bold truncate mb-0.5"><?= htmlspecialchars($p['title']) ?></div>
-                                            <div class="text-[10px] text-indigo-700 font-bold flex items-center gap-1 uppercase italic"><i class="fa fa-user text-[8px]"></i> Piket Kamu</div>
+                                            <div class="text-slate-800 dark:text-slate-200 font-bold truncate mb-0.5"><?= htmlspecialchars($p['title']) ?></div>
+                                            <div class="text-[10px] text-indigo-700 dark:text-indigo-400 font-bold flex items-center gap-1 uppercase italic"><i class="fa fa-user text-[8px]"></i> Piket Kamu</div>
                                         </div>
                                     </div>
                                 </div>
@@ -510,8 +518,8 @@ $today = date('Y-m-d');
                 </div>
 
                 <!-- 4. Kalender Akademik -->
-                <div class="p-4 bg-indigo-900/10 border border-indigo-200 rounded-xl">
-                    <h3 class="font-bold text-indigo-900 mb-3 flex items-center gap-2 text-sm">
+                <div class="p-4 bg-indigo-900/10 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-900/40 rounded-xl">
+                    <h3 class="font-bold text-indigo-900 dark:text-indigo-400 mb-3 flex items-center gap-2 text-sm">
                         <span class="event-dot event-kalender" style="width:10px;height:10px;"></span>
                         Kalender Akademik
                     </h3>
@@ -529,18 +537,18 @@ $today = date('Y-m-d');
                             foreach ($kalender_list as $k):
                                 $is_range = ($k['start'] !== $k['end']);
                         ?>
-                                <div class="bg-white/80 p-3 rounded-lg text-xs border border-indigo-100 flex items-center gap-3">
-                                    <div class="font-bold text-indigo-700 w-14 text-center leading-tight whitespace-nowrap">
+                                <div class="bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg text-xs border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-3">
+                                    <div class="font-bold text-indigo-700 dark:text-indigo-400 w-14 text-center leading-tight whitespace-nowrap">
                                         <?php if ($is_range): ?>
                                             <div class="text-[10px]"><?= date('d M', strtotime($k['start'])) ?></div>
-                                            <div class="text-[8px] text-slate-400">s/d</div>
+                                            <div class="text-[8px] text-slate-400 dark:text-slate-500">s/d</div>
                                             <div class="text-[10px]"><?= date('d M', strtotime($k['end'])) ?></div>
                                         <?php else: ?>
                                             <?= date('d', strtotime($k['start'])) ?><br><span class="text-[9px] uppercase"><?= date('M', strtotime($k['start'])) ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <div class="text-slate-800 font-bold leading-tight"><?= htmlspecialchars($k['title']) ?></div>
+                                        <div class="text-slate-800 dark:text-slate-200 font-bold leading-tight"><?= htmlspecialchars($k['title']) ?></div>
                                     </div>
                                 </div>
                             <?php endforeach;
@@ -558,8 +566,8 @@ $today = date('Y-m-d');
     </main>
 
     <!-- Date Popup Modal -->
-    <div id="dateModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
+    <div id="dateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden border border-slate-200 dark:border-slate-800">
             <div class="bg-gradient-to-r from-indigo-900 to-indigo-950 p-4 text-white">
                 <div class="flex justify-between items-center">
                     <h3 id="modalTitle" class="font-bold text-lg">Agenda Tanggal</h3>
@@ -598,7 +606,7 @@ $today = date('Y-m-d');
             const dayEvents = eventsData[dateKey] || [];
 
             if (dayEvents.length === 0) {
-                content.innerHTML = '<p class="text-slate-500 text-sm text-center py-4">Tidak ada agenda.</p>';
+                content.innerHTML = '<p class="text-slate-500 dark:text-slate-400 text-sm text-center py-4">Tidak ada agenda.</p>';
             } else {
                 let html = '<div class="space-y-3">';
                 dayEvents.forEach(evt => {
@@ -610,11 +618,11 @@ $today = date('Y-m-d');
                         'piket': 'Piket Proyektor'
                     } [evt.type] || '';
                     let bgClass = {
-                        'kalender': 'bg-indigo-50 border-indigo-200',
-                        'tugas': 'bg-slate-50 border-slate-200',
-                        'personal': 'bg-rose-50 border-rose-100',
-                        'piket': 'bg-indigo-900/5 border-indigo-900/20'
-                    } [evt.type] || 'bg-slate-50';
+                        'kalender': 'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-900/50',
+                        'tugas': 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700',
+                        'personal': 'bg-rose-50 dark:bg-rose-950/30 border-rose-100 dark:border-rose-900/50',
+                        'piket': 'bg-indigo-900/5 dark:bg-indigo-900/10 border-indigo-900/20 dark:border-indigo-900/30'
+                    } [evt.type] || 'bg-slate-50 dark:bg-slate-800';
 
                     if (evt.status === 'selesai') {
                         dotClass = 'event-done';
@@ -625,14 +633,14 @@ $today = date('Y-m-d');
                             <div class="flex items-start gap-3">
                                 <span class="event-dot ${dotClass} mt-1" style="width:10px;height:10px;flex-shrink:0;"></span>
                                 <div class="flex-1">
-                                    <div class="text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-tighter">${typeLabel}</div>
-                                    <div class="font-semibold text-slate-800 text-xs">${evt.title}</div>
-                                    ${evt.petugas ? `<div class="text-[10px] text-indigo-700 font-bold mt-1 uppercase"><i class="fa fa-user mr-1"></i>Petugas: ${evt.petugas}</div>` : ''}
+                                    <div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-tighter">${typeLabel}</div>
+                                    <div class="font-semibold text-slate-800 dark:text-slate-100 text-xs">${evt.title}</div>
+                                    ${evt.petugas ? `<div class="text-[10px] text-indigo-700 dark:text-indigo-400 font-bold mt-1 uppercase"><i class="fa fa-user mr-1"></i>Petugas: ${evt.petugas}</div>` : ''}
                                     ${evt.type === 'kalender' && evt.start && evt.end && evt.start !== evt.end ? 
-                                        `<div class="text-[10px] text-indigo-600 font-bold mt-1"><i class="fa fa-calendar-range mr-1"></i>${formatDateIndo(evt.start)} - ${formatDateIndo(evt.end)}</div>` : ''
+                                        `<div class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold mt-1"><i class="fa fa-calendar-range mr-1"></i>${formatDateIndo(evt.start)} - ${formatDateIndo(evt.end)}</div>` : ''
                                     }
-                                    ${evt.time ? `<div class="text-xs text-slate-600 mt-1"><i class="fa fa-clock mr-1"></i>${evt.time}</div>` : ''}
-                                    ${evt.status === 'selesai' ? '<div class="text-xs text-indigo-600 mt-1"><i class="fa fa-check-circle mr-1"></i>Selesai</div>' : ''}
+                                    ${evt.time ? `<div class="text-xs text-slate-600 dark:text-slate-400 mt-1"><i class="fa fa-clock mr-1"></i>${evt.time}</div>` : ''}
+                                    ${evt.status === 'selesai' ? '<div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1"><i class="fa fa-check-circle mr-1"></i>Selesai</div>' : ''}
                                 </div>
                             </div>
                         </div>

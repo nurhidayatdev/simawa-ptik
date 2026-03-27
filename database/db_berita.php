@@ -30,22 +30,23 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $id = 1;
     if (mysqli_num_rows($result) > 0) {
         while ($row = mysqli_fetch_assoc($result)) {
-            $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
+            $isEven = ($id++ % 2 == 0);
+            $rowClass = ($isEven ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors';
             echo '<tr class="' . $rowClass . '">';
-            echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-            echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800">' . htmlspecialchars($row['judul']) . '</td>';
-            echo '<td class="px-3 py-2 text-xs text-slate-600">' . (strlen($row['deskripsi']) > 100 ? htmlspecialchars(substr($row['deskripsi'], 0, 100)) . '...' : htmlspecialchars($row['deskripsi'])) . '</td>';
-            echo '<td class="px-3 py-2 text-xs text-blue-600">';
+            echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200">' . ($no++) . '</td>';
+            echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100">' . htmlspecialchars($row['judul']) . '</td>';
+            echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . (strlen($row['deskripsi']) > 100 ? htmlspecialchars(substr($row['deskripsi'], 0, 100)) . '...' : htmlspecialchars($row['deskripsi'])) . '</td>';
+            echo '<td class="px-3 py-2 text-xs text-blue-600 dark:text-blue-400">';
             if (!empty($row['link'])) {
                 echo '<a href="' . htmlspecialchars($row['link']) . '" target="_blank" class="hover:underline">Link →</a>';
             } else {
-                echo '<span class="text-gray-400">-</span>';
+                echo '<span class="text-gray-400 dark:text-slate-600">-</span>';
             }
             echo '</td>';
             if ($role === 'Administrator Utama'):
-                echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">';
-                echo '<a href="../actions/edit.php?tabel=akademik&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
-                echo '<a href="../actions/hapus.php?tabel=akademik&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus berita ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+                echo '<td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500 dark:text-slate-400">';
+                echo '<a href="../actions/edit.php?tabel=akademik&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3"></i></a>';
+                echo '<a href="../actions/hapus.php?tabel=akademik&id=' . $row['id'] . '" title="Hapus"><i class="fa fa-trash text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"></i></a>';
                 echo '</td>';
             endif;
             echo '</tr>';
@@ -79,23 +80,26 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800">Data Berita & Informasi</h1>
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Data Berita & Informasi</h1>
                 </div>
-                <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <form method="GET" class="w-full">
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <form method="GET" class="w-full sm:w-64">
                         <div class="flex flex-row gap-2 items-center">
-                            <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Cari berita..."
-                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+                            <div class="relative w-full">
+                                <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Cari berita..."
+                                    class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
+                                <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
+                            </div>
                             <?php if ($role === 'Administrator Utama'): ?>
-                                <a href="../actions/tambah.php?tabel=akademik" class=" bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
-                                    <i class="fa fa-plus"></i>
+                                <a href="../actions/tambah.php?tabel=akademik" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
+                                    <i class="fa fa-plus text-xs"></i>
                                 </a>
                             <?php endif; ?>
                         </div>
@@ -103,55 +107,58 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-indigo-900">
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead class="bg-indigo-900 dark:bg-slate-800">
                         <tr>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Judul</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Deskripsi</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Link</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">No</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Judul</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Deskripsi</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Link</th>
                             <?php if ($role === 'Administrator Utama'): ?>
-                                <th class="px-3 py-3 text-xs font-bold text-white uppercase tracking-wider text-center">Actions</th>
+                                <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200">
+                    <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
                         <?php
                         $no = 1;
                         $id = 1;
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
-                                $rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
+                                $isEven = ($id++ % 2 == 0);
+                                $rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors';
                         ?>
                                 <tr class="<?= $rowClass ?>">
-                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++ ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['judul']) ?></td>
-                                    <td class="px-3 py-2 text-xs text-slate-800">
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++ ?></td>
+                                    <td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100"><?= htmlspecialchars($row['judul']) ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                                         <?= strlen($row['deskripsi']) > 120 ? htmlspecialchars(substr($row['deskripsi'], 0, 120)) . '...' : htmlspecialchars($row['deskripsi']) ?>
                                     </td>
-                                    <td class="px-3 py-2 text-xs text-blue-600">
+                                    <td class="px-3 py-2 text-xs text-blue-600 dark:text-blue-400">
                                         <?php if (!empty($row['link'])): ?>
-                                            <a href="../<?= htmlspecialchars($row['link']) ?>" class="hover:underline">Link →</a>
+                                            <a href="../<?= htmlspecialchars($row['link']) ?>" class="hover:underline font-medium">Link →</a>
                                         <?php else: ?>
-                                            <span class="text-gray-400">-</span>
+                                            <span class="text-slate-400 dark:text-slate-600">-</span>
                                         <?php endif; ?>
                                     </td>
                                     <?php if ($role === 'Administrator Utama'): ?>
-                                        <td class="px-3 py-2 whitespace-nowrap text-center text-sm text-slate-500">
-                                            <a href="../actions/edit.php?tabel=akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a href="../actions/hapus.php?tabel=akademik&id=<?= $row['id'] ?>" title="Hapus" onclick="return confirm('Hapus berita ini?');" class="text-red-600 hover:text-red-900">
-                                                <i class="fa fa-trash"></i>
-                                            </a>
+                                        <td class="px-3 py-2 whitespace-nowrap text-center text-sm">
+                                            <div class="flex items-center justify-center gap-3">
+                                                <a href="../actions/edit.php?tabel=akademik&id=<?= $row['id'] ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="../actions/hapus.php?tabel=akademik&id=<?= $row['id'] ?>" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     <?php endif; ?>
                                 </tr>
                         <?php
                             }
                         } else {
-                            echo '<tr><td colspan="5" class="px-6 py-10 text-center text-xs text-gray-500 italic">Data berita tidak ditemukan.</td></tr>';
+                            echo '<tr><td colspan="5" class="px-6 py-10 text-center text-xs text-slate-500 dark:text-slate-400 italic">Data berita tidak ditemukan.</td></tr>';
                         }
                         ?>
                     </tbody>

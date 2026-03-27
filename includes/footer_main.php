@@ -16,14 +16,17 @@ if (!isset($base)) {
     <div class="container mx-auto px-4">
         <div class="grid md:grid-cols-4 gap-8">
             <div>
-                <h3 class="text-lg font-bold mb-4">PTIK C 2024</h3>
-                <p class="mb-4 text-xs">Jurusan Teknik Informatika dan Komputer</p>
-                <p class="text-xs">Fakultas Teknik</p>
-                <p class="text-xs">Universitas Negeri Makassar</p>
+                <h3 class="text-lg font-bold mb-3">Informasi & Bantuan</h3>
+                <ul class="space-y-1">
+                    <li><a href="<?= $base ?>info" class="hover:text-indigo-200 transition text-xs">Info Kelas</a></li>
+                    <li><a href="<?= $base ?>sejarah" class="hover:text-indigo-200 transition text-xs">Sejarah Kelas</a></li>
+                    <li><a href="<?= $base ?>panduan" class="hover:text-indigo-200 transition text-xs">Panduan Sistem</a></li>
+                    <li><a href="<?= $base ?>tentang" class="hover:text-indigo-200 transition text-xs">Tentang Platform</a></li>
+                </ul>
             </div>
 
             <div>
-                <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+                <h3 class="text-lg font-bold mb-3">Akademik</h3>
                 <ul class="space-y-1">
                     <li><a href="<?= $base ?>kalender" class="hover:text-indigo-200 transition text-xs">Kalender Akademik</a></li>
                     <li><a href="<?= $base ?>matakuliah" class="hover:text-indigo-200 transition text-xs">Kurikulum PTIK</a></li>
@@ -33,16 +36,16 @@ if (!isset($base)) {
             </div>
 
             <div>
-                <h3 class="text-lg font-bold mb-4">Kontak</h3>
+                <h3 class="text-lg font-bold mb-3">Kontak</h3>
                 <p class="mb-2 text-xs"><i class="fas fa-map-marker-alt mr-2 text-sm"></i> Jl. A.P. Pettarani, Makassar</p>
-                <p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@unm.ac.id</p>
+                <p class="mb-2 text-xs"><i class="fas fa-envelope mr-2 text-sm"></i> ptikc2024@gmail.com</p>
                 <a href="https://www.instagram.com/ptikc_24">
                     <p class="mb-2 text-xs"><i class="fab fa-instagram mr-2 text-sm"></i></i> @ptikc_24</p>
                 </a>
 
             </div>
             <div>
-                <h3 class="text-lg font-bold mb-4">Kirim Pesan Anonim</h3>
+                <h3 class="text-lg font-bold mb-3">Kirim Pesan Anonim</h3>
 
                 <form action="" method="POST" class="space-y-2" id="footer_form">
                     <textarea
@@ -76,8 +79,28 @@ if (!isset($base)) {
     </div>
     </div>
 
-    <div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs">
+    <div class="border-t border-indigo-800 mt-4 pt-4 text-center text-xs mx-5">
         <p>© <?php echo date("Y"); ?> Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
     </div>
     </div>
 </footer>
+
+<script>
+    // Prevent quotes in footer pesan_anonim
+    const footerForm = document.getElementById('footer_form');
+    if (footerForm) {
+        const footerTextArea = footerForm.querySelector('textarea[name="pesan_anonim"]');
+        if (footerTextArea) {
+            // Prevent typing
+            footerTextArea.addEventListener('keydown', function(e) {
+                if (e.key === "'" || e.key === '"') {
+                    e.preventDefault();
+                }
+            });
+            // Also handle pasting/other input methods
+            footerTextArea.addEventListener('input', function() {
+                this.value = this.value.replace(/['"]/g, '');
+            });
+        }
+    }
+</script>

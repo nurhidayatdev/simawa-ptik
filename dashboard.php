@@ -57,6 +57,17 @@ foreach ($tables as $table => $link) {
     }
 }
 
+/* =====================
+   TENTUKAN RENTANG TANGGAL SEMESTER (OTOMATIS)
+   ===================== */
+$q_start = mysqli_query($koneksi, "SELECT tanggal_mulai FROM kalender_akademik WHERE periode_id = '$periode_id' AND kegiatan LIKE '%Kuliah Bagian Pertama%' ORDER BY tanggal_mulai ASC LIMIT 1");
+$start_res = mysqli_fetch_assoc($q_start);
+$semester_start = $start_res['tanggal_mulai'] ?? date('Y-m-01'); // Default awal bulan ini jika tidak ada data
+
+$q_end = mysqli_query($koneksi, "SELECT tanggal_selesai FROM kalender_akademik WHERE periode_id = '$periode_id' AND kegiatan LIKE '%Kuliah Bagian Kedua%' ORDER BY tanggal_selesai DESC LIMIT 1");
+$end_res = mysqli_fetch_assoc($q_end);
+$semester_end = $end_res['tanggal_selesai'] ?? date('Y-m-t'); // Default akhir bulan ini jika tidak ada data
+
 // Task Status per Mata Kuliah
 $q_task_matkul = mysqli_query($koneksi, "SELECT mk.nama_matkul, 
     SUM(CASE WHEN t.status = 'selesai' THEN 1 ELSE 0 END) as selesai,
@@ -292,7 +303,163 @@ while ($current <= $last) {
     $current = strtotime("+1 day", $current);
 }
 
-// 7. VIBE CHECK LOGIC
+// 7. Data Kas Per Minggu (Stacked Bar - Lunas vs Belum)
+$total_mhs = (int)($counts['mahasiswa'] ?? 0);
+$q_nom = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 LIMIT 1");
+$fixed_nom = mysqli_fetch_assoc($q_nom)['nominal'] ?? 5000;
+
+$kas_per_minggu_history = [];
+for ($i = 1; $i <= 16; $i++) {
+    $kas_per_minggu_history[$i] = [
+        'minggu' => "M-" . $i,
+        'lunas_nominal' => 0,
+        'belum_nominal' => $total_mhs * $fixed_nom,
+        'lunas_cnt' => 0,
+        'persen' => 0
+    ];
+}
+
+$q_kas_per_minggu = mysqli_query($koneksi, "SELECT minggu_ke, SUM(nominal) as total, COUNT(*) as lunas_count FROM kas WHERE status = 'Lunas' AND periode_id = '$periode_id' GROUP BY minggu_ke ORDER BY minggu_ke ASC");
+while ($row = mysqli_fetch_assoc($q_kas_per_minggu)) {
+    $m_ke = (int)$row['minggu_ke'];
+    if (isset($kas_per_minggu_history[$m_ke])) {
+        $l_cnt = (int)$row['lunas_count'];
+        $l_nom = (int)$row['total'];
+        $kas_per_minggu_history[$m_ke]['lunas_nominal'] = $l_nom;
+        $kas_per_minggu_history[$m_ke]['lunas_cnt'] = $l_cnt;
+        $kas_per_minggu_history[$m_ke]['belum_nominal'] = max(0, ($total_mhs - $l_cnt) * $fixed_nom);
+        $kas_per_minggu_history[$m_ke]['persen'] = $total_mhs > 0 ? round(($l_cnt / $total_mhs) * 100) : 0;
+    }
+}
+// Reindex to 0-based for JS compatibility
+$kas_per_minggu_history = array_values($kas_per_minggu_history);
+
+// 8. Data Aktivitas Login (Vibe Check) - Default 30 hari terakhir tapi tetap dalam rentang semester
+$default_vibe_start = date('Y-m-d', strtotime('-30 days'));
+if ($default_vibe_start < $semester_start) $default_vibe_start = $semester_start;
+
+$vibe_start = $_GET['vibe_start'] ?? $default_vibe_start;
+$vibe_end = $_GET['vibe_end'] ?? date('Y-m-d'); // Default hari ini
+if ($vibe_end > $semester_end) $vibe_end = $semester_end;
+
+$vibe_activity_history = [];
+$v_current = strtotime($vibe_start);
+$v_last = strtotime($vibe_end);
+while ($v_current <= $v_last) {
+    $date = date('Y-m-d', $v_current);
+    $q_vibe_count = mysqli_query($koneksi, "SELECT COUNT(DISTINCT user_id) as cnt FROM vibe_check WHERE DATE(created_at) = '$date'");
+    $vibe_activity_history[] = [
+        'tanggal' => date('d M', $v_current),
+        'jumlah' => (int)mysqli_fetch_assoc($q_vibe_count)['cnt']
+    ];
+    $v_current = strtotime("+1 day", $v_current);
+}
+
+// 9. Distribusi Mood (Radar Chart) - Mengikuti rentang yang sama dengan vibe activity
+$radar_start = $_GET['radar_start'] ?? $vibe_start;
+$radar_end = $_GET['radar_end'] ?? $vibe_end;
+$q_vibe_dist = mysqli_query($koneksi, "SELECT mood, COUNT(*) as cnt FROM vibe_check WHERE DATE(created_at) BETWEEN '$radar_start' AND '$radar_end' GROUP BY mood");
+$vibe_dist_raw = ['productive' => 0, 'stress' => 0, 'relaxed' => 0, 'tired' => 0, 'hyper' => 0];
+while ($row = mysqli_fetch_assoc($q_vibe_dist)) {
+    if (isset($vibe_dist_raw[$row['mood']])) {
+        $vibe_dist_raw[$row['mood']] = (int)$row['cnt'];
+    }
+}
+// 10. Top 1 Per Vibe (Hall of Fame)
+$mood_list = [
+    'productive' => ['label' => 'Focus', 'icon' => 'fa-rocket', 'unicode' => "\uf135", 'emoji' => '🚀'],
+    'stress' => ['label' => 'Error', 'icon' => 'fa-head-side-virus', 'unicode' => "\ue064", 'emoji' => '🧠'],
+    'relaxed' => ['label' => 'Chill', 'icon' => 'fa-coffee', 'unicode' => "\uf0f4", 'emoji' => '☕'],
+    'tired' => ['label' => 'Low', 'icon' => 'fa-battery-quarter', 'unicode' => "\uf243", 'emoji' => '🔋'],
+    'hyper' => ['label' => 'Fire', 'icon' => 'fa-fire', 'unicode' => "\uf06d", 'emoji' => '🔥']
+];
+
+$vibe_radar_labels = [];
+$vibe_radar_data = [];
+foreach ($mood_list as $m_id => $m_info) {
+    // Label text only
+    $vibe_radar_labels[] = $m_info['label'];
+    $vibe_radar_data[] = $vibe_dist_raw[$m_id];
+}
+
+$top_vibers = [];
+foreach ($mood_list as $m_id => $m_info) {
+    $q_v = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, m.jenis_kelamin, COUNT(*) as cnt 
+        FROM vibe_check v 
+        JOIN mahasiswa m ON v.user_id = m.user_id 
+        WHERE v.mood = '$m_id' AND DATE(v.created_at) BETWEEN '$vibe_start' AND '$vibe_end'
+        GROUP BY v.user_id 
+        ORDER BY cnt DESC, m.nama_panggilan ASC 
+        LIMIT 1");
+    if ($row = mysqli_fetch_assoc($q_v)) {
+        $top_vibers[$m_id] = array_merge($row, $m_info);
+    }
+}
+
+// 11. Best Chemistry (Frequency in same groups)
+$q_all_groups = mysqli_query($koneksi, "SELECT anggota FROM kelompok WHERE periode_id = $periode_id");
+$pair_freq = [];
+while ($row = mysqli_fetch_assoc($q_all_groups)) {
+    $members = array_filter(array_map('trim', explode(',', $row['anggota'])));
+    $count = count($members);
+    if ($count < 2) continue;
+
+    for ($i = 0; $i < $count; $i++) {
+        for ($j = $i + 1; $j < $count; $j++) {
+            $p = [$members[$i], $members[$j]];
+            sort($p);
+            $key = $p[0] . "-" . $p[1];
+            $pair_freq[$key] = ($pair_freq[$key] ?? 0) + 1;
+        }
+    }
+}
+arsort($pair_freq);
+$top_chemistry = array_slice($pair_freq, 0, 4, true);
+$chemistry_data = [];
+foreach ($top_chemistry as $key => $freq) {
+    list($nim1, $nim2) = explode('-', $key);
+    $q1 = mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE nim = '$nim1'");
+    $q2 = mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE nim = '$nim2'");
+    $m1 = mysqli_fetch_assoc($q1);
+    $m2 = mysqli_fetch_assoc($q2);
+    if ($m1 && $m2) {
+        $chemistry_data[] = [
+            'm1' => $m1,
+            'm2' => $m2,
+            'freq' => $freq
+        ];
+    }
+}
+
+// 12. Piket Chemistry (Frequency in same shifts)
+$q_piket_groups = mysqli_query($koneksi, "SELECT jadwal_matkul_id, minggu_ke, GROUP_CONCAT(mahasiswa_id) as ids FROM piket_proyektor WHERE periode_id = $periode_id GROUP BY jadwal_matkul_id, minggu_ke");
+$piket_freq = [];
+while ($row = mysqli_fetch_assoc($q_piket_groups)) {
+    $ids = explode(',', $row['ids']);
+    $count = count($ids);
+    if ($count < 2) continue;
+    for ($i = 0; $i < $count; $i++) {
+        for ($j = $i + 1; $j < $count; $j++) {
+            $p = [(int)$ids[$i], (int)$ids[$j]];
+            sort($p);
+            $key = $p[0] . "-" . $p[1];
+            $piket_freq[$key] = ($piket_freq[$key] ?? 0) + 1;
+        }
+    }
+}
+arsort($piket_freq);
+$top_piket = array_slice($piket_freq, 0, 4, true);
+$piket_data = [];
+foreach ($top_piket as $key => $freq) {
+    list($id1, $id2) = explode('-', $key);
+    $m1 = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE id = $id1"));
+    $m2 = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE id = $id2"));
+    if ($m1 && $m2) {
+        $piket_data[] = ['m1' => $m1, 'm2' => $m2, 'freq' => $freq];
+    }
+}
+
+// 13. VIBE CHECK LOGIC
 $today_vibe = date('Y-m-d');
 $q_vibe_user = mysqli_query($koneksi, "SELECT * FROM vibe_check WHERE user_id = '$user_id' AND DATE(created_at) = '$today_vibe'");
 $vibe_user = mysqli_fetch_assoc($q_vibe_user);
@@ -308,11 +475,11 @@ while ($vs = mysqli_fetch_assoc($q_vibe_stats)) {
 function getVibeConfig($mood)
 {
     $configs = [
-        'productive' => ['icon' => 'fa-rocket', 'text' => 'text-indigo-500', 'bg_light' => 'bg-indigo-50', 'bg_main' => 'bg-indigo-500', 'label' => 'Focus'],
-        'stress' => ['icon' => 'fa-head-side-virus', 'text' => 'text-red-500', 'bg_light' => 'bg-red-50', 'bg_main' => 'bg-red-500', 'label' => 'Error'],
-        'relaxed' => ['icon' => 'fa-coffee', 'text' => 'text-emerald-500', 'bg_light' => 'bg-emerald-50', 'bg_main' => 'bg-emerald-500', 'label' => 'Chill'],
-        'tired' => ['icon' => 'fa-battery-quarter', 'text' => 'text-slate-500', 'bg_light' => 'bg-slate-50', 'bg_main' => 'bg-slate-500', 'label' => 'Low'],
-        'hyper' => ['icon' => 'fa-fire', 'text' => 'text-orange-500', 'bg_light' => 'bg-orange-50', 'bg_main' => 'bg-orange-500', 'label' => 'Fire']
+        'productive' => ['icon' => 'fa-rocket', 'text' => 'text-indigo-500 dark:text-indigo-400', 'bg_light' => 'bg-indigo-50 dark:bg-indigo-950/40', 'bg_main' => 'bg-indigo-500', 'label' => 'Focus'],
+        'stress' => ['icon' => 'fa-head-side-virus', 'text' => 'text-red-500 dark:text-red-400', 'bg_light' => 'bg-red-50 dark:bg-red-950/40', 'bg_main' => 'bg-red-500', 'label' => 'Error'],
+        'relaxed' => ['icon' => 'fa-coffee', 'text' => 'text-emerald-500 dark:text-emerald-400', 'bg_light' => 'bg-emerald-50 dark:bg-emerald-950/40', 'bg_main' => 'bg-emerald-500', 'label' => 'Chill'],
+        'tired' => ['icon' => 'fa-battery-quarter', 'text' => 'text-slate-500 dark:text-slate-400', 'bg_light' => 'bg-slate-50 dark:bg-slate-800/50', 'bg_main' => 'bg-slate-500', 'label' => 'Low'],
+        'hyper' => ['icon' => 'fa-fire', 'text' => 'text-orange-500 dark:text-orange-400', 'bg_light' => 'bg-orange-50 dark:bg-orange-950/40', 'bg_main' => 'bg-orange-500', 'label' => 'Fire']
     ];
     return $configs[$mood] ?? $configs['productive'];
 }
@@ -327,6 +494,76 @@ function getFireColor($streak)
     if ($streak >= 3) return '#FFC300';
     return null;
 }
+
+// --- LEADERBOARD BADGE COLLECTORS (DARI misi.php) ---
+$q_all_vibe_sets = mysqli_query($koneksi, "SELECT user_id, mood, COUNT(*) as cnt FROM vibe_check WHERE DATE(created_at) BETWEEN '$semester_start' AND '$semester_end' GROUP BY user_id, mood");
+$vibe_sets_by_user = [];
+while ($vs = mysqli_fetch_assoc($q_all_vibe_sets)) {
+    $vibe_sets_by_user[$vs['user_id']][$vs['mood']] = (int)$vs['cnt'];
+}
+
+$q_badge_data = mysqli_query($koneksi, "
+    SELECT 
+        m.id, m.nama_panggilan, m.foto, m.user_id, m.nim, m.instagram, m.bio,
+        (SELECT COUNT(*) FROM kas WHERE mahasiswa_id = m.id AND status = 'Lunas' AND periode_id = '$periode_id') as c_kas,
+        (SELECT COUNT(*) FROM absensi WHERE mahasiswa_id = m.id AND status = 'Hadir' AND periode_id = '$periode_id') as c_abs,
+        ks.current_streak, ks.total_games,
+        (SELECT COUNT(*) FROM vibe_check WHERE user_id = m.user_id AND DATE(created_at) BETWEEN '$semester_start' AND '$semester_end') as c_vibe,
+        (SELECT COUNT(*) FROM krs WHERE mahasiswa_id = m.id AND periode_id = '$periode_id') as c_krs,
+        (SELECT COUNT(*) FROM kelompok WHERE FIND_IN_SET(m.nim, REPLACE(anggota, ' ', '')) OR anggota LIKE CONCAT('%', m.nim, '%')) as c_kel,
+        IF(m.foto != '' AND m.foto != 'Yaya.png' AND m.instagram != '' AND m.bio != '', 1, 0) as prof_complete
+    FROM mahasiswa m
+    LEFT JOIN kuis_harian_stats ks ON m.user_id = ks.user_id
+");
+
+$leaderboard_badges = [];
+while ($m = mysqli_fetch_assoc($q_badge_data)) {
+    $badges = 0;
+    // Kas (5, 10, 16)
+    if ($m['c_kas'] >= 5) $badges++;
+    if ($m['c_kas'] >= 10) $badges++;
+    if ($m['c_kas'] >= 16) $badges++;
+    // Absensi (5, 15, 30)
+    if ($m['c_abs'] >= 5) $badges++;
+    if ($m['c_abs'] >= 15) $badges++;
+    if ($m['c_abs'] >= 30) $badges++;
+    // Kuis (Streak 3, 14, Total 50)
+    if (($m['current_streak'] ?? 0) >= 3) $badges++;
+    if (($m['current_streak'] ?? 0) >= 14) $badges++;
+    if (($m['total_games'] ?? 0) >= 50) $badges++;
+    // Login (10, 30, 60)
+    if ($m['c_vibe'] >= 10) $badges++;
+    if ($m['c_vibe'] >= 30) $badges++;
+    if ($m['c_vibe'] >= 60) $badges++;
+
+    // Mood sets (1, 3, 7)
+    $u_moods = $vibe_sets_by_user[$m['user_id']] ?? [];
+    $mood_list = ['productive', 'stress', 'relaxed', 'tired', 'hyper'];
+    $m_counts = [];
+    foreach ($mood_list as $ml) $m_counts[] = $u_moods[$ml] ?? 0;
+    $c_vibe_sets = min($m_counts);
+
+    if ($c_vibe_sets >= 1) $badges++;
+    if ($c_vibe_sets >= 3) $badges++;
+    if ($c_vibe_sets >= 7) $badges++;
+
+    // Social
+    if ($m['c_krs'] > 0) $badges++;
+    if ($m['prof_complete']) $badges++;
+    if ($m['c_kel'] >= 5) $badges++;
+
+    if ($badges > 0) {
+        $leaderboard_badges[] = [
+            'nama' => $m['nama_panggilan'],
+            'foto' => $m['foto'],
+            'badges' => $badges
+        ];
+    }
+}
+usort($leaderboard_badges, function ($a, $b) {
+    return $b['badges'] <=> $a['badges'];
+});
+$leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the leaderboard section
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -354,7 +591,7 @@ function getFireColor($streak)
 
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include 'includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
@@ -362,97 +599,94 @@ function getFireColor($streak)
 
 
             <!-- Welcome & Realtime Section -->
-            <div class="mb-6 bg-white  p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="mb-6 bg-white dark:bg-slate-900 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 transition-all">
                 <div class="flex items-center gap-4">
-                    <div class="h-14 w-14 flex-shrink-0 aspect-square rounded-full overflow-hidden border-2 border-indigo-200">
+                    <div class="h-14 w-14 flex-shrink-0 aspect-square rounded-full overflow-hidden border-2 border-indigo-200 dark:border-indigo-900/50">
                         <img src="<?= profilePhotoUrl($foto) ?>" alt="Profile" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <h2 class="font-bold text-lg text-slate-800">Selamat Datang, <span class="text-indigo-600"><?= htmlspecialchars($nama_lengkap) ?></span>!</h2>
-                        <p class="text-sm text-slate-600 flex items-center gap-2">
-                            <i class="fa fa-calendar-check text-green-600"></i>
-                            Periode: <span class="font-semibold bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs"><?= htmlspecialchars($periode_text) ?></span>
+                        <h2 class="font-bold text-lg text-slate-800 dark:text-slate-100">Selamat Datang, <span class="text-indigo-600 dark:text-indigo-400"><?= htmlspecialchars($nama_lengkap) ?></span>!</h2>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                            <i class="fa fa-calendar-check text-green-600 dark:text-green-400"></i>
+                            Periode: <span class="font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded text-xs"><?= htmlspecialchars($periode_text) ?></span>
                         </p>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-4 mt-2 md:mt-0">
-                    <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                        <i class="fa fa-calendar-alt text-indigo-500 text-xs"></i>
-                        <div id="realtime-date" class="text-xs font-medium text-slate-600 uppercase tracking-wide">...</div>
+                    <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <i class="fa fa-calendar-alt text-indigo-500 dark:text-indigo-400 text-xs"></i>
+                        <div id="realtime-date" class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">...</div>
                     </div>
-                    <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-                        <i class="fa fa-clock text-indigo-500 text-xs"></i>
-                        <div id="realtime-clock" class="text-xs font-mono font-bold text-slate-700 tracking-wider">--:--:--</div>
+                    <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <i class="fa fa-clock text-indigo-500 dark:text-indigo-400 text-xs"></i>
+                        <div id="realtime-clock" class="text-xs font-mono font-bold text-slate-700 dark:text-slate-200 tracking-wider">--:--:--</div>
                     </div>
                 </div>
 
             </div>
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <a href="database/db_mahasiswa" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
+                <a href="database/db_mahasiswa" class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 card-hover flex items-center gap-4 transition-all">
+                    <div class="h-12 w-12 bg-indigo-100 dark:bg-indigo-950/40 rounded-lg flex items-center justify-center text-indigo-700 dark:text-indigo-400">
                         <i class="fa fa-user-graduate text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mahasiswa</div>
-                        <div class="text-xl font-bold text-slate-800"><?= number_format($counts['mahasiswa']) ?></div>
+                        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mahasiswa</div>
+                        <div class="text-xl font-bold text-slate-800 dark:text-slate-100"><?= number_format($counts['mahasiswa']) ?></div>
                     </div>
                 </a>
 
-
-
-                <a href="database/db_tugas" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
+                <a href="database/db_tugas" class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 card-hover flex items-center gap-4 transition-all">
+                    <div class="h-12 w-12 bg-indigo-100 dark:bg-indigo-950/40 rounded-lg flex items-center justify-center text-indigo-700 dark:text-indigo-400">
                         <i class="fa fa-tasks text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tugas Aktif</div>
-                        <div class="text-xl font-bold text-slate-800"><?= number_format($counts['tugas']) ?></div>
+                        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tugas Aktif</div>
+                        <div class="text-xl font-bold text-slate-800 dark:text-slate-100"><?= number_format($counts['tugas']) ?></div>
                     </div>
                 </a>
 
-                <a href="views/kelompok" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
+                <a href="views/kelompok" class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 card-hover flex items-center gap-4 transition-all">
+                    <div class="h-12 w-12 bg-indigo-100 dark:bg-indigo-950/40 rounded-lg flex items-center justify-center text-indigo-700 dark:text-indigo-400">
                         <i class="fa fa-users text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Data Kelompok</div>
-                        <div class="text-xl font-bold text-slate-800"><?= number_format($counts['kelompok']) ?></div>
+                        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Data Kelompok</div>
+                        <div class="text-xl font-bold text-slate-800 dark:text-slate-100"><?= number_format($counts['kelompok']) ?></div>
                     </div>
                 </a>
 
-                <a href="database/db_jadwal" class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 card-hover flex items-center gap-4">
-                    <div class="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-700">
+                <a href="database/db_jadwal" class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 card-hover flex items-center gap-4 transition-all">
+                    <div class="h-12 w-12 bg-indigo-100 dark:bg-indigo-950/40 rounded-lg flex items-center justify-center text-indigo-700 dark:text-indigo-400">
                         <i class="fa fa-list-alt text-xl"></i>
                     </div>
                     <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Jadwal Kuliah</div>
-                        <div class="text-xl font-bold text-slate-800"><?= number_format($counts['jadwal_matkul']) ?></div>
+                        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Jadwal Kuliah</div>
+                        <div class="text-xl font-bold text-slate-800 dark:text-slate-100"><?= number_format($counts['jadwal_matkul']) ?></div>
                     </div>
                 </a>
             </div>
 
             <!-- Info Slider Section -->
-            <div class="mt-6 relative overflow-hidden bg-white rounded-xl shadow-sm border border-slate-200 h-28">
+            <div class="mt-6 relative overflow-hidden bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 h-28 transition-all">
                 <div id="infoSlider" class="flex transition-transform duration-700 ease-in-out h-full">
 
                     <!-- Slide 1: Jadwal -->
                     <div class="min-w-full p-4 flex items-center gap-6">
-                        <div class="h-16 w-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                        <div class="h-16 w-16 bg-blue-100 dark:bg-blue-950/40 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                             <i class="fa fa-calendar-alt text-2xl"></i>
                         </div>
                         <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kuliah Hari Ini (<?= $today_indo ?>)</div>
-                                <div class="text-sm font-bold text-slate-700">
+                                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Kuliah Hari Ini (<?= $today_indo ?>)</div>
+                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200">
                                     <?php if (empty($sch_today)): ?>
-                                        <span class="text-slate-400 italic font-normal lowercase">Tidak ada jadwal kuliah hari ini.</span>
+                                        <span class="text-slate-400 dark:text-slate-500 italic font-normal lowercase">Tidak ada jadwal kuliah hari ini.</span>
                                     <?php else: ?>
                                         <div class="flex flex-col <?= count($sch_today) > 1 ? 'gap-0' : '' ?>">
                                             <?php foreach ($sch_today as $s): ?>
-                                                <div class="<?= count($sch_today) > 1 ? 'text-[11px] leading-tight' : 'text-sm' ?> font-bold text-slate-700 truncate">
+                                                <div class="<?= count($sch_today) > 1 ? 'text-[11px] leading-tight' : 'text-sm' ?> font-bold text-slate-700 dark:text-slate-200 truncate">
                                                     • <?= $s['nama_matkul'] ?>
                                                 </div>
                                             <?php endforeach; ?>
@@ -460,15 +694,15 @@ function getFireColor($streak)
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            <div class="hidden md:block border-l border-slate-100 pl-4">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Besok (<?= $tomorrow_indo ?>)</div>
-                                <div class="text-sm font-bold text-slate-700">
+                            <div class="hidden md:block border-l border-slate-100 dark:border-slate-800 pl-4">
+                                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Besok (<?= $tomorrow_indo ?>)</div>
+                                <div class="text-sm font-bold text-slate-700 dark:text-slate-200">
                                     <?php if (empty($sch_tomorrow)): ?>
-                                        <span class="text-slate-400 italic font-normal lowercase">Tidak ada jadwal.</span>
+                                        <span class="text-slate-400 dark:text-slate-500 italic font-normal lowercase">Tidak ada jadwal.</span>
                                     <?php else: ?>
                                         <div class="flex flex-col <?= count($sch_tomorrow) > 1 ? 'gap-0' : '' ?>">
                                             <?php foreach ($sch_tomorrow as $s): ?>
-                                                <div class="<?= count($sch_tomorrow) > 1 ? 'text-[11px] leading-tight' : 'text-sm' ?> font-bold text-slate-700 truncate">
+                                                <div class="<?= count($sch_tomorrow) > 1 ? 'text-[11px] leading-tight' : 'text-sm' ?> font-bold text-slate-700 dark:text-slate-200 truncate">
                                                     • <?= $s['nama_matkul'] ?>
                                                 </div>
                                             <?php endforeach; ?>
@@ -481,19 +715,19 @@ function getFireColor($streak)
 
                     <!-- Slide 2: Deadline Tugas -->
                     <div class="min-w-full p-4 flex items-center gap-6">
-                        <div class="h-16 w-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shrink-0">
+                        <div class="h-16 w-16 bg-orange-100 dark:bg-orange-950/40 rounded-2xl flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
                             <i class="fa fa-hourglass-half text-2xl"></i>
                         </div>
                         <div class="flex-grow grid grid-cols-1 <?= count($closest_tasks) > 1 ? 'md:grid-cols-2' : '' ?> gap-4">
                             <?php if (!empty($closest_tasks)): ?>
                                 <?php foreach ($closest_tasks as $index => $task): ?>
-                                    <div class="<?= $index === 1 ? 'hidden md:block border-l border-slate-100 pl-4' : '' ?>">
-                                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                    <div class="<?= $index === 1 ? 'hidden md:block border-l border-slate-100 dark:border-slate-800 pl-4' : '' ?>">
+                                        <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                                             <?= $index === 0 ? 'Deadline Terdekat' : 'Deadline Berikutnya' ?>
                                         </div>
-                                        <div class="text-sm font-bold text-slate-700 mb-1 truncate"><?= $task['nama_matkul'] ?></div>
+                                        <div class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-1 truncate"><?= $task['nama_matkul'] ?></div>
                                         <div class="flex items-center gap-2">
-                                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-[10px] font-bold uppercase whitespace-nowrap">
+                                            <span class="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded text-[10px] font-bold uppercase whitespace-nowrap">
                                                 <?= date('d M Y', strtotime($task['deadline_tanggal'])) ?> • <?= date('H:i', strtotime($task['deadline_pukul'])) ?>
                                             </span>
                                         </div>
@@ -501,8 +735,8 @@ function getFireColor($streak)
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <div>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Deadline Terdekat</div>
-                                    <div class="text-sm text-slate-400 italic">Semua tugas telah selesai dikerjakan! ✨</div>
+                                    <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Deadline Terdekat</div>
+                                    <div class="text-sm text-slate-400 dark:text-slate-500 italic">Semua tugas telah selesai dikerjakan! ✨</div>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -510,49 +744,49 @@ function getFireColor($streak)
 
                     <!-- Slide 3: Distribusi Gender -->
                     <div class="min-w-full p-4 flex items-center gap-6">
-                        <div class="h-16 w-16 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-600 shrink-0">
+                        <div class="h-16 w-16 bg-pink-100 dark:bg-pink-950/40 rounded-2xl flex items-center justify-center text-pink-600 dark:text-pink-400 shrink-0">
                             <i class="fa fa-venus-mars text-2xl"></i>
                         </div>
                         <div class="flex-grow grid grid-cols-2 gap-4">
                             <div>
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mahasiswa Laki-laki</div>
-                                <div class="text-lg font-bold text-indigo-600"><?= number_format($gender_data['Laki-laki']) ?> <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Mahasiswa Laki-laki</div>
+                                <div class="text-lg font-bold text-indigo-600 dark:text-indigo-400"><?= number_format($gender_data['Laki-laki']) ?> <span class="text-xs font-normal text-slate-400 dark:text-slate-500">Orang</span></div>
                             </div>
-                            <div class="border-l border-slate-100 pl-4">
-                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mahasiswa Perempuan</div>
-                                <div class="text-lg font-bold text-pink-500"><?= number_format($gender_data['Perempuan']) ?> <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                            <div class="border-l border-slate-100 dark:border-slate-800 pl-4">
+                                <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Mahasiswa Perempuan</div>
+                                <div class="text-lg font-bold text-pink-500 dark:text-pink-400"><?= number_format($gender_data['Perempuan']) ?> <span class="text-xs font-normal text-slate-400 dark:text-slate-500">Orang</span></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Slide 4: Kalender Akademik -->
                     <div class="min-w-full p-4 flex items-center gap-6">
-                        <div class="h-16 w-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                        <div class="h-16 w-16 bg-blue-100 dark:bg-blue-950/40 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                             <i class="fa fa-calendar-alt text-2xl"></i>
                         </div>
                         <div class="flex-grow grid grid-cols-1 <?= count($academic_events) > 1 ? 'md:grid-cols-2' : '' ?> gap-4">
                             <?php if (!empty($academic_events)): ?>
                                 <?php foreach ($academic_events as $index => $event): ?>
-                                    <div class="<?= $index === 1 ? 'hidden md:block border-l border-slate-100 pl-4' : '' ?>">
-                                        <div class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">
+                                    <div class="<?= $index === 1 ? 'hidden md:block border-l border-slate-100 dark:border-slate-800 pl-4' : '' ?>">
+                                        <div class="text-[10px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider mb-1">
                                             <?= $event['status_event'] ?>
                                         </div>
                                         <?php
                                         // Perkecil font jika teks terlalu panjang (> 30 karakter)
                                         $fontClass = (strlen($event['kegiatan']) > 30) ? 'text-[11px]' : 'text-sm';
                                         ?>
-                                        <div class="<?= $fontClass ?> font-bold text-slate-700 mb-1" title="<?= htmlspecialchars($event['kegiatan']) ?>">
+                                        <div class="<?= $fontClass ?> font-bold text-slate-700 dark:text-slate-200 mb-1" title="<?= htmlspecialchars($event['kegiatan']) ?>">
                                             <?= htmlspecialchars($event['kegiatan']) ?>
                                         </div>
-                                        <div class="text-[10px] text-slate-500 font-medium">
+                                        <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
                                             <?= date('d M', strtotime($event['tanggal_mulai'])) ?> - <?= date('d M Y', strtotime($event['tanggal_selesai'])) ?>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <div>
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kalender Akademik</div>
-                                    <div class="text-sm text-slate-400 italic">Tidak ada agenda akademik terdekat.</div>
+                                    <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Kalender Akademik</div>
+                                    <div class="text-sm text-slate-400 dark:text-slate-500 italic">Tidak ada agenda akademik terdekat.</div>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -562,22 +796,24 @@ function getFireColor($streak)
 
                 <!-- Slider Indicators -->
                 <div class="absolute bottom-2 right-4 flex gap-1.5">
-                    <div class="h-1.5 w-4 rounded-full bg-indigo-900 indicator" data-index="0"></div>
-                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="1"></div>
-                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="2"></div>
-                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 indicator" data-index="3"></div>
+                    <div class="h-1.5 w-4 rounded-full bg-indigo-900 dark:bg-indigo-500 indicator" data-index="0"></div>
+                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-700 indicator" data-index="1"></div>
+                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-700 indicator" data-index="2"></div>
+                    <div class="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-700 indicator" data-index="3"></div>
                 </div>
             </div>
 
             <!-- --- SECTION: VIBE CHECK --- -->
-            <div class="mt-8 mb-6">
-                <div class="flex justify-between items-center border-b border-slate-200 pb-2 mb-4">
-                    <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa fa-smile text-amber-500"></i>
+            <div class="mt-8 mb-6 transition-all">
+                <div class="flex justify-between items-center border-b-2 border-amber-100 dark:border-amber-900/30 pb-2 mb-6">
+                    <h2 class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                        <span class="h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                            <i class="fa fa-face-smile"></i>
+                        </span>
                         Vibe Kelas Hari Ini
                     </h2>
                     <?php if (!$vibe_user): ?>
-                        <button onclick="document.getElementById('vibeModal').classList.remove('hidden')" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold hover:bg-amber-200 transition-all">
+                        <button onclick="document.getElementById('vibeModal').classList.remove('hidden'); document.getElementById('vibeModal').classList.add('flex');" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded font-bold hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all">
                             <i class="fa fa-plus-circle mr-1"></i> Check-in Mood
                         </button>
                     <?php endif; ?>
@@ -591,13 +827,13 @@ function getFireColor($streak)
                         $count = $vibe_stats[$m];
                         $percent = $total_vibe > 0 ? round(($count / $total_vibe) * 100) : 0;
                     ?>
-                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center text-center <?= $cfg['text'] ?>">
+                        <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center text-center transition-all">
                             <div class="h-10 w-10 <?= $cfg['bg_light'] ?> rounded-full flex items-center justify-center mb-2">
-                                <i class="fa <?= $cfg['icon'] ?> text-lg"></i>
+                                <i class="fa <?= $cfg['icon'] ?> text-lg <?= $cfg['text'] ?>"></i>
                             </div>
-                            <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
-                            <div class="text-lg font-black text-slate-800"><?= $percent ?>%</div>
-                            <div class="w-full bg-slate-100 h-1 rounded-full mt-2 overflow-hidden">
+                            <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
+                            <div class="text-lg font-black text-slate-800 dark:text-slate-100"><?= $percent ?>%</div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
                                 <div class="<?= $cfg['bg_main'] ?> h-full" style="width: <?= $percent ?>%"></div>
                             </div>
                         </div>
@@ -606,68 +842,70 @@ function getFireColor($streak)
             </div>
 
             <!-- --- SECTION 1: DEMOGRAFI & SOSIAL --- -->
-            <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
-                <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fa fa-user-friends text-indigo-900"></i>
-                    Pusat Aktivitas
+            <div class="mt-12 border-b-2 border-indigo-100 dark:border-indigo-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                        <i class="fa fa-chart-pie"></i>
+                    </span>
+                    Ringkasan Data
                 </h2>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Finance Summary Card -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex justify-between items-center">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex justify-between items-center">
                         <span><i class="fa fa-wallet text-green-500 mr-2"></i>Status Keuangan</span>
-                        <span class="text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-700 font-bold">Saldo Aktif</span>
+                        <span class="text-[10px] bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded text-green-700 dark:text-green-400 font-bold">Saldo Aktif</span>
                     </h3>
                     <div class="space-y-4">
-                        <div class="bg-slate-50 p-3 px-4 rounded-xl border border-slate-100">
-                            <div class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Saldo Sekarang</div>
-                            <div class="text-xl font-black text-slate-800">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-3 px-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-widest mb-1">Saldo Sekarang</div>
+                            <div class="text-xl font-black text-slate-800 dark:text-slate-100">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
-                                <div class="text-[9px] text-indigo-400 uppercase font-bold mb-1">Dari Setoran Kas</div>
-                                <div class="text-xs font-black text-indigo-700">Rp <?= number_format($kas_total, 0, ',', '.') ?></div>
+                            <div class="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
+                                <div class="text-[9px] text-indigo-400 dark:text-indigo-500 uppercase font-bold mb-1">Dari Setoran Kas</div>
+                                <div class="text-xs font-black text-indigo-700 dark:text-indigo-300">Rp <?= number_format($kas_total, 0, ',', '.') ?></div>
                             </div>
-                            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                <div class="text-[9px] text-blue-400 uppercase font-bold mb-1">Pemasukan Lain</div>
-                                <div class="text-xs font-black text-blue-700">Rp <?= number_format($arus_in, 0, ',', '.') ?></div>
+                            <div class="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                                <div class="text-[9px] text-blue-400 dark:text-blue-500 uppercase font-bold mb-1">Pemasukan Lain</div>
+                                <div class="text-xs font-black text-blue-700 dark:text-blue-300">Rp <?= number_format($arus_in, 0, ',', '.') ?></div>
                             </div>
                         </div>
-                        <div class="p-3 bg-red-50 rounded-lg border border-red-100">
+                        <div class="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-100 dark:border-red-900/30">
                             <div class="flex justify-between items-center">
-                                <div class="text-[9px] text-red-400 uppercase font-bold">Total Pengeluaran</div>
-                                <div class="text-xs font-black text-red-700">Rp <?= number_format($arus_out, 0, ',', '.') ?></div>
+                                <div class="text-[9px] text-red-400 dark:text-red-500 uppercase font-bold">Total Pengeluaran</div>
+                                <div class="text-xs font-black text-red-700 dark:text-red-300">Rp <?= number_format($arus_out, 0, ',', '.') ?></div>
                             </div>
                         </div>
                         <div>
                             <div class="flex justify-between items-end">
                                 <div class="flex flex-col">
-                                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Persentase Bayar Kas</div>
-                                    <select name="kas_minggu" form="vizFilters" onchange="this.form.submit()" class="text-[9px] border-none bg-indigo-50 text-indigo-700 font-bold p-0 focus:ring-0 cursor-pointer rounded mb-1">
+                                    <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Persentase Bayar Kas</div>
+                                    <select name="kas_minggu" form="vizFilters" onchange="this.form.submit()" class="text-[9px] border-none bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-bold p-1 focus:ring-0 cursor-pointer rounded mb-1">
                                         <option value="">Semua Minggu</option>
                                         <?php for ($i = 1; $i <= 16; $i++): ?>
                                             <option value="<?= $i ?>" <?= $filter_minggu_kas == $i ? 'selected' : '' ?>>Minggu <?= $i ?></option>
                                         <?php endfor; ?>
                                     </select>
                                 </div>
-                                <div class="text-xs font-black text-indigo-600"><?= $persen_lunas ?>%</div>
+                                <div class="text-xs font-black text-indigo-600 dark:text-indigo-400"><?= $persen_lunas ?>%</div>
                             </div>
-                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
                                 <div class="bg-indigo-500 h-full rounded-full" style="width: <?= $persen_lunas ?>%"></div>
                             </div>
                              <div class="flex justify-between mt-1 text-[9px] font-medium">
-                                <span class="text-green-600"><?= $display_lunas ?></span>
-                                <span class="text-slate-400"><?= $display_belum ?></span>
+                                <span class="text-green-600 dark:text-green-400"><?= $display_lunas ?></span>
+                                <span class="text-slate-400 dark:text-slate-500"><?= $display_belum ?></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Kuis Harian Leaderboard -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
                         <i class="fa fa-fire text-orange-500"></i>
                         Kuis Harian Leaderboard
                     </h3>
@@ -679,20 +917,20 @@ function getFireColor($streak)
                             while ($tk = mysqli_fetch_assoc($q_kuis_harian)):
                                 $fireColor = getFireColor($tk['current_streak']);
                         ?>
-                                <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all border border-slate-100 hover:border-slate-100">
+                                <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-700/50">
                                     <div class="w-5 text-center shrink-0">
-                                        <span class="text-xs font-black <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-400' : ($rank == 3 ? 'text-orange-400' : 'text-slate-300')) ?>">
+                                        <span class="text-xs font-black <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-400 dark:text-slate-300' : ($rank == 3 ? 'text-orange-400' : 'text-slate-300 dark:text-slate-600')) ?>">
                                             <?= $rank++ ?>
                                         </span>
                                     </div>
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
                                         <img src="<?= profilePhotoUrl($tk['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
                                     </div>
                                     <div class="flex-grow min-w-0">
-                                        <div class="text-xs font-bold text-slate-700 truncate">
+                                        <div class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
                                             <?= htmlspecialchars($tk['nama_panggilan']) ?>
                                         </div>
-                                        <div class="text-[10px] text-slate-400 font-medium">
+                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
                                             <?= $tk['total_games'] ?> games
                                         </div>
                                     </div>
@@ -708,8 +946,8 @@ function getFireColor($streak)
                             <?php endwhile; ?>
                         <?php else: ?>
                             <div class="text-center py-6">
-                                <i class="fa fa-ghost text-slate-200 text-2xl mb-2"></i>
-                                <p class="text-[10px] text-slate-400 font-medium italic">Belum ada aktivitas hari ini.</p>
+                                <i class="fa fa-ghost text-slate-200 dark:text-slate-800 text-2xl mb-2"></i>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic">Belum ada aktivitas hari ini.</p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -717,8 +955,8 @@ function getFireColor($streak)
                 </div>
 
                 <!-- Recent Messages -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 lg:col-span-1">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
                         <i class="fa fa-envelope-open-text text-purple-500"></i>
                         Pesan Anonim Terbaru
                     </h3>
@@ -728,13 +966,13 @@ function getFireColor($streak)
                         if (mysqli_num_rows($q_recent_pesan) > 0):
                             while ($ps = mysqli_fetch_assoc($q_recent_pesan)):
                         ?>
-                                <div class="bg-slate-50 p-3 rounded-lg border-l-4 border-purple-400">
-                                    <div class="text-[10px] text-purple-600 font-bold uppercase mb-1"><?= date('d M, H:i', strtotime($ps['tanggal'])) ?></div>
-                                    <div class="text-xs text-slate-600 italic line-clamp-2">"<?= htmlspecialchars($ps['isi_pesan']) ?>"</div>
+                                <div class="bg-slate-50 dark:bg-slate-800/30 p-3 rounded-lg border-l-4 border-purple-400 dark:border-purple-600">
+                                    <div class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase mb-1"><?= date('d M, H:i', strtotime($ps['tanggal'])) ?></div>
+                                    <div class="text-xs text-slate-600 dark:text-slate-400 italic line-clamp-2">"<?= htmlspecialchars($ps['isi_pesan']) ?>"</div>
                                 </div>
                             <?php endwhile; ?>
                         <?php else: ?>
-                            <p class="text-xs text-slate-400 text-center py-4">Belum ada pesan.</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 text-center py-4">Belum ada pesan.</p>
                         <?php endif; ?>
                     </div>
 
@@ -744,17 +982,19 @@ function getFireColor($streak)
             
 
             <!-- --- SECTION 2: AKADEMIK --- -->
-            <div class="mt-8 border-b border-slate-200 pb-2 mb-6">
-                <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fa fa-graduation-cap text-indigo-900"></i>
-                    Akademik & Tugas
+            <div class="mt-12 border-b-2 border-blue-100 dark:border-blue-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                        <i class="fa fa-graduation-cap"></i>
+                    </span>
+                    Manajemen Akademik
                 </h2>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Task Distribution per Subject -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
                         <i class="fa fa-tasks text-indigo-500"></i>
                         Distribusi Tugas per Matkul
                     </h3>
@@ -764,20 +1004,20 @@ function getFireColor($streak)
                 </div>
 
                 <!-- Attendance Statistics -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                             <i class="fa fa-user-check text-green-500"></i>
                             Statistik Absensi
                         </h3>
                         <div class="flex items-center gap-2">
-                            <select name="abs_matkul" form="vizFilters" onchange="this.form.submit()" class="text-[10px] border-slate-200 rounded p-1 focus:ring-indigo-500">
+                            <select name="abs_matkul" form="vizFilters" onchange="this.form.submit()" class="text-[10px] bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded p-1 focus:ring-indigo-500">
                                 <option value="">Semua Matkul</option>
                                 <?php foreach ($abs_matkuls as $m): ?>
                                     <option value="<?= $m['matkul_id'] ?>" <?= $abs_matkul == $m['matkul_id'] ? 'selected' : '' ?>><?= htmlspecialchars($m['nama_matkul']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <select name="abs_pertemuan" form="vizFilters" onchange="this.form.submit()" class="text-[10px] border-slate-200 rounded p-1 focus:ring-indigo-500">
+                            <select name="abs_pertemuan" form="vizFilters" onchange="this.form.submit()" class="text-[10px] bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded p-1 focus:ring-indigo-500">
                                 <option value="">Semua Pertemuan</option>
                                 <?php foreach ($abs_pertemuans as $p): ?>
                                     <option value="<?= $p ?>" <?= $abs_pertemuan == $p ? 'selected' : '' ?>>Ke-<?= $p ?></option>
@@ -791,29 +1031,34 @@ function getFireColor($streak)
                 </div>
             </div>
 
-            <!-- --- SECTION 3: TREN & ANALITIK --- -->
+            <!-- --- SECTION: TREN & ANALITIK --- -->
             <form id="vizFilters" method="GET" class="hidden">
                 <?php if (isset($_GET['periode_id'])): ?><input type="hidden" name="periode_id" value="<?= $_GET['periode_id'] ?>"><?php endif; ?>
             </form>
-            <div class="mt-12 border-b border-slate-200 pb-2 mb-6">
-                <h2 class="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fa fa-chart-line text-indigo-900"></i>
-                    Tren & Analitik
+
+            <!-- 1. Tren Arus Kas dan Pemasukan Kas per Minggu -->
+            <div class="mt-12 border-b-2 border-emerald-100 dark:border-emerald-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center">
+                        <i class="fa fa-piggy-bank"></i>
+                    </span>
+                    Analitik Keuangan
                 </h2>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
                 <!-- Financial Trend Line Chart -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa fa-wallet text-green-500"></i>
-                            Tren Arus Kas
-                        </h3>
-                        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded border border-slate-200">
-                            <input type="date" name="kas_start" value="<?= $kas_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
-                            <span class="text-slate-300 text-[10px]">-</span>
-                            <input type="date" name="kas_end" value="<?= $kas_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
+                        <div class="min-w-0">
+                            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                <i class="fa fa-line-chart text-green-500"></i>
+                                Tren Arus Kas
+                            </h3>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+                            <input type="date" name="kas_start" value="<?= $kas_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
+                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
+                            <input type="date" name="kas_end" value="<?= $kas_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
                         </div>
                     </div>
                     <div class="relative h-72">
@@ -821,22 +1066,279 @@ function getFireColor($streak)
                     </div>
                 </div>
 
-                <!-- Message Volume Bar Chart -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <!-- Weekly Cash Bar Chart -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
                     <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <i class="fa fa-chart-bar text-green-500"></i>
+                            Pemasukan Kas per Minggu
+                        </h3>
+                        <div class="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700">
+                           <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 px-2 uppercase tracking-tight">Data Per Minggu</span>
+                        </div>
+                    </div>
+                    <div class="relative h-72">
+                        <canvas id="kasMingguanChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Keaktifan Login dan Volume Pesan Anonim -->
+            <div class="mt-8 border-b-2 border-indigo-100 dark:border-indigo-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
+                        <i class="fa fa-bolt-lightning"></i>
+                    </span>
+                    Statistik Aktivitas
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                <!-- User Login Activity Bar Chart (Vibe Check) -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <i class="fa fa-chart-line text-indigo-500"></i>
+                            Keaktifan Login
+                        </h3>
+                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+                            <input type="date" name="vibe_start" value="<?= $vibe_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
+                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
+                            <input type="date" name="vibe_end" value="<?= $vibe_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
+                        </div>
+                    </div>
+                    <div class="relative h-72">
+                        <canvas id="vibeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Message Volume Bar Chart -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                             <i class="fa fa-chart-bar text-purple-500"></i>
                             Volume Pesan Anonim
                         </h3>
-                        <div class="flex items-center gap-1 bg-slate-50 p-1 rounded border border-slate-200">
-                            <input type="date" name="pesan_start" value="<?= $pesan_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
-                            <span class="text-slate-300 text-[10px]">-</span>
-                            <input type="date" name="pesan_end" value="<?= $pesan_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 bg-transparent border-none focus:ring-0 p-0 w-24">
+                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+                            <input type="date" name="pesan_start" value="<?= $pesan_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
+                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
+                            <input type="date" name="pesan_end" value="<?= $pesan_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
                         </div>
                     </div>
                     <div class="relative h-72">
                         <canvas id="messageChart"></canvas>
                     </div>
+                </div>
+            </div>
+
+            <!-- 3. Radar Mood dan Hall of Fame -->
+            <div class="mt-8 border-b-2 border-amber-100 dark:border-amber-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                        <i class="fa fa-crown"></i>
+                    </span>
+                    Spektrum Mood
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+                <!-- Vibe Distribution Radar Chart -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                            <i class="fa fa-braille text-indigo-500"></i>
+                            Radar Mood
+                        </h3>
+                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
+                            <input type="date" name="radar_start" value="<?= $radar_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
+                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
+                            <input type="date" name="radar_end" value="<?= $radar_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
+                        </div>
+                    </div>
+                    <div class="relative h-72">
+                        <canvas id="vibeRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Vibe Check Leaderboard (Hall of Fame) -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <i class="fa fa-crown text-amber-500"></i>
+                        Hall of Fame
+                    </h3>
+                    <div class="space-y-2">
+                        <?php if (!empty($top_vibers)): ?>
+                            <?php foreach ($top_vibers as $m_id => $v): 
+                                $cfg = getVibeConfig($m_id);
+                            ?>
+                                <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-indigo-100/50 dark:border-indigo-900/30">
+                                    <div class="w-8 h-8 rounded-full <?= $cfg['bg_light'] ?> flex items-center justify-center shrink-0">
+                                        <i class="fa <?= $cfg['icon'] ?> text-xs <?= $cfg['text'] ?>"></i>
+                                    </div>
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+                                        <img src="<?= profilePhotoUrl($v['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
+                                    </div>
+                                    <div class="flex-grow min-w-0">
+                                        <div class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
+                                            <?= htmlspecialchars($v['nama_panggilan']) ?>
+                                        </div>
+                                        <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight"><?= ($v['jenis_kelamin'] === 'Perempuan' ? 'Queen' : 'King') ?> of <?= $v['label'] ?></div>
+                                    </div>
+                                    <div class="shrink-0 text-right">
+                                        <span class="text-[10px] font-black <?= $cfg['text'] ?> <?= $cfg['bg_light'] ?> px-2 py-0.5 rounded-full border border-indigo-100/50 dark:border-indigo-900/30">
+                                            <?= $v['cnt'] ?>x
+                                        </span>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-6">Belum ada aktivitas.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Dynamic Duo Kelompok dan Dynamic Duo Piket -->
+            <div class="mt-8 border-b-2 border-rose-100 dark:border-rose-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
+                        <i class="fa fa-users"></i>
+                    </span>
+                    Dynamic Duo
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Best Chemistry (Kelompok Frequency) -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <i class="fa fa-star text-rose-500"></i>
+                        Dynamic Duo Kelompok
+                    </h3>
+                    <div class="space-y-3">
+                        <?php if (!empty($chemistry_data)): ?>
+                            <?php foreach ($chemistry_data as $c): ?>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-rose-50/50 to-indigo-50/50 dark:from-rose-950/20 dark:to-indigo-950/20 border border-rose-100 dark:border-rose-900/30 group hover:shadow-sm transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex gap-2 items-center">
+                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
+                                                <img src="<?= profilePhotoUrl($c['m1']['foto']) ?>" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
+                                                <img src="<?= profilePhotoUrl($c['m2']['foto']) ?>" class="w-full h-full object-cover">
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">
+                                                <?= htmlspecialchars($c['m1']['nama_panggilan']) ?> & <?= htmlspecialchars($c['m2']['nama_panggilan']) ?>
+                                            </div>
+                                            <div class="text-[9px] font-bold text-rose-500 dark:text-rose-400 uppercase tracking-tight">
+                                                Satu Kelompok <?= $c['freq'] ?>x
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="shrink-0 flex gap-1">
+                                        <?php for($i=0; $i<$c['freq']; $i++): ?>
+                                            <i class="fa fa-star text-[10px] text-rose-500 dark:text-rose-400"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-8">Data tidak cukup untuk dihitung.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Soulmate Piket (Piket Frequency) -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+                        <i class="fa fa-star text-blue-500"></i>
+                        Dynamic Duo Piket
+                    </h3>
+                    <div class="space-y-3">
+                        <?php if (!empty($piket_data)): ?>
+                            <?php foreach ($piket_data as $p): ?>
+                                <div class="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/30 group hover:shadow-sm transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex gap-2 items-center">
+                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
+                                                <img src="<?= profilePhotoUrl($p['m1']['foto']) ?>" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
+                                                <img src="<?= profilePhotoUrl($p['m2']['foto']) ?>" class="w-full h-full object-cover">
+                                            </div>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">
+                                                <?= htmlspecialchars($p['m1']['nama_panggilan']) ?> & <?= htmlspecialchars($p['m2']['nama_panggilan']) ?>
+                                            </div>
+                                            <div class="text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-tight">
+                                                Piket Bareng <?= $p['freq'] ?>x
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="shrink-0 flex gap-1">
+                                        <?php for($i=0; $i<$p['freq']; $i++): ?>
+                                            <i class="fa fa-star text-[10px] text-blue-500 dark:text-blue-400"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-8">Belum ada data piket.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <!-- --- SECTION 5: BADGE COLLECTORS LEADERBOARD --- -->
+            <div class="mt-12 border-b-2 border-yellow-100 dark:border-yellow-900/30 pb-2 mb-6 transition-all">
+                <h2 class="text-xs font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                    <span class="h-8 w-8 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center">
+                        <i class="fa fa-medal"></i>
+                    </span>
+                    Badge Mastery: Top Collectors
+                </h2>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 mb-12 relative overflow-hidden">
+                <!-- Background decoration -->
+                <div class="absolute -right-20 -top-20 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl"></div>
+                <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl"></div>
+
+                <div class="relative z-10 grid grid-cols-2 lg:grid-cols-5 gap-3">
+                    <?php if (!empty($leaderboard_badges)): ?>
+                        <?php 
+                        $rank = 1;
+                        foreach ($leaderboard_badges as $lb): 
+                            $rankColor = ($rank == 1) ? 'bg-yellow-400' : (($rank == 2) ? 'bg-slate-300' : (($rank == 3) ? 'bg-orange-300' : 'bg-slate-100 dark:bg-slate-800'));
+                            $rankText = ($rank <= 3) ? 'text-white' : 'text-slate-400';
+                        ?>
+                            <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 hover:border-yellow-200 dark:hover:border-yellow-900/50 transition-all group">
+                                <div class="relative">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-sm shrink-0">
+                                        <img src="<?= profilePhotoUrl($lb['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
+                                    </div>
+                                    <div class="absolute -top-1 -left-1 w-5 h-5 <?= $rankColor ?> <?= $rankText ?> rounded-full flex items-center justify-center text-[9px] font-black shadow-sm ring-2 ring-white dark:ring-slate-900">
+                                        <?= $rank++ ?>
+                                    </div>
+                                </div>
+                                <div class="flex-grow min-w-0">
+                                    <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
+                                        <?= htmlspecialchars($lb['nama']) ?>
+                                    </div>
+                                    <div class="flex items-center gap-1 mt-0.5">
+                                        <div class="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 rounded-full border border-yellow-200/50 dark:border-yellow-900/50">
+                                            <img src="assets/image/logo.webp" class="w-2.5 h-2.5 object-contain" style="filter: brightness(0) saturate(100%) invert(62%) sepia(77%) saturate(3143%) hue-rotate(352deg) brightness(101%) contrast(96%);">
+                                            <span class="text-[8px] font-black text-yellow-700 dark:text-yellow-400"><?= $lb['badges'] ?> Badge</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-span-full py-12 text-center">
+                            <i class="fa fa-medal text-slate-200 dark:text-slate-800 text-4xl mb-3"></i>
+                            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium italic">Belum ada pengoleksi badge. Ayo selesaikan misi!</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php include 'includes/footer_db.php'; ?>
@@ -860,11 +1362,11 @@ function getFireColor($streak)
             // Update indicators
             indicators.forEach((ind, idx) => {
                 if (idx === currentSlide) {
-                    ind.classList.add('bg-indigo-500', 'w-4');
-                    ind.classList.remove('bg-slate-200', 'w-1.5');
+                    ind.classList.add('bg-indigo-500', 'dark:bg-indigo-500', 'w-4');
+                    ind.classList.remove('bg-slate-200', 'dark:bg-slate-700', 'w-1.5');
                 } else {
-                    ind.classList.remove('bg-indigo-500', 'w-4');
-                    ind.classList.add('bg-slate-200', 'w-1.5');
+                    ind.classList.remove('bg-indigo-500', 'dark:bg-indigo-500', 'w-4');
+                    ind.classList.add('bg-slate-200', 'dark:bg-slate-700', 'w-1.5');
                 }
             });
         }
@@ -903,6 +1405,12 @@ function getFireColor($streak)
         setInterval(updateClock, 1000);
         updateClock(); // initial call
 
+        // Chart.js Global Dark Mode Config
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        Chart.defaults.color = isDarkMode ? '#94a3b8' : '#64748b';
+        Chart.defaults.borderColor = isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
         // Task Status per Matkul Chart
         const taskCtx = document.getElementById('taskStatusChart').getContext('2d');
         new Chart(taskCtx, {
@@ -918,7 +1426,7 @@ function getFireColor($streak)
                     {
                         label: 'Belum Selesai',
                         data: <?= json_encode($task_matkul_belum) ?>,
-                        backgroundColor: '#cad5e2',
+                        backgroundColor: isDarkMode ? '#1e293b' : '#f1f5f9',
                         borderRadius: 4
                     }
                 ]
@@ -1078,7 +1586,7 @@ function getFireColor($streak)
                 scales: {
                     y: {
                         grid: {
-                            color: '#f1f5f9'
+                            color: isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9'
                         },
                         ticks: {
                             font: {
@@ -1145,12 +1653,178 @@ function getFireColor($streak)
                 }
             }
         });
+
+        // Weekly Cash Chart
+        const kasCtx = document.getElementById('kasMingguanChart').getContext('2d');
+        const kasMingguanHistory = <?= json_encode($kas_per_minggu_history) ?>;
+        new Chart(kasCtx, {
+            type: 'bar',
+            data: {
+                labels: kasMingguanHistory.map(h => h.minggu),
+                datasets: [
+                    {
+                        label: 'Lunas',
+                        data: kasMingguanHistory.map(h => h.lunas_nominal),
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Belum Lunas',
+                        data: kasMingguanHistory.map(h => h.belum_nominal),
+                        backgroundColor: isDarkMode ? '#1e293b' : '#f1f5f9',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            font: { size: 9 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let item = kasMingguanHistory[context.dataIndex];
+                                let label = context.dataset.label;
+                                let val = context.parsed.y;
+                                let res = label + ': Rp ' + val.toLocaleString('id-ID');
+                                if (label === 'Lunas') res += ' (' + item.persen + '%)';
+                                return res;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            font: { size: 9 },
+                            callback: function(value) {
+                                if (value >= 1000000) return 'Rp ' + (value / 1000000) + 'jt';
+                                if (value >= 1000) return 'Rp ' + (value / 1000) + 'k';
+                                return 'Rp ' + value;
+                            }
+                        }
+                    },
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { size: 9 } }
+                    }
+                }
+            }
+        });
+
+        // Vibe Activity Chart (Bar Only)
+        const vibeCtx = document.getElementById('vibeChart').getContext('2d');
+        const vibeHistory = <?= json_encode($vibe_activity_history) ?>;
+        new Chart(vibeCtx, {
+            type: 'bar',
+            data: {
+                labels: vibeHistory.map(h => h.tanggal),
+                datasets: [{
+                    label: 'User Check-in',
+                    data: vibeHistory.map(h => h.jumlah),
+                    backgroundColor: '#6366f1',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            font: {
+                                size: 9
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 9
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Vibe Distribution Chart (Radar)
+        const radarCtx = document.getElementById('vibeRadarChart').getContext('2d');
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: <?= json_encode($vibe_radar_labels) ?>,
+                datasets: [{
+                    label: 'Mood Count',
+                    data: <?= json_encode($vibe_radar_data) ?>,
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    borderColor: '#6366f1',
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#6366f1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                r: {
+                    pointLabels: {
+                        font: {
+                            family: "'Inter', sans-serif",
+                            weight: 700,
+                            size: 10
+                        },
+                        color: isDarkMode ? '#94a3b8' : '#64748b'
+                    },
+                    angleLines: {
+                        display: true,
+                        color: isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9'
+                    },
+                    grid: {
+                        color: isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9'
+                    },
+                    suggestedMin: 0,
+                    ticks: {
+                        display: false
+                    }
+                }
+                }
+            }
+        });
     </script>
     <!-- VIBE MODAL -->
-    <div id="vibeModal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-slide-up">
-            <div class="bg-indigo-600 p-5 text-white relative">
-                <button onclick="document.getElementById('vibeModal').classList.add('hidden')" class="absolute top-4 right-4 text-white/50 hover:text-white transition-all">
+    <div id="vibeModal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-slide-up border dark:border-slate-800">
+            <div class="bg-indigo-600 dark:bg-indigo-900 p-5 text-white relative">
+                <button onclick="document.getElementById('vibeModal').classList.add('hidden'); document.getElementById('vibeModal').classList.remove('flex');" class="absolute top-4 right-4 text-white/50 hover:text-white transition-all">
                     <i class="fa fa-times text-lg"></i>
                 </button>
                 <div class="flex items-center gap-4">
@@ -1167,17 +1841,17 @@ function getFireColor($streak)
                 <div class="grid grid-cols-5 gap-2 mb-6">
                     <?php
                     $mood_options = [
-                        ['id' => 'productive', 'icon' => 'fa-rocket', 'label' => 'Focus', 'peer' => 'peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600'],
-                        ['id' => 'stress', 'icon' => 'fa-head-side-virus', 'label' => 'Error', 'peer' => 'peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-600'],
-                        ['id' => 'relaxed', 'icon' => 'fa-coffee', 'label' => 'Chill', 'peer' => 'peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-600'],
-                        ['id' => 'tired', 'icon' => 'fa-battery-quarter', 'label' => 'Low', 'peer' => 'peer-checked:border-slate-500 peer-checked:bg-slate-50 peer-checked:text-slate-600'],
-                        ['id' => 'hyper', 'icon' => 'fa-fire', 'label' => 'Fire', 'peer' => 'peer-checked:border-orange-500 peer-checked:bg-orange-50 peer-checked:text-orange-600']
+                        ['id' => 'productive', 'icon' => 'fa-rocket', 'label' => 'Focus', 'peer' => 'peer-checked:border-indigo-600 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/30 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400'],
+                        ['id' => 'stress', 'icon' => 'fa-head-side-virus', 'label' => 'Error', 'peer' => 'peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/30 peer-checked:text-red-600 dark:peer-checked:text-red-400'],
+                        ['id' => 'relaxed', 'icon' => 'fa-coffee', 'label' => 'Chill', 'peer' => 'peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400'],
+                        ['id' => 'tired', 'icon' => 'fa-battery-quarter', 'label' => 'Low', 'peer' => 'peer-checked:border-slate-500 peer-checked:bg-slate-50 dark:peer-checked:bg-slate-800 peer-checked:text-slate-600 dark:peer-checked:text-slate-400'],
+                        ['id' => 'hyper', 'icon' => 'fa-fire', 'label' => 'Fire', 'peer' => 'peer-checked:border-orange-500 peer-checked:bg-orange-50 dark:peer-checked:bg-orange-900/30 peer-checked:text-orange-600 dark:peer-checked:text-orange-400']
                     ];
                     foreach ($mood_options as $opt):
                     ?>
-                        <label class="cursor-pointer">
+                        <label class="cursor-pointer group">
                             <input type="radio" name="mood" value="<?= $opt['id'] ?>" class="peer hidden" required>
-                            <div class="flex flex-col items-center p-2 rounded-xl border-2 border-slate-100 group-hover:bg-slate-50 transition-all text-slate-400 <?= $opt['peer'] ?>">
+                            <div class="flex flex-col items-center p-2 rounded-xl border-2 border-slate-100 dark:border-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-all text-slate-400 dark:text-slate-500 <?= $opt['peer'] ?>">
                                 <i class="fa <?= $opt['icon'] ?> text-lg mb-1"></i>
                                 <span class="text-[8px] font-black uppercase"><?= $opt['label'] ?></span>
                             </div>
@@ -1185,7 +1859,7 @@ function getFireColor($streak)
                     <?php endforeach; ?>
                 </div>
 
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2 text-sm">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-100 dark:shadow-indigo-950/20 transition-all flex items-center justify-center gap-2 text-sm">
                     Kirim Vibe Saya <i class="fa fa-paper-plane text-xs"></i>
                 </button>
             </form>
@@ -1214,6 +1888,7 @@ function getFireColor($streak)
         <script>
             setTimeout(() => {
                 document.getElementById('vibeModal').classList.remove('hidden');
+                document.getElementById('vibeModal').classList.add('flex');
             }, 1000);
         </script>
     <?php endif; ?>

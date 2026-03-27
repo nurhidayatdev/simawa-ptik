@@ -211,83 +211,83 @@ if (isset($_POST['update'])) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 md:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-gray-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
 
             <form class="space-y-6" method="POST" enctype="multipart/form-data">
-                <div class="border-b border-gray-200 pb-6">
+                <div class="border-b border-gray-200 dark:border-slate-800 pb-6">
 
 
 
-                    <h3 class="text-2xl font-bold mb-6">Edit Profile</h3>
+                    <h3 class="text-2xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Profile</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
                             <input type="text" name="nama_lengkap" value="<?= $data['nama_lengkap']; ?>"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" readonly>
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
                             <input type="text" name="email" value="<?= $data['email']; ?>"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" readonly>
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
                             <input type="text" name="password" value="<?= htmlspecialchars($data['password']); ?>"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"
                                 minlength="8"
                                 pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
                                 title="Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and NO symbols."
                                 required>
-                            <p class="mt-1 text-[10px] text-gray-500 italic">* Minimal 8 karakter, harus ada huruf besar, kecil, angka, dan tanpa simbol.</p>
+                            <p class="mt-1 text-[10px] text-slate-500 dark:text-slate-500 italic">* Minimal 8 karakter, harus ada huruf besar, kecil, angka, dan tanpa simbol.</p>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Instagram</label>
+                         <div>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
                             <input name="instagram" value="<?= $data['instagram']; ?>" placeholder="@Username"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs" readonly></input>
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly></input>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Bio</label>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
                             <input name="bio" value="<?= $data['bio']; ?>" maxlength="35"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs"></input>
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></input>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Foto</label>
-                            <input type="file" id="foto-input" name="foto_file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 text-xs">
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto</label>
+                            <input type="file" id="foto-input" name="foto_file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             <input type="hidden" name="foto_data" id="foto_data">
                             <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto']); ?>">
 
                             <div class="flex items-center space-x-4 mt-4">
-                                <img id="current-preview" src="<?= profilePhotoUrl($data['foto'], '../') ?>" class="img-fluid rounded" style="width:120px; height:120px; object-fit:cover;" />
+                                <img id="current-preview" src="<?= profilePhotoUrl($data['foto'], '../') ?>" class="img-fluid rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm" style="width:120px; height:120px; object-fit:cover;" />
                                 <div>
-                                    <button type="button" id="open-cropper" class="px-3 py-1 bg-indigo-200 rounded text-xs hidden">Buka Cropper</button>
+                                    <button type="button" id="open-cropper" class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 rounded text-xs hidden shadow-sm transition-all">Buka Cropper</button>
                                 </div>
                             </div>
 
                             <!-- Cropper modal-ish area -->
-                            <div id="cropper-area" class="mt-4 hidden">
-                                <div class="grid sm:grid-cols-2 gap-4 space-x-4">
-                                    <div class="w-full flex align-center justify-center bg-slate-200">
+                            <div id="cropper-area" class="mt-4 hidden p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all">
+                                <div class="grid sm:grid-cols-2 gap-6">
+                                    <div class="w-full flex align-center justify-center bg-slate-200 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-700 shadow-inner">
                                         <img id="crop-image" style="max-width:100%; display:block;" />
                                     </div>
-                                    <div class="space-y-2">
-                                        <div class="border p-2 rounded" style="width:160px; height:160px; overflow:hidden;">
+                                    <div class="flex flex-col justify-center space-y-4">
+                                        <div class="border border-slate-300 dark:border-slate-700 p-1 bg-white dark:bg-slate-900 rounded-lg shadow-sm" style="width:160px; height:160px; overflow:hidden;">
                                             <div class="preview-wrapper" style="width:100%; height:100%;">
                                                 <img id="preview" style="width:100%; height:100%; object-fit:cover; display:block;" />
                                             </div>
                                         </div>
-                                        <div class="flex space-x-2">
-                                            <button type="button" id="zoom-in" class="px-3 py-1 bg-indigo-200 rounded">+</button>
-                                            <button type="button" id="zoom-out" class="px-3 py-1 bg-indigo-200 rounded">-</button>
-                                            <button type="button" id="rotate-left" class="px-3 py-1 bg-indigo-200 rounded">⟲</button>
-                                            <button type="button" id="rotate-right" class="px-3 py-1 bg-indigo-200 rounded">⟳</button>
+                                        <div class="flex flex-wrap gap-2">
+                                            <button type="button" id="zoom-in" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all font-bold shadow-sm">+</button>
+                                            <button type="button" id="zoom-out" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all font-bold shadow-sm">-</button>
+                                            <button type="button" id="rotate-left" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all shadow-sm">⟲</button>
+                                            <button type="button" id="rotate-right" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all shadow-sm">⟳</button>
                                         </div>
-                                        <div>
-                                            <button type="button" id="apply-crop" class="mt-2 px-3 py-1 bg-indigo-700 text-white rounded text-sm">Gunakan Foto</button>
-                                            <button type="button" id="cancel-crop" class="mt-2 ml-2 px-3 py-1 bg-indigo-200 rounded text-sm">Batal</button>
+                                        <div class="flex gap-3">
+                                            <button type="button" id="apply-crop" class="flex-grow px-4 py-2 bg-indigo-700 dark:bg-indigo-600 hover:bg-indigo-800 dark:hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg shadow-indigo-900/20">Gunakan Foto</button>
+                                            <button type="button" id="cancel-crop" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all shadow-sm">Batal</button>
                                         </div>
                                     </div>
                                 </div>
@@ -301,9 +301,9 @@ if (isset($_POST['update'])) {
 
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex justify-end pt-4">
                     <button type="submit" name="update"
-                        class="px-6 py-2 bg-indigo-800 text-white rounded-lg hover:bg-indigo-700 text-xs">Submit</button>
+                        class="px-8 py-2.5 bg-indigo-800 dark:bg-indigo-700 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 text-xs font-bold shadow-lg shadow-indigo-900/10 transition-all active:scale-95">Submit Perubahan</button>
                 </div>
             </form>
         </div>

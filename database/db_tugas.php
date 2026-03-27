@@ -51,30 +51,45 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 	$no = 1;
 	$id = 1;
 	while ($row = mysqli_fetch_assoc($result)) {
-		$rowClass = (($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white') . ' hover:bg-indigo-100';
+		$isEven = ($id++ % 2 == 0);
+		$rowClass = ($isEven ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors';
 		echo '<tr class="' . $rowClass . '">';
-		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . ($no++) . '</td>';
-		echo '<td class="px-3 py-2 text-xs text-slate-800">' . htmlspecialchars($row['nama_matkul'] ?? '—') . '</td>';
-		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-				<span class="block">' . ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : '') . '</span>
-				<span class="block md:inline md:ml-1 text-[10px] md:text-xs text-slate-500 md:text-slate-800">' . htmlspecialchars($row['deadline_pukul']) . '</span>
+		echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium">' . ($no++) . '</td>';
+		echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-100">' . htmlspecialchars($row['nama_matkul'] ?? '—') . '</td>';
+		echo '<td class="px-3 py-2 whitespace-nowrap text-xs">
+				<span class="block text-slate-800 dark:text-slate-200 font-bold">' . ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : '') . '</span>
+				<span class="block md:inline md:ml-1 text-[10px] text-slate-500 dark:text-slate-400 font-mono">' . htmlspecialchars($row['deadline_pukul']) . '</span>
 			  </td>';
 		$desc = strip_tags($row['deskripsi']);
 		if (strlen($desc) > 120) $desc = substr($desc, 0, 117) . '...';
-		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">' . htmlspecialchars($desc) . '</td>';
+		echo '<td class="hidden md:table-cell px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($desc) . '</td>';
+
+		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs">';
 		if (!empty($row['file_tugas'])) {
-			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><a href="../storage/tugas/' . htmlspecialchars($row['file_tugas']) . '" target="_blank" class="text-blue-600 underline">Lihat</a></td>';
+			echo '<a href="../storage/tugas/' . htmlspecialchars($row['file_tugas']) . '" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline font-medium"><i class="fas fa-file-download mr-1"></i>Unduh</a>';
 		} else {
-			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
+			echo '<span class="text-slate-400 dark:text-slate-600">-</span>';
 		}
+		echo '</td>';
+
+		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs">';
 		if (!empty($row['link_kirim'])) {
-			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800"><a href="' . htmlspecialchars($row['link_kirim']) . '" target="_blank" class="text-blue-600 underline">Kirim</a></td>';
+			echo '<a href="' . htmlspecialchars($row['link_kirim']) . '" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium"><i class="fas fa-paper-plane mr-1"></i>Kirim</a>';
 		} else {
-			echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">-</td>';
+			echo '<span class="text-slate-400 dark:text-slate-600">-</span>';
 		}
-		$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
-		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs"><span class="px-2 py-1 rounded-full border ' . $statusColor . '">' . ucfirst($row['status']) . '</span></td>';
-		echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">';
+		echo '</td>';
+
+		$isSelesai = ($row['status'] === 'selesai');
+		$statusColor = $isSelesai
+			? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50'
+			: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50';
+
+		echo '<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs">
+				<span class="px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-tighter ' . $statusColor . '">' . ucfirst($row['status']) . '</span>
+			  </td>';
+		echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
+		echo '<div class="flex items-center justify-center gap-3">';
 		echo '<button type="button" onclick="openModal(this)" 
 				data-matkul="' . htmlspecialchars($row['nama_matkul'] ?? '—') . '" 
 				data-deskripsi="' . htmlspecialchars($row['deskripsi']) . '" 
@@ -82,13 +97,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 				data-link="' . htmlspecialchars($row['link_kirim']) . '" 
 				data-file="' . htmlspecialchars($row['file_tugas']) . '" 
 				data-status="' . $row['status'] . '" 
-				title="Info">
-				<i class="fa fa-info-circle text-indigo-600 hover:text-indigo-900 mr-3"></i>
+				title="Info" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 transition-colors">
+				<i class="fa fa-info-circle"></i>
 			  </button>';
 		if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'):
-			echo '<a href="../actions/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>';
-			echo '<a href="../actions/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" onclick="return confirm(\'Hapus tugas ini?\');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>';
+			echo '<a href="../actions/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
+			echo '<a href="../actions/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"><i class="fa fa-trash"></i></a>';
 		endif;
+		echo '</div>';
 		echo '</td>';
 		echo '</tr>';
 	}
@@ -120,119 +136,123 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
 	<?php include '../includes/menu_db.php'; ?>
 
 	<main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-		<div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
-			<!-- Modified this section for better mobile responsiveness -->
+		<div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
 			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-				<h3 class="text-xl font-bold text-slate-800">Data Tugas</h3>
+				<div>
+					<h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Data Tugas Kuliah</h1>
+				</div>
 
 				<div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
 					<form method="GET" class="w-full">
 						<div class="flex flex-row gap-2 items-center">
 							<select name="status" id="statusFilter" onchange="this.form.submit()"
-								class="basis-1/5 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+								class="basis-1/4 px-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 appearance-none cursor-pointer">
 								<option value="belum" <?= ($status_filter == 'belum') ? 'selected' : '' ?>>Belum Selesai</option>
 								<option value="selesai" <?= ($status_filter == 'selesai') ? 'selected' : '' ?>>Selesai</option>
 							</select>
-							<input
-								id="searchInput"
-								type="text"
-								name="search"
-								value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
-								placeholder="Cari Mata Kuliah / Deskripsi..."
-								class="basis-3/5 w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-slate-400 text-xs">
+							<div class="relative flex-1 min-w-0">
+								<input
+									id="searchInput"
+									type="text"
+									name="search"
+									value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+									placeholder="Cari Mata Kuliah..."
+									class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
+								<i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
+							</div>
 							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
-								<button type="button" onclick="confirmReminderTelegram()" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-800 text-center text-xs flex items-center justify-center mr-1" title="Kirim Reminder Telegram">
-									<i class="fa fa-paper-plane"></i>
+								<button type="button" onclick="confirmReminderWhatsApp()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Kirim Reminder WhatsApp">
+									<i class="fa fa-paper-plane text-xs"></i>
 								</button>
-								<a href="../tugas" class="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-800 text-center text-xs flex items-center justify-center mr-1" title="Lihat View">
-									<i class="fa fa-eye"></i>
+								<a href="../tugas" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Lihat View">
+									<i class="fa fa-eye text-xs"></i>
 								</a>
-								<a href="../actions/tambah.php?tabel=tugas" class="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-800 text-center text-xs flex items-center justify-center" title="Tambah">
-									<i class="fa fa-plus"></i>
+								<a href="../actions/tambah.php?tabel=tugas" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
+									<i class="fa fa-plus text-xs"></i>
 								</a>
 							<?php endif; ?>
 						</div>
 					</form>
 				</div>
-
 			</div>
 
-			<div class="overflow-x-auto">
-				<table class="min-w-full divide-y divide-slate-200">
-					<thead class="bg-indigo-900">
+			<div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+				<table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+					<thead class="bg-indigo-900 dark:bg-slate-800">
 						<tr>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								No</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								Mata Kuliah</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								Deadline</th>
-							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								Deskripsi</th>
-							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								File</th>
-							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								Link Kirim</th>
-							<th class="hidden md:table-cell px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								Status</th>
-							<th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
-								Actions</th>
+							<th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">No</th>
+							<th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Mata Kuliah</th>
+							<th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Deadline</th>
+							<th class="hidden md:table-cell px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Deskripsi</th>
+							<th class="hidden md:table-cell px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">File</th>
+							<th class="hidden md:table-cell px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Link</th>
+							<th class="hidden md:table-cell px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Status</th>
+							<th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
 						</tr>
 					</thead>
-					<tbody class="bg-white divide-y divide-slate-200">
+					<tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
 						<?php
 						$no = 1;
 						$id = 1;
-						while ($row = mysqli_fetch_assoc($result)) : ?>
-							<tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100' : 'bg-white' ?> hover:bg-indigo-100">
-
-								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800"><?= $no++; ?></td>
-								<td class="px-3 py-2 text-xs text-slate-800"><?= htmlspecialchars($row['nama_matkul'] ?? '—'); ?></td>
-								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800">
-									<span class="block"><?= ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : ''); ?></span>
-									<span class="block md:inline md:ml-1 text-[10px] md:text-xs text-slate-500 md:text-slate-800"><?= htmlspecialchars($row['deadline_pukul']); ?></span>
+						while ($row = mysqli_fetch_assoc($result)) :
+							$isEven = ($id++ % 2 == 0);
+							$rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
+						?>
+							<tr class="<?= $rowClass ?>">
+								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++; ?></td>
+								<td class="px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-100"><?= htmlspecialchars($row['nama_matkul'] ?? '—'); ?></td>
+								<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200">
+									<span class="block font-bold"><?= ($row['deadline_tanggal'] ? date('Y-m-d', strtotime($row['deadline_tanggal'])) : ''); ?></span>
+									<span class="block md:inline md:ml-1 text-[10px] text-slate-500 dark:text-slate-400 font-mono"><?= htmlspecialchars($row['deadline_pukul']); ?></span>
 								</td>
-								<td class="hidden md:table-cell px-3 py-2 text-xs text-slate-800">
-									<?php $d = strip_tags($row['deskripsi']);
-									echo htmlspecialchars((strlen($d) > 120) ? substr($d, 0, 117) . '...' : $d); ?>
+								<td class="hidden md:table-cell px-3 py-2 text-xs text-slate-600 dark:text-slate-400">
+									<div class="line-clamp-1 max-w-[200px]">
+										<?php $d = strip_tags($row['deskripsi']);
+										echo htmlspecialchars((strlen($d) > 80) ? substr($d, 0, 77) . '...' : $d); ?>
+									</div>
 								</td>
-								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs">
 									<?php if (!empty($row['file_tugas'])): ?>
-										<a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 underline">Lihat</a>
-									<?php else: echo '-';
+										<a href="../storage/tugas/<?= htmlspecialchars($row['file_tugas']) ?>" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline font-bold flex items-center gap-1.5"><i class="fas fa-file-download text-[10px]"></i>Lihat</a>
+									<?php else: echo '<span class="text-slate-300 dark:text-slate-600">—</span>';
 									endif; ?>
 								</td>
-								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs">
 									<?php if (!empty($row['link_kirim'])): ?>
-										<a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="text-blue-600 underline">Kirim</a>
-									<?php else: echo '-';
+										<a href="<?= htmlspecialchars($row['link_kirim']) ?>" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold flex items-center gap-1.5"><i class="fas fa-paper-plane text-[10px]"></i>Kirim</a>
+									<?php else: echo '<span class="text-slate-300 dark:text-slate-600">—</span>';
 									endif; ?>
 								</td>
-								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800">
+								<td class="hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs">
 									<?php
-									$statusColor = ($row['status'] === 'selesai') ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200';
+									$isSelesai = ($row['status'] === 'selesai');
+									$statusColor = $isSelesai
+										? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50'
+										: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50';
 									?>
-									<span class="px-1.5 py-0.5 rounded-full border text-[10px] font-semibold <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
+									<span class="px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-tighter <?= $statusColor ?>"><?= ucfirst($row['status']) ?></span>
 								</td>
-								<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500">
-									<button type="button" onclick="openModal(this)"
-										data-matkul="<?= htmlspecialchars($row['nama_matkul'] ?? '—') ?>"
-										data-deskripsi="<?= htmlspecialchars($row['deskripsi']) ?>"
-										data-deadline="<?= ($row['deadline_tanggal'] ? date('d M Y', strtotime($row['deadline_tanggal'])) : '') . ' - ' . htmlspecialchars($row['deadline_pukul']) ?>"
-										data-link="<?= htmlspecialchars($row['link_kirim']) ?>"
-										data-file="<?= htmlspecialchars($row['file_tugas']) ?>"
-										data-status="<?= $row['status'] ?>"
-										title="Info">
-										<i class="fa fa-info-circle text-indigo-600 hover:text-indigo-900 mr-3 cursor-pointer"></i>
-									</button>
-									<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
-										<a href="../actions/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit"><i class="fa fa-edit text-blue-600 hover:text-blue-900 mr-3"></i></a>
-										<a href="../actions/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" onclick="return confirm('Hapus tugas ini?');"><i class="fa fa-trash text-red-600 hover:text-red-900"></i></a>
-									<?php endif; ?>
+								<td class="px-3 py-2 whitespace-nowrap text-sm text-center">
+									<div class="flex items-center justify-center gap-3">
+										<button type="button" onclick="openModal(this)"
+											data-matkul="<?= htmlspecialchars($row['nama_matkul'] ?? '—') ?>"
+											data-deskripsi="<?= htmlspecialchars($row['deskripsi']) ?>"
+											data-deadline="<?= ($row['deadline_tanggal'] ? date('d M Y', strtotime($row['deadline_tanggal'])) : '') . ' - ' . htmlspecialchars($row['deadline_pukul']) ?>"
+											data-link="<?= htmlspecialchars($row['link_kirim']) ?>"
+											data-file="<?= htmlspecialchars($row['file_tugas']) ?>"
+											data-status="<?= $row['status'] ?>"
+											title="Info" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200 transition-colors">
+											<i class="fa fa-info-circle"></i>
+										</button>
+										<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
+											<a href="../actions/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors"><i class="fa fa-edit"></i></a>
+											<a href="../actions/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors" ><i class="fa fa-trash"></i></a>
+										<?php endif; ?>
+									</div>
 								</td>
 							</tr>
 						<?php endwhile; ?>
@@ -244,45 +264,47 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 	</main>
 
 	<!-- Task Detail Modal -->
-	<div id="taskModal" class="fixed inset-0 bg-black/50 z-[60] hidden items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300">
-		<div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
+	<div id="taskModal" class="fixed inset-0 bg-black/60 z-[60] hidden items-center justify-center p-4 backdrop-blur-md transition-opacity duration-300">
+		<div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col transform scale-95 opacity-0 transition-all duration-300 border border-slate-200 dark:border-slate-800" id="modalContent">
 			<!-- Modal Header -->
-			<div class="p-6 border-b border-gray-100 flex justify-between items-start bg-indigo-50/50 rounded-t-2xl">
+			<div class="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-start bg-slate-50/50 dark:bg-slate-800/30 rounded-t-2xl">
 				<div>
-					<span id="modalStatus" class="inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2"></span>
-					<h3 id="modalTitle" class="text-xl font-bold text-gray-900 leading-snug"></h3>
+					<span id="modalStatus" class="inline-block px-2 py-0.5 text-[10px] font-black rounded uppercase tracking-wider mb-2 border"></span>
+					<h3 id="modalTitle" class="text-xl font-bold text-slate-900 dark:text-white leading-snug"></h3>
 				</div>
-				<button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition p-1 hover:bg-gray-100 rounded-full">
-					<i class="fas fa-times text-xl"></i>
+				<button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+					<i class="fas fa-times text-lg"></i>
 				</button>
 			</div>
 
 			<!-- Modal Body -->
-			<div class="p-6 overflow-y-auto">
-				<div class="mb-6">
-					<h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Deskripsi Tugas</h4>
-					<div id="modalDesc" class="text-sm text-gray-700 whitespace-pre-line leading-relaxed"></div>
+			<div class="p-6 overflow-y-auto custom-scrollbar">
+				<div class="mb-8">
+					<h4 class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+						<i class="fas fa-align-left text-[8px]"></i> Deskripsi Tugas
+					</h4>
+					<div id="modalDesc" class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed font-medium"></div>
 				</div>
 
-				<div class="grid grid-cols-1 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+				<div class="grid grid-cols-1 gap-4 bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50">
 					<div class="flex items-start">
-						<div class="bg-indigo-100 p-2 rounded-lg mr-3">
-							<i class="far fa-clock text-indigo-600 text-sm"></i>
+						<div class="bg-indigo-100 dark:bg-indigo-900/40 p-2.5 rounded-xl mr-4 border border-indigo-200 dark:border-indigo-800/50">
+							<i class="far fa-clock text-indigo-600 dark:text-indigo-400 text-sm"></i>
 						</div>
 						<div>
-							<p class="text-[10px] font-bold text-gray-500 uppercase">Deadline Pengumpulan</p>
-							<p id="modalDeadline" class="text-sm font-semibold text-gray-800"></p>
+							<p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Deadline Pengumpulan</p>
+							<p id="modalDeadline" class="text-sm font-bold text-slate-800 dark:text-slate-200 mt-0.5"></p>
 						</div>
 					</div>
 
-					<div id="modalFileContainer" class="items-start hidden">
-						<div class="bg-blue-100 p-2 rounded-lg mr-3">
-							<i class="far fa-file-alt text-blue-600 text-sm"></i>
+					<div id="modalFileContainer" class="items-start hidden pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+						<div class="bg-blue-100 dark:bg-blue-900/40 p-2.5 rounded-xl mr-4 border border-blue-200 dark:border-blue-800/50">
+							<i class="far fa-file-alt text-blue-600 dark:text-blue-400 text-sm"></i>
 						</div>
-						<div>
-							<p class="text-[10px] font-bold text-gray-500 uppercase">Lampiran File</p>
-							<a id="modalFileLink" href="#" target="_blank" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center">
-								Unduh Dokumen <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
+						<div class="flex-1">
+							<p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Lampiran File</p>
+							<a id="modalFileLink" href="#" target="_blank" class="text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline flex items-center mt-0.5 transition-colors">
+								Unduh Dokumen <i class="fas fa-external-link-alt ml-2 text-[10px]"></i>
 							</a>
 						</div>
 					</div>
@@ -290,16 +312,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			</div>
 
 			<!-- Modal Footer -->
-			<div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
-				<button onclick="closeModal()" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg hover:bg-gray-50 transition">
+			<div class="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 rounded-b-2xl flex items-center justify-between">
+				<button onclick="closeModal()" class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
 					Tutup
 				</button>
-				<a id="modalActionBtn" href="#" target="_blank" class="px-5 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-md hover:shadow-lg transition flex items-center">
-					<i class="fas fa-paper-plane mr-2"></i> Kirim Tugas
-				</a>
-				<span id="modalNoAction" class="hidden px-4 py-2 bg-gray-200 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed items-center">
-					<i class="fas fa-lock mr-2"></i> Tidak ada link
-				</span>
+				<div class="flex items-center gap-3">
+					<a id="modalActionBtn" href="#" target="_blank" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all flex items-center">
+						<i class="fas fa-paper-plane mr-2"></i> Kirim Tugas
+					</a>
+					<span id="modalNoAction" class="hidden px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 text-xs font-bold rounded-xl cursor-not-allowed items-center">
+						<i class="fas fa-lock mr-2"></i> Tidak ada link
+					</span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -348,10 +372,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			const statusBadge = document.getElementById('modalStatus');
 			if (data.status === 'selesai') {
 				statusBadge.textContent = 'Selesai';
-				statusBadge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-gray-100 text-gray-500';
+				statusBadge.className = 'inline-block px-2 py-0.5 text-[10px] font-black rounded uppercase tracking-wider mb-2 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700';
 			} else {
-				statusBadge.textContent = 'Aktif';
-				statusBadge.className = 'inline-block px-2 py-1 text-[10px] font-bold rounded uppercase tracking-wider mb-2 bg-yellow-100 text-yellow-700';
+				statusBadge.textContent = 'Belum Selesai';
+				statusBadge.className = 'inline-block px-2 py-0.5 text-[10px] font-black rounded uppercase tracking-wider mb-2 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50';
 			}
 
 			// File Handling
@@ -411,10 +435,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 			}
 		});
 
-		// SweetAlert Confirmation for Telegram Reminder
-		function confirmReminderTelegram() {
+		// SweetAlert Confirmation for WhatsApp Reminder
+		function confirmReminderWhatsApp() {
 			Swal.fire({
-				title: 'Kirim Reminder Telegram?',
+				title: 'Kirim Reminder WhatsApp?',
 				text: "Mata kuliah yang belum dikumpulkan akan dikirim ke grup.",
 				icon: 'question',
 				showCancelButton: true,

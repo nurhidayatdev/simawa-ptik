@@ -27,6 +27,42 @@ if (file_exists($logo_path)) {
     <title>Dashboard Pesan Anonim - PTIK C 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark body {
+            background-color: #0b0f1a;
+            color: #f8fafc;
+        }
+
+        .navbar-responsive {
+            background-color: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-color: #e2e8f0;
+        }
+
+        .dark .navbar-responsive {
+            background-color: rgba(11, 15, 26, 0.92);
+            border-color: #1e293b;
+        }
+
+        .card-responsive {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .dark .card-responsive {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-color: #1e293b;
+        }
+
         .rotate-180 {
             transform: rotate(180deg);
         }
@@ -76,49 +112,65 @@ if (file_exists($logo_path)) {
 
 </head>
 
-<body class="bg-gray-900 min-h-screen text-gray-100">
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute top-10 left-10 w-24 h-24 bg-indigo-500/10 dark:bg-indigo-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-20 w-32 h-32 bg-purple-500/10 dark:bg-purple-600/20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="w-full p-3 flex justify-between items-center z-50 border-b navbar-responsive transition-colors duration-300">
+        <div class="flex items-center gap-3">
+            <img src="../assets/image/logo.webp" alt="Logo" class="w-8 h-8 object-contain dark:brightness-100 brightness-0 transition-all">
+            <h1 class="text-base font-bold tracking-tight text-slate-900 dark:text-white">DindingPesan</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="theme-toggle" class="relative inline-flex items-center h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-white/10 transition-all duration-300 ease-in-out focus:outline-none">
+                <span id="theme-toggle-thumb" class="pointer-events-none absolute left-0.5 h-5 w-5 transform rounded-full bg-white shadow-md transition duration-300 ease-in-out flex items-center justify-center dark:translate-x-5">
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-[10px] text-orange-500 transition-all duration-300 absolute"></i>
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-[10px] text-indigo-900 transition-all duration-300 absolute opacity-0 scale-0"></i>
+                </span>
+            </button>
+            <a href="../pesan" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-medium text-white transition-colors">
+                <i class="fa fa-paper-plane mr-1"></i> Kirim
+            </a>
+            <a href="../dashboard" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700/50 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+                <i class="fa fa-arrow-left mr-1"></i> Kembali
+            </a>
+        </div>
+    </div>
 
     <div class="container mx-auto px-4 py-8">
 
         <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 animate-fade-in-down">
-            <div>
-                <h1 class="text-3xl font-bold text-white mb-2 flex items-center">
-                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
-                        Dinding Pesan Anonim
-                    </span>
-                    <i class="fas fa-layer-group ml-3 text-indigo-500 text-xl"></i>
-                </h1>
-                <p class="text-sm text-gray-400 border-l-2 border-indigo-500 pl-3">
-                    Aspirasi dan pesan rahasia dari mahasiswa kelas PTIK C 2024.
-                </p>
-            </div>
-            <div class="flex flex-row flex-wrap items-center justify-end gap-3 md:gap-4 w-full">
-                <a href="../pesan" class="group relative px-6 py-3 rounded-lg bg-indigo-600 border border-indigo-400/30 text-white text-sm font-medium hover:bg-indigo-500 transition-all overflow-hidden shadow-lg shadow-indigo-500/20">
-                    <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
-                    <span class="relative flex items-center gap-2">
-                        <i class="fas fa-paper-plane transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"></i>
-                        Kirim Pesan
-                    </span>
-                </a>
-
-
-
-                <a href="../dashboard" class="group relative px-6 py-3 rounded-lg bg-indigo-900/40 border border-indigo-500/30 text-indigo-300 text-sm font-medium hover:bg-indigo-800/50 transition-all overflow-hidden">
-                    <div class="absolute inset-0 w-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent skew-x-12 -translate-x-full group-hover:animate-shine"></div>
-                    <span class="relative flex items-center gap-2">
-                        <i class="fas fa-arrow-left transition-transform group-hover:-translate-x-1"></i>
-                        Kembali
-                    </span>
-                </a>
-            </div>
-
+        <div class="mb-8 animate-fade-in-down">
+            <h1 class="text-2xl font-bold mb-2 flex items-center text-slate-900 dark:text-white">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">
+                    Dinding Pesan Anonim
+                </span>
+                <i class="fas fa-layer-group ml-3 text-indigo-500 text-xl"></i>
+            </h1>
+            <p class="text-sm text-slate-500 dark:text-gray-400 border-l-2 border-indigo-500 pl-3">
+                Aspirasi dan pesan rahasia dari mahasiswa kelas PTIK C 2024.
+            </p>
         </div>
 
         <!-- Grid Pesan -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <?php
-            $query = mysqli_query($koneksi, "SELECT * FROM pesan ORDER BY tanggal DESC");
+            $show_all = isset($_GET['expand']);
+            $limit_count = 100;
+
+            // Get total count for logic
+            $total_res = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM pesan");
+            $total_data = mysqli_fetch_assoc($total_res)['total'];
+
+            $sql = "SELECT * FROM pesan ORDER BY tanggal DESC";
+            if (!$show_all) {
+                $sql .= " LIMIT $limit_count";
+            }
+
+            $query = mysqli_query($koneksi, $sql);
             if (mysqli_num_rows($query) > 0) {
                 while ($row = mysqli_fetch_assoc($query)) {
                     $pesan_content = htmlspecialchars($row['isi_pesan']);
@@ -128,18 +180,18 @@ if (file_exists($logo_path)) {
             ?>
                     <!-- Card Item -->
                     <div class="relative group cursor-pointer" onclick='openModal(<?php echo json_encode($pesan_content); ?>, "<?php echo $pesan_date; ?>", "<?php echo $pesan_time; ?>")'>
-                        <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-                        <div class="relative bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl border border-gray-700/50 group-hover:border-indigo-500/30 transition-all shadow-xl">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-10 group-hover:opacity-30 transition duration-500"></div>
+                        <div class="relative card-responsive p-6 rounded-2xl border group-hover:border-indigo-500/30 transition-all shadow-xl">
 
                             <!-- Header Card -->
                             <div class="flex justify-between items-start mb-4">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-lg shadow-indigo-500/20 p-1.5">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-lg shadow-indigo-500/20 p-1.5 shrink-0">
                                         <img src="../assets/image/logo.webp" alt="Anonim" class="w-full h-full object-contain filter drop-shadow-sm opacity-90">
                                     </div>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-white">PTIK C 24</h4>
-                                        <span class="text-[10px] text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/10">Anonim</span>
+                                    <div class="min-w-0">
+                                        <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate">ProTechNoTy</h4>
+                                        <span class="text-[10px] text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-500/10">Anonim</span>
                                     </div>
                                 </div>
 
@@ -149,18 +201,18 @@ if (file_exists($logo_path)) {
                             <!-- Content -->
                             <div class="relative">
                                 <i class="fas fa-quote-left absolute -top-1 -left-1 text-2xl text-indigo-500/10"></i>
-                                <p class="text-gray-300 text-sm leading-relaxed relative z-10 pl-4 py-2 italic font-light line-clamp-4">
+                                <p class="text-slate-600 dark:text-gray-300 text-sm leading-relaxed relative z-10 pl-4 py-2 italic font-light line-clamp-4">
                                     "<?php echo nl2br($pesan_content); ?>"
                                 </p>
                             </div>
 
                             <!-- Footer Card -->
-                            <div class="mt-4 pt-4 border-t border-gray-700/50 flex items-center justify-between text-[10px] text-gray-500">
+                            <div class="mt-4 pt-4 border-t border-slate-100 dark:border-gray-700/50 flex items-center justify-between text-[10px] text-slate-400 dark:text-gray-500">
                                 <span class="flex items-center gap-1.5">
                                     <i class="far fa-clock"></i>
                                     <?php echo $pesan_date; ?>
                                 </span>
-                                <span class="flex items-center gap-1.5 text-indigo-400/80">
+                                <span class="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400/80">
                                     <i class="fas fa-history"></i>
                                     <?php echo $pesan_time; ?> WITA
                                 </span>
@@ -172,12 +224,12 @@ if (file_exists($logo_path)) {
             } else {
                 ?>
                 <!-- Empty State -->
-                <div class="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-gray-700 rounded-3xl bg-gray-800/30">
-                    <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-4 shadow-inner">
-                        <i class="far fa-paper-plane text-3xl text-gray-600"></i>
+                <div class="col-span-full flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-slate-200 dark:border-gray-700 rounded-3xl bg-white/50 dark:bg-gray-800/30">
+                    <div class="w-20 h-20 bg-slate-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                        <i class="far fa-paper-plane text-3xl text-slate-400 dark:text-gray-600"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-400 mb-2">Belum ada pesan</h3>
-                    <p class="text-sm text-gray-500 max-w-xs mx-auto">
+                    <h3 class="text-xl font-bold text-slate-700 dark:text-gray-400 mb-2">Belum ada pesan</h3>
+                    <p class="text-sm text-slate-500 dark:text-gray-500 max-w-xs mx-auto">
                         Jadilah yang pertama mengirimkan pesan rahasia di kotak saran kelas.
                     </p>
                     <a href="../pesan" class="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-full transition shadow-lg shadow-indigo-500/20">
@@ -186,25 +238,31 @@ if (file_exists($logo_path)) {
                 </div>
             <?php } ?>
         </div>
+
+        <?php if (!$show_all && $total_data > $limit_count): ?>
+            <!-- Expand Button -->
+            <div class="mt-12 flex justify-center animate-fade-in-up">
+                <a href="?expand=true" class="group relative px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm transition-all hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-chevron-down transition-transform group-hover:translate-y-0.5"></i>
+                    </div>
+                    <span>Tampilkan Semua Pesan (<?php echo $total_data - $limit_count; ?> lainnya)</span>
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 
-    <!-- Background Decoration -->
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl mix-blend-screen animate-blob"></div>
-        <div class="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl mix-blend-screen animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl mix-blend-screen animate-blob animation-delay-4000"></div>
-    </div>
 
     <!-- Modal Popup -->
-    <div id="shareModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-gray-900 rounded-2xl w-full max-w-md border border-gray-700 shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+    <div id="shareModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md border border-slate-200 dark:border-gray-700 shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
 
             <div class="p-6 relative">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white transition">
                     <i class="fas fa-times text-xl"></i>
                 </button>
 
-                <h3 class="text-xl font-bold text-white mb-6 text-center">Bagikan Pesan</h3>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 text-center">Bagikan Pesan</h3>
 
                 <!-- Preview Area for Image Generation -->
                 <div id="captureArea"
@@ -216,7 +274,7 @@ if (file_exists($logo_path)) {
                                 <img src="<?php echo $logo_base64; ?>" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
                             <div style="margin-left: 0.75rem;">
-                                <h4 style="font-size: 1rem; font-weight: 700; color: #ffffff; margin: 0;">PTIK C 2024</h4>
+                                <h4 style="font-size: 1rem; font-weight: 700; color: #ffffff; margin: 0;">ProTechNoTy</h4>
                                 <p style="font-size: 0.8rem; color: #9ca3af; margin: 0;">Pesan Anonim</p>
                             </div>
                         </div>
@@ -227,7 +285,7 @@ if (file_exists($logo_path)) {
 
                         <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.625rem; padding-top: 0.75rem; border-top: 1px solid #374151; color: #6b7280;">
                             <span id="modalDate"></span>
-                            <span style="color: #818cf8;">@ptikc_24</span>
+                            <span style="color: #818cf8;"><i class="fab fa-instagram"></i> ptikc_24</span>
                         </div>
                     </div>
                 </div>
@@ -239,18 +297,18 @@ if (file_exists($logo_path)) {
                         Simpan Gambar
                     </button>
                 </div>
-                <p class="text-[10px] text-gray-500 text-center mt-3">
+                <p class="text-[10px] text-slate-500 dark:text-gray-500 text-center mt-3">
                     *Unduh gambar untuk dibagikan ke Instagram Story
                 </p>
             </div>
         </div>
     </div>
     <!-- Footer -->
-    <div class="mt-12 mb-8 text-center relative z-10">
-        <p class="text-[10px] text-gray-500">
-            &copy; <?php echo date("Y"); ?> Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. <br>All rights reserved.
-        </p>
-    </div>
+    <footer class="w-full py-6 px-3 border-t border-slate-200 dark:border-slate-800 transition-colors mt-auto">
+        <div class="max-w-5xl mx-auto text-center">
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">© <?php echo date("Y"); ?> Kelas PTIK C - Teknik Informatika dan Komputer FT UNM. All rights reserved.</p>
+        </div>
+    </footer>
     <script>
         const modal = document.getElementById('shareModal');
         const modalContent = document.getElementById('modalContent');
@@ -269,6 +327,7 @@ if (file_exists($logo_path)) {
             }
 
             modal.classList.remove('hidden');
+            modal.classList.add('flex');
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 modalContent.classList.remove('scale-95');
@@ -282,6 +341,7 @@ if (file_exists($logo_path)) {
             modalContent.classList.add('scale-95');
             setTimeout(() => {
                 modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }, 300);
         }
 
@@ -357,12 +417,42 @@ if (file_exists($logo_path)) {
                 closeModal();
             }
         });
+
+        // --- THEME TOGGLE LOGIC ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (themeToggleBtn) {
+            const setToggleState = (isDark) => {
+                if (isDark) {
+                    lightIcon.classList.add('opacity-0', 'scale-0');
+                    darkIcon.classList.remove('opacity-0', 'scale-0');
+                } else {
+                    lightIcon.classList.remove('opacity-0', 'scale-0');
+                    darkIcon.classList.add('opacity-0', 'scale-0');
+                }
+            };
+
+            setToggleState(document.documentElement.classList.contains('dark'));
+
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = !document.documentElement.classList.contains('dark');
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+                setToggleState(isDark);
+                // Reload page to correctly re-initialize components
+                setTimeout(() => {
+                    location.reload();
+                }, 150);
+            });
+        }
     </script>
-
-
-
-
-
 </body>
 
 </html>

@@ -178,23 +178,23 @@ $json_details = json_encode($krs_details);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-slate-100 dark:bg-slate-950 transition-colors">
     <?php include '../includes/menu_db.php'; ?>
 
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
-        <div class="bg-white rounded-lg border border-slate-200 p-6 flex-grow w-full">
+        <div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full transition-all shadow-sm">
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h3 class="text-2xl font-bold text-slate-800">Validasi KRS</h3>
-                    <p class="text-xs text-slate-500 font-medium mt-1">Periode: <span class="text-indigo-600"><?= htmlspecialchars($periode_info) ?></span></p>
+                    <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Validasi KRS</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Periode: <span class="text-indigo-600 dark:text-indigo-400"><?= htmlspecialchars($periode_info) ?></span></p>
                 </div>
             </div>
 
             <!-- Table -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-slate-200">
-                    <thead class="bg-indigo-900">
+            <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                    <thead class="bg-indigo-900 dark:bg-indigo-950">
                         <tr>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
                             <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Mahasiswa</th>
@@ -203,15 +203,15 @@ $json_details = json_encode($krs_details);
                             <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-slate-200">
+                    <tbody class="bg-white dark:bg-slate-900/50 divide-y divide-slate-200 dark:divide-slate-800">
                         <?php
                         $no = 1;
                         foreach ($list_mahasiswa as $m):
                             $status = $m['status_validasi'] ?? 'pending';
                             $status_color = match ($status) {
-                                'approved' => 'bg-green-100 text-green-800 border-green-200',
-                                'rejected' => 'bg-red-100 text-red-800 border-red-200',
-                                default => 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                                'approved' => 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 border-green-200 dark:border-green-900/30',
+                                'rejected' => 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 border-red-200 dark:border-red-900/30',
+                                default => 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-900/30'
                             };
                             $status_label = match ($status) {
                                 'approved' => 'Disetujui',
@@ -219,39 +219,39 @@ $json_details = json_encode($krs_details);
                                 default => 'Menunggu'
                             };
                         ?>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-700"><?= $no++ ?></td>
+                            <tr class="hover:bg-slate-50 dark:hover:bg-indigo-900/20 transition-colors">
+                                <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-700 dark:text-slate-300"><?= $no++ ?></td>
                                 <td class="px-3 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <img class="h-8 w-8 rounded-full object-cover mr-3 border border-slate-200" src="<?= profilePhotoUrl($m['foto'], '../') ?>" alt="">
+                                        <img class="h-8 w-8 rounded-full object-cover mr-3 border border-slate-200 dark:border-slate-700" src="<?= profilePhotoUrl($m['foto'], '../') ?>" alt="">
                                         <div>
-                                            <div class="text-xs font-bold text-slate-800"><?= htmlspecialchars($m['nama_lengkap']) ?></div>
-                                            <div class="text-[10px] text-slate-500"><?= htmlspecialchars($m['nim']) ?></div>
+                                            <div class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= htmlspecialchars($m['nama_lengkap']) ?></div>
+                                            <div class="text-[10px] text-slate-500 dark:text-slate-500 font-medium"><?= htmlspecialchars($m['nim']) ?></div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-3 py-3 whitespace-nowrap text-xs text-center font-semibold text-slate-700">
+                                <td class="px-3 py-3 whitespace-nowrap text-xs text-center font-semibold text-slate-700 dark:text-slate-300">
                                     <?= $m['total_sks'] ?>/24
                                 </td>
                                 <td class="px-3 py-3 whitespace-nowrap text-center">
-                                    <span class="px-2 py-1 rounded-full border text-[10px] font-semibold <?= $status_color ?>">
+                                    <span class="px-2 py-1 rounded-full border text-[10px] font-bold <?= $status_color ?>">
                                         <?= $status_label ?>
                                     </span>
                                 </td>
                                 <td class="px-3 py-3 whitespace-nowrap text-center">
                                     <button onclick="showDetails(<?= $m['id'] ?>, '<?= htmlspecialchars(addslashes($m['nama_lengkap'])) ?>')"
-                                        class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1 rounded text-xs font-semibold transition-colors mr-1">
+                                        class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1 rounded text-xs font-bold transition-colors mr-1">
                                         <i class="fas fa-eye mr-1"></i> Detail
                                     </button>
                                     <?php if ($status !== 'approved'): ?>
                                         <button onclick="confirmAction(<?= $m['id'] ?>, 'approve')"
-                                            class="bg-green-50 text-green-600 hover:bg-green-100 px-3 py-1 rounded text-xs font-semibold transition-colors mr-1" title="Setujui">
+                                            class="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 px-3 py-1 rounded text-xs font-bold transition-colors mr-1" title="Setujui">
                                             <i class="fas fa-check"></i>
                                         </button>
                                     <?php endif; ?>
                                     <?php if ($status !== 'rejected'): ?>
                                         <button onclick="confirmAction(<?= $m['id'] ?>, 'reject')"
-                                            class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded text-xs font-semibold transition-colors" title="Tolak">
+                                            class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 px-3 py-1 rounded text-xs font-bold transition-colors" title="Tolak">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     <?php endif; ?>
@@ -261,7 +261,7 @@ $json_details = json_encode($krs_details);
 
                         <?php if (empty($list_mahasiswa)): ?>
                             <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-slate-400 text-xs italic">
+                                <td colspan="5" class="px-6 py-8 text-center text-slate-400 dark:text-slate-500 text-xs italic font-medium">
                                     Belum ada mahasiswa yang mengisi KRS pada periode ini.
                                 </td>
                             </tr>
@@ -291,28 +291,31 @@ $json_details = json_encode($krs_details);
                 return;
             }
 
+            const isDark = document.documentElement.classList.contains('dark') || 
+                          window.matchMedia('(prefers-color-scheme: dark)').matches;
+
             let htmlContent = `
                 <div class="overflow-x-auto text-left mt-2">
-                    <table class="min-w-full divide-y divide-slate-200 border border-slate-200 rounded-lg">
-                        <thead class="bg-slate-50">
+                    <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                        <thead class="bg-slate-50 dark:bg-slate-800/80">
                             <tr>
-                                <th class="px-3 py-2 text-xs font-bold text-slate-700">Kode</th>
-                                <th class="px-3 py-2 text-xs font-bold text-slate-700">Mata Kuliah</th>
-                                <th class="px-3 py-2 text-xs font-bold text-slate-700 text-center">SKS</th>
-                                <th class="px-3 py-2 text-xs font-bold text-slate-700 text-center">Sem</th>
+                                <th class="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Kode</th>
+                                <th class="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Mata Kuliah</th>
+                                <th class="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 text-center uppercase tracking-wider">SKS</th>
+                                <th class="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 text-center uppercase tracking-wider">Sem</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200 bg-white">
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
             `;
 
             let totalSks = 0;
             data.forEach(d => {
                 htmlContent += `
-                    <tr>
-                        <td class="px-3 py-2 text-xs text-slate-600">${d.kode_matkul}</td>
-                        <td class="px-3 py-2 text-xs text-slate-800 font-medium">${d.nama_matkul}</td>
-                        <td class="px-3 py-2 text-xs text-slate-600 text-center">${d.sks}</td>
-                        <td class="px-3 py-2 text-xs text-slate-600 text-center">${d.semester}</td>
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 font-mono">${d.kode_matkul}</td>
+                        <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-200 font-bold">${d.nama_matkul}</td>
+                        <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 text-center font-bold">${d.sks}</td>
+                        <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 text-center font-bold">${d.semester}</td>
                     </tr>
                 `;
                 totalSks += parseInt(d.sks);
@@ -320,10 +323,10 @@ $json_details = json_encode($krs_details);
 
             htmlContent += `
                         </tbody>
-                        <tfoot class="bg-indigo-50">
+                        <tfoot class="bg-indigo-50 dark:bg-indigo-950/50">
                             <tr>
-                                <td colspan="2" class="px-3 py-2 text-xs font-bold text-indigo-900 text-right">Total SKS</td>
-                                <td class="px-3 py-2 text-xs font-bold text-indigo-900 text-center">${totalSks}</td>
+                                <td colspan="2" class="px-3 py-2 text-xs font-bold text-indigo-900 dark:text-indigo-300 text-right uppercase tracking-wider">Total SKS</td>
+                                <td class="px-3 py-2 text-xs font-bold text-indigo-900 dark:text-indigo-300 text-center">${totalSks}</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -332,11 +335,13 @@ $json_details = json_encode($krs_details);
             `;
 
             Swal.fire({
-                title: `<strong>${nama}</strong>`,
+                title: `<strong class="text-slate-800 dark:text-slate-100">${nama}</strong>`,
                 html: htmlContent,
                 width: '600px',
                 confirmButtonText: 'Tutup',
-                confirmButtonColor: '#3730a3'
+                confirmButtonColor: '#3730a3',
+                background: isDark ? '#0f172a' : '#ffffff',
+                color: isDark ? '#f1f5f9' : '#1e293b'
             });
         }
 

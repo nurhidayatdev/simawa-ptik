@@ -23,17 +23,43 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam
         <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
         <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
         <style>
-            body { font-family: 'Poppins', sans-serif !important; }
+            html, body {
+                background-color: #f8fafc;
+            }
+            body { 
+                font-family: 'Poppins', sans-serif !important; 
+                transition: background-color 0.3s;
+            }
+            .dark html, .dark body {
+                background-color: #020617;
+                color: #f1f5f9;
+            }
         </style>
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'light';
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     </head>
     <body>
         <script>
+            const isDarkMode = document.documentElement.classList.contains('dark');
             Swal.fire({
                 title: 'Anda yakin?',
                 text: 'Data yang dihapus tidak dapat dikembalikan!',
                 icon: 'warning',
                 showCancelButton: true,
+                background: isDarkMode ? '#0f172a' : '#fff',
+                color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: isDarkMode ? '#1e293b' : '#94a3b8',
                 confirmButtonText: 'Ya, hapus',
                 cancelButtonText: 'Batal'
             }).then((result) => {
@@ -70,20 +96,45 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
                 <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
                 <style>
-                    body { font-family: 'Poppins', sans-serif !important; }
+                    html, body {
+                        background-color: #f8fafc;
+                    }
+                    body { 
+                        font-family: 'Poppins', sans-serif !important; 
+                        transition: background-color 0.3s;
+                    }
+                    .dark html, .dark body {
+                        background-color: #020617;
+                        color: #f1f5f9;
+                    }
                 </style>
                 <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+                <script>
+                    (function() {
+                        const theme = localStorage.getItem('theme') || 'light';
+                        const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                        if (isDark) {
+                            document.documentElement.classList.add('dark');
+                        } else {
+                            document.documentElement.classList.remove('dark');
+                        }
+                    })();
+                </script>
             </head>
             <body>
                 <script>
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: 'Data berhasil dihapus!',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            window.location.href = '$redirect';
-                        });
+                    const isDarkMode = document.documentElement.classList.contains('dark');
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Data berhasil dihapus!',
+                        icon: 'success',
+                        background: isDarkMode ? '#0f172a' : '#fff',
+                        color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                        confirmButtonColor: '#4f46e5',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '$redirect';
+                    });
                 </script>
             </body>
             </html>
@@ -112,17 +163,43 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && !isset($_GET['confirm'])) {
         <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
         <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
         <style>
-            body { font-family: 'Poppins', sans-serif !important; }
+            html, body {
+                background-color: #f8fafc;
+            }
+            body { 
+                font-family: 'Poppins', sans-serif !important; 
+                transition: background-color 0.3s;
+            }
+            .dark html, .dark body {
+                background-color: #020617;
+                color: #f1f5f9;
+            }
         </style>
         <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'light';
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     </head>
     <body>
         <script>
+            const isDarkMode = document.documentElement.classList.contains('dark');
             Swal.fire({
                 title: 'Anda yakin?',
                 text: 'Data yang dihapus tidak dapat dikembalikan!',
                 icon: 'warning',
                 showCancelButton: true,
+                background: isDarkMode ? '#0f172a' : '#fff',
+                color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: isDarkMode ? '#1e293b' : '#94a3b8',
                 confirmButtonText: 'Ya, hapus',
                 cancelButtonText: 'Batal'
             }).then((result) => {
@@ -145,7 +222,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
     $tabel = $_GET['tabel'];
     $id = intval($_GET['id']);
 
-    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik', 'ruangan', 'kuis_harian_soal'];
+    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik', 'ruangan', 'kuis_harian_soal', 'kelompok'];
 
     if (!in_array($tabel, $tabel_diizinkan)) {
         echo "Tabel tidak diizinkan!";
@@ -192,7 +269,10 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
             $redirect = '../database/db_ruangan';
             break;
         case 'kuis_harian_soal':
-            $redirect = '../views/manajemen_kuis';
+            $redirect = '../database/db_soal';
+            break;
+        case 'kelompok':
+            $redirect = '../database/db_kelompok';
             break;
     }
 
@@ -210,20 +290,45 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
                 <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
                 <style>
-                    body { font-family: 'Poppins', sans-serif !important; }
+                    html, body {
+                        background-color: #f8fafc;
+                    }
+                    body { 
+                        font-family: 'Poppins', sans-serif !important; 
+                        transition: background-color 0.3s;
+                    }
+                    .dark html, .dark body {
+                        background-color: #020617;
+                        color: #f1f5f9;
+                    }
                 </style>
                 <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+                <script>
+                    (function() {
+                        const theme = localStorage.getItem('theme') || 'light';
+                        const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                        if (isDark) {
+                            document.documentElement.classList.add('dark');
+                        } else {
+                            document.documentElement.classList.remove('dark');
+                        }
+                    })();
+                </script>
             </head>
             <body>
                 <script>
-                        Swal.fire({
-                            title: 'Berhasil!',
-                            text: 'Data berhasil dihapus!',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            window.location.href = '$redirect';
-                        });
+                    const isDarkMode = document.documentElement.classList.contains('dark');
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Data berhasil dihapus!',
+                        icon: 'success',
+                        background: isDarkMode ? '#0f172a' : '#fff',
+                        color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                        confirmButtonColor: '#4f46e5',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '$redirect';
+                    });
                 </script>
             </body>
             </html>

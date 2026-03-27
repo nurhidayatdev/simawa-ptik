@@ -34,7 +34,8 @@ while ($r = mysqli_fetch_assoc($result)) {
   </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 dark:bg-slate-950 min-h-screen flex flex-col transition-colors duration-300">
+
   <?php include 'includes/header_main.php'; ?>
 
   <!-- spacer to avoid content hidden under fixed header -->
@@ -42,11 +43,11 @@ while ($r = mysqli_fetch_assoc($result)) {
 
 
   <div class="container mx-auto px-6 py-12 flex-grow">
-    <h1 class="text-3xl font-bold mb-2 text-gray-800 scroll-reveal text-center">Data Mahasiswa</h1>
-    <p class="text-gray-500 mb-8 scroll-reveal text-sm text-center italic">Direktori profil seluruh rekan mahasiswa PTIK C 2024, jalin silaturahmi dan kenali lebih dalam setiap jiwa di angkatan kita.</p>
+    <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white scroll-reveal text-center transition-colors">Data Mahasiswa</h1>
+    <p class="text-gray-500 dark:text-slate-400 mb-8 scroll-reveal text-sm text-center italic">Direktori profil seluruh rekan mahasiswa PTIK C 2024, jalin silaturahmi dan kenali lebih dalam setiap jiwa di angkatan kita.</p>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 scroll-reveal">
-      <input id="searchInput" type="search" placeholder="Cari nama, panggilan, NIM..." class="w-full sm:w-1/2 px-5 py-3 rounded-full border border-slate-200 shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />
+      <input id="searchInput" type="search" placeholder="Cari nama, panggilan, NIM..." class="w-full sm:w-1/2 px-5 py-3 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />
     </div>
 
     <!-- Card view (hidden by default) -->
@@ -64,10 +65,10 @@ while ($r = mysqli_fetch_assoc($result)) {
             data-initials="<?= strtoupper(substr($row['nama_lengkap'], 0, 2)) ?>"
             data-instagram="<?php echo htmlspecialchars($row['instagram'] ?? ''); ?>"
             data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>"
-            class="cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 hover:shadow-lg transition-all group hover:-translate-y-1 scroll-reveal">
+            class="cursor-pointer bg-white dark:bg-slate-900 rounded-2xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-all group hover:-translate-y-1 scroll-reveal">
             <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-14 relative">
               <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
-                <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
+                <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
                   <?php if (!empty($row['foto'])): ?>
                     <img src="<?= profilePhotoUrl($row['foto']) ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                   <?php else: ?>
@@ -77,8 +78,8 @@ while ($r = mysqli_fetch_assoc($result)) {
               </div>
             </div>
             <div class="pt-10 pb-4 px-3 text-center">
-              <h4 class="text-xs font-bold text-slate-900 truncate mb-1"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
-              <p class="text-[10px] text-slate-500 mb-2 truncate"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
+              <h4 class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate mb-1"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2 truncate"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
               <?php if (!empty($row['instagram'])): ?>
                 <a href="https://instagram.com/<?php echo ltrim(htmlspecialchars($row['instagram']), '@'); ?>" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm">
                   <i class="fab fa-instagram"></i>
@@ -100,7 +101,7 @@ while ($r = mysqli_fetch_assoc($result)) {
     <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
       <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <!-- Modal Panel -->
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-sm scale-95 opacity-0" id="modalPanel">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white dark:bg-slate-900 text-left shadow-2xl transition-all sm:my-8 w-full max-w-sm scale-95 opacity-0 border border-white dark:border-slate-800" id="modalPanel">
 
           <!-- Header Pattern -->
           <div class="h-28 bg-gradient-to-br from-indigo-800 to-indigo-950 relative overflow-hidden">
@@ -116,30 +117,30 @@ while ($r = mysqli_fetch_assoc($result)) {
           <div class="px-6 pb-8 -mt-14 relative z-0">
             <!-- Profile Image -->
             <div class="flex justify-center">
-              <div class="w-28 h-28 rounded-2xl p-1.5 bg-white shadow-xl rotate-0 hover:rotate-3 transition-transform duration-500">
-                <div id="modalFotoContainer" class="w-full h-full rounded-xl overflow-hidden bg-indigo-50 flex items-center justify-center text-indigo-300 text-4xl font-bold border border-indigo-50">
+              <div class="w-28 h-28 rounded-2xl p-1.5 bg-white dark:bg-slate-800 shadow-xl rotate-0 hover:rotate-3 transition-transform duration-500 border border-indigo-50 dark:border-slate-700">
+                <div id="modalFotoContainer" class="w-full h-full rounded-xl overflow-hidden bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-300 dark:text-indigo-600 text-4xl font-bold border border-indigo-50 dark:border-indigo-900/50">
                   <!-- Image injected via JS -->
                 </div>
               </div>
             </div>
 
             <div class="text-center mt-5">
-              <h3 class="text-xl font-bold text-slate-900 leading-tight" id="modalNama"></h3>
-              <p class="text-sm text-slate-500 mt-2 px-4 line-clamp-3" id="modalBio"></p>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white leading-tight" id="modalNama"></h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 px-4 line-clamp-3" id="modalBio"></p>
 
               <div class="flex items-center justify-center gap-2 mt-5">
-                <div class="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold border border-indigo-100 shadow-sm flex items-center gap-1.5">
+                <div class="px-4 py-1.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-semibold border border-indigo-100 dark:border-indigo-800 shadow-sm flex items-center gap-1.5">
                   <i class="fas fa-id-card text-indigo-400"></i>
                   <span id="modalNim"></span>
                 </div>
-                <div class="px-4 py-1.5 bg-pink-50 text-pink-700 rounded-full text-xs font-semibold border border-pink-100 shadow-sm flex items-center gap-1.5">
+                <div class="px-4 py-1.5 bg-pink-50 dark:bg-pink-950/50 text-pink-700 dark:text-pink-400 rounded-full text-xs font-semibold border border-pink-100 dark:border-pink-800 shadow-sm flex items-center gap-1.5">
                   <i class="fas fa-user-tag text-pink-400"></i>
                   <span id="modalPanggilan"></span>
                 </div>
               </div>
 
               <div id="modalInstagramContainer" class="mt-6 hidden">
-                <a id="modalInstagramLink" href="#" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-lg shadow-purple-200 hover:shadow-purple-300 hover:-translate-y-0.5 transition-all font-medium text-sm group">
+                <a id="modalInstagramLink" href="#" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-md shadow-purple-200 hover:shadow-purple-300 hover:-translate-y-0.5 transition-all font-medium text-sm group">
                   <i class="fab fa-instagram text-lg group-hover:rotate-12 transition-transform"></i>
                   <span>Instagram</span>
                 </a>
