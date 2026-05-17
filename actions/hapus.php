@@ -216,6 +216,128 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && !isset($_GET['confirm'])) {
     exit();
 }
 
+// Handle hapus satu set kelompok
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'set_kelompok' && !isset($_GET['confirm'])) {
+    $tabel = 'set_kelompok';
+    $matkul_id = intval($_GET['matkul_id']);
+    $dosen = mysqli_real_escape_string($koneksi, $_GET['dosen']);
+    $keterangan = mysqli_real_escape_string($koneksi, $_GET['keterangan']);
+
+    echo <<<HTML
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>Hapus Set Kelompok - Kelas PTIK C 2024</title>
+        <link rel='icon' href='../assets/image/icon.webp' />
+        <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
+        <style>
+            html, body {
+                background-color: #f8fafc;
+            }
+            body { 
+                font-family: 'Poppins', sans-serif !important; 
+            }
+            .dark html, .dark body {
+                background-color: #020617;
+                color: #f1f5f9;
+            }
+        </style>
+        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        <script>
+            (function() {
+                const theme = localStorage.getItem('theme') || 'light';
+                const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) document.documentElement.classList.add('dark');
+            })();
+        </script>
+    </head>
+    <body>
+        <script>
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            Swal.fire({
+                title: 'Hapus Satu Set?',
+                text: 'Seluruh kelompok dalam matkul, dosen, dan keterangan yang sama akan dihapus!',
+                icon: 'warning',
+                showCancelButton: true,
+                background: isDarkMode ? '#0f172a' : '#fff',
+                color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: isDarkMode ? '#1e293b' : '#94a3b8',
+                confirmButtonText: 'Ya, hapus semua',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'hapus?tabel=set_kelompok&matkul_id={$matkul_id}&dosen={$dosen}&keterangan={$keterangan}&confirm=yes';
+                } else {
+                    window.history.back();
+                }
+            });
+        </script>
+    </body>
+    </html>
+    HTML;
+    exit();
+}
+
+// Logic untuk hapus satu set kelompok (confirm)
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'set_kelompok' && isset($_GET['confirm'])) {
+    $matkul_id = intval($_GET['matkul_id']);
+    $dosen = mysqli_real_escape_string($koneksi, $_GET['dosen']);
+    $keterangan = mysqli_real_escape_string($koneksi, $_GET['keterangan']);
+    
+    // Ambil periode aktif untuk memastikan kita hanya hapus di periode sekarang
+    $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+    $p = mysqli_fetch_assoc($q_p);
+    $p_id = $p['id'] ?? 0;
+
+    $hapus = mysqli_query($koneksi, "DELETE FROM kelompok WHERE matkul_id='$matkul_id' AND dosen='$dosen' AND keterangan='$keterangan' AND periode_id='$p_id'");
+    $redirect = '../database/db_kelompok';
+
+    if ($hapus) {
+        echo <<<HTML
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+                <script>
+                    (function() {
+                        const theme = localStorage.getItem('theme') || 'light';
+                        if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                            document.documentElement.classList.add('dark');
+                        }
+                    })();
+                </script>
+                <style>
+                    .dark body { background-color: #020617; color: #f1f5f9; }
+                </style>
+            </head>
+            <body>
+                <script>
+                    const isDark = document.documentElement.classList.contains('dark');
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Satu set kelompok berhasil dihapus!',
+                        icon: 'success',
+                        background: isDark ? '#0f172a' : '#fff',
+                        color: isDark ? '#f1f5f9' : '#1e293b',
+                        confirmButtonColor: '#4f46e5'
+                    }).then(() => {
+                        window.location.href = '$redirect';
+                    });
+                </script>
+            </body>
+            </html>
+        HTML;
+    } else {
+        echo "Gagal menghapus data set.";
+    }
+    exit();
+}
+
 
 if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
 

@@ -203,6 +203,20 @@ $group_sets = [];
 while ($row = mysqli_fetch_assoc($q_sets)) {
     $group_sets[] = $row;
 }
+
+// Prepare SweetAlert configuration for response messages
+$swalConfig = null;
+if (isset($_SESSION['reminder_msg'])) {
+    $swalConfig = [
+        'icon' => (($_SESSION['reminder_type'] ?? '') === "success" ? "success" : (($_SESSION['reminder_type'] ?? '') === "error" ? "error" : "info")),
+        'title' => (($_SESSION['reminder_type'] ?? '') === "success" ? "Berhasil!" : (($_SESSION['reminder_type'] ?? '') === "error" ? "Gagal!" : "Informasi")),
+        'text' => $_SESSION['reminder_msg'],
+        'confirmButtonColor' => '#3730a3',
+        'showDenyButton' => (bool)($_SESSION['show_piket_button'] ?? false),
+        'denyButtonText' => 'Kirim Piket Proyektor',
+        'denyButtonColor' => '#312e81'
+    ];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -223,7 +237,6 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             }
         }
 
-        /* SweetAlert Dark Mode Fix */
         .dark .swal2-popup {
             background-color: #0f172a !important;
             color: #f8fafc !important;
@@ -244,7 +257,23 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         }
 
         .dark .swal2-confirm {
-            background-color: #312e81 !important;
+            background-color: #4f46e5 !important;
+        }
+
+        .dark .swal2-deny {
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+
+        .dark .swal2-cancel {
+            background-color: #0f172a !important;
+            color: #94a3b8 !important;
+            border: 1px solid #1e293b !important;
+        }
+
+        .dark .swal2-validation-message {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
         }
     </style>
 
@@ -538,7 +567,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             if (currentJadwal.length === 0) {
                 html += '<p class="text-slate-400 dark:text-slate-600 text-xs text-center py-8">Belum ada jadwal yang ditambahkan.</p>';
             } else {
-                html += `<div class="overflow-x-auto max-h-64 border dark:border-slate-800 rounded-lg bg-slate-50">
+                html += `<div class="overflow-x-auto max-h-64 border border-slate-200 dark:border-slate-800 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                     <table class="w-full text-xs text-left">
                         <thead class="bg-indigo-900 text-white border-b dark:border-slate-800 sticky top-0">
                             <tr>
@@ -561,11 +590,11 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                             <div class="font-bold text-slate-800 dark:text-slate-200">${item.matkul}</div>
                             ${statusBadge}
                         </td>
-                        <td class="p-2 text-slate-500 dark:text-slate-400 font-medium">${detailText}</td>d>
+                        <td class="p-2 text-slate-500 dark:text-slate-400 font-medium">${detailText}</td>
                         <td class="p-2 text-center">
                             <div class="flex gap-1 justify-center">
-                                <button type="button" onclick="showEditForm(${index})" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition"><i class="fas fa-edit"></i></button>
-                                <button type="button" onclick="removeItem(${index})" class="p-1.5 text-red-600 hover:bg-red-50 rounded transition"><i class="fas fa-trash"></i></button>
+                                <button type="button" onclick="showEditForm(${index})" class="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition"><i class="fas fa-edit"></i></button>
+                                <button type="button" onclick="removeItem(${index})" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>`;
@@ -604,14 +633,14 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         }
 
         function addNewMatkul() {
-            let mkSelect = `<select id="new_matkul" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm mb-4 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
+            let mkSelect = `<select id="new_matkul" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-sm mb-4 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
             mkSelect += `<option value="" disabled selected>-- Pilih Mata Kuliah --</option>`;
             optMk.forEach(opt => {
                 mkSelect += `<option value="${opt.nama}">${opt.nama}</option>`;
             });
             mkSelect += `</select>`;
 
-            let ruangSelect = `<select id="new_ruang" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
+            let ruangSelect = `<select id="new_ruang" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
             ruangSelect += `<option value="" disabled selected>-- Pilih Ruangan --</option>`;
             optRuang.forEach(opt => {
                 ruangSelect += `<option value="${opt.val}">${opt.label}</option>`;
@@ -623,7 +652,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 html: `
                     <div class="text-left space-y-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Pilih Mata Kuliah</label>
+                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Pilih Mata Kuliah</label>
                             ${mkSelect}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
@@ -637,7 +666,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Pilih Ruangan</label>
+                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Pilih Ruangan</label>
                             ${ruangSelect}
                         </div>
                     </div>
@@ -692,7 +721,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
             const currentStatus = item.status || 'masuk';
 
             // Generate Ruangan Options
-            let ruangHtml = `<select id="edit_ruang" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
+            let ruangHtml = `<select id="edit_ruang" class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium">`;
             optRuang.forEach(opt => {
                 const selected = (opt.val === item.ruangan_text) ? 'selected' : '';
                 ruangHtml += `<option value="${opt.val}" ${selected}>${opt.label}</option>`;
@@ -704,8 +733,8 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                 html: `
                     <div class="text-left space-y-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Status Kehadiran</label>
-                            <select id="edit_status" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium" onchange="toggleEditFields(this.value)">
+                            <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status Kehadiran</label>
+                            <select id="edit_status" class="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-800 rounded-xl text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all font-medium" onchange="toggleEditFields(this.value)">
                                 <option value="masuk" ${currentStatus === 'masuk' ? 'selected' : ''}>Masuk</option>
                                 <option value="tidak_masuk" ${currentStatus === 'tidak_masuk' ? 'selected' : ''}>Tidak Masuk (Absen)</option>
                             </select>
@@ -724,7 +753,7 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
                             </div>
                             
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Pilih Ruangan Kuliah</label>
+                                <label class="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Pilih Ruangan Kuliah</label>
                                 ${ruangHtml}
                             </div>
                         </div>
@@ -845,19 +874,11 @@ while ($row = mysqli_fetch_assoc($q_sets)) {
         }
 
         // Response Message with SweetAlert
-        <?php if (isset($_SESSION['reminder_msg'])): ?>
-            Swal.fire({
-                icon: '<?= $_SESSION['reminder_type'] === "success" ? "success" : ($_SESSION['reminder_type'] === "error" ? "error" : "info") ?>',
-                title: '<?= $_SESSION['reminder_type'] === "success" ? "Berhasil!" : ($_SESSION['reminder_type'] === "error" ? "Gagal!" : "Informasi") ?>',
-                text: '<?= addslashes($_SESSION['reminder_msg']) ?>',
-                confirmButtonColor: '#3730a3'<?php if (isset($_SESSION['show_piket_button']) && $_SESSION['show_piket_button']): ?>,
-                showDenyButton: true,
-                denyButtonText: 'Kirim Piket Proyektor',
-                denyButtonColor: '#312e81'<?php endif; ?>
-            }).then((result) => {
+        <?php if ($swalConfig): ?>
+            Swal.fire(<?= json_encode($swalConfig) ?>).then((result) => {
                 <?php if (isset($_SESSION['show_piket_button']) && $_SESSION['show_piket_button']): ?>
                 if (result.isDenied) {
-                    submitPiketCustom('<?= addslashes($_SESSION['last_custom_payload']) ?>', '<?= $_SESSION['last_day'] ?>');
+                    submitPiketCustom('<?= addslashes($_SESSION['last_custom_payload'] ?? '') ?>', '<?= $_SESSION['last_day'] ?? '' ?>');
                 }
                 <?php endif; ?>
             });

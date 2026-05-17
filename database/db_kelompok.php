@@ -19,7 +19,9 @@ $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'akti
 $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'] ?? 0;
 
-$query_base = "SELECT k.*, mk.nama_matkul 
+$query_base = "SELECT k.matkul_id, k.dosen, k.keterangan, mk.nama_matkul, 
+               COUNT(*) as jml_kelompok, 
+               MIN(k.created_at) as tgl_dibuat
                FROM kelompok k 
                JOIN mata_kuliah mk ON k.matkul_id = mk.id 
                WHERE k.periode_id = $periode_id ";
@@ -27,14 +29,14 @@ $query_base = "SELECT k.*, mk.nama_matkul
 if (!empty($search)) {
     $stmt = mysqli_prepare(
         $koneksi,
-        $query_base . " AND (mk.nama_matkul LIKE ? OR k.dosen LIKE ? OR k.keterangan LIKE ?) ORDER BY k.matkul_id, k.kelompok_no ASC"
+        $query_base . " AND (mk.nama_matkul LIKE ? OR k.dosen LIKE ? OR k.keterangan LIKE ?) GROUP BY k.matkul_id, k.dosen, k.keterangan ORDER BY mk.nama_matkul ASC"
     );
     $like = "%$search%";
     mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
-    $result = mysqli_query($koneksi, $query_base . " ORDER BY k.matkul_id, k.kelompok_no ASC");
+    $result = mysqli_query($koneksi, $query_base . " GROUP BY k.matkul_id, k.dosen, k.keterangan ORDER BY mk.nama_matkul ASC");
 }
 
 // If AJAX live-search request, return only the table rows
@@ -45,21 +47,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $isEven = ($id++ % 2 == 0);
         $rowClass = ($isEven ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
         
-        // Count members
-        $members = array_filter(explode(',', $row['anggota']));
-        $memberCount = count($members);
+        // Formatting time
 
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-bold">' . htmlspecialchars($row['nama_matkul']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-bold">Kelompok ' . htmlspecialchars($row['kelompok_no']) . '</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-indigo-600 dark:text-indigo-400 font-bold">' . htmlspecialchars($row['jml_kelompok']) . ' Kelompok</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200">' . htmlspecialchars($row['dosen']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center">' . $memberCount . ' Anggota</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center font-medium">' . date('d M Y, H:i', strtotime($row['tgl_dibuat'])) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400">' . htmlspecialchars($row['keterangan']) . '</td>';
         if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
             echo '<div class="flex items-center justify-center gap-3">';
-            echo '<a href="../actions/hapus.php?tabel=kelompok&id=' . $row['id'] . '" title="Hapus Satu Kelompok" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200"><i class="fa fa-trash"></i></a>';
+            echo '<a href="../actions/hapus.php?tabel=set_kelompok&matkul_id=' . $row['matkul_id'] . '&dosen=' . urlencode($row['dosen']) . '&keterangan=' . urlencode($row['keterangan']) . '" title="Hapus Seluruh Set Kelompok" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200"><i class="fa fa-trash"></i></a>';
             echo '</div>';
             echo '</td>';
         endif;
@@ -120,7 +120,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Mata Kuliah</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Kelompok</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen</th>
-                            <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Anggota</th>
+                            <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Waktu Dibuat</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Keterangan</th>
                             <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
@@ -134,21 +134,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         while ($row = mysqli_fetch_assoc($result)) : 
                             $isEven = ($id++ % 2 == 0);
                             $rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
-                            
-                            $members = array_filter(explode(',', $row['anggota']));
-                            $memberCount = count($members);
                         ?>
                             <tr class="<?= $rowClass ?>">
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-bold"><?= htmlspecialchars($row['nama_matkul']); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs font-bold text-indigo-600 dark:text-indigo-400">Kelompok <?= htmlspecialchars($row['kelompok_no']); ?></td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs font-bold text-indigo-600 dark:text-indigo-400"><?= htmlspecialchars($row['jml_kelompok']); ?> Kelompok</td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200"><?= htmlspecialchars($row['dosen']); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center font-semibold"><?= $memberCount ?> Anggota</td>
+                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center font-medium"><?= date('d M Y, H:i', strtotime($row['tgl_dibuat'])); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400 capitalize"><?= htmlspecialchars($row['keterangan'] ?: '-'); ?></td>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
-                                            <a href="../actions/hapus.php?tabel=kelompok&id=<?= $row['id']; ?>" title="Hapus Satu Kelompok" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors"><i class="fa fa-trash"></i></a>
+                                            <a href="../actions/hapus.php?tabel=set_kelompok&matkul_id=<?= $row['matkul_id']; ?>&dosen=<?= urlencode($row['dosen']); ?>&keterangan=<?= urlencode($row['keterangan']); ?>" title="Hapus Seluruh Set Kelompok" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors"><i class="fa fa-trash"></i></a>
                                         </div>
                                     </td>
                                 <?php endif; ?>
