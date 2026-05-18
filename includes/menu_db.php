@@ -184,6 +184,17 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                     <div>
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Aktivitas</p>
                         <div class="space-y-1">
+                            <!-- Wrapped Menu Highlighted -->
+                            <a href="<?= $base ?>wrapped" class="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group mb-1">
+                                <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                                <i class="fa-solid fa-gift w-5 h-5 mr-3 animate-bounce"></i>
+                                <span class="text-xs font-bold tracking-wider">PTIK C Wrapped</span>
+                                <span class="absolute top-1 right-2 flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-300"></span>
+                                </span>
+                            </a>
+
                             <a href="<?= $base ?>views/misi" class="flex items-center px-4 py-1 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                                 <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900 dark:text-indigo-400"></i>
                                 <span class="text-xs font-medium">Pusat Misi</span>
