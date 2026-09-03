@@ -1,6 +1,8 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include 'koneksi.php';
-session_start();
 
 $login_status = '';
 $login_message = '';
@@ -33,20 +35,32 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
     $result = mysqli_stmt_get_result($stmt);
 
     if ($data = mysqli_fetch_assoc($result)) {
-      $_SESSION['user_id']       = $data['user_id'];
-      $_SESSION['email']         = $data['email'];
-      $_SESSION['nama_lengkap']  = $data['nama_lengkap'];
-      $_SESSION['nama_panggilan']  = $data['nama_panggilan'];
-      $_SESSION['role']          = $data['role'];
-      $_SESSION['foto']          = $data['foto'];
-      $login_status = 'success';
-      $login_message = "Selamat datang, " . htmlspecialchars($data['nama_lengkap']) . "!";
+      if (is_maintenance_mode($koneksi) && $data['role'] !== 'Administrator Utama') {
+        $login_status = 'error';
+        $login_message = get_maintenance_message($koneksi);
+      } else {
+        $_SESSION['user_id']       = $data['user_id'];
+        $_SESSION['email']         = $data['email'];
+        $_SESSION['nama_lengkap']  = $data['nama_lengkap'];
+        $_SESSION['nama_panggilan']  = $data['nama_panggilan'];
+        $_SESSION['role']          = $data['role'];
+        $_SESSION['foto']          = $data['foto'];
+        $login_status = 'success';
+        $login_message = "Selamat datang, " . htmlspecialchars($data['nama_lengkap']) . "!";
+      }
     } else {
       $login_status = 'error';
       $login_message = 'Email atau Password salah!';
     }
   }
 }
+
+if (isset($_SESSION['maintenance_blocked'])) {
+  $login_status = 'error';
+  $login_message = $_SESSION['maintenance_blocked'];
+  unset($_SESSION['maintenance_blocked']);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -129,12 +143,25 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
     <!-- Login Card -->
     <div class="w-full max-w-md z-10">
       <div class="bg-white/95 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-slate-800 transition-colors">
-        <div class="text-center mb-8">
+        <div class="text-center mb-6">
           <h2 class="text-3xl font-bold text-slate-800 dark:text-white">Login</h2>
           <p class="text-slate-500 dark:text-slate-400 text-sm mt-2">Silakan masuk dengan akun anda.</p>
         </div>
 
+        <?php if (is_maintenance_mode($koneksi)): ?>
+          <div class="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs flex items-start gap-3 shadow-sm">
+            <i class="fas fa-screwdriver-wrench text-amber-500 text-base mt-0.5 shrink-0"></i>
+            <div>
+              <p class="font-bold text-amber-700 dark:text-amber-300">Mode Maintenance Aktif</p>
+              <p class="text-[11px] mt-0.5 leading-relaxed text-amber-600/90 dark:text-amber-400/90">
+                Hanya <strong>Administrator Utama</strong> yang diizinkan untuk login saat pemeliharaan sistem.
+              </p>
+            </div>
+          </div>
+        <?php endif; ?>
+
         <form method="POST" id="loginForm" novalidate>
+
           <div class="space-y-5">
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Email Address</label>

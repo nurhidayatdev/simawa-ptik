@@ -160,11 +160,11 @@ if (!empty($filter_minggu_kas)) {
     $q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
     $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
 
-    $q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas");
+    $q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id'");
     $current_week_target = mysqli_fetch_assoc($q_latest_week)['max_week'] ?? 1;
     if ($current_week_target < 1) $current_week_target = 1;
 
-    $q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 LIMIT 1");
+    $q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 AND periode_id = '$periode_id' LIMIT 1");
     $fixed_nominal = mysqli_fetch_assoc($q_nominal)['nominal'] ?? 5000;
 
     $target_kas = $total_students * $current_week_target * $fixed_nominal;
@@ -305,7 +305,7 @@ while ($current <= $last) {
 
 // 7. Data Kas Per Minggu (Stacked Bar - Lunas vs Belum)
 $total_mhs = (int)($counts['mahasiswa'] ?? 0);
-$q_nom = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 LIMIT 1");
+$q_nom = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 AND periode_id = '$periode_id' LIMIT 1");
 $fixed_nom = mysqli_fetch_assoc($q_nom)['nominal'] ?? 5000;
 
 $kas_per_minggu_history = [];

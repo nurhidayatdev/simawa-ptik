@@ -6,7 +6,11 @@ function kirimKasReminder($koneksi, $minggu_ke, $token = null, $chat_id = null)
 {
     date_default_timezone_set('Asia/Makassar');
 
-    $q_belum = "SELECT m.nama_panggilan FROM kas k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.minggu_ke = '$minggu_ke' AND (k.status IS NULL OR k.status != 'Lunas') ORDER BY m.nim ASC";
+    $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+    $p = mysqli_fetch_assoc($q_p);
+    $periode_id = (int)($p['id'] ?? 0);
+
+    $q_belum = "SELECT m.nama_panggilan FROM mahasiswa m LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu_ke' AND k.periode_id = '$periode_id' WHERE (k.status IS NULL OR k.status != 'Lunas') ORDER BY m.nim ASC";
     $res_belum = mysqli_query($koneksi, $q_belum);
 
     if ($res_belum && mysqli_num_rows($res_belum) > 0) {

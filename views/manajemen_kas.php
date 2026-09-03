@@ -18,6 +18,14 @@ if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Ketua Tingkat' |
     exit();
 }
 
+/* =====================
+   AMBIL PERIODE AKTIF
+   ===================== */
+$q_periode = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode = mysqli_fetch_assoc($q_periode);
+$periode_id = (int)($periode['id'] ?? 0);
+$periode_info = $periode ? ($periode['tahun_periode'] . ' ' . $periode['semester_nama']) : '-';
+
 /**
  * ==========================================
  * HANDLING EXPORT EXCEL (Arus Kas & Mingguan)
@@ -29,7 +37,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel_arus') {
     // Need totals for the report
     $res_other_in = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_other_masuk FROM arus_kas WHERE tipe='masuk'");
     $total_other_masuk = mysqli_fetch_assoc($res_other_in)['total_other_masuk'];
-    $res_kas_total = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas'");
+    $res_kas_total = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas' AND periode_id = '$periode_id'");
     $total_kas = mysqli_fetch_assoc($res_kas_total)['total_kas'];
     $total_masuk = $total_kas + $total_other_masuk;
     $res_out = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_keluar FROM arus_kas WHERE tipe='keluar'");
@@ -41,7 +49,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel_arus') {
     header("Content-Disposition: attachment; filename=\"$filename\"");
 
     echo '<table border="1">';
-    echo '<tr><th colspan="5" style="background-color: #1e1b4b; color: white;">LAPORAN ARUS KAS PTIK C 2024</th></tr>';
+    echo '<tr><th colspan="5" style="background-color: #1e1b4b; color: white;">LAPORAN ARUS KAS PTIK C 2024 (' . htmlspecialchars($periode_info) . ')</th></tr>';
     echo '<tr style="background-color: #f1f5f9;"><th>ID</th><th>Tipe</th><th>Deskripsi</th><th>Jumlah</th><th>Tanggal</th></tr>';
     $q = mysqli_query($koneksi, "SELECT * FROM arus_kas ORDER BY tanggal DESC, created_at DESC");
     while ($r = mysqli_fetch_assoc($q)) {
@@ -61,14 +69,20 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel_mingguan' && isset($_GE
     if ($filter_exp === 'Lunas') $where_exp = "AND k.status = 'Lunas'";
     elseif ($filter_exp === 'Belum') $where_exp = "AND (k.status IS NULL OR k.status != 'Lunas')";
 
-    $res = mysqli_query($koneksi, "SELECT m.nim, m.nama_lengkap, k.minggu_ke, k.status, k.tanggal_bayar FROM kas k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.minggu_ke = '$minggu' $where_exp ORDER BY m.nim ASC");
+    $res = mysqli_query($koneksi, "
+        SELECT m.nim, m.nama_lengkap, '$minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
+        FROM mahasiswa m 
+        LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' 
+        WHERE 1=1 $where_exp 
+        ORDER BY m.nim ASC
+    ");
 
-    $filename = 'kas_minggu_' . $minggu . '.xls';
+    $filename = 'kas_minggu_' . $minggu . '_' . str_replace(' ', '_', $periode_info) . '.xls';
     header("Content-Type: application/vnd.ms-excel");
     header("Content-Disposition: attachment; filename=\"$filename\"");
 
     echo '<table border="1">';
-    echo '<tr><th colspan="5">DATA KAS MINGGU ' . $minggu . '</th></tr>';
+    echo '<tr><th colspan="5">DATA KAS MINGGU ' . $minggu . ' (' . htmlspecialchars($periode_info) . ')</th></tr>';
     echo '<tr style="background-color: #1e1b4b; color: white;"><th>NIM</th><th>Nama Lengkap</th><th>Minggu</th><th>Status</th><th>Tanggal Bayar</th></tr>';
     while ($r = mysqli_fetch_assoc($res)) {
         $tgl = !empty($r['tanggal_bayar']) ? date('d/m/Y', strtotime($r['tanggal_bayar'])) : '-';
@@ -134,7 +148,7 @@ $res_other_in = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_
 $total_other_masuk = mysqli_fetch_assoc($res_other_in)['total_other_masuk'] ?? 0;
 
 // Pemasukan dari tabel kas (Mahasiswa)
-$res_kas = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas'");
+$res_kas = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas' AND periode_id = '$periode_id'");
 $total_kas = mysqli_fetch_assoc($res_kas)['total_kas'] ?? 0;
 
 $total_masuk = $total_kas + $total_other_masuk;
@@ -147,19 +161,19 @@ $saldo = $total_masuk - $total_keluar;
 $q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
 $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
 
-$q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas");
-$current_week = mysqli_fetch_assoc($q_latest_week)['max_week'] ?? 1;
+$q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id'");
+$current_week = (int)(mysqli_fetch_assoc($q_latest_week)['max_week'] ?? 1);
 if ($current_week < 1) $current_week = 1;
 
-$q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 LIMIT 1");
-$fixed_nominal = mysqli_fetch_assoc($q_nominal)['nominal'] ?? 5000;
+$q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 AND periode_id = '$periode_id' LIMIT 1");
+$fixed_nominal = (int)(mysqli_fetch_assoc($q_nominal)['nominal'] ?? 5000);
 
 $target_kas = $total_students * $current_week * $fixed_nominal;
 $progress_percent = ($target_kas > 0) ? min(100, round(($total_kas / $target_kas) * 100, 1)) : 0;
 
 // Weekly Details
 $weekly_data = [];
-$q_weekly = mysqli_query($koneksi, "SELECT minggu_ke, COUNT(*) as paid_count FROM kas WHERE status='Lunas' GROUP BY minggu_ke");
+$q_weekly = mysqli_query($koneksi, "SELECT minggu_ke, COUNT(*) as paid_count FROM kas WHERE status='Lunas' AND periode_id = '$periode_id' GROUP BY minggu_ke");
 while ($rw = mysqli_fetch_assoc($q_weekly)) {
     $weekly_data[$rw['minggu_ke']] = $rw['paid_count'];
 }
@@ -197,10 +211,10 @@ $f_filter_mhs = $_GET['filter_mhs'] ?? 'all';
 $where_mhs = ($f_filter_mhs === 'Lunas') ? " AND k.status = 'Lunas'" : (($f_filter_mhs === 'Belum') ? " AND (k.status IS NULL OR k.status != 'Lunas')" : "");
 
 $mhs_status = mysqli_query($koneksi, "
-    SELECT m.id AS mahasiswa_id, m.nim, m.nama_lengkap, m.foto, k.minggu_ke, k.status, k.tanggal_bayar 
-    FROM kas k 
-    JOIN mahasiswa m ON k.mahasiswa_id = m.id 
-    WHERE k.minggu_ke = '$f_minggu' $where_mhs 
+    SELECT m.id AS mahasiswa_id, m.nim, m.nama_lengkap, m.foto, '$f_minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
+    FROM mahasiswa m 
+    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$f_minggu' AND k.periode_id = '$periode_id'
+    WHERE 1=1 $where_mhs 
     ORDER BY m.nim ASC
 ");
 
@@ -240,7 +254,9 @@ $mhs_status = mysqli_query($koneksi, "
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h3 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight text-center md:text-left">Manajemen Kas</h3>
-                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1 text-center md:text-left">Cash Flow & Savings Tracking</p>
+                    <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-1 text-center md:text-left">
+                        Periode Aktif: <span class="text-indigo-600 dark:text-indigo-400 font-bold"><?= htmlspecialchars($periode_info) ?></span> &bull; Cash Flow & Savings
+                    </p>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <a href="?action=export_excel_arus" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">

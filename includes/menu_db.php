@@ -46,6 +46,12 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
         <div class="flex items-center">
             <img src="<?= $base ?>assets/image/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
             <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
+            <?php if (function_exists('is_maintenance_mode') && is_maintenance_mode($koneksi)): ?>
+                <span class="ml-3 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+                    <i class="fas fa-screwdriver-wrench text-amber-400 text-[10px]"></i>
+                    <span class="hidden sm:inline">Maintenance Mode</span>
+                </span>
+            <?php endif; ?>
         </div>
         <div class="flex items-center gap-2">
             <!-- Theme Toggle -->
@@ -240,7 +246,12 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                     <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
                                 </button>
                                 <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 dark:border-slate-800 ml-6">
+                                    <a href="<?= $base ?>database/db_settings" class="block px-4 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg flex items-center justify-between">
+                                        <span>Pengaturan Sistem</span>
+                                        <i class="fas fa-gear text-[10px]"></i>
+                                    </a>
                                     <a href="<?= $base ?>database/db_users" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Users</a>
+
                                     <a href="<?= $base ?>database/db_periode" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Periode</a>
                                     <a href="<?= $base ?>database/db_ruangan" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Ruangan</a>
                                     <a href="<?= $base ?>database/db_jam" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Jam Kuliah</a>
@@ -249,6 +260,10 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                     <a href="<?= $base ?>database/db_soal" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Data Soal Kuis</a>
                                     <a href="<?= $base ?>database/db_pesan" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Pesan Anonim</a>
                                     <a href="<?= $base ?>actions/validasi_krs" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Validasi KRS</a>
+                                    <a href="<?= $base ?>actions/bulk_krs" class="block px-4 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-lg flex items-center justify-between">
+                                        <span>KRS Massal</span>
+                                        <i class="fas fa-layer-group text-[9px]"></i>
+                                    </a>
                                 </div>
                             <?php endif; ?>
                             <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>

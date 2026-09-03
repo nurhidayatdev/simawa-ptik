@@ -561,6 +561,11 @@ if (isset($_POST['update'])) {
                                     </div>
                                 </div>
                             <?php elseif ($tabel === 'tugas'): ?>
+                                <?php
+                                $q_per_edit = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+                                $per_edit = mysqli_fetch_assoc($q_per_edit);
+                                $pid_edit = (int)($per_edit['id'] ?? 0);
+                                ?>
                                 <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Tugas</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="md:col-span-2">
@@ -569,11 +574,12 @@ if (isset($_POST['update'])) {
                                             <option value="">-- Pilih Mata Kuliah --</option>
                                             <?php
                                             $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
-                                        mk.id AS matkul_id,
-                                        mk.nama_matkul
-                                        FROM krs k
-                                        JOIN mata_kuliah mk ON k.matkul_id = mk.id
-                                        ORDER BY mk.nama_matkul ASC");
+                                                mk.id AS matkul_id,
+                                                mk.nama_matkul
+                                                FROM krs k
+                                                JOIN mata_kuliah mk ON k.matkul_id = mk.id
+                                                WHERE (k.periode_id = '$pid_edit' OR mk.id = '{$data['matkul_id']}')
+                                                ORDER BY mk.nama_matkul ASC");
                                             while ($mk = mysqli_fetch_assoc($query_mk)) {
                                                 $selected = ($data['matkul_id'] == $mk['matkul_id']) ? 'selected' : '';
                                                 echo "<option value='{$mk['matkul_id']}' $selected>{$mk['nama_matkul']}</option>";
@@ -608,6 +614,11 @@ if (isset($_POST['update'])) {
                                     </div>
                                 </div>
                             <?php elseif ($tabel === 'jadwal_matkul'): ?>
+                                <?php
+                                $q_per_edit = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+                                $per_edit = mysqli_fetch_assoc($q_per_edit);
+                                $pid_edit = (int)($per_edit['id'] ?? 0);
+                                ?>
                                 <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Jadwal Mata Kuliah</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
@@ -615,13 +626,13 @@ if (isset($_POST['update'])) {
                                         <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                             <option value="">-- Pilih Mata Kuliah --</option>
                                             <?php
-
                                             $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
-                                        mk.id AS matkul_id,
-                                        mk.nama_matkul
-                                        FROM krs k
-                                        JOIN mata_kuliah mk ON k.matkul_id = mk.id
-                                        ORDER BY mk.nama_matkul ASC");
+                                                mk.id AS matkul_id,
+                                                mk.nama_matkul
+                                                FROM krs k
+                                                JOIN mata_kuliah mk ON k.matkul_id = mk.id
+                                                WHERE (k.periode_id = '$pid_edit' OR mk.id = '{$data['matkul_id']}')
+                                                ORDER BY mk.nama_matkul ASC");
                                             while ($mk = mysqli_fetch_assoc($query_mk)) {
                                                 $selected = ($data['matkul_id'] == $mk['matkul_id']) ? 'selected' : '';
                                                 echo "<option value='{$mk['matkul_id']}' $selected>{$mk['nama_matkul']}</option>";

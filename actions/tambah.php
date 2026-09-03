@@ -382,14 +382,15 @@ if (isset($_POST['tambah'])) {
                                     // Get active periode_id
                                     $q_per_add = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
                                     $per_add = mysqli_fetch_assoc($q_per_add);
-                                    $pid_add = $per_add['id'] ?? 0;
+                                    $pid_add = (int)($per_add['id'] ?? 0);
 
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
                                         mk.id AS matkul_id,
                                         mk.nama_matkul
                                         FROM krs k
                                         JOIN mata_kuliah mk ON k.matkul_id = mk.id
-                                        WHERE mk.id NOT IN (SELECT matkul_id FROM jadwal_matkul WHERE periode_id = '$pid_add')
+                                        WHERE k.periode_id = '$pid_add'
+                                        AND mk.id NOT IN (SELECT matkul_id FROM jadwal_matkul WHERE periode_id = '$pid_add')
                                         ORDER BY mk.nama_matkul ASC");
                                     while ($mk = mysqli_fetch_assoc($query_mk)) {
                                         echo "<option value='{$mk['matkul_id']}'>{$mk['nama_matkul']}</option>";
@@ -497,11 +498,16 @@ if (isset($_POST['tambah'])) {
                                 <select name="matkul_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Mata Kuliah --</option>
                                     <?php
+                                    $q_per_tugas = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+                                    $per_tugas = mysqli_fetch_assoc($q_per_tugas);
+                                    $pid_tugas = (int)($per_tugas['id'] ?? 0);
+
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
                                         mk.id AS matkul_id,
                                         mk.nama_matkul
                                         FROM krs k
                                         JOIN mata_kuliah mk ON k.matkul_id = mk.id
+                                        WHERE k.periode_id = '$pid_tugas'
                                         ORDER BY mk.nama_matkul ASC");
                                     while ($mk = mysqli_fetch_assoc($query_mk)) {
                                         echo "<option value='{$mk['matkul_id']}'>{$mk['nama_matkul']}</option>";
