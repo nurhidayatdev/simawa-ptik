@@ -3,6 +3,11 @@ include 'koneksi.php';
 
 include 'includes/pesan.php';
 
+// Ambil periode aktif
+$q_periode = mysqli_query($koneksi, "SELECT id, tahun_periode, semester_nama FROM periode WHERE status = 'aktif' LIMIT 1");
+$periode_aktif = mysqli_fetch_assoc($q_periode);
+$periode_id = (int)($periode_aktif['id'] ?? 0);
+
 $result = mysqli_query($koneksi, "SELECT 
     jm.id, jm.matkul_id, jm.hari, jm.jam_mulai_ke, jm.jam_selesai_ke, 
     jk_start.jam_mulai, jk_end.jam_selesai,
@@ -16,7 +21,8 @@ LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
 LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
-ORDER BY jm.hari, jk_start.jam_mulai");
+WHERE jm.periode_id = $periode_id
+ORDER BY FIELD(jm.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), jk_start.jam_mulai");
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -36,8 +42,16 @@ ORDER BY jm.hari, jk_start.jam_mulai");
 
 
     <div class="container mx-auto px-6 py-12 flex-grow">
-        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white transition-colors text-center">Jadwal Mata Kuliah</h1>
-        <p class="text-gray-500 dark:text-slate-400 mb-8 transition-colors text-sm text-center">Pantau waktu perkuliahan, ruangan, dan dosen pengampu untuk membantu perencanaan studi harian Anda.</p>
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white transition-colors">Jadwal Mata Kuliah</h1>
+            <?php if ($periode_aktif): ?>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/50 mb-3">
+                    <i class="fas fa-calendar-alt text-[10px]"></i>
+                    <span>Periode: <?= htmlspecialchars($periode_aktif['tahun_periode'] . ' - ' . $periode_aktif['semester_nama']) ?></span>
+                </div>
+            <?php endif; ?>
+            <p class="text-gray-500 dark:text-slate-400 transition-colors text-sm">Pantau waktu perkuliahan, ruangan, dan dosen pengampu untuk membantu perencanaan studi harian Anda.</p>
+        </div>
         
 
         <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden transition-colors">
@@ -70,23 +84,34 @@ ORDER BY jm.hari, jk_start.jam_mulai");
                         <?php
                         $no = 1;
                         $id = 1;
-                        while ($row = mysqli_fetch_assoc($result)) : ?>
-                            <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100 dark:bg-slate-800/40' : 'bg-white dark:bg-slate-900' ?> hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors">
+                        if ($result && mysqli_num_rows($result) > 0) :
+                            while ($row = mysqli_fetch_assoc($result)) : ?>
+                                <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-100 dark:bg-slate-800/40' : 'bg-white dark:bg-slate-900' ?> hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors">
 
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $no++; ?></td>
+                                    <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $no++; ?></td>
 
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['hari']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['hari']; ?></td>
+                                    <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['jam_mulai_ke']; ?>-<?= $row['jam_selesai_ke']; ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= date('H.i', strtotime($row['jam_mulai'])); ?> - <?= date('H.i', strtotime($row['jam_selesai'])); ?></td>
 
-                                <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['ruangan']; ?></td>
-                                <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['nama_matkul']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['sks']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['dosen_pengampu']; ?></td>
-                                <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['dosen_mitra']; ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['ruangan']; ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['nama_matkul']; ?></td>
+                                    <td class="toggle-col hidden md:table-cell px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['sks']; ?></td>
+                                    <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['dosen_pengampu']; ?></td>
+                                    <td class="toggle-col hidden md:table-cell px-3 py-2 text-xs text-slate-800 dark:text-slate-300 transition-colors"><?= $row['dosen_mitra']; ?></td>
 
+                                </tr>
+                            <?php endwhile;
+                        else: ?>
+                            <tr>
+                                <td colspan="9" class="px-4 py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                                    <div class="flex flex-col items-center justify-center gap-1.5">
+                                        <i class="fas fa-calendar-times text-2xl text-slate-300 dark:text-slate-600 mb-1"></i>
+                                        <span>Tidak ada jadwal kuliah untuk periode aktif saat ini.</span>
+                                    </div>
+                                </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
