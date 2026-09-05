@@ -13,16 +13,20 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
         AND (kegiatan LIKE '%Kuliah Bagian Pertama%') 
         ORDER BY tanggal_mulai ASC LIMIT 1");
     $start_res = mysqli_fetch_assoc($q_start);
-    $start_date = $start_res['tanggal_mulai'] ?? "2026-01-19";
+    $start_date = $start_res['tanggal_mulai'] ?? "2026-08-18";
+
+    // Hitung hari Senin sebagai awal pekan perkuliahan (siklus Senin s/d Jumat)
+    $day_of_week = (int)date('N', strtotime($start_date)); // 1 = Senin, ..., 7 = Minggu
+    $start_monday = date('Y-m-d', strtotime("$start_date - " . ($day_of_week - 1) . " days"));
 
     // 3. Tentukan Target (Hari & Tanggal)
     if ($day === 'minggu_ini') {
-        // Cari Senin minggu ini
-        $monday_this_week = date('Y-m-d', strtotime('monday this week'));
-        $target_date_start = $monday_this_week;
-        $target_date_end = date('Y-m-d', strtotime('sunday this week'));
+        // Cari Senin pekan ini
+        $today_dow = (int)date('N'); // 1 = Senin, ..., 7 = Minggu
+        $target_date_start = date('Y-m-d', strtotime("-" . ($today_dow - 1) . " days"));
+        $target_date_end = date('Y-m-d', strtotime("$target_date_start + 4 days")); // Jumat
         
-        $diff = strtotime($target_date_start) - strtotime($start_date);
+        $diff = strtotime($target_date_start) - strtotime($start_monday);
         $days_diff = floor($diff / (60 * 60 * 24));
         $minggu_ke = floor($days_diff / 7) + 1;
     } else {
@@ -36,7 +40,7 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
         ];
         $target_ind = $days_map[$target_eng];
 
-        $diff = strtotime($target_date) - strtotime($start_date);
+        $diff = strtotime($target_date) - strtotime($start_monday);
         $days_diff = floor($diff / (60 * 60 * 24));
         $minggu_ke = floor($days_diff / 7) + 1;
     }
@@ -72,7 +76,9 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     // 5. Format Pesan
     $msg = "📢 *REMINDER PIKET PROYEKTOR*\n";
     if ($day === 'minggu_ini') {
-        $msg .= "📅 *Minggu ke-{$minggu_ke}* (Seluruh Pekan)\n\n";
+        $start_week_date = date('d M', strtotime($target_date_start));
+        $end_week_date = date('d M Y', strtotime($target_date_end));
+        $msg .= "📅 *Minggu ke-{$minggu_ke}* ({$start_week_date} - {$end_week_date})\n\n";
     } else {
         $header_label = ($day === 'hari_ini') ? 'Hari Ini' : 'Besok';
         $msg .= "📅 {$header_label}: *{$target_ind}, " . date('d M Y', strtotime($target_date)) . "* | Minggu ke-{$minggu_ke}\n\n";

@@ -72,28 +72,28 @@ while ($row = mysqli_fetch_assoc($res_krs)) {
 $filter_blok_target = isset($_GET['blok']) ? intval($_GET['blok']) : null;
 
 if ($filter_blok_target) {
-    $w_start = ($filter_blok_target * 2) - 1;
-    $w_end = $filter_blok_target * 2;
-    mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id AND (minggu_ke = $w_start OR minggu_ke = $w_end)");
+    $w_start = ($filter_blok_target - 1) * 3 + 1;
+    $w_end = $filter_blok_target * 3;
+    mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id AND (minggu_ke BETWEEN $w_start AND $w_end)");
 } else {
     mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id");
 }
 
-// 5. Algoritma "Bagi Habis" Eksak dengan Pengelompokan Jenis Kelamin (Siklus 2 Mingguan)
+// 5. Algoritma "Bagi Habis" Eksak dengan Pengelompokan Jenis Kelamin (Siklus 3 Mingguan)
 if ($filter_blok_target) {
-    // MODE: ACAK 1 BLOK (2 MINGGU) TERTENTU
+    // MODE: ACAK 1 BLOK (3 MINGGU) TERTENTU
     $block = $filter_blok_target - 1;
     $boys_pool = $boys_master;
     $girls_pool = $girls_master;
     shuffle($boys_pool);
     shuffle($girls_pool);
 
-    // Siapkan 14 slot untuk 2 minggu ini
+    // Siapkan slot untuk 3 minggu ini
     $block_slots = [];
-    for ($w = 1; $w <= 2; $w++) {
+    for ($w = 1; $w <= 3; $w++) {
         foreach ($one_week_schedules as $sch) {
             $block_slots[] = [
-                'week' => ($block * 2) + $w,
+                'week' => ($block * 3) + $w,
                 'jid' => $sch['id'],
                 'mid' => $sch['matkul_id']
             ];
@@ -175,19 +175,19 @@ if ($filter_blok_target) {
         }
     }
 } else {
-    // MODE: ACAK SEMUA 18 MINGGU
-    for ($block = 0; $block < 9; $block++) {
+    // MODE: ACAK SEMUA 18 MINGGU (6 BLOK x 3 MINGGU)
+    for ($block = 0; $block < 6; $block++) {
     $boys_pool = $boys_master;
     $girls_pool = $girls_master;
     shuffle($boys_pool);
     shuffle($girls_pool);
 
-    // Siapkan 14 slot untuk 2 minggu ini
+    // Siapkan slot untuk 3 minggu ini
     $block_slots = [];
-    for ($w = 1; $w <= 2; $w++) {
+    for ($w = 1; $w <= 3; $w++) {
         foreach ($one_week_schedules as $sch) {
             $block_slots[] = [
-                'week' => ($block * 2) + $w,
+                'week' => ($block * 3) + $w,
                 'jid' => $sch['id'],
                 'mid' => $sch['matkul_id']
             ];

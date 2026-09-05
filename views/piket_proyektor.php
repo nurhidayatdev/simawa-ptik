@@ -19,9 +19,6 @@ $is_admin = in_array($role, $admin_roles);
 // Include foto helpers for cache busting
 include_once '../functions/foto_helpers.php';
 
-// Include foto helpers for cache busting
-include_once '../functions/foto_helpers.php';
-
 /* =====================
    AMBIL PERIODE AKTIF
    ===================== */
@@ -33,11 +30,15 @@ $periode_text = $periode ? $periode['tahun_periode'] . ' - ' . $periode['semeste
 // Ambil Tanggal Mulai Kuliah dari Kalender Akademik (Otomatis)
 $q_start = mysqli_query($koneksi, "SELECT tanggal_mulai FROM kalender_akademik WHERE periode_id = $periode_id AND (kegiatan LIKE '%Kuliah Bagian Pertama%') ORDER BY tanggal_mulai ASC LIMIT 1");
 $start_res = mysqli_fetch_assoc($q_start);
-$start_date = $start_res['tanggal_mulai'] ?? "2026-01-19"; // Fallback jika tidak ditemukan
+$start_date = $start_res['tanggal_mulai'] ?? "2026-08-18"; // Fallback jika tidak ditemukan
 
-// Hitung Minggu Default berdasarkan tanggal hari ini
+// Hitung hari Senin sebagai awal pekan perkuliahan (siklus Senin s/d Jumat)
+$day_of_week = (int)date('N', strtotime($start_date)); // 1 = Senin, ..., 7 = Minggu
+$start_monday = date('Y-m-d', strtotime("$start_date - " . ($day_of_week - 1) . " days"));
+
+// Hitung Minggu Default berdasarkan tanggal hari ini (siklus Senin - Minggu)
 $today = date('Y-m-d');
-$diff = strtotime($today) - strtotime($start_date);
+$diff = strtotime($today) - strtotime($start_monday);
 $default_minggu = floor($diff / (7 * 24 * 60 * 60)) + 1;
 if ($default_minggu < 1) $default_minggu = 1;
 if ($default_minggu > 18) $default_minggu = 18;
@@ -85,10 +86,12 @@ for ($i = 1; $i <= 18; $i++) {
 }
 
 $block_options = [];
-for ($i = 1; $i <= 9; $i++) {
-    $w1 = ($i * 2) - 1;
-    $w2 = $i * 2;
-    $block_options[$i] = "Blok $i (Minggu $w1 - $w2)";
+for ($i = 1; $i <= 6; $i++) {
+    $w1 = ($i - 1) * 3 + 1;
+    $w2 = $i * 3;
+    $b_start_monday = date('d M', strtotime("$start_monday + " . (($w1 - 1) * 7) . " days"));
+    $b_end_friday = date('d M Y', strtotime("$start_monday + " . (($w2 - 1) * 7 + 4) . " days"));
+    $block_options[$i] = "Blok $i (Minggu $w1 - $w2: $b_start_monday - $b_end_friday)";
 }
 
 // Data Piket Saya (Summary)
@@ -105,10 +108,19 @@ if ($my_mhs_id) {
         LEFT JOIN ruangan r ON jm.ruangan_id = r.id
         WHERE p.mahasiswa_id = $my_mhs_id AND p.periode_id = $periode_id
         ORDER BY p.minggu_ke ASC, FIELD(jm.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), jk_start.jam_mulai ASC");
+    $day_map_mhs = [
+        'Senin'  => 0,
+        'Selasa' => 1,
+        'Rabu'   => 2,
+        'Kamis'  => 3,
+        'Jumat'  => 4,
+        'Sabtu'  => 5,
+        'Minggu' => 6
+    ];
     while ($mp = mysqli_fetch_assoc($q_mp)) {
-        $d_map = ['Senin' => 0, 'Selasa' => 1, 'Rabu' => 2, 'Kamis' => 3, 'Jumat' => 4, 'Sabtu' => 5, 'Minggu' => 6];
-        $d_idx = $d_map[$mp['hari']] ?? 0;
-        $mp['tgl_formatted'] = date('d M Y', strtotime($start_date . " + " . (($mp['minggu_ke'] - 1) * 7 + $d_idx) . " days"));
+        $my_monday = date('Y-m-d', strtotime("$start_monday + " . (($mp['minggu_ke'] - 1) * 7) . " days"));
+        $d_offset = $day_map_mhs[$mp['hari']] ?? 0;
+        $mp['tgl_formatted'] = date('d M Y', strtotime("$my_monday + $d_offset days"));
         
         // Ambil rekan piket
         $jid = $mp['jadwal_matkul_id'];
@@ -206,8 +218,10 @@ if ($my_mhs_id) {
                     <select name="minggu" onchange="this.form.submit()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-indigo-700 dark:text-indigo-400 rounded-lg px-3 py-2.5 appearance-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 cursor-pointer shadow-sm">
                         <?php
                         for ($i = 1; $i <= 18; $i++):
-                            $week_start = date('d M', strtotime($start_date . " + " . (($i - 1) * 7) . " days"));
-                            $week_end = date('d M Y', strtotime($start_date . " + " . (($i * 7) - 1) . " days"));
+                            $w_monday = date('Y-m-d', strtotime("$start_monday + " . (($i - 1) * 7) . " days"));
+                            $w_friday = date('Y-m-d', strtotime("$w_monday + 4 days"));
+                            $week_start = date('d M', strtotime($w_monday));
+                            $week_end = date('d M Y', strtotime($w_friday));
                         ?>
                             <option value="<?= $i ?>" <?= $filter_minggu == $i ? 'selected' : '' ?>>
                                 Minggu <?= $i ?> (<?= $week_start ?> - <?= $week_end ?>)
@@ -231,10 +245,19 @@ if ($my_mhs_id) {
             <?php else: ?>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     <?php
-                    $day_map = ['Senin' => 0, 'Selasa' => 1, 'Rabu' => 2, 'Kamis' => 3, 'Jumat' => 4, 'Sabtu' => 5, 'Minggu' => 6];
+                    $day_map = [
+                        'Senin'  => 0,
+                        'Selasa' => 1,
+                        'Rabu'   => 2,
+                        'Kamis'  => 3,
+                        'Jumat'  => 4,
+                        'Sabtu'  => 5,
+                        'Minggu' => 6
+                    ];
+                    $filter_monday = date('Y-m-d', strtotime("$start_monday + " . (($filter_minggu - 1) * 7) . " days"));
                     foreach ($piket_data as $jid => $data):
-                        $day_idx = $day_map[$data['hari']] ?? 0;
-                        $duty_date = date('d M Y', strtotime($start_date . " + " . (($filter_minggu - 1) * 7 + $day_idx) . " days"));
+                        $day_offset = $day_map[$data['hari']] ?? 0;
+                        $duty_date = date('d M Y', strtotime("$filter_monday + $day_offset days"));
                     ?>
                         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-md transition-all group">
                             <div class="bg-slate-50 dark:bg-slate-950 px-4 py-3 border-b border-slate-100 dark:border-slate-800 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/30 transition-colors">
@@ -333,7 +356,7 @@ if ($my_mhs_id) {
                 denyButtonColor: '#10b981',
                 cancelButtonColor: '#6b7280',
                 confirmButtonText: 'Acak Semua (18 Minggu)',
-                denyButtonText: 'Acak 2 Minggu Saja',
+                denyButtonText: 'Acak 3 Minggu Saja',
                 cancelButtonText: 'Batal',
                 customClass: {
                     popup: 'rounded-2xl',
@@ -355,10 +378,10 @@ if ($my_mhs_id) {
                         if(c.isConfirmed) window.location.href = '../actions/tambah_piket_proyektor.php';
                     });
                 } else if (result.isDenied) {
-                    // Acak Blok (2 Minggu)
+                    // Acak Blok (3 Minggu)
                     Swal.fire({
-                        title: 'Acak 2 Minggu Tertentu',
-                        text: "Pilih blok yang ingin diacak ulang (berisi 2 minggu):",
+                        title: 'Acak 3 Minggu Tertentu',
+                        text: "Pilih blok yang ingin diacak ulang (berisi 3 minggu):",
                         input: 'select',
                         inputOptions: <?= json_encode($block_options) ?>,
                         showCancelButton: true,
