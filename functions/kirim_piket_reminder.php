@@ -1,5 +1,5 @@
 <?php
-function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok', $custom_data = null)
+function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok', $custom_data = null, $minggu_ke = null)
 {
     date_default_timezone_set('Asia/Makassar');
 
@@ -20,15 +20,21 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     $start_monday = date('Y-m-d', strtotime("$start_date - " . ($day_of_week - 1) . " days"));
 
     // 3. Tentukan Target (Hari & Tanggal)
-    if ($day === 'minggu_ini') {
-        // Cari Senin pekan ini
-        $today_dow = (int)date('N'); // 1 = Senin, ..., 7 = Minggu
-        $target_date_start = date('Y-m-d', strtotime("-" . ($today_dow - 1) . " days"));
-        $target_date_end = date('Y-m-d', strtotime("$target_date_start + 4 days")); // Jumat
-        
-        $diff = strtotime($target_date_start) - strtotime($start_monday);
-        $days_diff = floor($diff / (60 * 60 * 24));
-        $minggu_ke = floor($days_diff / 7) + 1;
+    $is_weekly = in_array($day, ['minggu', 'minggu_ini', 'seluruh_minggu']);
+    if ($is_weekly) {
+        if ($minggu_ke !== null && $minggu_ke >= 1 && $minggu_ke <= 18) {
+            $target_date_start = date('Y-m-d', strtotime("$start_monday + " . (($minggu_ke - 1) * 7) . " days"));
+            $target_date_end = date('Y-m-d', strtotime("$target_date_start + 4 days")); // Jumat
+        } else {
+            // Cari Senin pekan ini
+            $today_dow = (int)date('N'); // 1 = Senin, ..., 7 = Minggu
+            $target_date_start = date('Y-m-d', strtotime("-" . ($today_dow - 1) . " days"));
+            $target_date_end = date('Y-m-d', strtotime("$target_date_start + 4 days")); // Jumat
+            
+            $diff = strtotime($target_date_start) - strtotime($start_monday);
+            $days_diff = floor($diff / (60 * 60 * 24));
+            $minggu_ke = floor($days_diff / 7) + 1;
+        }
     } else {
         $offset = ($day === 'hari_ini') ? 'now' : '+1 day';
         $target_eng = date('l', strtotime($offset));
@@ -61,7 +67,7 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
               WHERE p.periode_id = $p_id 
               AND p.minggu_ke = $minggu_ke ";
     
-    if ($day !== 'minggu_ini') {
+    if (!$is_weekly) {
         $query .= " AND jm.hari = '$target_ind' ";
     }
     
@@ -70,12 +76,12 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     $res = mysqli_query($koneksi, $query);
 
     if (mysqli_num_rows($res) == 0) {
-        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor untuk periode yang dipilih."];
+        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor untuk periode yang dipilih (Minggu $minggu_ke)."];
     }
 
     // 5. Format Pesan
     $msg = "📢 *REMINDER PIKET PROYEKTOR*\n";
-    if ($day === 'minggu_ini') {
+    if ($is_weekly) {
         $start_week_date = date('d M', strtotime($target_date_start));
         $end_week_date = date('d M Y', strtotime($target_date_end));
         $msg .= "📅 *Minggu ke-{$minggu_ke}* ({$start_week_date} - {$end_week_date})\n\n";
@@ -92,7 +98,7 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
         $jam = date('H:i', strtotime($row['jam_mulai'])) . ' - ' . date('H:i', strtotime($row['jam_selesai']));
         $ruangan = $row['nama_ruangan'] ?? '-';
         
-        $group_key = ($day === 'minggu_ini') ? $hari . '_' . $jid : $jid;
+        $group_key = $is_weekly ? $hari . '_' . $jid : $jid;
 
         if (!isset($piket_grouped[$group_key])) {
             $piket_grouped[$group_key] = [
@@ -108,7 +114,7 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
 
     $current_day_print = "";
     foreach ($piket_grouped as $data) {
-        if ($day === 'minggu_ini' && $current_day_print !== $data['hari']) {
+        if ($is_weekly && $current_day_print !== $data['hari']) {
             $current_day_print = $data['hari'];
             $msg .= "📌 *HARI " . strtoupper($current_day_print) . "*\n";
         }
@@ -121,11 +127,11 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     $msg .= "⚠️ *Catatan:*\n_Jadwal di atas bersifat situasional. Waktu dan lokasi dapat berubah mengikuti kondisi perkuliahan. Harap tetap memantau instruksi final dari Ketua Tingkat sebelum bertugas._";
 
     // 6. Kirim ke WhatsApp via Fonnte
-    include_once 'helpers.php';
+    require_once __DIR__ . '/helpers.php';
     $status = sendFonnteMessage($msg);
 
     if ($status['success']) {
-        return ['status' => 'success', 'message' => 'Notifikasi piket proyektor berhasil dikirim ke WhatsApp!'];
+        return ['status' => 'success', 'message' => "Notifikasi piket proyektor Minggu ke-{$minggu_ke} berhasil dikirim ke WhatsApp!"];
     } else {
         return ['status' => 'error', 'message' => 'Gagal mengirim pesan ke WhatsApp. Error: ' . ($status['error'] ?? 'Unknown')];
     }

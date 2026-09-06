@@ -163,7 +163,8 @@ if (isset($_POST['action'])) {
         if (isset($_POST['custom_payload'])) {
             $custom_data = json_decode($_POST['custom_payload'], true);
         }
-        $response = kirimPiketReminder($koneksi, null, null, $day, $custom_data);
+        $minggu_ke = isset($_POST['minggu_ke']) && !empty($_POST['minggu_ke']) ? (int)$_POST['minggu_ke'] : null;
+        $response = kirimPiketReminder($koneksi, null, null, $day, $custom_data, $minggu_ke);
     }
 
     $_SESSION['reminder_msg'] = $response['message'];
@@ -202,6 +203,28 @@ $q_sets = mysqli_query($koneksi, "
 $group_sets = [];
 while ($row = mysqli_fetch_assoc($q_sets)) {
     $group_sets[] = $row;
+}
+
+// Kalender akademik untuk opsi piket mingguan
+$q_start_piket = mysqli_query($koneksi, "SELECT tanggal_mulai FROM kalender_akademik WHERE periode_id = $p_id AND (kegiatan LIKE '%Kuliah Bagian Pertama%') ORDER BY tanggal_mulai ASC LIMIT 1");
+$start_piket_res = mysqli_fetch_assoc($q_start_piket);
+$start_piket_date = $start_piket_res['tanggal_mulai'] ?? "2026-08-18";
+$dow_piket = (int)date('N', strtotime($start_piket_date));
+$start_monday_piket = date('Y-m-d', strtotime("$start_piket_date - " . ($dow_piket - 1) . " days"));
+$today_piket = date('Y-m-d');
+$diff_piket = strtotime($today_piket) - strtotime($start_monday_piket);
+$default_minggu_piket = floor($diff_piket / (7 * 24 * 60 * 60)) + 1;
+if ($default_minggu_piket < 1) $default_minggu_piket = 1;
+if ($default_minggu_piket > 18) $default_minggu_piket = 18;
+
+$week_piket_options = [];
+for ($i = 1; $i <= 18; $i++) {
+    $w_monday = date('Y-m-d', strtotime("$start_monday_piket + " . (($i - 1) * 7) . " days"));
+    $w_friday = date('Y-m-d', strtotime("$w_monday + 4 days"));
+    $week_start = date('d M', strtotime($w_monday));
+    $week_end = date('d M Y', strtotime($w_friday));
+    $is_cur = ($i == $default_minggu_piket) ? ' (Minggu Ini)' : '';
+    $week_piket_options[$i] = "Minggu $i ($week_start - $week_end)$is_cur";
 }
 
 // Prepare SweetAlert configuration for response messages
@@ -402,13 +425,14 @@ if (isset($_SESSION['reminder_msg'])) {
             <form method="POST" id="formPiket" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
                 <input type="hidden" name="action" value="piket">
                 <input type="hidden" name="day" id="piket_day" value="besok">
+                <input type="hidden" name="minggu_ke" id="piket_minggu_ke" value="">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 bg-indigo-900 text-white rounded-lg flex items-center justify-center flex-shrink-0 relative">
                         <i class="fa fa-plug text-xl"></i>
                     </div>
                     <div class="flex-grow">
                         <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Piket Proyektor</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Kirim pengingat petugas piket hari ini, besok, atau sepekan ini</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Kirim pengingat petugas piket hari ini, besok, atau seluruh minggu</p>
                         <button type="button" onclick="confirmPiket()" class="w-full bg-indigo-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
                             <i class="fab fa-whatsapp mr-1"></i> Kirim
                         </button>
@@ -465,6 +489,9 @@ if (isset($_SESSION['reminder_msg'])) {
             });
         }
 
+        const weekPiketOptions = <?= json_encode($week_piket_options) ?>;
+        const defaultMingguPiket = <?= json_encode($default_minggu_piket) ?>;
+
         function confirmPiket() {
             Swal.fire({
                 title: 'Kirim Notifikasi Piket',
@@ -473,12 +500,12 @@ if (isset($_SESSION['reminder_msg'])) {
                 inputOptions: {
                     'hari_ini': 'Piket Hari Ini',
                     'besok': 'Piket Besok',
-                    'minggu_ini': 'Piket Seluruh Minggu Ini'
+                    'seluruh_minggu': 'Piket Seluruh Minggu'
                 },
                 inputPlaceholder: 'Pilih tipe pengingat...',
                 showCancelButton: true,
                 confirmButtonColor: '#312e81',
-                confirmButtonText: '<i class="fab fa-whatsapp"></i> Kirim Notifikasi',
+                confirmButtonText: 'Lanjutkan <i class="fa fa-arrow-right ml-1"></i>',
                 cancelButtonText: 'Batal',
                 inputValidator: (value) => {
                     if (!value) {
@@ -487,8 +514,36 @@ if (isset($_SESSION['reminder_msg'])) {
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('piket_day').value = result.value;
-                    document.getElementById('formPiket').submit();
+                    if (result.value === 'seluruh_minggu' || result.value === 'minggu_ini') {
+                        Swal.fire({
+                            title: 'Pilih Minggu Perkuliahan',
+                            text: 'Pilih minggu jadwal piket yang ingin dikirim:',
+                            input: 'select',
+                            inputOptions: weekPiketOptions,
+                            inputValue: defaultMingguPiket || 1,
+                            showCancelButton: true,
+                            confirmButtonColor: '#312e81',
+                            confirmButtonText: '<i class="fab fa-whatsapp"></i> Kirim Notifikasi',
+                            cancelButtonText: 'Kembali',
+                            inputValidator: (val) => {
+                                if (!val) {
+                                    return 'Silakan pilih minggu terlebih dahulu!'
+                                }
+                            }
+                        }).then((weekResult) => {
+                            if (weekResult.isConfirmed) {
+                                document.getElementById('piket_day').value = 'seluruh_minggu';
+                                document.getElementById('piket_minggu_ke').value = weekResult.value;
+                                document.getElementById('formPiket').submit();
+                            } else if (weekResult.dismiss === Swal.DismissReason.cancel) {
+                                confirmPiket();
+                            }
+                        });
+                    } else {
+                        document.getElementById('piket_day').value = result.value;
+                        document.getElementById('piket_minggu_ke').value = '';
+                        document.getElementById('formPiket').submit();
+                    }
                 }
             });
         }

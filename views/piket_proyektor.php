@@ -94,6 +94,16 @@ for ($i = 1; $i <= 6; $i++) {
     $block_options[$i] = "Blok $i (Minggu $w1 - $w2: $b_start_monday - $b_end_friday)";
 }
 
+$week_reminder_options = [];
+for ($i = 1; $i <= 18; $i++) {
+    $w_monday = date('Y-m-d', strtotime("$start_monday + " . (($i - 1) * 7) . " days"));
+    $w_friday = date('Y-m-d', strtotime("$w_monday + 4 days"));
+    $week_start = date('d M', strtotime($w_monday));
+    $week_end = date('d M Y', strtotime($w_friday));
+    $is_cur = ($i == $default_minggu) ? ' (Minggu Ini)' : '';
+    $week_reminder_options[$i] = "Minggu $i ($week_start - $week_end)$is_cur";
+}
+
 // Data Piket Saya (Summary)
 $res_mhs_piket = mysqli_query($koneksi, "SELECT id FROM mahasiswa WHERE user_id = '$user_id'");
 $mhs_piket_row = mysqli_fetch_assoc($res_mhs_piket);
@@ -197,6 +207,7 @@ if ($my_mhs_id) {
                             <form action="reminder" method="POST" id="reminderForm" class="w-full sm:w-auto">
                                 <input type="hidden" name="action" value="piket">
                                 <input type="hidden" name="day" id="piket_day" value="besok">
+                                <input type="hidden" name="minggu_ke" id="piket_minggu_ke" value="">
                                 <input type="hidden" name="redirect" value="piket_proyektor">
                                 <button type="button" onclick="confirmPiket()" class="w-full bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all uppercase tracking-wide">
                                     <i class="fab fa-whatsapp text-xs"></i> Notifikasi
@@ -311,6 +322,10 @@ if ($my_mhs_id) {
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        const weekReminderOptions = <?= json_encode($week_reminder_options) ?>;
+        const currentFilterMinggu = <?= json_encode($filter_minggu) ?>;
+        const currentDefaultMinggu = <?= json_encode($default_minggu) ?>;
+
         function confirmPiket() {
             Swal.fire({
                 title: 'Kirim Notifikasi WhatsApp',
@@ -319,12 +334,12 @@ if ($my_mhs_id) {
                 inputOptions: {
                     'hari_ini': 'Piket Hari Ini',
                     'besok': 'Piket Besok',
-                    'minggu_ini': 'Piket Seluruh Minggu Ini'
+                    'seluruh_minggu': 'Piket Seluruh Minggu'
                 },
                 inputPlaceholder: 'Pilih tipe pengingat...',
                 showCancelButton: true,
                 confirmButtonColor: '#312e81',
-                confirmButtonText: '<i class="fab fa-whatsapp"></i> Kirim Notifikasi',
+                confirmButtonText: 'Lanjutkan <i class="fa fa-arrow-right ml-1"></i>',
                 cancelButtonText: 'Batal',
                 customClass: {
                     popup: 'rounded-2xl',
@@ -339,8 +354,42 @@ if ($my_mhs_id) {
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('piket_day').value = result.value;
-                    document.getElementById('reminderForm').submit();
+                    if (result.value === 'seluruh_minggu' || result.value === 'minggu_ini') {
+                        Swal.fire({
+                            title: 'Pilih Minggu Perkuliahan',
+                            text: "Pilih minggu jadwal piket yang ingin dikirim:",
+                            input: 'select',
+                            inputOptions: weekReminderOptions,
+                            inputValue: currentFilterMinggu || currentDefaultMinggu || 1,
+                            showCancelButton: true,
+                            confirmButtonColor: '#312e81',
+                            confirmButtonText: '<i class="fab fa-whatsapp"></i> Kirim Notifikasi',
+                            cancelButtonText: 'Kembali',
+                            customClass: {
+                                popup: 'rounded-2xl',
+                                title: 'text-lg font-bold',
+                                htmlContainer: 'text-sm',
+                                input: 'text-xs font-semibold rounded-lg'
+                            },
+                            inputValidator: (val) => {
+                                if (!val) {
+                                    return 'Silakan pilih minggu terlebih dahulu!'
+                                }
+                            }
+                        }).then((weekResult) => {
+                            if (weekResult.isConfirmed) {
+                                document.getElementById('piket_day').value = 'seluruh_minggu';
+                                document.getElementById('piket_minggu_ke').value = weekResult.value;
+                                document.getElementById('reminderForm').submit();
+                            } else if (weekResult.dismiss === Swal.DismissReason.cancel) {
+                                confirmPiket();
+                            }
+                        });
+                    } else {
+                        document.getElementById('piket_day').value = result.value;
+                        document.getElementById('piket_minggu_ke').value = '';
+                        document.getElementById('reminderForm').submit();
+                    }
                 }
             });
         }
