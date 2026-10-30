@@ -19,6 +19,9 @@ if ($role === 'Administrator Utama') {
 } elseif ($role === 'Ketua Tingkat') {
     header("Location: dashboard_keti.php");
     exit;
+} elseif ($role === 'Sekretaris') {
+    header("Location: dashboard_sekretaris.php");
+    exit;
 }
 
 // Include foto helpers for cache busting

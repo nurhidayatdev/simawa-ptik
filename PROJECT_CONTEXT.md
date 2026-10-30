@@ -91,6 +91,7 @@ simawa-ptik/
 ├── dashboard.php                 # Router & dashboard internal operasional kelas
 ├── dashboard_admin.php           # Executive Dashboard khusus Administrator Utama (Multi-Kelas)
 ├── dashboard_keti.php            # Dedicated Dashboard khusus Ketua Tingkat (Pusat Kendali Kelas)
+├── dashboard_sekretaris.php      # Dedicated Dashboard khusus Sekretaris (Pusat Presensi Kelas)
 ├── design.md                     # STANDAR RESMI UI/UX & Design System SIMAWA PTIK
 ├── PROJECT_CONTEXT.md            # DOKUMEN INI (Konteks menyeluruh proyek & pengujian)
 │
@@ -203,7 +204,7 @@ simawa-ptik/
 | :--- | :--- | :--- |
 | **Administrator Utama** | `'Administrator Utama'` | Hak akses penuh (*superadmin*): semua menu CRUD di folder `database/`, konfigurasi sistem, dan toggle maintenance. |
 | **Ketua Tingkat** | `'Ketua Tingkat'` | Akses manajerial perkuliahan: absensi, kas, pembagian kelompok, jadwal piket, dan manajemen tugas. |
-| **Sekretaris** | `'Sekretaris'` | Input dan rekap presensi mahasiswa (`views/manajemen_absen.php`, `views/rekap_absen.php`). |
+| **Sekretaris** | `'Sekretaris'` | Dedicated Presensi Dashboard (`dashboard_sekretaris.php`), input dan rekap presensi mahasiswa (`views/manajemen_absen.php`, `views/rekap_absen.php`). |
 | **Bendahara** | `'Bendahara'` | Input transaksi kas, rekapitulasi saldo, dan penagihan iuran kelas (`views/manajemen_kas.php`, `views/rekap_kas.php`). |
 | **Mahasiswa** | `'Mahasiswa'` | Akses portal mahasiswa: memantau jadwal, tugas pribadi, histori kas sendiri, KSM, dan kelompok. |
 
