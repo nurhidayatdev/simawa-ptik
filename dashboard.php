@@ -12,6 +12,12 @@ $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
+// Routing: Administrator Utama memiliki executive multi-class dashboard sendiri
+if ($role === 'Administrator Utama') {
+    header("Location: dashboard_admin.php");
+    exit;
+}
+
 // Include foto helpers for cache busting
 include_once 'functions/foto_helpers.php';
 

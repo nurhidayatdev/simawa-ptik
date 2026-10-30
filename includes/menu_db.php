@@ -91,7 +91,11 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
         <nav class="mt-4 h-[calc(100vh-4rem)] overflow-y-auto pb-10">
             <div class="px-4 space-y-2">
                 <!-- Dashboard Menu -->
-                <a href="<?= $base ?>dashboard" class="flex items-center px-4 py-2 text-indigo-900 dark:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-indigo-900/50">
+                <?php 
+                $menu_role = $_SESSION['role'] ?? '';
+                $dashboard_target = ($menu_role === 'Administrator Utama') ? $base . 'dashboard_admin.php' : $base . 'dashboard';
+                ?>
+                <a href="<?= $dashboard_target ?>" class="flex items-center px-4 py-2 text-indigo-900 dark:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-indigo-900/50">
                     <i class="fa fa-home w-4 h-4 mr-4"></i>
                     <span class="text-xs font-medium">Dashboard</span>
                 </a>
