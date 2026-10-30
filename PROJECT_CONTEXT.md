@@ -88,7 +88,8 @@ simawa-ptik/
 ├── koneksi.php                   # Koneksi MySQLi + init settings + enforcement maintenance
 ├── index.php                     # Landing page utama publik
 ├── login.php                     # Halaman autentikasi login pengguna
-├── dashboard.php                 # Dashboard internal (statistik, jadwal, tren kas, absensi)
+├── dashboard.php                 # Router & dashboard internal operasional kelas
+├── dashboard_admin.php           # Executive Dashboard khusus Administrator Utama (Multi-Kelas)
 ├── design.md                     # STANDAR RESMI UI/UX & Design System SIMAWA PTIK
 ├── PROJECT_CONTEXT.md            # DOKUMEN INI (Konteks menyeluruh proyek & pengujian)
 │
