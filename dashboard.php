@@ -304,69 +304,7 @@ while ($row = mysqli_fetch_assoc($q_kas_per_minggu)) {
 // Reindex to 0-based for JS compatibility
 $kas_per_minggu_history = array_values($kas_per_minggu_history);
 
-// 8. Data Aktivitas Login (Vibe Check) - Default 30 hari terakhir tapi tetap dalam rentang semester
-$default_vibe_start = date('Y-m-d', strtotime('-30 days'));
-if ($default_vibe_start < $semester_start) $default_vibe_start = $semester_start;
-
-$vibe_start = $_GET['vibe_start'] ?? $default_vibe_start;
-$vibe_end = $_GET['vibe_end'] ?? date('Y-m-d'); // Default hari ini
-if ($vibe_end > $semester_end) $vibe_end = $semester_end;
-
-$vibe_activity_history = [];
-$v_current = strtotime($vibe_start);
-$v_last = strtotime($vibe_end);
-while ($v_current <= $v_last) {
-    $date = date('Y-m-d', $v_current);
-    $q_vibe_count = mysqli_query($koneksi, "SELECT COUNT(DISTINCT user_id) as cnt FROM vibe_check WHERE DATE(created_at) = '$date'");
-    $vibe_activity_history[] = [
-        'tanggal' => date('d M', $v_current),
-        'jumlah' => (int)mysqli_fetch_assoc($q_vibe_count)['cnt']
-    ];
-    $v_current = strtotime("+1 day", $v_current);
-}
-
-// 9. Distribusi Mood (Radar Chart) - Mengikuti rentang yang sama dengan vibe activity
-$radar_start = $_GET['radar_start'] ?? $vibe_start;
-$radar_end = $_GET['radar_end'] ?? $vibe_end;
-$q_vibe_dist = mysqli_query($koneksi, "SELECT mood, COUNT(*) as cnt FROM vibe_check WHERE DATE(created_at) BETWEEN '$radar_start' AND '$radar_end' GROUP BY mood");
-$vibe_dist_raw = ['productive' => 0, 'stress' => 0, 'relaxed' => 0, 'tired' => 0, 'hyper' => 0];
-while ($row = mysqli_fetch_assoc($q_vibe_dist)) {
-    if (isset($vibe_dist_raw[$row['mood']])) {
-        $vibe_dist_raw[$row['mood']] = (int)$row['cnt'];
-    }
-}
-// 10. Top 1 Per Vibe (Hall of Fame)
-$mood_list = [
-    'productive' => ['label' => 'Focus', 'icon' => 'fa-rocket', 'unicode' => "\uf135", 'emoji' => '🚀'],
-    'stress' => ['label' => 'Error', 'icon' => 'fa-head-side-virus', 'unicode' => "\ue064", 'emoji' => '🧠'],
-    'relaxed' => ['label' => 'Chill', 'icon' => 'fa-coffee', 'unicode' => "\uf0f4", 'emoji' => '☕'],
-    'tired' => ['label' => 'Low', 'icon' => 'fa-battery-quarter', 'unicode' => "\uf243", 'emoji' => '🔋'],
-    'hyper' => ['label' => 'Fire', 'icon' => 'fa-fire', 'unicode' => "\uf06d", 'emoji' => '🔥']
-];
-
-$vibe_radar_labels = [];
-$vibe_radar_data = [];
-foreach ($mood_list as $m_id => $m_info) {
-    // Label text only
-    $vibe_radar_labels[] = $m_info['label'];
-    $vibe_radar_data[] = $vibe_dist_raw[$m_id];
-}
-
-$top_vibers = [];
-foreach ($mood_list as $m_id => $m_info) {
-    $q_v = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, m.jenis_kelamin, COUNT(*) as cnt 
-        FROM vibe_check v 
-        JOIN mahasiswa m ON v.user_id = m.user_id 
-        WHERE v.mood = '$m_id' AND DATE(v.created_at) BETWEEN '$vibe_start' AND '$vibe_end'
-        GROUP BY v.user_id 
-        ORDER BY cnt DESC, m.nama_panggilan ASC 
-        LIMIT 1");
-    if ($row = mysqli_fetch_assoc($q_v)) {
-        $top_vibers[$m_id] = array_merge($row, $m_info);
-    }
-}
-
-// 11. Best Chemistry (Frequency in same groups)
+// 8. Best Chemistry (Frequency in same groups)
 $q_all_groups = mysqli_query($koneksi, "SELECT anggota FROM kelompok WHERE periode_id = $periode_id");
 $pair_freq = [];
 while ($row = mysqli_fetch_assoc($q_all_groups)) {
@@ -401,7 +339,7 @@ foreach ($top_chemistry as $key => $freq) {
     }
 }
 
-// 12. Piket Chemistry (Frequency in same shifts)
+// 9. Piket Chemistry (Frequency in same shifts)
 $q_piket_groups = mysqli_query($koneksi, "SELECT jadwal_matkul_id, minggu_ke, GROUP_CONCAT(mahasiswa_id) as ids FROM piket_proyektor WHERE periode_id = $periode_id GROUP BY jadwal_matkul_id, minggu_ke");
 $piket_freq = [];
 while ($row = mysqli_fetch_assoc($q_piket_groups)) {
@@ -427,31 +365,6 @@ foreach ($top_piket as $key => $freq) {
     if ($m1 && $m2) {
         $piket_data[] = ['m1' => $m1, 'm2' => $m2, 'freq' => $freq];
     }
-}
-
-// 13. VIBE CHECK LOGIC
-$today_vibe = date('Y-m-d');
-$q_vibe_user = mysqli_query($koneksi, "SELECT * FROM vibe_check WHERE user_id = '$user_id' AND DATE(created_at) = '$today_vibe'");
-$vibe_user = mysqli_fetch_assoc($q_vibe_user);
-
-$q_vibe_stats = mysqli_query($koneksi, "SELECT mood, COUNT(*) as cnt FROM vibe_check WHERE DATE(created_at) = '$today_vibe' GROUP BY mood");
-$vibe_stats = ['productive' => 0, 'stress' => 0, 'relaxed' => 0, 'tired' => 0, 'hyper' => 0];
-$total_vibe = 0;
-while ($vs = mysqli_fetch_assoc($q_vibe_stats)) {
-    $vibe_stats[$vs['mood']] = (int)$vs['cnt'];
-    $total_vibe += (int)$vs['cnt'];
-}
-
-function getVibeConfig($mood)
-{
-    $configs = [
-        'productive' => ['icon' => 'fa-rocket', 'text' => 'text-indigo-500 dark:text-indigo-400', 'bg_light' => 'bg-indigo-50 dark:bg-indigo-950/40', 'bg_main' => 'bg-indigo-500', 'label' => 'Focus'],
-        'stress' => ['icon' => 'fa-head-side-virus', 'text' => 'text-red-500 dark:text-red-400', 'bg_light' => 'bg-red-50 dark:bg-red-950/40', 'bg_main' => 'bg-red-500', 'label' => 'Error'],
-        'relaxed' => ['icon' => 'fa-coffee', 'text' => 'text-emerald-500 dark:text-emerald-400', 'bg_light' => 'bg-emerald-50 dark:bg-emerald-950/40', 'bg_main' => 'bg-emerald-500', 'label' => 'Chill'],
-        'tired' => ['icon' => 'fa-battery-quarter', 'text' => 'text-slate-500 dark:text-slate-400', 'bg_light' => 'bg-slate-50 dark:bg-slate-800/50', 'bg_main' => 'bg-slate-500', 'label' => 'Low'],
-        'hyper' => ['icon' => 'fa-fire', 'text' => 'text-orange-500 dark:text-orange-400', 'bg_light' => 'bg-orange-50 dark:bg-orange-950/40', 'bg_main' => 'bg-orange-500', 'label' => 'Fire']
-    ];
-    return $configs[$mood] ?? $configs['productive'];
 }
 
 function getFireColor($streak)
@@ -705,44 +618,6 @@ function getFireColor($streak)
                 </div>
             </div>
 
-            <!-- --- SECTION: VIBE CHECK --- -->
-            <div class="mt-8 mb-6 transition-all">
-                <div class="flex justify-between items-center border-b-2 border-amber-100 dark:border-amber-900/30 pb-2 mb-6">
-                    <h2 class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                        <span class="h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
-                            <i class="fa fa-face-smile"></i>
-                        </span>
-                        Vibe Mahasiswa Hari Ini
-                    </h2>
-                    <?php if (!$vibe_user): ?>
-                        <button onclick="document.getElementById('vibeModal').classList.remove('hidden'); document.getElementById('vibeModal').classList.add('flex');" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded font-bold hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all">
-                            <i class="fa fa-plus-circle mr-1"></i> Check-in Mood
-                        </button>
-                    <?php endif; ?>
-                </div>
-
-                <div class="grid grid-cols-5 gap-2 md:gap-4">
-                    <?php
-                    $moods_list = ['productive', 'stress', 'relaxed', 'tired', 'hyper'];
-                    foreach ($moods_list as $m):
-                        $cfg = getVibeConfig($m);
-                        $count = $vibe_stats[$m];
-                        $percent = $total_vibe > 0 ? round(($count / $total_vibe) * 100) : 0;
-                    ?>
-                        <div class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center text-center transition-all">
-                            <div class="h-10 w-10 <?= $cfg['bg_light'] ?> rounded-full flex items-center justify-center mb-2">
-                                <i class="fa <?= $cfg['icon'] ?> text-lg <?= $cfg['text'] ?>"></i>
-                            </div>
-                            <div class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter"><?= $cfg['label'] ?></div>
-                            <div class="text-lg font-black text-slate-800 dark:text-slate-100"><?= $percent ?>%</div>
-                            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
-                                <div class="<?= $cfg['bg_main'] ?> h-full" style="width: <?= $percent ?>%"></div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
             <!-- --- SECTION 1: DEMOGRAFI & SOSIAL --- -->
             <div class="mt-12 border-b-2 border-indigo-100 dark:border-indigo-900/30 pb-2 mb-6 transition-all">
                 <h2 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-3">
@@ -909,104 +784,7 @@ function getFireColor($streak)
                 </div>
             </div>
 
-            <!-- 2. Keaktifan Login -->
-            <div class="mt-8 border-b-2 border-indigo-100 dark:border-indigo-900/30 pb-2 mb-6 transition-all">
-                <h2 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-                        <i class="fa fa-bolt-lightning"></i>
-                    </span>
-                    Statistik Aktivitas
-                </h2>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                <!-- User Login Activity Bar Chart (Vibe Check) -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                            <i class="fa fa-chart-line text-indigo-500"></i>
-                            Keaktifan Login
-                        </h3>
-                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
-                            <input type="date" name="vibe_start" value="<?= $vibe_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
-                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
-                            <input type="date" name="vibe_end" value="<?= $vibe_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
-                        </div>
-                    </div>
-                    <div class="relative h-72">
-                        <canvas id="vibeChart"></canvas>
-                    </div>
-                </div>
-
-                
-            </div>
-
-            <!-- 3. Radar Mood dan Hall of Fame -->
-            <div class="mt-8 border-b-2 border-amber-100 dark:border-amber-900/30 pb-2 mb-6 transition-all">
-                <h2 class="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
-                        <i class="fa fa-crown"></i>
-                    </span>
-                    Spektrum Mood
-                </h2>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                <!-- Vibe Distribution Radar Chart -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                            <i class="fa fa-braille text-indigo-500"></i>
-                            Radar Mood
-                        </h3>
-                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
-                            <input type="date" name="radar_start" value="<?= $radar_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
-                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
-                            <input type="date" name="radar_end" value="<?= $radar_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
-                        </div>
-                    </div>
-                    <div class="relative h-72">
-                        <canvas id="vibeRadarChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Vibe Check Leaderboard (Hall of Fame) -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <i class="fa fa-crown text-amber-500"></i>
-                        Hall of Fame
-                    </h3>
-                    <div class="space-y-2">
-                        <?php if (!empty($top_vibers)): ?>
-                            <?php foreach ($top_vibers as $m_id => $v): 
-                                $cfg = getVibeConfig($m_id);
-                            ?>
-                                <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-indigo-100/50 dark:border-indigo-900/30">
-                                    <div class="w-8 h-8 rounded-full <?= $cfg['bg_light'] ?> flex items-center justify-center shrink-0">
-                                        <i class="fa <?= $cfg['icon'] ?> text-xs <?= $cfg['text'] ?>"></i>
-                                    </div>
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
-                                        <img src="<?= profilePhotoUrl($v['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
-                                    </div>
-                                    <div class="flex-grow min-w-0">
-                                        <div class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
-                                            <?= htmlspecialchars($v['nama_panggilan']) ?>
-                                        </div>
-                                        <div class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-tight"><?= ($v['jenis_kelamin'] === 'Perempuan' ? 'Queen' : 'King') ?> of <?= $v['label'] ?></div>
-                                    </div>
-                                    <div class="shrink-0 text-right">
-                                        <span class="text-[10px] font-black <?= $cfg['text'] ?> <?= $cfg['bg_light'] ?> px-2 py-0.5 rounded-full border border-indigo-100/50 dark:border-indigo-900/30">
-                                            <?= $v['cnt'] ?>x
-                                        </span>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-6">Belum ada aktivitas.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Dynamic Duo Kelompok dan Dynamic Duo Piket -->
+            <!-- 2. Dynamic Duo Kelompok dan Dynamic Duo Piket -->
             <div class="mt-8 border-b-2 border-rose-100 dark:border-rose-900/30 pb-2 mb-6 transition-all">
                 <h2 class="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-[0.2em] flex items-center gap-3">
                     <span class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
@@ -1434,176 +1212,7 @@ function getFireColor($streak)
             }
         });
 
-        // Vibe Activity Chart (Bar Only)
-        const vibeCtx = document.getElementById('vibeChart').getContext('2d');
-        const vibeHistory = <?= json_encode($vibe_activity_history) ?>;
-        new Chart(vibeCtx, {
-            type: 'bar',
-            data: {
-                labels: vibeHistory.map(h => h.tanggal),
-                datasets: [{
-                    label: 'User Check-in',
-                    data: vibeHistory.map(h => h.jumlah),
-                    backgroundColor: '#6366f1',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0,
-                            font: {
-                                size: 9
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 9
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Vibe Distribution Chart (Radar)
-        const radarCtx = document.getElementById('vibeRadarChart').getContext('2d');
-        new Chart(radarCtx, {
-            type: 'radar',
-            data: {
-                labels: <?= json_encode($vibe_radar_labels) ?>,
-                datasets: [{
-                    label: 'Mood Count',
-                    data: <?= json_encode($vibe_radar_data) ?>,
-                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                    borderColor: '#6366f1',
-                    pointBackgroundColor: '#6366f1',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#6366f1'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                r: {
-                    pointLabels: {
-                        font: {
-                            family: "'Inter', sans-serif",
-                            weight: 700,
-                            size: 10
-                        },
-                        color: isDarkMode ? '#94a3b8' : '#64748b'
-                    },
-                    angleLines: {
-                        display: true,
-                        color: isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9'
-                    },
-                    grid: {
-                        color: isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9'
-                    },
-                    suggestedMin: 0,
-                    ticks: {
-                        display: false
-                    }
-                }
-                }
-            }
-        });
-    </script>
-    <!-- VIBE MODAL -->
-    <div id="vibeModal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm transition-all duration-300">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-slide-up border dark:border-slate-800">
-            <div class="bg-indigo-600 dark:bg-indigo-900 p-5 text-white relative">
-                <button onclick="document.getElementById('vibeModal').classList.add('hidden'); document.getElementById('vibeModal').classList.remove('flex');" class="absolute top-4 right-4 text-white/50 hover:text-white transition-all">
-                    <i class="fa fa-times text-lg"></i>
-                </button>
-                <div class="flex items-center gap-4">
-                    <div class="h-10 w-10 bg-white/20 rounded-xl flex items-center justify-center">
-                        <i class="fa fa-smile-beam text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-lg">Vibe Check!</h3>
-                        <p class="text-xs text-white/80">Gimana kabarmu hari ini?</p>
-                    </div>
-                </div>
-            </div>
-            <form action="actions/tambah_vibe" method="POST" class="p-6">
-                <div class="grid grid-cols-5 gap-2 mb-6">
-                    <?php
-                    $mood_options = [
-                        ['id' => 'productive', 'icon' => 'fa-rocket', 'label' => 'Focus', 'peer' => 'peer-checked:border-indigo-600 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/30 peer-checked:text-indigo-600 dark:peer-checked:text-indigo-400'],
-                        ['id' => 'stress', 'icon' => 'fa-head-side-virus', 'label' => 'Error', 'peer' => 'peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/30 peer-checked:text-red-600 dark:peer-checked:text-red-400'],
-                        ['id' => 'relaxed', 'icon' => 'fa-coffee', 'label' => 'Chill', 'peer' => 'peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/30 peer-checked:text-emerald-600 dark:peer-checked:text-emerald-400'],
-                        ['id' => 'tired', 'icon' => 'fa-battery-quarter', 'label' => 'Low', 'peer' => 'peer-checked:border-slate-500 peer-checked:bg-slate-50 dark:peer-checked:bg-slate-800 peer-checked:text-slate-600 dark:peer-checked:text-slate-400'],
-                        ['id' => 'hyper', 'icon' => 'fa-fire', 'label' => 'Fire', 'peer' => 'peer-checked:border-orange-500 peer-checked:bg-orange-50 dark:peer-checked:bg-orange-900/30 peer-checked:text-orange-600 dark:peer-checked:text-orange-400']
-                    ];
-                    foreach ($mood_options as $opt):
-                    ?>
-                        <label class="cursor-pointer group">
-                            <input type="radio" name="mood" value="<?= $opt['id'] ?>" class="peer hidden" required>
-                            <div class="flex flex-col items-center p-2 rounded-xl border-2 border-slate-100 dark:border-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-800 transition-all text-slate-400 dark:text-slate-500 <?= $opt['peer'] ?>">
-                                <i class="fa <?= $opt['icon'] ?> text-lg mb-1"></i>
-                                <span class="text-[8px] font-black uppercase"><?= $opt['label'] ?></span>
-                            </div>
-                        </label>
-                    <?php endforeach; ?>
-                </div>
-
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-100 dark:shadow-indigo-950/20 transition-all flex items-center justify-center gap-2 text-sm">
-                    Kirim Vibe Saya <i class="fa fa-paper-plane text-xs"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <style>
-        .animate-slide-up {
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-    </style>
-
-    <?php if (!$vibe_user && !isset($_GET['vibe_success'])): ?>
-        <script>
-            setTimeout(() => {
-                document.getElementById('vibeModal').classList.remove('hidden');
-                document.getElementById('vibeModal').classList.add('flex');
-            }, 1000);
         </script>
-    <?php endif; ?>
-
-</body>
+    </body>
 
 </html>
