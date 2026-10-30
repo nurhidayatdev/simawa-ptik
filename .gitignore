@@ -3,6 +3,7 @@
 
 # Database backups and dumps
 *.sql
+!database/migrations/*.sql
 backup_*.sql
 
 # Original private backups
