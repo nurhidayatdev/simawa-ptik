@@ -215,17 +215,10 @@ $foto         = $_SESSION['foto'] ?? '';
                     <div class="space-y-1">
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Aktivitas Kelas</p>
                         
-                        <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <div class="flex items-center">
-                                <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">Tugas</span>
-                            </div>
-                            <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                        </button>
-                        <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 dark:border-slate-800 ml-6">
-                            <a href="<?= $base ?>database/db_tugas" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Tugas Kuliah</a>
-                            <a href="<?= $base ?>views/tugas_saya" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Tugas Saya</a>
-                        </div>
+                        <a href="<?= $base ?>database/db_tugas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Tugas Kuliah</span>
+                        </a>
 
                         <a href="<?= $base ?>views/kelompok" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-users w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
@@ -268,22 +261,10 @@ $foto         = $_SESSION['foto'] ?? '';
                         </a>
                     </div>
 
-                    <!-- Section: Akun Pribadi -->
+                    <!-- Section: Akun Pengurus -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun Saya</p>
+                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun</p>
                         
-                        <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <div class="flex items-center">
-                                <i class="fa fa-id-card w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">KRS & KSM</span>
-                            </div>
-                            <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                        </button>
-                        <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 dark:border-slate-800 ml-6">
-                            <a href="<?= $base ?>actions/edit_krs" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KRS Saya</a>
-                            <a href="<?= $base ?>views/ksm" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KSM Saya</a>
-                        </div>
-
                         <a href="<?= $base ?>views/profile" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Profile Saya</span>
@@ -351,27 +332,10 @@ $foto         = $_SESSION['foto'] ?? '';
                         </a>
                     </div>
 
-                    <!-- Section: Akun & Tugas Saya -->
+                    <!-- Section: Akun Pengurus -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun Saya</p>
+                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun</p>
                         
-                        <a href="<?= $base ?>views/tugas_saya" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Tugas Saya</span>
-                        </a>
-
-                        <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <div class="flex items-center">
-                                <i class="fa fa-id-card w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">KRS & KSM</span>
-                            </div>
-                            <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                        </button>
-                        <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 dark:border-slate-800 ml-6">
-                            <a href="<?= $base ?>actions/edit_krs" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KRS Saya</a>
-                            <a href="<?= $base ?>views/ksm" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KSM Saya</a>
-                        </div>
-
                         <a href="<?= $base ?>views/profile" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Profile Saya</span>
@@ -441,27 +405,10 @@ $foto         = $_SESSION['foto'] ?? '';
                         </a>
                     </div>
 
-                    <!-- Section: Akun & Tugas Saya -->
+                    <!-- Section: Akun Pengurus -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun Saya</p>
+                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun</p>
                         
-                        <a href="<?= $base ?>views/tugas_saya" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Tugas Saya</span>
-                        </a>
-
-                        <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <div class="flex items-center">
-                                <i class="fa fa-id-card w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">KRS & KSM</span>
-                            </div>
-                            <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
-                        </button>
-                        <div class="submenu pl-1 space-y-1 hidden overflow-y-auto max-h-52 border-l-2 border-slate-100 dark:border-slate-800 ml-6">
-                            <a href="<?= $base ?>actions/edit_krs" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KRS Saya</a>
-                            <a href="<?= $base ?>views/ksm" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KSM Saya</a>
-                        </div>
-
                         <a href="<?= $base ?>views/profile" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Profile Saya</span>
