@@ -125,42 +125,6 @@ $q_arus_out = mysqli_query($koneksi, "SELECT SUM(jumlah) as total FROM arus_kas 
 $arus_out = mysqli_fetch_assoc($q_arus_out)['total'] ?? 0;
 $saldo_sekarang = ($kas_total + $arus_in) - $arus_out;
 
-// Statistik Pembayaran Kas
-$filter_minggu_kas = $_GET['kas_minggu'] ?? '';
-
-if (!empty($filter_minggu_kas)) {
-    $q_kas_stats = mysqli_query($koneksi, "SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END) as lunas
-        FROM kas 
-        WHERE periode_id = '$periode_id' AND minggu_ke = '$filter_minggu_kas'");
-    $kas_stats_data = mysqli_fetch_assoc($q_kas_stats);
-    $lunas_val = (int)($kas_stats_data['lunas'] ?? 0);
-    $total_val = $counts['mahasiswa'] ?? 0;
-    
-    $persen_lunas = $total_val > 0 ? round(($lunas_val / $total_val) * 100) : 0;
-    $display_lunas = "Lunas: " . $lunas_val;
-    $display_belum = "Belum: " . ($total_val - $lunas_val);
-} else {
-    // Sesuai dengan logika di manajemen_kas.php
-    $q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
-    $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
-
-    $q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id'");
-    $current_week_target = mysqli_fetch_assoc($q_latest_week)['max_week'] ?? 1;
-    if ($current_week_target < 1) $current_week_target = 1;
-
-    $q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 AND periode_id = '$periode_id' LIMIT 1");
-    $fixed_nominal = mysqli_fetch_assoc($q_nominal)['nominal'] ?? 5000;
-
-    $target_kas = $total_students * $current_week_target * $fixed_nominal;
-    $persen_lunas = ($target_kas > 0) ? min(100, round(($kas_total / $target_kas) * 100)) : 0;
-    
-    $display_lunas = "Rp " . number_format($kas_total, 0, ',', '.');
-    $display_belum = "Target: Rp " . number_format($target_kas, 0, ',', '.');
-}
-
-
 // Kalender Akademik untuk Slider
 $today_date = date('Y-m-d');
 $academic_events = [];
@@ -303,69 +267,6 @@ while ($row = mysqli_fetch_assoc($q_kas_per_minggu)) {
 }
 // Reindex to 0-based for JS compatibility
 $kas_per_minggu_history = array_values($kas_per_minggu_history);
-
-// 8. Best Chemistry (Frequency in same groups)
-$q_all_groups = mysqli_query($koneksi, "SELECT anggota FROM kelompok WHERE periode_id = $periode_id");
-$pair_freq = [];
-while ($row = mysqli_fetch_assoc($q_all_groups)) {
-    $members = array_filter(array_map('trim', explode(',', $row['anggota'])));
-    $count = count($members);
-    if ($count < 2) continue;
-
-    for ($i = 0; $i < $count; $i++) {
-        for ($j = $i + 1; $j < $count; $j++) {
-            $p = [$members[$i], $members[$j]];
-            sort($p);
-            $key = $p[0] . "-" . $p[1];
-            $pair_freq[$key] = ($pair_freq[$key] ?? 0) + 1;
-        }
-    }
-}
-arsort($pair_freq);
-$top_chemistry = array_slice($pair_freq, 0, 4, true);
-$chemistry_data = [];
-foreach ($top_chemistry as $key => $freq) {
-    list($nim1, $nim2) = explode('-', $key);
-    $q1 = mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE nim = '$nim1'");
-    $q2 = mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE nim = '$nim2'");
-    $m1 = mysqli_fetch_assoc($q1);
-    $m2 = mysqli_fetch_assoc($q2);
-    if ($m1 && $m2) {
-        $chemistry_data[] = [
-            'm1' => $m1,
-            'm2' => $m2,
-            'freq' => $freq
-        ];
-    }
-}
-
-// 9. Piket Chemistry (Frequency in same shifts)
-$q_piket_groups = mysqli_query($koneksi, "SELECT jadwal_matkul_id, minggu_ke, GROUP_CONCAT(mahasiswa_id) as ids FROM piket_proyektor WHERE periode_id = $periode_id GROUP BY jadwal_matkul_id, minggu_ke");
-$piket_freq = [];
-while ($row = mysqli_fetch_assoc($q_piket_groups)) {
-    $ids = explode(',', $row['ids']);
-    $count = count($ids);
-    if ($count < 2) continue;
-    for ($i = 0; $i < $count; $i++) {
-        for ($j = $i + 1; $j < $count; $j++) {
-            $p = [(int)$ids[$i], (int)$ids[$j]];
-            sort($p);
-            $key = $p[0] . "-" . $p[1];
-            $piket_freq[$key] = ($piket_freq[$key] ?? 0) + 1;
-        }
-    }
-}
-arsort($piket_freq);
-$top_piket = array_slice($piket_freq, 0, 4, true);
-$piket_data = [];
-foreach ($top_piket as $key => $freq) {
-    list($id1, $id2) = explode('-', $key);
-    $m1 = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE id = $id1"));
-    $m2 = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT nama_panggilan, foto FROM mahasiswa WHERE id = $id2"));
-    if ($m1 && $m2) {
-        $piket_data[] = ['m1' => $m1, 'm2' => $m2, 'freq' => $freq];
-    }
-}
 
 function getFireColor($streak)
 {
@@ -618,71 +519,7 @@ function getFireColor($streak)
                 </div>
             </div>
 
-            <!-- --- SECTION 1: DEMOGRAFI & SOSIAL --- -->
-            <div class="mt-12 border-b-2 border-indigo-100 dark:border-indigo-900/30 pb-2 mb-6 transition-all">
-                <h2 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
-                        <i class="fa fa-chart-pie"></i>
-                    </span>
-                    Ringkasan Data
-                </h2>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Finance Summary Card -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex justify-between items-center">
-                        <span><i class="fa fa-wallet text-green-500 mr-2"></i>Status Keuangan</span>
-                        <span class="text-[10px] bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded text-green-700 dark:text-green-400 font-bold">Saldo Aktif</span>
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="bg-slate-50 dark:bg-slate-800/50 p-3 px-4 rounded-xl border border-slate-100 dark:border-slate-700">
-                            <div class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-widest mb-1">Saldo Sekarang</div>
-                            <div class="text-xl font-black text-slate-800 dark:text-slate-100">Rp <?= number_format($saldo_sekarang, 0, ',', '.') ?></div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg border border-indigo-100 dark:border-indigo-900/30">
-                                <div class="text-[9px] text-indigo-400 dark:text-indigo-500 uppercase font-bold mb-1">Dari Setoran Kas</div>
-                                <div class="text-xs font-black text-indigo-700 dark:text-indigo-300">Rp <?= number_format($kas_total, 0, ',', '.') ?></div>
-                            </div>
-                            <div class="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                                <div class="text-[9px] text-blue-400 dark:text-blue-500 uppercase font-bold mb-1">Pemasukan Lain</div>
-                                <div class="text-xs font-black text-blue-700 dark:text-blue-300">Rp <?= number_format($arus_in, 0, ',', '.') ?></div>
-                            </div>
-                        </div>
-                        <div class="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-100 dark:border-red-900/30">
-                            <div class="flex justify-between items-center">
-                                <div class="text-[9px] text-red-400 dark:text-red-500 uppercase font-bold">Total Pengeluaran</div>
-                                <div class="text-xs font-black text-red-700 dark:text-red-300">Rp <?= number_format($arus_out, 0, ',', '.') ?></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-end">
-                                <div class="flex flex-col">
-                                    <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Persentase Bayar Kas</div>
-                                    <select name="kas_minggu" form="vizFilters" onchange="this.form.submit()" class="text-[9px] border-none bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-bold p-1 focus:ring-0 cursor-pointer rounded mb-1">
-                                        <option value="">Semua Minggu</option>
-                                        <?php for ($i = 1; $i <= 16; $i++): ?>
-                                            <option value="<?= $i ?>" <?= $filter_minggu_kas == $i ? 'selected' : '' ?>>Minggu <?= $i ?></option>
-                                        <?php endfor; ?>
-                                    </select>
-                                </div>
-                                <div class="text-xs font-black text-indigo-600 dark:text-indigo-400"><?= $persen_lunas ?>%</div>
-                            </div>
-                            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-indigo-500 h-full rounded-full" style="width: <?= $persen_lunas ?>%"></div>
-                            </div>
-                             <div class="flex justify-between mt-1 text-[9px] font-medium">
-                                <span class="text-green-600 dark:text-green-400"><?= $display_lunas ?></span>
-                                <span class="text-slate-400 dark:text-slate-500"><?= $display_belum ?></span>
-                            </div>
-                        </div>
-                    </div>
-                </div></div>
-
-            
-
-            <!-- --- SECTION 2: AKADEMIK --- -->
+            <!-- --- SECTION 1: AKADEMIK --- -->
             <div class="mt-12 border-b-2 border-blue-100 dark:border-blue-900/30 pb-2 mb-6 transition-all">
                 <h2 class="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em] flex items-center gap-3">
                     <span class="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
@@ -784,98 +621,6 @@ function getFireColor($streak)
                 </div>
             </div>
 
-            <!-- 2. Dynamic Duo Kelompok dan Dynamic Duo Piket -->
-            <div class="mt-8 border-b-2 border-rose-100 dark:border-rose-900/30 pb-2 mb-6 transition-all">
-                <h2 class="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="h-8 w-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
-                        <i class="fa fa-users"></i>
-                    </span>
-                    Dynamic Duo
-                </h2>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Best Chemistry (Kelompok Frequency) -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <i class="fa fa-star text-rose-500"></i>
-                        Dynamic Duo Kelompok
-                    </h3>
-                    <div class="space-y-3">
-                        <?php if (!empty($chemistry_data)): ?>
-                            <?php foreach ($chemistry_data as $c): ?>
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-rose-50/50 to-indigo-50/50 dark:from-rose-950/20 dark:to-indigo-950/20 border border-rose-100 dark:border-rose-900/30 group hover:shadow-sm transition-all">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex gap-2 items-center">
-                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
-                                                <img src="<?= profilePhotoUrl($c['m1']['foto']) ?>" class="w-full h-full object-cover">
-                                            </div>
-                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
-                                                <img src="<?= profilePhotoUrl($c['m2']['foto']) ?>" class="w-full h-full object-cover">
-                                            </div>
-                                        </div>
-                                        <div class="min-w-0">
-                                            <div class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">
-                                                <?= htmlspecialchars($c['m1']['nama_panggilan']) ?> & <?= htmlspecialchars($c['m2']['nama_panggilan']) ?>
-                                            </div>
-                                            <div class="text-[9px] font-bold text-rose-500 dark:text-rose-400 uppercase tracking-tight">
-                                                Satu Kelompok <?= $c['freq'] ?>x
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="shrink-0 flex gap-1">
-                                        <?php for($i=0; $i<$c['freq']; $i++): ?>
-                                            <i class="fa fa-star text-[10px] text-rose-500 dark:text-rose-400"></i>
-                                        <?php endfor; ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-8">Data tidak cukup untuk dihitung.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- Soulmate Piket (Piket Frequency) -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <i class="fa fa-star text-blue-500"></i>
-                        Dynamic Duo Piket
-                    </h3>
-                    <div class="space-y-3">
-                        <?php if (!empty($piket_data)): ?>
-                            <?php foreach ($piket_data as $p): ?>
-                                <div class="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/30 group hover:shadow-sm transition-all">
-                                    <div class="flex items-center gap-3">
-                                        <div class="flex gap-2 items-center">
-                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
-                                                <img src="<?= profilePhotoUrl($p['m1']['foto']) ?>" class="w-full h-full object-cover">
-                                            </div>
-                                            <div class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm bg-slate-200 dark:bg-slate-700">
-                                                <img src="<?= profilePhotoUrl($p['m2']['foto']) ?>" class="w-full h-full object-cover">
-                                            </div>
-                                        </div>
-                                        <div class="min-w-0">
-                                            <div class="text-[11px] font-black text-slate-700 dark:text-slate-200 truncate">
-                                                <?= htmlspecialchars($p['m1']['nama_panggilan']) ?> & <?= htmlspecialchars($p['m2']['nama_panggilan']) ?>
-                                            </div>
-                                            <div class="text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-tight">
-                                                Piket Bareng <?= $p['freq'] ?>x
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="shrink-0 flex gap-1">
-                                        <?php for($i=0; $i<$p['freq']; $i++): ?>
-                                            <i class="fa fa-star text-[10px] text-blue-500 dark:text-blue-400"></i>
-                                        <?php endfor; ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-8">Belum ada data piket.</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
             <?php include 'includes/footer_db.php'; ?>
     </main>
     <?php include 'includes/script_db.php'; ?>
