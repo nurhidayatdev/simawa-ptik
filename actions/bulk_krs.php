@@ -305,7 +305,7 @@ $json_matkul   = json_encode($all_matkul);
 <html lang="id">
 
 <head>
-    <title>Manajemen KRS Massal - PTIK C 2024</title>
+    <title>Manajemen KRS Massal - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -426,7 +426,7 @@ $json_matkul   = json_encode($all_matkul);
                         <div>
                             <div class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mb-1">Total Mahasiswa</div>
                             <div class="text-xl font-bold text-slate-800 dark:text-white leading-none"><?= $summary['total_mhs'] ?? 0 ?></div>
-                            <div class="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1">Kelas PTIK C 2024</div>
+                            <div class="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1">SIMAWA PTIK 2024</div>
                         </div>
                     </div>
                 </div>
@@ -459,7 +459,7 @@ $json_matkul   = json_encode($all_matkul);
                     </div>
                 </div>
 
-                <!-- Signature PTIK C Gradient Hero Card -->
+                <!-- Signature SIMAWA PTIK Gradient Hero Card -->
                 <?php 
                 $total_mhs_count = max($summary['total_mhs'] ?? 1, 1);
                 $persen_approved = round((($summary['approved'] ?? 0) / $total_mhs_count) * 100);

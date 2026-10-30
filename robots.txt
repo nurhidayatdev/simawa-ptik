@@ -2,12 +2,8 @@ User-agent: *
 # Allow specific public pages
 Allow: /index
 Allow: /info
-Allow: /galeri
-Allow: /sejarah
 Allow: /index.php
 Allow: /info.php
-Allow: /galeri.php
-Allow: /sejarah.php
 
 # Allow assets for proper page rendering and social previews
 Allow: /assets/
@@ -15,5 +11,5 @@ Allow: /assets/
 # Disallow everything else (including database, actions, includes, functions, and other pages)
 Disallow: /
 
-# Sitemap path
-Sitemap: https://ptikc24.fwh.is/sitemap.xml
+# Sitemap path (ganti DOMAIN-ANDA dengan domain produksi)
+Sitemap: https://DOMAIN-ANDA/sitemap.xml

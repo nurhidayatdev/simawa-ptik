@@ -317,7 +317,7 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
                     </div>
                     <div class="flex flex-col">
                         <span class="text-slate-400 dark:text-slate-500 text-[9px] uppercase tracking-widest font-black mb-0.5">Kelas</span>
-                        <span class="text-slate-800 dark:text-slate-200 font-bold text-base">PTIK C 2024</span>
+                        <span class="text-slate-800 dark:text-slate-200 font-bold text-base">SIMAWA PTIK 2024</span>
                     </div>
                 </div>
                 <div class="bg-indigo-900 dark:bg-indigo-950 text-white p-3 px-6 rounded-xl shadow-lg text-center min-w-[120px] z-10 print-total-sks">

@@ -77,7 +77,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <head>
 
-    <title>Data Periode - PTIK C 2024</title>
+    <title>Data Periode - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

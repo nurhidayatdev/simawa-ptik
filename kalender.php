@@ -1,8 +1,6 @@
 <?php
 include 'koneksi.php';
 
-include 'includes/pesan.php';
-
 // Get active period
 $q_active = mysqli_query($koneksi, "SELECT * FROM periode WHERE status = 'aktif' LIMIT 1");
 $active_period = mysqli_fetch_assoc($q_active);
@@ -21,7 +19,7 @@ $events = mysqli_query($koneksi, "SELECT * FROM kalender_akademik WHERE periode_
 <html lang="id">
 
 <head>
-    <title>Kalender Akademik - Kelas PTIK C 2024</title>
+    <title>Kalender Akademik - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
 </head>
 

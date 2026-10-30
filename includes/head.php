@@ -13,7 +13,7 @@ if (!isset($base)) {
 ?>
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Website Resmi Kelas PTIK C 2024 - Jurusan Teknik Informatika dan Komputer, Universitas Negeri Makassar.">
+    <meta name="description" content="SIMAWA PTIK 2024 - Sistem Informasi Mahasiswa Jurusan Teknik Informatika dan Komputer 2024, Universitas Negeri Makassar.">
     <meta name="theme-color" content="#1e1b4b" />
 <link rel="icon" href="<?= $base ?>assets/image/icon.webp" />
 <script>

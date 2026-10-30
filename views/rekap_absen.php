@@ -125,7 +125,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
 <html lang="en">
 
 <head>
-    <title>Rekap Absensi - PTIK C 2024</title>
+    <title>Rekap Absensi - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .abs-cell {

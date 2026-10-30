@@ -1,8 +1,6 @@
 <?php
 include 'koneksi.php';
 
-include 'includes/pesan.php';
-
 // Auto-update status based on deadline before fetching
 mysqli_query($koneksi, "UPDATE tugas SET status = 'selesai' WHERE (deadline_tanggal < CURDATE() OR (deadline_tanggal = CURDATE() AND deadline_pukul < CURTIME())) AND status = 'belum'");
 
@@ -36,7 +34,7 @@ $query_matkul = mysqli_query($koneksi, "
 <html lang="id">
 
 <head>
-    <title>Tugas Mata Kuliah - Kelas PTIK C 2024</title>
+    <title>Tugas Mata Kuliah - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
 </head>
 

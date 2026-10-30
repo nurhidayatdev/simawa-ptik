@@ -95,7 +95,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <head>
 
-    <title>Data Users - PTIK C 2024</title>
+    <title>Data Users - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -191,7 +191,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         <?php if (isset($_GET['status']) && $_GET['status'] == 'success_reset'): ?>
             Swal.fire({
                 title: 'Berhasil!',
-                text: "Password berhasil direset ke 'ptikClass24'",
+                text: "Password berhasil direset ke 'simawa2024'",
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then(() => {
@@ -203,7 +203,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         function confirmReset(id) {
             Swal.fire({
                 title: 'Reset Password?',
-                text: "Password akan diubah kembali ke 'ptikClass24'",
+                text: "Password akan diubah kembali ke 'simawa2024'",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#eab308',

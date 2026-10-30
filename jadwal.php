@@ -1,8 +1,6 @@
 <?php
 include 'koneksi.php';
 
-include 'includes/pesan.php';
-
 // Ambil periode aktif
 $q_periode = mysqli_query($koneksi, "SELECT id, tahun_periode, semester_nama FROM periode WHERE status = 'aktif' LIMIT 1");
 $periode_aktif = mysqli_fetch_assoc($q_periode);
@@ -29,7 +27,7 @@ ORDER BY FIELD(jm.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'M
 
 <head>
    
-    <title>Jadwal Kuliah - PTIK C 2024</title>
+    <title>Jadwal Kuliah - SIMAWA PTIK 2024</title>
    <?php include 'includes/head.php'; ?>
 </head>
 

@@ -162,7 +162,7 @@ $json_details = json_encode($krs_details);
 <html lang="en">
 
 <head>
-    <title>Validasi KRS - PTIK C 2024</title>
+    <title>Validasi KRS - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

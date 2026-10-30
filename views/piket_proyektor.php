@@ -150,7 +150,7 @@ if ($my_mhs_id) {
 <html lang="en">
 
 <head>
-    <title>Piket Proyektor - PTIK C 2024</title>
+    <title>Piket Proyektor - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .piket-card {

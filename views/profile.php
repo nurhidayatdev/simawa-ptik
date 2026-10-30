@@ -84,11 +84,6 @@ $periode_id = $periode['id'] ?? 0;
 $res_kas = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kas WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Lunas' AND periode_id = '$periode_id'");
 $count_kas = mysqli_fetch_assoc($res_kas)['total'] ?? 0;
 
-// 2. Kuis
-$res_kuis = mysqli_query($koneksi, "SELECT current_streak, total_games FROM kuis_harian_stats WHERE user_id = '$user_id'");
-$kuis_stats = mysqli_fetch_assoc($res_kuis);
-$kuis_streak = $kuis_stats['current_streak'] ?? 0;
-$kuis_total = $kuis_stats['total_games'] ?? 0;
 
 // 3. Absensi
 $res_absensi_total = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Hadir' AND periode_id = '$periode_id'");
@@ -103,28 +98,6 @@ $q_nim = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE id = '$mahasisw
 $nim_mhs = mysqli_fetch_assoc($q_nim)['nim'] ?? '';
 $res_kelompok = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kelompok WHERE FIND_IN_SET('$nim_mhs', REPLACE(anggota, ' ', '')) OR anggota LIKE '%$nim_mhs%'");
 $count_kelompok = mysqli_fetch_assoc($res_kelompok)['total'] ?? 0;
-
-// Definisi Misi (untuk Badge)
-$missions = [
-    ['icon' => 'fa-wallet', 'color' => 'emerald', 'levels' => [['name' => 'Bronze', 'target' => 5, 'current' => $count_kas], ['name' => 'Silver', 'target' => 10, 'current' => $count_kas], ['name' => 'Gold', 'target' => 16, 'current' => $count_kas]]],
-    ['icon' => 'fa-user-check', 'color' => 'blue', 'levels' => [['name' => 'Hadir 5x', 'target' => 5, 'current' => $count_absensi], ['name' => 'Hadir 15x', 'target' => 15, 'current' => $count_absensi], ['name' => 'Hadir 30x', 'target' => 30, 'current' => $count_absensi]]],
-    ['icon' => 'fa-fire', 'color' => 'orange', 'levels' => [['name' => 'Starter', 'target' => 3, 'current' => $kuis_streak], ['name' => 'Veteran', 'target' => 14, 'current' => $kuis_streak], ['name' => 'Gamer', 'target' => 50, 'current' => $kuis_total]]],
-    ['icon' => 'fa-users', 'color' => 'purple', 'levels' => [['name' => 'KRS', 'target' => 1, 'current' => ($count_krs > 0 ? 1 : 0)], ['name' => 'Profil', 'target' => 1, 'current' => $profil_lengkap], ['name' => 'Kelompok', 'target' => 9, 'current' => $count_kelompok]]]
-];
-
-$color_filters = [
-    'emerald' => 'brightness(0) saturate(100%) invert(65%) sepia(16%) saturate(3065%) hue-rotate(116deg) brightness(101%) contrast(86%)',
-    'blue'    => 'brightness(0) saturate(100%) invert(51%) sepia(85%) saturate(2394%) hue-rotate(201deg) brightness(99%) contrast(94%)',
-    'orange'  => 'brightness(0) saturate(100%) invert(62%) sepia(77%) saturate(3143%) hue-rotate(352deg) brightness(101%) contrast(96%)',
-    'purple'  => 'brightness(0) saturate(100%) invert(43%) sepia(72%) saturate(3085%) hue-rotate(244deg) brightness(102%) contrast(95%)'
-];
-
-$badge_gradients = [
-    'emerald' => 'from-emerald-400 to-emerald-600',
-    'blue'    => 'from-blue-400 to-blue-600',
-    'orange'  => 'from-orange-400 to-orange-600',
-    'purple'  => 'from-purple-400 to-purple-600'
-];
 
 // --- Attendance per Matkul Progress ---
 $q_att_matkul = "
@@ -147,7 +120,7 @@ $res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
 
 <head>
 
-    <title>Profile - PTIK C 2024</title>
+    <title>Profile - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {
@@ -303,55 +276,11 @@ $res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
 
                             
                         
-                        <!-- Badges Section -->
-                        <div class="bg-indigo-950 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden">
-                            <div class="relative z-10">
-                                <h3 class="text-lg font-black mb-4 flex items-center gap-2">
-                                    <i class="fa fa-medal text-yellow-400"></i>
-                                    Koleksi Lencana
-                                </h3>
-                                <div class="flex flex-wrap gap-4">
-                                    <?php
-                                    $any_badge = false;
-                                    foreach ($missions as $cat):
-                                        $bg_grad = $badge_gradients[$cat['color']] ?? 'from-slate-400 to-slate-600';
-                                        foreach ($cat['levels'] as $l_idx => $level):
-                                            if ($level['current'] >= $level['target']):
-                                                $any_badge = true;
-                                    ?>
-                                                <div class="group relative flex flex-col items-center">
-                                                    <div class="relative w-12 h-12 rounded-full bg-gradient-to-br <?= $bg_grad ?> p-[1px] shadow-lg transform group-hover:-translate-y-1 transition-transform">
-                                                        <div class="w-full h-full rounded-full bg-slate-900 flex flex-col items-center justify-center relative overflow-hidden">
-                                                            <i class="fa <?= $cat['icon'] ?> text-xs text-white"></i>
-                                                            <div class="flex gap-0.5 mt-0.5">
-                                                                <?php for ($s = 0; $s <= $l_idx; $s++): ?>
-                                                                    <img src="../assets/image/logo.webp" class="w-2 h-2 object-contain" style="filter: <?= $color_filters[$cat['color']] ?>;">
-                                                                <?php endfor; ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <span class="text-[9px] font-bold uppercase mt-1 text-white/70"><?= $level['name'] ?></span>
-                                                </div>
-                                        <?php
-                                            endif;
-                                        endforeach;
-                                    endforeach;
-
-                                    if (!$any_badge):
-                                        ?>
-                                        <div class="w-full text-center py-4 bg-white/5 rounded-xl border border-dashed border-white/20">
-                                            <p class="text-[10px] text-indigo-300">Belum ada lencana yang terbuka.</p>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <?php include '../includes/footer_db.php'; ?>
+                <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>

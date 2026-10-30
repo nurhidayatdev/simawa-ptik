@@ -1,6 +1,5 @@
 <?php
 include 'koneksi.php';
-include 'includes/pesan.php';
 
 $query = mysqli_query($koneksi, "SELECT * FROM akademik ORDER BY id DESC");
 
@@ -123,7 +122,7 @@ $today = date('Y-m-d');
 <html lang="id">
 
 <head>
-    <title>Akademik - Kelas PTIK C 2024</title>
+    <title>Akademik - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
 
     <style>

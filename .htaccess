@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /ptikc24/
+RewriteBase /simawa-ptik/
 DirectoryIndex index.php
 
 # Redirect /file.php to /file (handles query strings automatically)

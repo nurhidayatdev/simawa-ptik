@@ -112,7 +112,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
 <html lang="en">
 
 <head>
-    <title>Manajemen Absensi - PTIK C 2024</title>
+    <title>Manajemen Absensi - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .animate-shimmer {

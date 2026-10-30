@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else $alpha[] = $row['nama_lengkap'];
     }
 
-    $wa_msg = "📝 *LAPORAN ABSENSI PTIK C 2024*\n";
+    $wa_msg = "📝 *LAPORAN ABSENSI SIMAWA PTIK 2024*\n";
     $wa_msg .= "📘 *{$matkul_name}*\n";
     $wa_msg .= "🔢 Pertemuan Ke-{$pertemuan}\n\n";
 
@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <head>
 
-    <title>Absensi - PTIK C 2024</title>
+    <title>Absensi - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

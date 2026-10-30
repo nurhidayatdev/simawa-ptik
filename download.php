@@ -9,7 +9,7 @@ $periode = mysqli_fetch_assoc($q_periode);
 <html lang="id">
 
 <head>
-    <title>Download Assets - PTIK C 2024</title>
+    <title>Download Assets - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
     <style>
         .glass-card {
@@ -93,15 +93,15 @@ $periode = mysqli_fetch_assoc($q_periode);
                             <i class="fa fa-image text-lg"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-bold text-slate-900 dark:text-white leading-none transition-colors">Logo Kelas (HD)</h2>
+                            <h2 class="text-base font-bold text-slate-900 dark:text-white leading-none transition-colors">Logo Resmi SIMAWA PTIK (HD)</h2>
                             <p class="text-[9px] text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider font-semibold transition-colors">Branding Assets</p>
                         </div>
                     </div>
                     <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed mb-6 transition-colors">
-                        Logo resmi PTIK C 2024 dengan resolusi tinggi. Tersedia dalam format PNG transparan untuk kebutuhan desain, presentasi, dan dokumen resmi kelas.
+                        Logo resmi SIMAWA PTIK 2024 dengan resolusi tinggi. Tersedia dalam format PNG transparan untuk kebutuhan desain, presentasi, dan dokumen resmi.
                     </p>
                     <div class="mt-auto">
-                        <a href="assets/image/logo-ptikc.png" download="Logo_PTIK_C_24.png" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/40">
+                        <a href="assets/image/logo-ptikc.png" download="Logo_SIMAWA_PTIK_2024.png" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-100 dark:shadow-indigo-900/40">
                             <i class="fa fa-download scale-90"></i> Download (.png)
                         </a>
                     </div>
@@ -132,7 +132,7 @@ $periode = mysqli_fetch_assoc($q_periode);
                         Latar belakang virtual resmi untuk pertemuan online (Zoom/Google Meet). Memberikan kesan profesional dan kompak pada setiap sesi kuliah digital.
                     </p>
                     <div class="mt-auto flex flex-col gap-3">
-                        <a href="assets/image/background-ptikc.jpg" download="Zoom_BG_PTIK_C_24.jpg" class="w-full py-3 bg-slate-900 dark:bg-slate-800 hover:bg-slate-950 dark:hover:bg-slate-700 text-white rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200 dark:shadow-black/20">
+                        <a href="assets/image/background-ptikc.jpg" download="Zoom_BG_SIMAWA_PTIK_2024.jpg" class="w-full py-3 bg-slate-900 dark:bg-slate-800 hover:bg-slate-950 dark:hover:bg-slate-700 text-white rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200 dark:shadow-black/20">
                             <i class="fa fa-download scale-90"></i> Download (.jpg)
                         </a>
                     </div>

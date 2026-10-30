@@ -148,7 +148,7 @@ if (mysqli_num_rows($krs) > 0) {
 
 <head>
 
-    <title>Kartu Rencana Studi - PTIK C 2024</title>
+    <title>Kartu Rencana Studi - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {
@@ -301,7 +301,7 @@ if (mysqli_num_rows($krs) > 0) {
                         </div>
                         <div class="flex gap-3">
                             <div class="mt-1"><i class="fas fa-check-circle text-indigo-500"></i></div>
-                            <p class="${isDark ? 'text-slate-300' : 'text-slate-700'}">Hanya mengambil mata kuliah yang <strong>diprogramkan bersama kelas PTIK C 24</strong>.</p>
+                            <p class="${isDark ? 'text-slate-300' : 'text-slate-700'}">Hanya mengambil mata kuliah yang <strong>diprogramkan bersama SIMAWA PTIK 2024</strong>.</p>
                         </div>
                         <div class="flex gap-3">
                             <div class="mt-1"><i class="fas fa-exclamation-triangle text-amber-500"></i></div>

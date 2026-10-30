@@ -15,10 +15,10 @@ if (!isset($base)) {
     <div class="container mx-auto px-4 py-2 flex justify-between items-center">
         <!-- Logo -->
         <div class="flex items-center">
-            <img src="<?= $base ?>assets/image/logo.webp" alt="Logo PTIK C 2024" class="h-10 w-10 mr-3">
+            <img src="<?= $base ?>assets/image/logo.webp" alt="Logo SIMAWA PTIK 2024" class="h-10 w-10 mr-3">
             <div>
-                <h1 class="text-lg font-bold">PTIK C 2024</h1>
-                <p class="text-xs">ProTechNoTy Class</p>
+                <h1 class="text-lg font-bold">SIMAWA PTIK 2024</h1>
+                <p class="text-xs text-indigo-200">Portal Mahasiswa PTIK 2024</p>
             </div>
         </div>
 
@@ -46,18 +46,8 @@ if (!isset($base)) {
                         </a>
                     </li>
                     <li>
-                        <a href="<?= $base ?>mahasiswa" class="flex items-center hover:text-indigo-200 transition text-sm">
-                            <i class="fas fa-user-graduate mr-2"></i>Mahasiswa
-                        </a>
-                    </li>
-                    <li>
                         <a href="<?= $base ?>akademik" class="flex items-center hover:text-indigo-200 transition text-sm">
                             <i class="fas fa-graduation-cap mr-2"></i>Akademik
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= $base ?>galeri" class="flex items-center hover:text-indigo-200 transition text-sm">
-                            <i class="fas fa-images mr-2"></i>Galeri
                         </a>
                     </li>
                     <li>
@@ -78,18 +68,8 @@ if (!isset($base)) {
                 </a>
             </li>
             <li>
-                <a href="<?= $base ?>mahasiswa" class="flex items-center space-x-3 hover:text-indigo-200 transition text-sm py-2">
-                    <i class="fas fa-user-graduate w-5"></i><span>Mahasiswa</span>
-                </a>
-            </li>
-            <li>
                 <a href="<?= $base ?>akademik" class="flex items-center space-x-3 hover:text-indigo-200 transition text-sm py-2">
                     <i class="fas fa-graduation-cap w-5"></i><span>Akademik</span>
-                </a>
-            </li>
-            <li>
-                <a href="<?= $base ?>galeri" class="flex items-center space-x-3 hover:text-indigo-200 transition text-sm py-2">
-                    <i class="fas fa-images w-5"></i><span>Galeri</span>
                 </a>
             </li>
             <li>

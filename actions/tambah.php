@@ -140,38 +140,6 @@ if (isset($_POST['tambah'])) {
             $redirect = "../database/db_tugas";
             break;
 
-
-        case 'galeri':
-            $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
-            $tanggal_kegiatan = $_POST['tanggal_kegiatan'];
-
-            mysqli_query($koneksi, "INSERT INTO galeri (judul, tanggal_kegiatan) VALUES ('$judul', '$tanggal_kegiatan')");
-            $galeri_id = mysqli_insert_id($koneksi);
-
-            if (!empty($_FILES['fotos']['name'][0])) {
-                $target_dir = __DIR__ . "../../storage/gallery/"; // Absolute path for safety
-                if (!is_dir($target_dir)) {
-                    mkdir($target_dir, 0777, true);
-                }
-
-                $sanitized_judul = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $judul));
-                foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
-                    if (empty($tmp_name)) continue;
-
-                    $file_name = $_FILES['fotos']['name'][$key];
-                    $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                    $final_name = $sanitized_judul . "_" . time() . "_" . $key . "." . $ext;
-                    $target_file = $target_dir . $final_name;
-
-                    if (move_uploaded_file($tmp_name, $target_file)) {
-                        $db_path = $final_name;
-                        mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$galeri_id', '$db_path')");
-                    }
-                }
-            }
-            $redirect = "../database/db_galeri";
-            break;
-
         case 'akademik':
             $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
             $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
@@ -204,14 +172,6 @@ if (isset($_POST['tambah'])) {
             mysqli_query($koneksi, "INSERT INTO jam_kuliah (jam_ke, jam_mulai, jam_selesai) VALUES ('$jam_ke', '$jam_mulai', '$jam_selesai')");
             $redirect = "../database/db_jam";
             break;
-
-        case 'kuis_harian_soal':
-            $tanggal = $_POST['tanggal'];
-            $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
-            $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
-            mysqli_query($koneksi, "INSERT INTO kuis_harian_soal (tanggal, pertanyaan, jawaban) VALUES ('$tanggal', '$pertanyaan', '$jawaban')");
-            $redirect = "../database/db_soal";
-            break;
     }
     include '../includes/alert_actions.php';
 
@@ -223,7 +183,7 @@ if (isset($_POST['tambah'])) {
 
 <head>
 
-    <title>Tambah - PTIK C 2024</title>
+    <title>Tambah - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {
@@ -576,25 +536,6 @@ if (isset($_POST['tambah'])) {
                             </div>
                         </div>
 
-                    <?php elseif ($tabel === 'galeri'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Galeri Kegiatan</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Judul Kegiatan</label>
-                                <input type="text" name="judul" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Kegiatan</label>
-                                <input type="date" name="tanggal_kegiatan" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto-foto (Bisa pilih banyak)</label>
-                                <input type="file" name="fotos[]" multiple accept="image/*" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                        </div>
                     <?php elseif ($tabel === 'akademik'): ?>
                         <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Berita & Informasi Akademik</h3>
                         <div class="grid grid-cols-1 gap-6">
@@ -671,25 +612,6 @@ if (isset($_POST['tambah'])) {
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Selesai</label>
                                 <input type="time" name="jam_selesai" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                        </div>
-                    <?php elseif ($tabel === 'kuis_harian_soal'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Soal Kuis Harian</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal</label>
-                                <input type="date" name="tanggal" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Pertanyaan</label>
-                                <textarea name="pertanyaan" rows="3" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></textarea>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jawaban</label>
-                                <input type="text" name="jawaban" required
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>

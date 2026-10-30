@@ -1,0 +1,34 @@
+# Environment variables
+.env
+
+# Database backups and dumps
+*.sql
+backup_*.sql
+
+# Original private backups
+storage_backup_original/
+
+# Uploaded storage files (keep folder structure)
+storage/profile/*
+!storage/profile/.gitkeep
+storage/tugas/*
+!storage/tugas/.gitkeep
+
+# Testing documents and coursework materials
+INSTRUMEN_*
+Instrumen*
+LOG_*
+PROJECT_CONTEXT.md
+PROPOSAL_*
+Panduan dan Template Proposal PPL.pdf
+TIMELINE_*
+
+# Dependencies
+node_modules/
+vendor/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

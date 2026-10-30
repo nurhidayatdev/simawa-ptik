@@ -44,7 +44,7 @@ $beban_studi = [1 => 20, 2 => 20, 3 => 22, 4 => 22, 5 => 22, 6 => 22, 7 => 12, 8
 
 <head>
 
-    <title>Data Mata Kuliah - PTIK C 2024</title>
+    <title>Data Mata Kuliah - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

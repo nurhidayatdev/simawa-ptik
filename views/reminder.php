@@ -111,7 +111,6 @@ require_once __DIR__ . '/../functions/helpers.php';
 require_once __DIR__ . '/../functions/kirim_jadwal.php';
 require_once __DIR__ . '/../functions/kirim_tugas.php';
 require_once __DIR__ . '/../functions/kirim_kas.php';
-require_once __DIR__ . '/../functions/kirim_streak.php';
 require_once __DIR__ . '/../functions/kirim_krs.php';
 require_once __DIR__ . '/../functions/kirim_kelompok.php';
 require_once __DIR__ . '/../functions/kirim_piket_reminder.php';
@@ -148,8 +147,6 @@ if (isset($_POST['action'])) {
     } elseif ($action === 'kas') {
         $minggu_ke = (int)($_POST['minggu_ke'] ?? 1);
         $response = kirimKasReminder($koneksi, $minggu_ke);
-    } elseif ($action === 'streak') {
-        $response = kirimStreakReminder($koneksi);
     } elseif ($action === 'krs') {
         $response = kirimKrsReminder($koneksi);
     } elseif ($action === 'kelompok') {
@@ -182,7 +179,6 @@ $now_date = date('Y-m-d');
 $now_time = date('H:i:s');
 $yesterday_date = date('Y-m-d', strtotime('-1 day'));
 $tugas_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas WHERE status='belum' AND (deadline_tanggal > '$now_date' OR (deadline_tanggal = '$now_date' AND deadline_pukul > '$now_time'))"))['cnt'] ?? 0;
-$streak_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM kuis_harian_stats WHERE current_streak > 0 AND (last_played_date = '$now_date' OR last_played_date = '$yesterday_date') AND (last_completed_at IS NULL OR DATE(last_completed_at) != '$now_date')"))['cnt'] ?? 0;
 
 $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
 $p_id = mysqli_fetch_assoc($q_p)['id'] ?? 0;
@@ -246,7 +242,7 @@ if (isset($_SESSION['reminder_msg'])) {
 
 <head>
 
-    <title>Reminder - PTIK C 2024</title>
+    <title>Reminder - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {
@@ -316,7 +312,7 @@ if (isset($_SESSION['reminder_msg'])) {
                 </div>
                 <div>
                     <h2 class="text-lg font-bold text-slate-800 dark:text-white">Kirim Reminder ke WhatsApp</h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Pilih jenis reminder yang ingin dikirim ke grup WhatsApp PTIK C</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Pilih jenis reminder yang ingin dikirim ke grup WhatsApp PTIK 2024</p>
                 </div>
             </div>
         </div>
@@ -365,25 +361,7 @@ if (isset($_SESSION['reminder_msg'])) {
                 </div>
             </form>
 
-            <!-- Streak Kuis Harian -->
-            <form method="POST" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
-                <input type="hidden" name="action" value="streak">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-lg flex items-center justify-center flex-shrink-0 relative">
-                        <i class="fa fa-fire text-xl"></i>
-                        <?php if ($streak_count > 0): ?>
-                            <span class="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center"><?= $streak_count ?></span>
-                        <?php endif; ?>
-                    </div>
-                    <div class="flex-grow">
-                        <h3 class="font-bold text-slate-800 dark:text-slate-200 text-md">Streak Kuis Harian</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3">Ingatkan pemain yang belum main hari ini</p>
-                        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-2 px-4 rounded-lg transition shadow-sm">
-                            <i class="fab fa-whatsapp mr-1"></i> Kirim
-                        </button>
-                    </div>
-                </div>
-            </form>
+            
 
             <!-- Jadwal -->
             <form id="formJadwal" method="POST" class="bg-white dark:bg-slate-900/50 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition">
@@ -551,7 +529,7 @@ if (isset($_SESSION['reminder_msg'])) {
         function confirmJadwal() {
             Swal.fire({
                 title: 'Kirim Jadwal Kuliah',
-                text: "Pilih jadwal yang ingin dikirim ke WhatsApp PTIK C.",
+                text: "Pilih jadwal yang ingin dikirim ke WhatsApp PTIK 2024.",
                 icon: 'question',
                 showCancelButton: true,
                 showDenyButton: true,

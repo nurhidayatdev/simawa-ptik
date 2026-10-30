@@ -195,7 +195,7 @@ if (isset($_POST['update'])) {
 
 <head>
 
-    <title>Edit Profile - PTIK C 2024</title>
+    <title>Edit Profile - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

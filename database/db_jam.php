@@ -57,7 +57,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <head>
 
-    <title>Data Jam Kuliah - PTIK C 2024</title>
+    <title>Data Jam Kuliah - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

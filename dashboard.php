@@ -30,8 +30,6 @@ $tables = [
     'dosen' => 'database/db_dosen',
     'jadwal_matkul' => 'database/db_jadwal',
     'tugas' => 'database/db_tugas',
-    'galeri' => 'database/db_galeri',
-    'pesan' => 'views/dinding_pesan',
     'akademik' => 'database/db_berita',
     'kelompok' => 'views/kelompok'
 ];
@@ -86,19 +84,7 @@ while ($row = mysqli_fetch_assoc($q_task_matkul)) {
     $task_matkul_belum[] = (int)$row['belum'];
 }
 
-// Recent Messages (Anonymous)
-$q_recent_pesan = mysqli_query($koneksi, "SELECT * FROM pesan ORDER BY tanggal DESC LIMIT 4");
 
-
-// Kuis Harian Leaderboard
-$yesterday_date = date('Y-m-d', strtotime('-1 day'));
-$q_kuis_harian = mysqli_query($koneksi, "SELECT m.nama_panggilan, m.foto, 
-    IF(s.last_played_date >= '$yesterday_date', s.current_streak, 0) AS current_streak, 
-    s.total_games, s.last_completed_at 
-    FROM kuis_harian_stats s 
-    JOIN mahasiswa m ON s.user_id = m.user_id 
-    ORDER BY current_streak DESC, s.total_games DESC, s.last_completed_at ASC  
-    LIMIT 5");
 
 // --- DATA UNTUK SLIDER ---
 $days_indo = [
@@ -285,23 +271,7 @@ while ($current <= $last) {
     $current = strtotime("+1 day", $current);
 }
 
-// 5. Filter Rentang Tanggal (PESAN)
-$pesan_start = $_GET['pesan_start'] ?? date('Y-m-d', strtotime('-30 days'));
-$pesan_end = $_GET['pesan_end'] ?? date('Y-m-d');
 
-// 6. Data Pesan Anonim (Bar Chart)
-$pesan_history = [];
-$current = strtotime($pesan_start);
-$last = strtotime($pesan_end);
-while ($current <= $last) {
-    $date = date('Y-m-d', $current);
-    $q_pesan_count = mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM pesan WHERE DATE(tanggal) = '$date'");
-    $pesan_history[] = [
-        'tanggal' => date('d M', $current),
-        'jumlah' => (int)mysqli_fetch_assoc($q_pesan_count)['cnt']
-    ];
-    $current = strtotime("+1 day", $current);
-}
 
 // 7. Data Kas Per Minggu (Stacked Bar - Lunas vs Belum)
 $total_mhs = (int)($counts['mahasiswa'] ?? 0);
@@ -495,81 +465,13 @@ function getFireColor($streak)
     return null;
 }
 
-// --- LEADERBOARD BADGE COLLECTORS (DARI misi.php) ---
-$q_all_vibe_sets = mysqli_query($koneksi, "SELECT user_id, mood, COUNT(*) as cnt FROM vibe_check WHERE DATE(created_at) BETWEEN '$semester_start' AND '$semester_end' GROUP BY user_id, mood");
-$vibe_sets_by_user = [];
-while ($vs = mysqli_fetch_assoc($q_all_vibe_sets)) {
-    $vibe_sets_by_user[$vs['user_id']][$vs['mood']] = (int)$vs['cnt'];
-}
 
-$q_badge_data = mysqli_query($koneksi, "
-    SELECT 
-        m.id, m.nama_panggilan, m.foto, m.user_id, m.nim, m.instagram, m.bio,
-        (SELECT COUNT(*) FROM kas WHERE mahasiswa_id = m.id AND status = 'Lunas' AND periode_id = '$periode_id') as c_kas,
-        (SELECT COUNT(*) FROM absensi WHERE mahasiswa_id = m.id AND status = 'Hadir' AND periode_id = '$periode_id') as c_abs,
-        ks.current_streak, ks.total_games,
-        (SELECT COUNT(*) FROM vibe_check WHERE user_id = m.user_id AND DATE(created_at) BETWEEN '$semester_start' AND '$semester_end') as c_vibe,
-        (SELECT COUNT(*) FROM krs WHERE mahasiswa_id = m.id AND periode_id = '$periode_id') as c_krs,
-        (SELECT COUNT(*) FROM kelompok WHERE FIND_IN_SET(m.nim, REPLACE(anggota, ' ', '')) OR anggota LIKE CONCAT('%', m.nim, '%')) as c_kel,
-        IF(m.foto != '' AND m.foto != 'Yaya.png' AND m.instagram != '' AND m.bio != '', 1, 0) as prof_complete
-    FROM mahasiswa m
-    LEFT JOIN kuis_harian_stats ks ON m.user_id = ks.user_id
-");
-
-$leaderboard_badges = [];
-while ($m = mysqli_fetch_assoc($q_badge_data)) {
-    $badges = 0;
-    // Kas (5, 10, 16)
-    if ($m['c_kas'] >= 5) $badges++;
-    if ($m['c_kas'] >= 10) $badges++;
-    if ($m['c_kas'] >= 16) $badges++;
-    // Absensi (5, 15, 30)
-    if ($m['c_abs'] >= 5) $badges++;
-    if ($m['c_abs'] >= 15) $badges++;
-    if ($m['c_abs'] >= 30) $badges++;
-    // Kuis (Streak 3, 14, Total 50)
-    if (($m['current_streak'] ?? 0) >= 3) $badges++;
-    if (($m['current_streak'] ?? 0) >= 14) $badges++;
-    if (($m['total_games'] ?? 0) >= 50) $badges++;
-    // Login (10, 30, 60)
-    if ($m['c_vibe'] >= 10) $badges++;
-    if ($m['c_vibe'] >= 30) $badges++;
-    if ($m['c_vibe'] >= 60) $badges++;
-
-    // Mood sets (1, 3, 7)
-    $u_moods = $vibe_sets_by_user[$m['user_id']] ?? [];
-    $mood_list = ['productive', 'stress', 'relaxed', 'tired', 'hyper'];
-    $m_counts = [];
-    foreach ($mood_list as $ml) $m_counts[] = $u_moods[$ml] ?? 0;
-    $c_vibe_sets = min($m_counts);
-
-    if ($c_vibe_sets >= 1) $badges++;
-    if ($c_vibe_sets >= 3) $badges++;
-    if ($c_vibe_sets >= 7) $badges++;
-
-    // Social
-    if ($m['c_krs'] > 0) $badges++;
-    if ($m['prof_complete']) $badges++;
-    if ($m['c_kel'] >= 5) $badges++;
-
-    if ($badges > 0) {
-        $leaderboard_badges[] = [
-            'nama' => $m['nama_panggilan'],
-            'foto' => $m['foto'],
-            'badges' => $badges
-        ];
-    }
-}
-usort($leaderboard_badges, function ($a, $b) {
-    return $b['badges'] <=> $a['badges'];
-});
-$leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the leaderboard section
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <title>Dashboard - PTIK C 2024</title>
+    <title>Dashboard - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
     <style>
         .card-hover:hover {
@@ -810,7 +712,7 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                         <span class="h-8 w-8 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
                             <i class="fa fa-face-smile"></i>
                         </span>
-                        Vibe Kelas Hari Ini
+                        Vibe Mahasiswa Hari Ini
                     </h2>
                     <?php if (!$vibe_user): ?>
                         <button onclick="document.getElementById('vibeModal').classList.remove('hidden'); document.getElementById('vibeModal').classList.add('flex');" class="text-[10px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded font-bold hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all">
@@ -851,7 +753,7 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                 </h2>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Finance Summary Card -->
                 <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
                     <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex justify-between items-center">
@@ -901,83 +803,7 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Kuis Harian Leaderboard -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <i class="fa fa-fire text-orange-500"></i>
-                        Kuis Harian Leaderboard
-                    </h3>
-                    <div class="space-y-2">
-                        <?php
-                        $rank = 1;
-                        mysqli_data_seek($q_kuis_harian, 0);
-                        if (mysqli_num_rows($q_kuis_harian) > 0):
-                            while ($tk = mysqli_fetch_assoc($q_kuis_harian)):
-                                $fireColor = getFireColor($tk['current_streak']);
-                        ?>
-                                <div class="flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-700/50">
-                                    <div class="w-5 text-center shrink-0">
-                                        <span class="text-xs font-black <?= $rank == 1 ? 'text-yellow-500' : ($rank == 2 ? 'text-slate-400 dark:text-slate-300' : ($rank == 3 ? 'text-orange-400' : 'text-slate-300 dark:text-slate-600')) ?>">
-                                            <?= $rank++ ?>
-                                        </span>
-                                    </div>
-                                    <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
-                                        <img src="<?= profilePhotoUrl($tk['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
-                                    </div>
-                                    <div class="flex-grow min-w-0">
-                                        <div class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
-                                            <?= htmlspecialchars($tk['nama_panggilan']) ?>
-                                        </div>
-                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
-                                            <?= $tk['total_games'] ?> games
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center shrink-0 w-12">
-                                        <?php if ($fireColor): ?>
-                                            <div class="flex items-center gap-1.5 font-black" style="color: <?= $fireColor ?>;">
-                                                <i class="fa fa-fire text-xs w-3 text-center"></i>
-                                                <span class="text-xs font-bold"><?= $tk['current_streak'] ?></span>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <div class="text-center py-6">
-                                <i class="fa fa-ghost text-slate-200 dark:text-slate-800 text-2xl mb-2"></i>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic">Belum ada aktivitas hari ini.</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                </div>
-
-                <!-- Recent Messages -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 lg:col-span-1 transition-all">
-                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-                        <i class="fa fa-envelope-open-text text-purple-500"></i>
-                        Pesan Anonim Terbaru
-                    </h3>
-                    <div class="space-y-3">
-                        <?php
-                        mysqli_data_seek($q_recent_pesan, 0);
-                        if (mysqli_num_rows($q_recent_pesan) > 0):
-                            while ($ps = mysqli_fetch_assoc($q_recent_pesan)):
-                        ?>
-                                <div class="bg-slate-50 dark:bg-slate-800/30 p-3 rounded-lg border-l-4 border-purple-400 dark:border-purple-600">
-                                    <div class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase mb-1"><?= date('d M, H:i', strtotime($ps['tanggal'])) ?></div>
-                                    <div class="text-xs text-slate-600 dark:text-slate-400 italic line-clamp-2">"<?= htmlspecialchars($ps['isi_pesan']) ?>"</div>
-                                </div>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <p class="text-xs text-slate-400 dark:text-slate-500 text-center py-4">Belum ada pesan.</p>
-                        <?php endif; ?>
-                    </div>
-
-                </div>
-            </div>
+                </div></div>
 
             
 
@@ -1083,7 +909,7 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                 </div>
             </div>
 
-            <!-- 2. Keaktifan Login dan Volume Pesan Anonim -->
+            <!-- 2. Keaktifan Login -->
             <div class="mt-8 border-b-2 border-indigo-100 dark:border-indigo-900/30 pb-2 mb-6 transition-all">
                 <h2 class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] flex items-center gap-3">
                     <span class="h-8 w-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center">
@@ -1111,23 +937,7 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                     </div>
                 </div>
 
-                <!-- Message Volume Bar Chart -->
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 transition-all">
-                    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
-                        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-                            <i class="fa fa-chart-bar text-purple-500"></i>
-                            Volume Pesan Anonim
-                        </h3>
-                        <div class="flex items-center justify-between sm:justify-start gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded border border-slate-200 dark:border-slate-700 w-full sm:w-auto">
-                            <input type="date" name="pesan_start" value="<?= $pesan_start ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
-                            <span class="text-slate-300 dark:text-slate-600 text-[10px]">-</span>
-                            <input type="date" name="pesan_end" value="<?= $pesan_end ?>" form="vizFilters" onchange="this.form.submit()" class="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-transparent border-none focus:ring-0 p-0 flex-grow sm:flex-none w-0 sm:w-24 text-center">
-                        </div>
-                    </div>
-                    <div class="relative h-72">
-                        <canvas id="messageChart"></canvas>
-                    </div>
-                </div>
+                
             </div>
 
             <!-- 3. Radar Mood dan Hall of Fame -->
@@ -1286,59 +1096,6 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                             <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium italic text-center py-8">Belum ada data piket.</p>
                         <?php endif; ?>
                     </div>
-                </div>
-            </div>
-            <!-- --- SECTION 5: BADGE COLLECTORS LEADERBOARD --- -->
-            <div class="mt-12 border-b-2 border-yellow-100 dark:border-yellow-900/30 pb-2 mb-6 transition-all">
-                <h2 class="text-xs font-black text-yellow-600 dark:text-yellow-400 uppercase tracking-[0.2em] flex items-center gap-3">
-                    <span class="h-8 w-8 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center">
-                        <i class="fa fa-medal"></i>
-                    </span>
-                    Badge Mastery: Top Collectors
-                </h2>
-            </div>
-
-            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 mb-12 relative overflow-hidden">
-                <!-- Background decoration -->
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-yellow-500/5 rounded-full blur-3xl"></div>
-                <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl"></div>
-
-                <div class="relative z-10 grid grid-cols-2 lg:grid-cols-5 gap-3">
-                    <?php if (!empty($leaderboard_badges)): ?>
-                        <?php 
-                        $rank = 1;
-                        foreach ($leaderboard_badges as $lb): 
-                            $rankColor = ($rank == 1) ? 'bg-yellow-400' : (($rank == 2) ? 'bg-slate-300' : (($rank == 3) ? 'bg-orange-300' : 'bg-slate-100 dark:bg-slate-800'));
-                            $rankText = ($rank <= 3) ? 'text-white' : 'text-slate-400';
-                        ?>
-                            <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 hover:border-yellow-200 dark:hover:border-yellow-900/50 transition-all group">
-                                <div class="relative">
-                                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white dark:border-slate-800 shadow-sm shrink-0">
-                                        <img src="<?= profilePhotoUrl($lb['foto']) ?>" class="w-full h-full object-cover" onerror="this.src='assets/image/logo.webp'">
-                                    </div>
-                                    <div class="absolute -top-1 -left-1 w-5 h-5 <?= $rankColor ?> <?= $rankText ?> rounded-full flex items-center justify-center text-[9px] font-black shadow-sm ring-2 ring-white dark:ring-slate-900">
-                                        <?= $rank++ ?>
-                                    </div>
-                                </div>
-                                <div class="flex-grow min-w-0">
-                                    <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors">
-                                        <?= htmlspecialchars($lb['nama']) ?>
-                                    </div>
-                                    <div class="flex items-center gap-1 mt-0.5">
-                                        <div class="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 rounded-full border border-yellow-200/50 dark:border-yellow-900/50">
-                                            <img src="assets/image/logo.webp" class="w-2.5 h-2.5 object-contain" style="filter: brightness(0) saturate(100%) invert(62%) sepia(77%) saturate(3143%) hue-rotate(352deg) brightness(101%) contrast(96%);">
-                                            <span class="text-[8px] font-black text-yellow-700 dark:text-yellow-400"><?= $lb['badges'] ?> Badge</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="col-span-full py-12 text-center">
-                            <i class="fa fa-medal text-slate-200 dark:text-slate-800 text-4xl mb-3"></i>
-                            <p class="text-sm text-slate-400 dark:text-slate-500 font-medium italic">Belum ada pengoleksi badge. Ayo selesaikan misi!</p>
-                        </div>
-                    <?php endif; ?>
                 </div>
             </div>
             <?php include 'includes/footer_db.php'; ?>
@@ -1589,52 +1346,6 @@ $leaderboard_badges = array_slice($leaderboard_badges, 0, 10); // Top 10 for the
                             color: isDarkMode ? 'rgba(148, 163, 184, 0.1)' : '#f1f5f9'
                         },
                         ticks: {
-                            font: {
-                                size: 9
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 9
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Message Chart
-        const msgCtx = document.getElementById('messageChart').getContext('2d');
-        const msgHistory = <?= json_encode($pesan_history) ?>;
-        new Chart(msgCtx, {
-            type: 'bar',
-            data: {
-                labels: msgHistory.map(h => h.tanggal),
-                datasets: [{
-                    label: 'Jumlah Pesan',
-                    data: msgHistory.map(h => h.jumlah),
-                    backgroundColor: '#8b5cf6',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0,
                             font: {
                                 size: 9
                             }

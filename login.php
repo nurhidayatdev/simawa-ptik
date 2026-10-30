@@ -67,7 +67,7 @@ if (isset($_SESSION['maintenance_blocked'])) {
 
 <head>
 
-  <title>Login - Kelas PTIK C 2024</title>
+  <title>Login - SIMAWA PTIK 2024</title>
   <?php include 'includes/head.php'; ?>
   <style>
     .error {
@@ -171,7 +171,7 @@ if (isset($_SESSION['maintenance_blocked'])) {
                 </span>
                 <input type="email" name="email" id="email" required autocomplete="username"
                   class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white py-2.5 pl-10 pr-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                  placeholder="nim@ptikc.id">
+                  placeholder="nim@simawa.id">
               </div>
             </div>
 
@@ -199,7 +199,7 @@ if (isset($_SESSION['maintenance_blocked'])) {
 
         <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center transition-colors">
           <p class="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed uppercase tracking-widest font-semibold">
-            &copy; <?php echo date("Y"); ?> Kelas PTIK C<br>Teknik Informatika dan Komputer FT UNM
+            &copy; <?php echo date("Y"); ?> SIMAWA PTIK 2024<br>Teknik Informatika dan Komputer FT UNM
           </p>
         </div>
       </div>

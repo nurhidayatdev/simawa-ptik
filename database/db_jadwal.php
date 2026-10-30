@@ -186,7 +186,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <head>
 
-    <title>Data Jadwal Kuliah - PTIK C 2024</title>
+    <title>Data Jadwal Kuliah - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {
@@ -333,7 +333,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         function confirmJadwal() {
             Swal.fire({
                 title: 'Kirim Jadwal Kuliah',
-                text: "Pilih jadwal yang ingin dikirim ke WhatsApp PTIK C.",
+                text: "Pilih jadwal yang ingin dikirim ke WhatsApp PTIK 2024.",
                 icon: 'question',
                 showCancelButton: true,
                 showDenyButton: true,

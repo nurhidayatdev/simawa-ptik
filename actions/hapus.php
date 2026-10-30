@@ -15,9 +15,9 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <meta name='description' content='Dashboard Resmi Kelas PTIK C 2024'>
+        <meta name='description' content='Dashboard Resmi SIMAWA PTIK 2024'>
         <meta name='theme-color' content='#1e1b4b' />
-        <title>Hapus Data - Kelas PTIK C 2024</title>
+        <title>Hapus Data - SIMAWA PTIK 2024</title>
         <link rel='icon' href='../assets/image/icon.webp' />
         <link rel='preconnect' href='https://fonts.googleapis.com'>
         <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -90,7 +90,7 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam
                 <meta charset='UTF-8'>
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <meta name='theme-color' content='#1e1b4b' />
-                <title>Hapus Data - Kelas PTIK C 2024</title>
+                <title>Hapus Data - SIMAWA PTIK 2024</title>
                 <link rel='icon' href='../assets/image/icon.webp' />
                 <link rel='preconnect' href='https://fonts.googleapis.com'>
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -155,9 +155,9 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && !isset($_GET['confirm'])) {
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <meta name='description' content='Dashboard Resmi Kelas PTIK C 2024'>
+        <meta name='description' content='Dashboard Resmi SIMAWA PTIK 2024'>
         <meta name='theme-color' content='#1e1b4b' />
-        <title>Hapus Data - Kelas PTIK C 2024</title>
+        <title>Hapus Data - SIMAWA PTIK 2024</title>
         <link rel='icon' href='../assets/image/icon.webp' />
         <link rel='preconnect' href='https://fonts.googleapis.com'>
         <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
@@ -229,7 +229,7 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'set_kelompok' && !isset($_GET['
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Hapus Set Kelompok - Kelas PTIK C 2024</title>
+        <title>Hapus Set Kelompok - SIMAWA PTIK 2024</title>
         <link rel='icon' href='../assets/image/icon.webp' />
         <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
         <style>
@@ -344,7 +344,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
     $tabel = $_GET['tabel'];
     $id = intval($_GET['id']);
 
-    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'galeri', 'pesan', 'akademik', 'kalender_akademik', 'ruangan', 'kuis_harian_soal', 'kelompok'];
+    $tabel_diizinkan = ['mahasiswa', 'mata_kuliah', 'jadwal_matkul', 'users', 'dosen', 'tugas', 'akademik', 'kalender_akademik', 'ruangan', 'kelompok'];
 
     if (!in_array($tabel, $tabel_diizinkan)) {
         echo "Tabel tidak diizinkan!";
@@ -375,11 +375,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
         case 'tugas':
             $redirect = '../database/db_tugas';
             break;
-        case 'galeri':
-            $redirect = '../database/db_galeri';
             break;
-        case 'pesan':
-            $redirect = '../database/db_pesan';
             break;
         case 'akademik':
             $redirect = '../database/db_berita';
@@ -390,8 +386,6 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
         case 'ruangan':
             $redirect = '../database/db_ruangan';
             break;
-        case 'kuis_harian_soal':
-            $redirect = '../database/db_soal';
             break;
         case 'kelompok':
             $redirect = '../database/db_kelompok';
@@ -406,7 +400,7 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
                 <meta charset='UTF-8'>
                 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
                 <meta name='theme-color' content='#1e1b4b' />
-                <title>Hapus Data - Kelas PTIK C 2024</title>
+                <title>Hapus Data - SIMAWA PTIK 2024</title>
                 <link rel='icon' href='../assets/image/icon.webp' />
                 <link rel='preconnect' href='https://fonts.googleapis.com'>
                 <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>

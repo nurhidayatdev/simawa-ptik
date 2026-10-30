@@ -5,7 +5,7 @@ echo "<!DOCTYPE html>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <meta name='theme-color' content='#1e1b4b' />
-    <title>PTIK C 2024</title>
+    <title>SIMAWA PTIK 2024</title>
     <link rel='icon' href='../assets/image/icon.png' />
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>

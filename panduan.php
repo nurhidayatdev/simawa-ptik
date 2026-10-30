@@ -10,7 +10,7 @@ $periode = mysqli_fetch_assoc($q_periode);
 <html lang="id">
 
 <head>
-    <title>Panduan Penggunaan - PTIK C 2024</title>
+    <title>Panduan Penggunaan - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -248,7 +248,7 @@ $periode = mysqli_fetch_assoc($q_periode);
                                                 <li>Buka <strong>Settings</strong> di Chrome/Browser Anda.</li>
                                                 <li>Pilih menu <strong>Google Password Manager</strong>.</li>
                                                 <li>Klik tombol <strong>+ Add</strong> atau <strong>Tambah</strong>.</li>
-                                                <li>Masukkan URL: <code>ptikc24.fwh.is</code></li>
+                                                <li>Masukkan URL: <code>simawa-ptik.local</code></li>
                                                 <li>Masukkan Username: <code>NIM Anda</code></li>
                                                 <li>Masukkan Password yang baru saja Anda buat.</li>
                                             </ol>
@@ -286,7 +286,7 @@ $periode = mysqli_fetch_assoc($q_periode);
                                                 <li><strong>Jadwal Kuliah:</strong> Untuk melihat jadwal perkuliahan pada kelas.</li>
                                                 <li><strong>Berita & Info:</strong> Untuk update informasi terbaru seputar kelas.</li>
                                                 <li><strong>Kalender Akademik:</strong> Untuk memantau jadwal penting semester ini.</li>
-                                                <li><strong>Galeri Kelas:</strong> Untuk melihat dokumentasi atau foto-foto kegiatan kelas.</li>
+                                                
                                             </ol>
                                         </div>
                                     </li>
@@ -516,126 +516,6 @@ $periode = mysqli_fetch_assoc($q_periode);
                         </div>
                     </div>
 
-                    <!-- Pusat Misi -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Pusat Misi dan Pencapaian</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Selesaikan tantangan untuk mendapatkan poin atau pencapaian:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-trophy text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Akses Menu:</strong> Pilih <strong>Pusat Misi</strong> pada <strong>sidebar</strong> untuk meninjau daftar misi yang tersedia.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-clipboard-list text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Status Misi:</strong> Selesaikan setiap instruksi untuk mendapatkan apresiasi sistem.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-medal text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Inventori Lencana:</strong> Anda dapat melihat seluruh <strong>badge</strong> atau <strong>lencana</strong> yang telah diraih dengan menggulir halaman hingga ke bagian paling bawah.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mengikuti Kuis -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Mengikuti Kuis Harian</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Asah kemampuan Anda sebelum ujian resmi:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-brain text-indigo-500 mt-0.5"></i>
-                                        <span>Buka menu <strong>Kuis Harian</strong> melalui <strong>Sidebar</strong>.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-circle-info text-indigo-500 mt-0.5"></i>
-                                        <span>Pastikan memahami tata cara bermain dengan menekan ikon <strong>?</strong> sebelum mulai mengerjakan.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-keyboard text-indigo-500 mt-0.5"></i>
-                                        <span>Masukkan jawaban Anda pada kolom yang tersedia dan klik <strong>submit</strong>.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-lightbulb text-indigo-500 mt-0.5"></i>
-                                        <span>Gunakan <strong>Hint</strong> (ikon lampu) jika mengalami kesulitan. Fitur ini akan membuka satu karakter jawaban selama <strong>HintStock</strong> tersedia.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-fire text-indigo-500 mt-0.5"></i>
-                                        <span>Jika melewatkan satu hari, gunakan <strong>RecoveryStock</strong> agar status keaktifan (<strong>"Api"</strong>) tetap terjaga.</span>
-                                    </li>
-                                     <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-trophy text-indigo-500 mt-0.5"></i>
-                                        <span>Lihat skor Anda dan cek posisi di <strong>Leaderboard</strong> kelas.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pesan Anonim -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Aspirasi Pesan Anonim</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Curhat atau kirim kritik/saran tanpa diketahui identitasnya:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-user-secret text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Akses Sidebar:</strong> Pilih menu <strong>Pesan Anonim</strong> untuk menampilkan <strong>feed</strong> pesan publik.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-image text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Download Pesan:</strong> Anda dapat mengunduh pesan tertentu sebagai <strong>file gambar</strong> dengan cara mengkliknya.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-paper-plane text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Kirim Pesan:</strong> Gunakan fitur <strong>Kirim</strong> untuk membagikan pemikiran atau kritik secara rahasia.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Random Picker -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Random Student Picker</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Alat bantu pemilihan nama yang adil:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-circle-dot text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Akses Menu:</strong> Buka <strong>Sidebar</strong> > <strong>Random Picker</strong>.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-dice text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Pilih Kategori:</strong> Tentukan objek <strong>undian</strong> (Mahasiswa atau Kelompok) melalui menu Random Picker di sidebar.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-sliders text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Filter Kustom:</strong> Untuk kategori mahasiswa, Anda dapat menyaring daftar berdasarkan jenis kelamin atau memilih nama-nama tertentu saja. Untuk kelompok, silakan pilih berdasarkan set mata kuliah.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-rotate text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Mekanisme Undian:</strong> Tekan area <strong>roda putar</strong> untuk memulai putaran. Hasil akan muncul secara otomatis setelah 4 detik.</span>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400 transition-colors">
-                                        <i class="fa fa-clock-rotate-left text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Log & Pengaturan:</strong> Pantau daftar nama yang sudah keluar pada bagian <strong>Riwayat</strong> dan gunakan fitur <strong>Acak Urutan</strong> untuk merombak posisi pada roda putar.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Bot WhatsApp -->
                     <div class="step-card group">
                         <div class="flex gap-6 relative z-10">
@@ -676,12 +556,12 @@ $periode = mysqli_fetch_assoc($q_periode);
 
                                                 <!-- Identitas -->
                                                 <div class="space-y-1.5">
-                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-image text-indigo-500"></i> IDENTITAS & SEJARAH</p>
+                                                    <p class="text-[12px] font-bold text-slate-800 dark:text-white flex items-center gap-2"><i class="fa fa-image text-indigo-500"></i> IDENTITAS & INFORMASI</p>
                                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
                                                         <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.info</code> : Identitas kelas & makna logo</p>
-                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.sejarah</code> : Jejak terbentuknya kelas</p>
+                                                        
                                                         <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.download</code> : Unduh logo & bg zoom</p>
-                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.galeri</code> : Dokumentasi foto kelas</p>
+                                                        
                                                     </div>
                                                 </div>
 
@@ -691,8 +571,6 @@ $periode = mysqli_fetch_assoc($q_periode);
                                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5 pl-2">
                                                         <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.tentang</code> : Tech stack & versi website</p>
                                                         <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.panduan</code> : Panduan penggunaan web</p>
-                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.spin</code> : Random picker terintegrasi</p>
-                                                        <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.pesan</code> : Kirim pesan anonim</p>
                                                         <p class="text-[12px] text-slate-500 dark:text-slate-400">• <code class="text-indigo-500 font-bold">.login</code> : Akses portal member</p>
                                                     </div>
                                                 </div>
@@ -832,7 +710,6 @@ $periode = mysqli_fetch_assoc($q_periode);
                                             <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
                                                 <li><strong>Reminder KRS:</strong> Mengingatkan mahasiswa yang belum melakukan pengisian atau validasi <strong>KRS</strong>.</li>
                                                 <li><strong>Tugas Aktif:</strong> Mengirimkan rekap daftar <strong>tugas aktif</strong> yang mendekati deadline.</li>
-                                                <li><strong>Streak Kuis Harian:</strong> Mengingatkan teman-teman yang belum mengerjakan <strong>kuis harian</strong> agar "Api" mereka tidak mati.</li>
                                                 <li><strong>Jadwal Kuliah:</strong> Mengirimkan info <strong>jadwal kuliah</strong> untuk hari ini atau esok hari.</li>
                                                 <li><strong>Kas Mingguan:</strong> Memberikan teguran halus bagi mahasiswa yang memiliki tunggakan <strong>uang kas</strong>.</li>
                                                 <li><strong>Piket Proyektor:</strong> Mengingatkan petugas <strong>piket proyektor</strong> yang bertanggung jawab hari ini, besok, atau selama sepekan ke depan.</li>
@@ -1244,40 +1121,6 @@ $periode = mysqli_fetch_assoc($q_periode);
                                     <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
                                         <i class="fa fa-triangle-exclamation text-indigo-600 mt-0.5"></i>
                                         <span><strong>Peringatan Keamanan:</strong> Gunakan fitur ini dengan bijak karena setiap perubahan data pada database bersifat <strong>permanen</strong>.</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Manajemen Kuis & Gift -->
-                    <div class="step-card group">
-                        <div class="flex gap-6 relative z-10">
-
-                            <div class="flex-1">
-                                <h3 class="text-lg font-black text-slate-800 dark:text-white mb-3 plus-jakarta transition-colors">Kuis Harian & Reward System</h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4 transition-colors">Mengelola konten edukasi dan apresiasi keaktifan mahasiswa:</p>
-                                <ul class="space-y-3">
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-microchip text-indigo-600 mt-0.5"></i>
-                                        <div class="space-y-1">
-                                            <span><strong>Pengelolaan Statistik & Hadiah:</strong></span>
-                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
-                                                <li>Buka <strong>Website > Manajemen Stats Kuis</strong>.</li>
-                                                <li>Gunakan fitur <strong>Global Hint/Recovery</strong> untuk membagikan bonus stok bantuan ke seluruh mahasiswa secara serentak.</li>
-                                                <li>Berikan <strong>HintStock/RecoveryStock</strong> secara spesifik ke pemain tertentu untuk apresiasi individu.</li>
-                                            </ol>
-                                        </div>
-                                    </li>
-                                    <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-book-medical text-indigo-600 mt-0.5"></i>
-                                        <div class="space-y-1">
-                                            <span><strong>Pengelolaan Bank Soal:</strong></span>
-                                            <ol class="list-decimal list-inside pl-2 space-y-1 opacity-80 decoration-indigo-200">
-                                                <li>Buka <strong>Website > Data Soal Kuis</strong>.</li>
-                                                <li>Input pertanyaan, kunci jawaban, dan tentukan <strong>tanggal tayang</strong> kuis melalui ikon <strong>(+)</strong>.</li>
-                                            </ol>
-                                        </div>
                                     </li>
                                 </ul>
                             </div>

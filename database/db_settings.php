@@ -28,7 +28,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 <html lang="id">
 
 <head>
-    <title>Pengaturan Sistem & Maintenance - PTIK C 2024</title>
+    <title>Pengaturan Sistem & Maintenance - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>

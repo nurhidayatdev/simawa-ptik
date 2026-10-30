@@ -17,7 +17,7 @@ function kirimTugasReminder($koneksi, $token = null, $chat_id = null)
     $days_map = ['Sunday' => 'Minggu', 'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu', 'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu'];
 
     if ($result && mysqli_num_rows($result) > 0) {
-        $message = "🔔 *REKAP TUGAS AKTIF PTIK C* 🔔\n\nDaftar tugas *belum dikumpulkan*:\n\n";
+        $message = "🔔 *REKAP TUGAS AKTIF SIMAWA PTIK 2024* 🔔\n\nDaftar tugas *belum dikumpulkan*:\n\n";
         $no = 1;
         while ($row = mysqli_fetch_assoc($result)) {
             $day_ind = $days_map[date('l', strtotime($row['deadline_tanggal']))];

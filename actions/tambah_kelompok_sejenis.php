@@ -140,7 +140,7 @@ if ($selected_matkul) {
 
 <head>
 
-    <title>Kelompok Per Gender - PTIK C 2024</title>
+    <title>Kelompok - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

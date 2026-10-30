@@ -113,7 +113,7 @@ if ($my_nim) {
 
 <head>
 
-    <title>Data Kelompok - PTIK C 2024</title>
+    <title>Data Kelompok - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

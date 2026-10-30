@@ -111,7 +111,7 @@ if (isset($_POST['simpan_kas'])) {
         }
     }
 
-    $wa_msg = "💰 *LAPORAN KAS PTIK C 2024*\n";
+    $wa_msg = "💰 *LAPORAN KAS SIMAWA PTIK 2024*\n";
     $wa_msg .= "📅 *Minggu Ke-{$minggu}*\n\n";
 
     $count_belum = count($belum);
@@ -148,7 +148,7 @@ if (isset($_POST['simpan_kas'])) {
 
 <head>
 
-    <title>Kas Mingguan - PTIK C 2024</title>
+    <title>Kas Mingguan - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

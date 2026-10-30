@@ -10,7 +10,7 @@ $periode = mysqli_fetch_assoc($q_periode);
 <html lang="id">
 
 <head>
-    <title>Informasi Kelas - PTIK C 2024</title>
+    <title>Informasi Akademik - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
     <style>
         .glass-card {
@@ -45,23 +45,15 @@ $periode = mysqli_fetch_assoc($q_periode);
         .dark .bg-mesh {
             background-color: #020617;
             background-image:
-                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
-        }
-
-        .hover-scale {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .hover-scale:hover {
-            transform: scale(1.05);
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(79, 70, 229, 0.1) 0px, transparent 50%);
         }
     </style>
 </head>
 
-<body class="bg-mesh min-h-screen text-slate-800 dark:text-slate-200 transition-colors duration-300">
+<body class="bg-mesh min-h-screen text-slate-800 transition-colors duration-300">
 
     <?php include 'includes/header_main.php'; ?>
 
@@ -70,40 +62,45 @@ $periode = mysqli_fetch_assoc($q_periode);
 
     <main class="container mx-auto px-6 py-12 flex-grow">
         <!-- Hero Section -->
-        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white scroll-reveal text-center transition-colors">Informasi Kelas</h1>
-        <p class="text-gray-500 dark:text-slate-400 mb-8 scroll-reveal text-sm text-center max-w-2xl mx-auto">Temukan filosofi di balik nama ProTechNoTy, struktur kepengurusan kelas, serta visi dan misi yang kami bawa.</p>
+        <div class="max-w-4xl mx-auto text-center mb-16 scroll-reveal">
+            <h1 class="text-3xl md:text-5xl font-black mb-4 text-slate-900 dark:text-white transition-colors">
+                Informasi & Identitas <span class="text-gradient">SIMAWA PTIK 2024</span>
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 text-sm md:text-base max-w-xl mx-auto transition-colors">
+                Mengenal lebih dekat identitas akademik, visi, dan filosofi platform mahasiswa PTIK Angkatan 2024 FT UNM.
+            </p>
+        </div>
 
-        <!-- Section: Penjelasan Nama -->
-        <section class="mb-16">
-            <div class="glass-card p-6 md:p-10 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-8 items-stretch">
-                <!-- Explanation List -->
+        <!-- Section: Identitas -->
+        <section class="glass-card p-6 md:p-12 rounded-[2.5rem] mb-16 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+            <div class="flex flex-col md:flex-row gap-8 items-center">
                 <div class="w-full md:w-7/12 flex flex-col justify-center py-2 order-1 md:order-1">
                     <div class="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 w-max transition-colors">
-                        Etimologi
+                        Identitas Akademik
                     </div>
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 transition-colors">Arti <span class="text-indigo-600 dark:text-indigo-400">PTIK C 24</span></h2>
-                    <p class="text-slate-400 dark:text-slate-500 text-xs mb-8 transition-colors">Simbol perjuangan dan identitas kolektif kita.</p>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-2 transition-colors">Program Studi <span class="text-indigo-600 dark:text-indigo-400">PTIK 2024</span></h2>
+                    <p class="text-slate-400 dark:text-slate-500 text-xs mb-8 transition-colors">Pendidikan Teknik Informatika dan Komputer - Angkatan 2024.</p>
 
                     <div class="space-y-4">
                         <div class="flex gap-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-indigo-200 dark:hover:border-indigo-500">
                             <div class="h-10 w-10 shrink-0 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">P</div>
                             <div>
-                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Pendidikan Teknik Informatika & Komputer</p>
-                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Program Studi kita di Universitas Negeri Makassar.</p>
+                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Pendidikan</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Membentuk pendidik dan praktisi teknologi yang berkompeten dan berkarakter.</p>
                             </div>
                         </div>
                         <div class="flex gap-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-cyan-200 dark:hover:border-cyan-500">
-                            <div class="h-10 w-10 shrink-0 bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">C</div>
+                            <div class="h-10 w-10 shrink-0 bg-cyan-50 dark:bg-cyan-950/50 text-cyan-600 dark:text-cyan-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">TIK</div>
                             <div>
-                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Kelas C</p>
-                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Identitas rombongan belajar angkatan kita.</p>
+                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Teknik Informatika & Komputer</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Fakultas Teknik, Universitas Negeri Makassar.</p>
                             </div>
                         </div>
                         <div class="flex gap-5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:border-slate-200 dark:hover:border-slate-600">
                             <div class="h-10 w-10 shrink-0 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl flex items-center justify-center font-black text-sm transition-colors">24</div>
                             <div>
                                 <p class="text-xs font-bold text-slate-700 dark:text-slate-200 leading-none transition-colors">Angkatan 2024</p>
-                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Tahun dimulainya perjalanan akademik kita.</p>
+                                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 transition-colors">Tahun penerimaan mahasiswa baru angkatan 2024.</p>
                             </div>
                         </div>
                     </div>
@@ -116,120 +113,29 @@ $periode = mysqli_fetch_assoc($q_periode);
                         <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full -ml-10 -mb-10"></div>
 
                         <h3 class="text-[10px] font-bold mb-6 flex items-center gap-2 uppercase tracking-widest text-indigo-300">
-                            <i class="fa fa-shuttle-space"></i> Filosofi Nama
+                            <i class="fa fa-graduation-cap"></i> Nilai Akademik
                         </h3>
                         <div class="space-y-4 border-l-2 border-indigo-500/30 pl-6">
                             <div class="flex items-center gap-4">
-                                <span class="w-10 font-black text-indigo-200 text-sm">Pro</span>
-                                <span class="text-[11px] opacity-70 whitespace-nowrap uppercase tracking-wider">= Programmer</span>
+                                <span class="w-16 font-black text-indigo-200 text-xs">Inovatif</span>
+                                <span class="text-[11px] opacity-70">Mampu beradaptasi dengan perkembangan teknologi</span>
                             </div>
                             <div class="flex items-center gap-4">
-                                <span class="w-10 font-black text-indigo-200 text-sm">Tech</span>
-                                <span class="text-[11px] opacity-70 whitespace-nowrap uppercase tracking-wider">= Technology</span>
+                                <span class="w-16 font-black text-indigo-200 text-xs">Kolaboratif</span>
+                                <span class="text-[11px] opacity-70">Saling mendukung antar kelas dan mahasiswa</span>
                             </div>
                             <div class="flex items-center gap-4">
-                                <span class="w-10 font-black text-indigo-200 text-sm">No</span>
-                                <span class="text-[11px] opacity-70 whitespace-nowrap uppercase tracking-wider">= INovation</span>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <span class="w-10 font-black text-indigo-200 text-sm">Ty</span>
-                                <span class="text-[11px] opacity-70 whitespace-nowrap uppercase tracking-wider">= CreativiTy</span>
+                                <span class="w-16 font-black text-indigo-200 text-xs">Akuntabel</span>
+                                <span class="text-[11px] opacity-70">Transparansi data akademik dan administrasi</span>
                             </div>
                         </div>
                         <div class="mt-8 pt-6 border-t border-white/10">
-                            <p class="text-sm font-bold text-indigo-300">ProTechNoTy Class 24</p>
-                            <p class="text-[9px] opacity-40 uppercase tracking-widest">Official Class Identity</p>
+                            <p class="text-sm font-bold text-indigo-300">SIMAWA PTIK 2024</p>
+                            <p class="text-[9px] opacity-40 uppercase tracking-widest">Portal Akademik Mahasiswa</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- Section: Penjelasan Logo -->
-        <section class="mb-16 px-8 md:px-12 py-12 rounded-[2.5rem] bg-slate-900 text-white relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
-            <div class="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px]"></div>
-
-            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div class="flex flex-col items-center">
-                    <div class="p-8 bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] mb-6 group hover:bg-white/10 transition-colors shadow-2xl">
-                        <img src="assets/image/logo.webp" alt="Logo PTIK C 24" class="w-48 h-48 md:w-64 md:h-64 object-contain drop-shadow-[0_0_20px_rgba(79,70,229,0.3)] group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="text-center">
-                        <div class="inline-block px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
-                            Identitas Visual
-                        </div>
-                        <h2 class="text-2xl font-bold">Filosofi <span class="text-indigo-400">Logo Kelas</span></h2>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="flex gap-5">
-                        <div class="w-1 h-12 bg-indigo-500 rounded-full shrink-0"></div>
-                        <div>
-                            <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wide">1. Huruf 'C' Dominan</h4>
-                            <p class="text-[11px] text-slate-400 leading-relaxed mt-1.5">Representasi <strong>Kelas C</strong> sebagai wadah kesatuan. Terbuka ke arah kanan menunjukkan keterbukaan terhadap inovasi sekaligus melindungi anggota di dalamnya.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-5">
-                        <div class="w-1 h-12 bg-cyan-400 rounded-full shrink-0"></div>
-                        <div>
-                            <h4 class="text-xs font-bold text-cyan-300 uppercase tracking-wide">2. Garis Kecepatan (Speed Lines)</h4>
-                            <p class="text-[11px] text-slate-400 leading-relaxed mt-1.5">Merepresentasikan <strong>akselerasi dan efisiensi</strong>. Mencerminkan adaptivitas mahasiswa PTIK 24 yang bergerak cepat mengikuti perkembangan teknologi.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-5">
-                        <div class="w-1 h-12 bg-white/40 rounded-full shrink-0"></div>
-                        <div>
-                            <h4 class="text-xs font-bold text-slate-100 uppercase tracking-wide">3. Tipografi PTIK Solid</h4>
-                            <p class="text-[11px] text-slate-400 leading-relaxed mt-1.5">Font tebal melambangkan <strong>fondasi pengetahuan</strong> yang kokoh dan profesionalisme dalam menuntut ilmu di Fakultas Teknik.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-5">
-                        <div class="w-1 h-12 bg-indigo-400 rounded-full shrink-0"></div>
-                        <div>
-                            <h4 class="text-xs font-bold text-indigo-200 uppercase tracking-wide">4. Angka "24" dalam Lingkaran</h4>
-                            <p class="text-[11px] text-slate-400 leading-relaxed mt-1.5">Menandakan identitas angkatan yang menyatu dengan teks utama, menciptakan rasa <strong>kepemilikan (Sense of Belonging)</strong> yang tinggi.</p>
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-white/5 border border-white/10 rounded-2xl mt-4">
-                        <h4 class="text-[11px] font-bold text-slate-100 mb-3 uppercase tracking-wide">5. Makna Warna</h4>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
-                                <p class="text-xs font-bold text-indigo-300">Navy Blue</p>
-                                <p class="text-[10px] text-slate-400 mt-1">Simbol kedewasaan, kecerdasan, dan teknologi tinggi.</p>
-                            </div>
-                            <div>
-                                <p class="text-xs font-bold text-slate-200">Putih</p>
-                                <p class="text-[10px] text-slate-400 mt-1">Ketulusan dalam belajar dan fokus pada tujuan bersama.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="max-w-2xl mx-auto px-4 sm:px-0">
-            <a href="download.php" class="block group">
-                <div class="glass-card p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-500 transition-all flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-8 text-center sm:text-left">
-                    <div class="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
-                        <div class="w-14 h-14 md:w-16 md:h-16 bg-indigo-600 rounded-[1.2rem] md:rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl shadow-indigo-200 dark:shadow-indigo-900/40 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shrink-0">
-                            <i class="fa fa-cloud-arrow-down text-xl md:text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-base md:text-lg font-bold text-slate-900 dark:text-white transition-colors">Download Official Assets</h3>
-                            <p class="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors">Dapatkan Logo, Virtual Background, dan Resources kelas lainnya dalam kualitas HD.</p>
-                        </div>
-                    </div>
-                    <div class="hidden sm:flex h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-800 items-center justify-center text-slate-400 dark:text-slate-500 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shrink-0">
-                        <i class="fa fa-chevron-right text-sm"></i>
-                    </div>
-                </div>
-            </a>
         </section>
     </main>
 

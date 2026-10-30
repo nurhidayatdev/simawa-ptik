@@ -203,7 +203,7 @@ $today = date('Y-m-d');
 
 <head>
 
-    <title>Kalender Kelas - PTIK C 2024</title>
+    <title>Kalender Kelas - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .calendar-grid {

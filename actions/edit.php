@@ -246,50 +246,6 @@ if (isset($_POST['update'])) {
             $redirect = "../database/db_jadwal";
             break;
 
-        case 'galeri':
-            $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
-            $tanggal_kegiatan = $_POST['tanggal_kegiatan'];
-
-            mysqli_query($koneksi, "UPDATE galeri SET judul='$judul', tanggal_kegiatan='$tanggal_kegiatan' WHERE id='$id'");
-
-            // Handle new photos
-            if (!empty($_FILES['fotos']['name'][0])) {
-                $target_dir = __DIR__ . "../../storage/gallery/";
-                if (!is_dir($target_dir)) {
-                    mkdir($target_dir, 0777, true);
-                }
-
-                $sanitized_judul = strtolower(preg_replace('/[^a-zA-Z0-9]/', '_', $judul));
-                foreach ($_FILES['fotos']['tmp_name'] as $key => $tmp_name) {
-                    if (empty($tmp_name)) continue;
-
-                    $file_name = $_FILES['fotos']['name'][$key];
-                    $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-                    $final_name = $sanitized_judul . "_" . time() . "_" . $key . "." . $ext;
-                    $target_file = $target_dir . $final_name;
-
-                    if (move_uploaded_file($tmp_name, $target_file)) {
-                        $db_path = $final_name;
-                        mysqli_query($koneksi, "INSERT INTO galeri_foto (galeri_id, foto_path) VALUES ('$id', '$db_path')");
-                    }
-                }
-            }
-
-            // Handle photo deletion (if any IDs are passed)
-            if (isset($_POST['delete_photos'])) {
-                foreach ($_POST['delete_photos'] as $foto_id) {
-                    $q_f = mysqli_query($koneksi, "SELECT foto_path FROM galeri_foto WHERE id = '$foto_id'");
-                    $f_data = mysqli_fetch_assoc($q_f);
-                    if ($f_data) {
-                        @unlink("../" . $f_data['foto_path']);
-                        mysqli_query($koneksi, "DELETE FROM galeri_foto WHERE id = '$foto_id'");
-                    }
-                }
-            }
-
-            $redirect = "../database/db_galeri";
-            break;
-
         case 'akademik':
             $judul = mysqli_real_escape_string($koneksi, $_POST['judul']);
             $deskripsi = mysqli_real_escape_string($koneksi, $_POST['deskripsi']);
@@ -322,14 +278,6 @@ if (isset($_POST['update'])) {
             mysqli_query($koneksi, "UPDATE jam_kuliah SET jam_mulai='$jam_mulai', jam_selesai='$jam_selesai' WHERE jam_ke='$jam_ke_param'");
             $redirect = "../database/db_jam";
             break;
-
-        case 'kuis_harian_soal':
-            $tanggal = $_POST['tanggal'];
-            $pertanyaan = mysqli_real_escape_string($koneksi, $_POST['pertanyaan']);
-            $jawaban = mysqli_real_escape_string($koneksi, $_POST['jawaban']);
-            mysqli_query($koneksi, "UPDATE kuis_harian_soal SET tanggal='$tanggal', pertanyaan='$pertanyaan', jawaban='$jawaban' WHERE id='$id'");
-            $redirect = "../database/db_soal";
-            break;
     }
 
     include '../includes/alert_actions.php';
@@ -342,7 +290,7 @@ if (isset($_POST['update'])) {
 
 <head>
 
-    <title>Edit - PTIK C 2024</title>
+    <title>Edit - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {
@@ -722,45 +670,7 @@ if (isset($_POST['update'])) {
                                     </div>
                                 </div>
                             </div>
-                        <?php elseif ($tabel === 'galeri'): ?>
-                            <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Galeri Kegiatan</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Judul Kegiatan</label>
-                                    <input type="text" name="judul" value="<?= htmlspecialchars($data['judul']); ?>" required
-                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal Kegiatan</label>
-                                    <input type="date" name="tanggal_kegiatan" value="<?= $data['tanggal_kegiatan']; ?>" required
-                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tambah Foto Baru</label>
-                                    <input type="file" name="fotos[]" multiple accept="image/*"
-                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Kelola Foto Saat Ini (Centang untuk hapus)</label>
-                                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
-                                        <?php
-                                        $q_f = mysqli_query($koneksi, "SELECT * FROM galeri_foto WHERE galeri_id = '$id'");
-                                        while ($f = mysqli_fetch_assoc($q_f)) {
-                                        ?>
-                                            <div class="relative group">
-                                                <img src="../storage/gallery/<?= htmlspecialchars($f['foto_path']) ?>" class="w-full h-24 object-cover rounded-lg border dark:border-slate-700 transition-colors">
-                                                <div class="absolute top-1 right-1">
-                                                    <input type="checkbox" name="delete_photos[]" value="<?= $f['id'] ?>" class="w-4 h-4 text-red-600 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded focus:ring-red-500 transition-colors">
-                                                </div>
-                                            </div>
-                                        <?php
-                                        }
-                                        ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <?php elseif ($tabel === 'akademik'): ?>
+                        <?php elseif ($tabel === 'akademik'): ?>
                         <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Berita & Informasi Akademik</h3>
                         <div class="grid grid-cols-1 gap-6">
                             <div>
@@ -837,25 +747,6 @@ if (isset($_POST['update'])) {
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jam Selesai</label>
                                 <input type="time" name="jam_selesai" value="<?= htmlspecialchars($data['jam_selesai']); ?>" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                        </div>
-                    <?php elseif ($tabel === 'kuis_harian_soal'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Soal Kuis Harian</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tanggal</label>
-                                <input type="date" name="tanggal" value="<?= htmlspecialchars($data['tanggal']); ?>" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Pertanyaan</label>
-                                <textarea name="pertanyaan" rows="3" required
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"><?= htmlspecialchars($data['pertanyaan']); ?></textarea>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jawaban</label>
-                                <input type="text" name="jawaban" value="<?= htmlspecialchars($data['jawaban']); ?>" required
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                         </div>

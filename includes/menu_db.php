@@ -45,7 +45,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
     <div class="flex justify-between items-center px-6 py-2">
         <div class="flex items-center">
             <img src="<?= $base ?>assets/image/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
-            <span class="text-xl font-bold text-white">Dashboard PTIK C</span>
+            <span class="text-xl font-bold text-white">SIMAWA PTIK 2024</span>
             <?php if (function_exists('is_maintenance_mode') && is_maintenance_mode($koneksi)): ?>
                 <span class="ml-3 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
                     <i class="fas fa-screwdriver-wrench text-amber-400 text-[10px]"></i>
@@ -115,7 +115,6 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                 <a href="<?= $base ?>database/db_jadwal" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Jadwal Kuliah</a>
                                 <a href="<?= $base ?>database/db_berita" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Berita & Info</a>
                                 <a href="<?= $base ?>database/db_kalender" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Kalender Akademik</a>
-                                <a href="<?= $base ?>database/db_galeri" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Galeri Kelas</a>
                             </div>
 
                             <button class="submenu-button flex items-center justify-between w-full px-4 py-1 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
@@ -187,40 +186,7 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                         </div>
                     </div>
 
-                    <div>
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Aktivitas</p>
-                        <div class="space-y-1">
-                            <!-- Wrapped Menu Highlighted -->
-                            <a href="<?= $base ?>wrapped" class="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group mb-1">
-                                <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                                <i class="fa-solid fa-gift w-5 h-5 mr-3 animate-bounce"></i>
-                                <span class="text-xs font-bold tracking-wider">PTIK C Wrapped</span>
-                                <span class="absolute top-1 right-2 flex h-2 w-2">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-300"></span>
-                                </span>
-                            </a>
-
-                            <a href="<?= $base ?>views/misi" class="flex items-center px-4 py-1 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <i class="fa fa-trophy w-5 h-5 mr-3 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">Pusat Misi</span>
-                            </a>
-
-                            <a href="<?= $base ?>views/kuis_harian" class="flex items-center px-4 py-1 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <i class="fa fa-gamepad w-5 h-5 mr-3 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">Kuis Harian</span>
-                            </a>
-                            <a href="<?= $base ?>views/dinding_pesan" class="flex items-center px-4 py-1 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <i class="fa fa-comments w-5 h-5 mr-3 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">Pesan Anonim</span>
-                            </a>
-                            <a href="<?= $base ?>spin" class="flex items-center px-4 py-1 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                                <i class="fa fa-sync w-5 h-5 mr-3 text-indigo-900 dark:text-indigo-400"></i>
-                                <span class="text-xs font-medium">Random Picker</span>
-                            </a>
-
-                        </div>
-                    </div>
+                    
 
                     <div>
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Pengaturan</p>
@@ -256,9 +222,6 @@ include_once __DIR__ . '/../functions/foto_helpers.php';
                                     <a href="<?= $base ?>database/db_ruangan" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Ruangan</a>
                                     <a href="<?= $base ?>database/db_jam" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Jam Kuliah</a>
                                     <a href="<?= $base ?>database/db_kelompok" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Data Kelompok</a>
-                                    <a href="<?= $base ?>views/manajemen_kuis" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Manajemen Stats Kuis</a>
-                                    <a href="<?= $base ?>database/db_soal" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Data Soal Kuis</a>
-                                    <a href="<?= $base ?>database/db_pesan" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Pesan Anonim</a>
                                     <a href="<?= $base ?>actions/validasi_krs" class="block px-4 py-1 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">Validasi KRS</a>
                                     <a href="<?= $base ?>actions/bulk_krs" class="block px-4 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-lg flex items-center justify-between">
                                         <span>KRS Massal</span>

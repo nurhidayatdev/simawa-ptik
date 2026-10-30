@@ -9,7 +9,7 @@ $periode = mysqli_fetch_assoc($q_periode);
 <html lang="id">
 
 <head>
-    <title>Tentang Project - PTIK C 2024</title>
+    <title>Tentang Platform - SIMAWA PTIK 2024</title>
     <?php include 'includes/head.php'; ?>
     <style>
         .glass-card {
@@ -57,8 +57,8 @@ $periode = mysqli_fetch_assoc($q_periode);
 
     <main class="container mx-auto px-6 py-12 flex-grow">
         <!-- Hero Section -->
-        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white transition-colors">Tentang Project</h1>
-        <p class="text-gray-500 dark:text-slate-400 mb-8 transition-colors text-sm">Platform digital yang dirancang khusus untuk mempermudah koordinasi dan manajemen data mahasiswa PTIK C 2024.</p>
+        <h1 class="text-3xl font-bold mb-2 text-gray-800 dark:text-white transition-colors">Tentang Platform</h1>
+        <p class="text-gray-500 dark:text-slate-400 mb-8 transition-colors text-sm">Platform digital terpadu untuk koordinasi dan manajemen data mahasiswa Program Studi PTIK Angkatan 2024.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Deskripsi Project -->
@@ -68,20 +68,20 @@ $periode = mysqli_fetch_assoc($q_periode);
                         <i class="fa fa-bullseye text-indigo-600 dark:text-indigo-400"></i> Visi & Misi
                     </h2>
                     <p class="text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed mb-4 transition-colors">
-                        Web ini dirancang khusus untuk memenuhi kebutuhan sirkulasi informasi di dalam kelas PTIK C Angkatan 2024. Proyek ini lahir dari keinginan untuk memiliki sistem yang terintegrasi, transparan, dan menyenangkan bagi seluruh rekan mahasiswa.
+                        SIMAWA PTIK 2024 dirancang khusus untuk memfasilitasi kebutuhan sirkulasi informasi, administrasi perkuliahan, dan manajemen kegiatan akademik mahasiswa Program Studi Pendidikan Teknik Informatika dan Komputer Angkatan 2024 di Fakultas Teknik, Universitas Negeri Makassar.
                     </p>
                     <ul class="space-y-3">
                         <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-400 transition-colors">
                             <i class="fa fa-check-circle text-indigo-500 dark:text-indigo-400 mt-1 transition-colors"></i>
-                            <span><b>Sentralisasi Data:</b> Semua info tugas, jadwal, and krs berada dalam satu pintu.</span>
+                            <span><b>Sentralisasi Data:</b> Informasi perkuliahan, jadwal, kurikulum, dan tugas berada dalam satu pintu terpadu.</span>
                         </li>
                         <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-400 transition-colors">
                             <i class="fa fa-check-circle text-indigo-500 dark:text-indigo-400 mt-1 transition-colors"></i>
-                            <span><b>Transparansi Keuangan:</b> Laporan kas yang bisa dipantau secara langsung oleh seluruh mahasiswa.</span>
+                            <span><b>Transparansi Keuangan:</b> Pelaporan kas dan keuangan yang akuntabel dan dapat dipantau oleh mahasiswa.</span>
                         </li>
                         <li class="flex items-start gap-3 text-xs text-slate-600 dark:text-slate-400 transition-colors">
                             <i class="fa fa-check-circle text-indigo-500 dark:text-indigo-400 mt-1 transition-colors"></i>
-                            <span><b>Engagement:</b> Fitur Kuis Harian dan Pesan Anonim untuk menjaga kelas tetap hidup.</span>
+                            <span><b>Interaktivitas & Produktivitas:</b> Fitur presensi digital, manajemen tugas, dan pembagian kelompok otomatis.</span>
                         </li>
                     </ul>
                 </section>
@@ -113,53 +113,52 @@ $periode = mysqli_fetch_assoc($q_periode);
                         </div>
                     </div>
                     <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 transition-colors">
-                        <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-3 transition-colors">Library & Tools Tambahan:</h3>
+                        <h3 class="text-[10px] font-bold text-slate-500 uppercase mb-3 transition-colors">Library & Komponen Pendukung:</h3>
                         <div class="flex flex-wrap gap-2">
                             <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">SweetAlert2</span>
                             <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">Chart.js</span>
                             <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">FontAwesome 6</span>
-                            <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">Canvas Confetti</span>
+                            <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">jQuery</span>
                             <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">Google Fonts</span>
-                            <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded text-[9px] font-bold transition-colors">Fonnte API</span>
                         </div>
                     </div>
                 </section>
             </div>
 
-            <!-- Developer Card -->
+            <!-- Card Info -->
             <div class="space-y-6">
                 <section class="bg-indigo-600 dark:bg-indigo-900/60 p-6 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-black/20 text-white relative overflow-hidden transition-colors">
                     <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl">
                         <i class="fa fa-code"></i>
                     </div>
-                    <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-4">Pengembang</h3>
+                    <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-4">Pengembangan</h3>
                     <div class="flex items-center gap-4 mb-4">
                         <div class="h-16 w-16 rounded-2xl overflow-hidden border-2 border-white/20 p-2 bg-white/10">
-                            <img src="assets/image/logo.webp" alt="Dev" class="w-full h-full object-contain">
+                            <img src="assets/image/logo.webp" alt="Logo" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <div class="font-bold text-lg leading-tight">Admin PTIK C</div>
-                            <div class="text-[10px] opacity-80 italic mt-1">Bismillah Fullstack Developer</div>
+                            <div class="font-bold text-lg leading-tight">SIMAWA PTIK 2024</div>
+                            <div class="text-[10px] opacity-80 italic mt-1">Sistem Informasi Mahasiswa</div>
                         </div>
                     </div>
                     <p class="text-[11px] leading-relaxed opacity-90">
-                        Dikembangkan dengan penuh dedikasi untuk kemajuan kolektif kelas PTIK C 2024.
+                        Dikembangkan untuk mendukung civitas akademika Program Studi Pendidikan Teknik Informatika dan Komputer Angkatan 2024.
                     </p>
                 </section>
 
                 <section class="glass-card p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h3 class="text-xs font-bold text-slate-800 dark:text-white mb-3 transition-colors">Versi Aplikasi</h3>
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-white mb-3 transition-colors">Informasi Sistem</h3>
                     <div class="flex items-center justify-between py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">
-                        <span class="text-[11px] text-slate-500">Current Version</span>
-                        <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 rounded transition-colors">v3.0.1</span>
+                        <span class="text-[11px] text-slate-500">Versi Sistem</span>
+                        <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 rounded transition-colors">v3.1.0</span>
                     </div>
                     <div class="flex items-center justify-between py-2 border-b border-slate-50 dark:border-slate-800 transition-colors">
-                        <span class="text-[11px] text-slate-500">Last Build</span>
-                        <span class="text-[11px] font-medium text-slate-700 dark:text-slate-300 transition-colors">27 Maret 2026</span>
+                        <span class="text-[11px] text-slate-500">Kategori</span>
+                        <span class="text-[11px] font-medium text-slate-700 dark:text-slate-300 transition-colors">Portal Mahasiswa</span>
                     </div>
                     <div class="flex items-center justify-between py-2">
-                        <span class="text-[11px] text-slate-500">Environment</span>
-                        <span class="text-[11px] font-bold text-emerald-600 uppercase">Production</span>
+                        <span class="text-[11px] text-slate-500">Institusi</span>
+                        <span class="text-[11px] font-medium text-slate-700 dark:text-slate-300 transition-colors">FT UNM Makassar</span>
                     </div>
                 </section>
             </div>
@@ -169,26 +168,6 @@ $periode = mysqli_fetch_assoc($q_periode);
     <?php include 'includes/footer_main.php'; ?>
     <?php include 'includes/script_main.php'; ?>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            gsap.from("main > div > *", {
-                opacity: 0,
-                y: 30,
-                duration: 0.8,
-                stagger: 0.2,
-                ease: "power3.out"
-            });
-            gsap.from(".tech-card", {
-                scale: 0.8,
-                opacity: 0,
-                duration: 0.5,
-                stagger: 0.1,
-                ease: "back.out(1.7)",
-                delay: 0.6
-            });
-        });
-    </script>
 </body>
 
 </html>

@@ -155,7 +155,7 @@ if ($selected_matkul && !empty($selected_dosen)) {
 
 <head>
 
-    <title>Edit Kelompok - PTIK C 2024</title>
+    <title>Edit Kelompok - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

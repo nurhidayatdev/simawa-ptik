@@ -49,7 +49,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel_arus') {
     header("Content-Disposition: attachment; filename=\"$filename\"");
 
     echo '<table border="1">';
-    echo '<tr><th colspan="5" style="background-color: #1e1b4b; color: white;">LAPORAN ARUS KAS PTIK C 2024 (' . htmlspecialchars($periode_info) . ')</th></tr>';
+    echo '<tr><th colspan="5" style="background-color: #1e1b4b; color: white;">LAPORAN ARUS KAS SIMAWA PTIK 2024 (' . htmlspecialchars($periode_info) . ')</th></tr>';
     echo '<tr style="background-color: #f1f5f9;"><th>ID</th><th>Tipe</th><th>Deskripsi</th><th>Jumlah</th><th>Tanggal</th></tr>';
     $q = mysqli_query($koneksi, "SELECT * FROM arus_kas ORDER BY tanggal DESC, created_at DESC");
     while ($r = mysqli_fetch_assoc($q)) {
@@ -223,7 +223,7 @@ $mhs_status = mysqli_query($koneksi, "
 <html lang="en">
 
 <head>
-    <title>Manajemen Kas - PTIK C 2024</title>
+    <title>Manajemen Kas - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .animate-shimmer {

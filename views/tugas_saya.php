@@ -99,7 +99,7 @@ $total_done = $count_personal_done + $count_global_done;
 <html lang="id">
 
 <head>
-    <title>Tugas Saya - PTIK C 2024</title>
+    <title>Tugas Saya - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>

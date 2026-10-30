@@ -80,7 +80,7 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
 
 <head>
 
-    <title>Kas Individu - PTIK C 2024</title>
+    <title>Kas Individu - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <style>
         .rotate-180 {

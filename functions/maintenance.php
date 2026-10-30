@@ -99,7 +99,7 @@ if (!function_exists('enforce_maintenance_mode')) {
                 
                 $script = $_SERVER['SCRIPT_NAME'] ?? '';
                 if (strpos($script, 'login.php') === false && strpos($script, 'login') === false) {
-                    $base_url = function_exists('env') ? env('APP_URL', '/') : '/ptikc24/';
+                    $base_url = function_exists('env') ? env('APP_URL', '/') : '/simawa-ptik/';
                     // Adjust base path if needed
                     header("Location: " . rtrim($base_url, '/') . "/login?maintenance=1");
                     exit();
