@@ -210,6 +210,21 @@ simawa-ptik/
 | **Bendahara** | `'Bendahara'` | Dedicated Kas Dashboard (`dashboard_bendahara.php`), input kas, rekapitulasi saldo, dan penagihan iuran kelas (`views/manajemen_kas.php`, `views/rekap_kas.php`). |
 | **Mahasiswa** | `'Mahasiswa'` | Dedicated Student Dashboard (`dashboard_mahasiswa.php`), memantau jadwal, tugas pribadi, histori kas sendiri, KSM, dan kelompok. |
 
+### 4.3 Prinsip Single-Role Account & Akun Ganda Terpisah
+Sesuai pedoman arsitektur SIMAWA PTIK:
+1. **1 Akun = 1 Peran Tunggal Definitif (*Single Responsibility per Account*):**
+   - Sistem tidak mengizinkan akun *hybrid* atau multi-peran gabungan dalam satu akun/sesi.
+   - Akun `Ketua Tingkat` bertindak eksklusif sebagai pengelola manajerial kelas.
+   - Akun `Sekretaris` bertindak eksklusif untuk operasional presensi kelas.
+   - Akun `Bendahara` bertindak eksklusif untuk tata kelola keuangan kas.
+   - Akun `Mahasiswa` bertindak eksklusif sebagai peserta perkuliahan reguler.
+2. **Pemisahan Akun untuk Individu yang Sama (*Dual-Account Separation*):**
+   - Seseorang (individu nyata) yang menjabat sebagai pengurus kelas memiliki **dua akun berbeda** dengan kredensial login terpisah:
+     - **Akun Pengurus** (contoh: `ketua@simawa.id`, `benda1@simawa.id`, `sekre1@simawa.id`) untuk wewenang manajerial kelas.
+     - **Akun Mahasiswa** (contoh: `mhs01@simawa.id`, `mhs07@simawa.id`) untuk aktivitas akademik pribadinya (tugas personal, KRS/KSM saya).
+3. **Pencegahan Perilaku Multi-Wewenang (*Role Pollution Prevention*):**
+   - Dalam satu sesi login aktif, pengguna hanya memiliki satu set wewenang yang jelas. Tidak ada hak akses yang tercampur atau tumpang tindih, sehingga menjaga kepatuhan karakteristik **ISO/IEC 25010 (Security & Functional Suitability)**.
+
 ---
 
 ## 5. REKAPITULASI BASIS DATA (22 TABEL AKTIF)
