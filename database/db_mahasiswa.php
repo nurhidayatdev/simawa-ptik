@@ -12,27 +12,40 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
-// Include foto helpers for cache busting
+// Include foto helpers and helpers for multi-class scoping
 include_once '../functions/foto_helpers.php';
+require_once '../functions/helpers.php';
 
+$where_mhs_kelas = getKelasWhereClause('kelas_id', false);
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
-    $stmt = mysqli_prepare(
-        $koneksi,
-        "SELECT * FROM mahasiswa 
-         WHERE nim LIKE ? 
-         OR nama_lengkap LIKE ? 
-         OR nama_panggilan LIKE ?
-         ORDER BY nim ASC"
-    );
-
     $like = "%$search%";
-    mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
+    if (!empty($where_mhs_kelas)) {
+        $stmt = mysqli_prepare(
+            $koneksi,
+            "SELECT * FROM mahasiswa 
+             WHERE ($where_mhs_kelas) 
+             AND (nim LIKE ? OR nama_lengkap LIKE ? OR nama_panggilan LIKE ?)
+             ORDER BY nim ASC"
+        );
+        mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
+    } else {
+        $stmt = mysqli_prepare(
+            $koneksi,
+            "SELECT * FROM mahasiswa 
+             WHERE nim LIKE ? 
+             OR nama_lengkap LIKE ? 
+             OR nama_panggilan LIKE ?
+             ORDER BY nim ASC"
+        );
+        mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
+    }
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
-    $result = mysqli_query($koneksi, "SELECT * FROM mahasiswa ORDER BY nim ASC");
+    $where_sql = !empty($where_mhs_kelas) ? "WHERE $where_mhs_kelas" : "";
+    $result = mysqli_query($koneksi, "SELECT * FROM mahasiswa $where_sql ORDER BY nim ASC");
 }
 
 // If this is an AJAX live-search request, return only the table rows

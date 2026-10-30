@@ -12,9 +12,12 @@ $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
-// Routing: Administrator Utama memiliki executive multi-class dashboard sendiri
+// Routing dashboard per peran spesifik
 if ($role === 'Administrator Utama') {
     header("Location: dashboard_admin.php");
+    exit;
+} elseif ($role === 'Ketua Tingkat') {
+    header("Location: dashboard_keti.php");
     exit;
 }
 

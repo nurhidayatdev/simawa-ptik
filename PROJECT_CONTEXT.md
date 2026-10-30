@@ -90,6 +90,7 @@ simawa-ptik/
 ├── login.php                     # Halaman autentikasi login pengguna
 ├── dashboard.php                 # Router & dashboard internal operasional kelas
 ├── dashboard_admin.php           # Executive Dashboard khusus Administrator Utama (Multi-Kelas)
+├── dashboard_keti.php            # Dedicated Dashboard khusus Ketua Tingkat (Pusat Kendali Kelas)
 ├── design.md                     # STANDAR RESMI UI/UX & Design System SIMAWA PTIK
 ├── PROJECT_CONTEXT.md            # DOKUMEN INI (Konteks menyeluruh proyek & pengujian)
 │
@@ -114,6 +115,7 @@ simawa-ptik/
 │   ├── edit_krs.php              # Edit status KRS mahasiswa
 │   ├── edit_profile.php          # Pembaruan profil & foto pengguna
 │   ├── hapus.php                 # Handler penghapusan data dengan konfirmasi
+│   ├── kelola_pengurus.php       # Aksi Ketua Tingkat: tambah mhs, tunjuk pengurus, reset pwd, copot
 │   ├── reset_password.php        # Reset password akun pengguna
 │   ├── tambah.php                # Form penambahan data serbaguna
 │   ├── tambah_absensi.php        # Input absensi per pertemuan

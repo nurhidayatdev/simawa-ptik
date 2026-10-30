@@ -186,7 +186,7 @@ $foto         = $_SESSION['foto'] ?? '';
                 <?php elseif ($role === 'Ketua Tingkat'): ?>
 
                     <!-- Dashboard Keti -->
-                    <a href="<?= $base ?>dashboard" class="flex items-center px-4 py-2 text-indigo-900 dark:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-indigo-900/50">
+                    <a href="<?= $base ?>dashboard_keti.php" class="flex items-center px-4 py-2 text-indigo-900 dark:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-indigo-900/50">
                         <i class="fa fa-home w-4 h-4 mr-4"></i>
                         <span class="text-xs font-semibold">Dashboard</span>
                     </a>
