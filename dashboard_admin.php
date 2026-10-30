@@ -112,11 +112,11 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
 
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans antialiased min-h-screen flex flex-col transition-colors duration-300">
 
-    <!-- Navigasi Shell: Header Penuh Khusus Administrator Utama (Tanpa Sidebar) -->
-    <?php include 'includes/header_admin.php'; ?>
+    <!-- Navigasi Shell (Top Bar + Fixed Sidebar per Role) -->
+    <?php include 'includes/menu_db.php'; ?>
 
-    <!-- Main Shell: Layout Full-Width Eksekutif -->
-    <main class="pt-20 px-4 sm:px-6 lg:px-8 pb-12 flex flex-col min-h-screen">
+    <!-- Main Shell (Offset Margin Left ml-0 lg:ml-48, pt-20 untuk topbar) -->
+    <main class="ml-0 lg:ml-48 pt-20 p-4 md:p-6 flex flex-col min-h-screen">
         <div class="max-w-7xl mx-auto w-full space-y-6 flex-grow">
 
             <!-- 1. Header & Action Bar -->
