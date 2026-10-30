@@ -49,6 +49,7 @@ if ($filter_minggu < 1) $filter_minggu = 1;
 if ($filter_minggu > 18) $filter_minggu = 18;
 
 // Data Piket
+$where_p_kelas = getKelasWhereClause('p', true);
 $query = "SELECT p.*, m.nama_lengkap, m.foto, jm.hari, mk.nama_matkul, r.nama_ruangan, jk_start.jam_mulai, jk_end.jam_selesai
           FROM piket_proyektor p
           JOIN mahasiswa m ON p.mahasiswa_id = m.id
@@ -57,7 +58,7 @@ $query = "SELECT p.*, m.nama_lengkap, m.foto, jm.hari, mk.nama_matkul, r.nama_ru
           LEFT JOIN ruangan r ON jm.ruangan_id = r.id
           LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
           LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
-          WHERE p.periode_id = $periode_id AND p.minggu_ke = $filter_minggu
+          WHERE p.periode_id = $periode_id AND p.minggu_ke = $filter_minggu $where_p_kelas
           ORDER BY FIELD(jm.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), jk_start.jam_mulai, p.jadwal_matkul_id, m.nama_lengkap";
 
 $res_piket = mysqli_query($koneksi, $query);
@@ -135,7 +136,8 @@ if ($my_mhs_id) {
         // Ambil rekan piket
         $jid = $mp['jadwal_matkul_id'];
         $m_ke = $mp['minggu_ke'];
-        $q_teammates = mysqli_query($koneksi, "SELECT m.nama_lengkap FROM piket_proyektor p JOIN mahasiswa m ON p.mahasiswa_id = m.id WHERE p.jadwal_matkul_id = $jid AND p.minggu_ke = $m_ke AND p.periode_id = $periode_id");
+        $where_p_tm = getKelasWhereClause('p', true);
+        $q_teammates = mysqli_query($koneksi, "SELECT m.nama_lengkap FROM piket_proyektor p JOIN mahasiswa m ON p.mahasiswa_id = m.id WHERE p.jadwal_matkul_id = $jid AND p.minggu_ke = $m_ke AND p.periode_id = $periode_id $where_p_tm");
         $tm_names = [];
         while($tm = mysqli_fetch_assoc($q_teammates)) {
             $tm_names[] = "<li class='flex items-center gap-1.5'><i class='fa fa-circle text-[5px] text-slate-300 dark:text-slate-600'></i> " . htmlspecialchars($tm['nama_lengkap']) . "</li>";

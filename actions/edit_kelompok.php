@@ -42,13 +42,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $mk_data = mysqli_fetch_assoc($q_mk);
         $nama_matkul = $mk_data['nama_matkul'] ?? 'Mata Kuliah';
 
+        $target_kelas_id = getKelasScope() ?? 1;
+        $q_chk = mysqli_query($koneksi, "SELECT kelas_id FROM kelompok WHERE matkul_id = $mata_kuliah_id AND periode_id = $periode_id AND dosen = '$dosen_name' AND keterangan = '$keterangan' LIMIT 1");
+        if ($r_chk = mysqli_fetch_assoc($q_chk)) {
+            if (!empty($r_chk['kelas_id'])) {
+                requireKelasAccess($r_chk['kelas_id']);
+                $target_kelas_id = (int)$r_chk['kelas_id'];
+            }
+        }
+
         // Remove existing groups for this specific set
-        $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ?");
+        $where_k_del = getKelasWhereClause('', true);
+        $stmt = mysqli_prepare($koneksi, "DELETE FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ? $where_k_del");
         mysqli_stmt_bind_param($stmt, 'iiss', $mata_kuliah_id, $periode_id, $dosen_name, $keterangan);
         mysqli_stmt_execute($stmt);
 
         // Insert new groups
-        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id, dosen, keterangan) VALUES (?, ?, ?, ?, ?, ?)");
+        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id, dosen, keterangan, kelas_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $message_groups = "";
 
         $kel_count = 1;
@@ -59,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 return $s['nim'];
             }, $anggotaArr));
 
-            mysqli_stmt_bind_param($insert, 'iisiss', $mata_kuliah_id, $kel_count, $anggotaStr, $periode_id, $dosen_name, $keterangan);
+            mysqli_stmt_bind_param($insert, 'iisissi', $mata_kuliah_id, $kel_count, $anggotaStr, $periode_id, $dosen_name, $keterangan, $target_kelas_id);
             mysqli_stmt_execute($insert);
 
             // Format message for WhatsApp
@@ -82,10 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+$where_jm_matkuls = getKelasWhereClause('jm', true);
 $matkuls = mysqli_query($koneksi, "SELECT DISTINCT jm.matkul_id AS id, mk.nama_matkul
     FROM jadwal_matkul jm
     JOIN mata_kuliah mk ON jm.matkul_id = mk.id
-    WHERE jm.periode_id = $periode_id
+    WHERE jm.periode_id = $periode_id $where_jm_matkuls
     ORDER BY mk.semester, mk.nama_matkul");
 
 // Determine selected matkul
@@ -98,7 +109,8 @@ $existing_groups = [];
 
 if ($selected_matkul && !empty($selected_dosen)) {
     // Load students
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
+    $where_mhs_kelas = getKelasWhereClause('m', true);
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? $where_mhs_kelas ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
@@ -126,7 +138,8 @@ if ($selected_matkul && !empty($selected_dosen)) {
     }
 
     // Load existing groups
-    $stmt_g = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ? ORDER BY kelompok_no");
+    $where_k_stmt_g = getKelasWhereClause('', true);
+    $stmt_g = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ? $where_k_stmt_g ORDER BY kelompok_no");
     mysqli_stmt_bind_param($stmt_g, 'iiss', $selected_matkul, $periode_id, $selected_dosen, $selected_keterangan);
     mysqli_stmt_execute($stmt_g);
     $res_g = mysqli_stmt_get_result($stmt_g);

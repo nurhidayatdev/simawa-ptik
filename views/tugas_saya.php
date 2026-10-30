@@ -52,12 +52,13 @@ if (isset($_POST['action'])) {
         mysqli_query($koneksi, "UPDATE tugas_personal SET judul = '$judul', deskripsi = '$deskripsi', deadline = '$deadline' WHERE id = '$id' AND user_id = '$user_id'");
         $_SESSION['success'] = "Tugas personal berhasil diupdate.";
     } elseif ($_POST['action'] == 'complete_all_global') {
+        $where_t_kelas = getKelasWhereClause('t', true);
         mysqli_query($koneksi, "
             INSERT INTO tugas_global_done (user_id, tugas_id, periode_id) 
             SELECT '$user_id', t.id, '$periode_id' 
             FROM tugas t 
             LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
-            WHERE t.periode_id = '$periode_id' AND gd.id IS NULL
+            WHERE t.periode_id = '$periode_id' $where_t_kelas AND gd.id IS NULL
         ");
         $_SESSION['success'] = "Semua tugas kelas telah ditandai selesai.";
     } elseif ($_POST['action'] == 'complete_all_personal') {
@@ -77,22 +78,23 @@ $personal_tasks = mysqli_query($koneksi, "SELECT * FROM tugas_personal WHERE use
 // Get Global Tasks
 $global_order = $show_done ? "DESC" : "ASC";
 $global_cond = $show_done ? " AND gd.id IS NOT NULL" : " AND gd.id IS NULL";
+$where_t_scope = getKelasWhereClause('t', true);
 $global_tasks = mysqli_query($koneksi, "
     SELECT t.*, mk.nama_matkul, gd.id as is_done
     FROM tugas t
     LEFT JOIN mata_kuliah mk ON t.matkul_id = mk.id
     LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id'
-    WHERE t.periode_id = '$periode_id' $global_cond
+    WHERE t.periode_id = '$periode_id' $where_t_scope $global_cond
     ORDER BY t.deadline_tanggal $global_order
 ");
 
 // Get Counts for Badges
 $count_personal_active = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' AND status = 'belum'"))['cnt'] ?? 0;
-$count_global_active = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas t LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id' WHERE t.periode_id = '$periode_id' AND gd.id IS NULL"))['cnt'] ?? 0;
+$count_global_active = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas t LEFT JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id' WHERE t.periode_id = '$periode_id' $where_t_scope AND gd.id IS NULL"))['cnt'] ?? 0;
 $total_active = $count_personal_active + $count_global_active;
 
 $count_personal_done = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas_personal WHERE user_id = '$user_id' AND periode_id = '$periode_id' AND status = 'selesai'"))['cnt'] ?? 0;
-$count_global_done = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas t JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id' WHERE t.periode_id = '$periode_id'"))['cnt'] ?? 0;
+$count_global_done = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas t JOIN tugas_global_done gd ON t.id = gd.tugas_id AND gd.user_id = '$user_id' AND gd.periode_id = '$periode_id' WHERE t.periode_id = '$periode_id' $where_t_scope"))['cnt'] ?? 0;
 $total_done = $count_personal_done + $count_global_done;
 ?>
 <!DOCTYPE html>

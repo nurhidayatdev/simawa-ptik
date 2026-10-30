@@ -44,13 +44,16 @@ $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'akti
 $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'];
 
+$where_mhs_matkul = getKelasWhereClause('m', true);
 $query_matkul = "
 SELECT DISTINCT
     mk.id AS matkul_id,
     mk.nama_matkul
 FROM krs k
+JOIN mahasiswa m ON k.mahasiswa_id = m.id
 JOIN mata_kuliah mk ON k.matkul_id = mk.id
 WHERE k.periode_id = $periode_id
+$where_mhs_matkul
 ORDER BY mk.nama_matkul ASC
 ";
 
@@ -64,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $matkul_id = $_POST['matkul_id'];
     $pertemuan = $_POST['pertemuan'];
     $status    = $_POST['status'];
-
+    $target_kelas_id = getKelasScope() ?? 1;
 
     // Ensure period is active
     if (!$periode_id) {
@@ -74,21 +77,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($status as $mahasiswa_id => $st) {
 
         $query = "
-        INSERT INTO absensi (mahasiswa_id, matkul_id, pertemuan, status, periode_id)
-        VALUES (?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE status = ?
+        INSERT INTO absensi (mahasiswa_id, matkul_id, pertemuan, status, periode_id, kelas_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE status = VALUES(status), kelas_id = VALUES(kelas_id)
         ";
 
         $stmt = mysqli_prepare($koneksi, $query);
         mysqli_stmt_bind_param(
             $stmt,
-            "iiisis",
+            "iiisii",
             $mahasiswa_id,
             $matkul_id,
             $pertemuan,
             $st,
             $periode_id,
-            $st
+            $target_kelas_id
         );
         mysqli_stmt_execute($stmt);
     }
@@ -101,12 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $matkul_name = mysqli_fetch_assoc($q_matkul_info)['nama_matkul'];
 
     // Fetch all students in this course with their attendance for this meeting
+    $where_mhs_rep = getKelasWhereClause('m', true);
+    $where_a_rep = getKelasWhereClause('a', true);
     $q_report = mysqli_query($koneksi, "
         SELECT m.nama_lengkap, IFNULL(a.status, 'Alpha') as status_absen
         FROM krs k
         JOIN mahasiswa m ON k.mahasiswa_id = m.id
-        LEFT JOIN absensi a ON a.mahasiswa_id = m.id AND a.matkul_id = '$matkul_id' AND a.pertemuan = '$pertemuan' AND a.periode_id = '$periode_id'
-        WHERE k.matkul_id = '$matkul_id' AND k.periode_id = '$periode_id'
+        LEFT JOIN absensi a ON a.mahasiswa_id = m.id AND a.matkul_id = '$matkul_id' AND a.pertemuan = '$pertemuan' AND a.periode_id = '$periode_id' $where_a_rep
+        WHERE k.matkul_id = '$matkul_id' AND k.periode_id = '$periode_id' $where_mhs_rep
         ORDER BY m.nama_lengkap ASC
     ");
 
@@ -269,6 +274,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $where_clause = " AND a.status = '$filter'";
                 }
 
+                $where_mhs_tbl = getKelasWhereClause('m', true);
+                $where_a_tbl = getKelasWhereClause('a', true);
                 $query = "
         SELECT DISTINCT
             m.id AS mahasiswa_id,
@@ -281,8 +288,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ON a.mahasiswa_id = m.id
             AND a.matkul_id = k.matkul_id
             AND a.pertemuan = ?
+            $where_a_tbl
         WHERE k.matkul_id = ?
         AND k.periode_id = ?
+        $where_mhs_tbl
         $where_clause
         ORDER BY m.nim ASC
     ";

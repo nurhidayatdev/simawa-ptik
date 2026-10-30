@@ -44,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             exit;
         }
 
-        $check = mysqli_query($koneksi, "SELECT id FROM kelompok WHERE matkul_id = $mata_kuliah_id AND periode_id = $periode_id AND dosen = '$dosen_name' AND keterangan = '$keterangan' LIMIT 1");
+        $where_k_chk = getKelasWhereClause('', true);
+        $check = mysqli_query($koneksi, "SELECT id FROM kelompok WHERE matkul_id = $mata_kuliah_id AND periode_id = $periode_id AND dosen = '$dosen_name' AND keterangan = '$keterangan' $where_k_chk LIMIT 1");
         if (mysqli_num_rows($check) > 0) {
             $_SESSION['error'] = "Kelompok dengan dosen dan keterangan ini sudah ada.";
             header("Location: tambah_kelompok_murni?matkul_id=$mata_kuliah_id");
@@ -55,9 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $q_mk = mysqli_query($koneksi, "SELECT nama_matkul FROM mata_kuliah WHERE id = $mata_kuliah_id");
         $mk_data = mysqli_fetch_assoc($q_mk);
         $nama_matkul = $mk_data['nama_matkul'] ?? 'Mata Kuliah';
+        $target_kelas_id = getKelasScope() ?? 1;
 
         // Insert new groups
-        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id, dosen, keterangan) VALUES (?, ?, ?, ?, ?, ?)");
+        $insert = mysqli_prepare($koneksi, "INSERT INTO kelompok (matkul_id, kelompok_no, anggota, periode_id, dosen, keterangan, kelas_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $message_groups = "";
 
         $kel_count = 1;
@@ -68,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 return $s['nim'];
             }, $anggotaArr));
 
-            mysqli_stmt_bind_param($insert, 'iisiss', $mata_kuliah_id, $kel_count, $anggotaStr, $periode_id, $dosen_name, $keterangan);
+            mysqli_stmt_bind_param($insert, 'iisissi', $mata_kuliah_id, $kel_count, $anggotaStr, $periode_id, $dosen_name, $keterangan, $target_kelas_id);
             mysqli_stmt_execute($insert);
 
             // Format message for WhatsApp
@@ -95,10 +97,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+$where_jm_matkuls = getKelasWhereClause('jm', true);
 $matkuls = mysqli_query($koneksi, "SELECT DISTINCT jm.matkul_id AS id, mk.nama_matkul
     FROM jadwal_matkul jm
     JOIN mata_kuliah mk ON jm.matkul_id = mk.id
-    WHERE jm.periode_id = $periode_id
+    WHERE jm.periode_id = $periode_id $where_jm_matkuls
     ORDER BY mk.semester, mk.nama_matkul");
 
 // Determine selected matkul from GET so we can load only mahasiswa yang mengambil matkul ini (dari krs)
@@ -123,7 +126,8 @@ if ($selected_matkul) {
         if ($rl['nama_dosen']) $lecturers[] = $rl['nama_dosen'];
     }
 
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? ORDER BY m.nim");
+    $where_mhs_kelas = getKelasWhereClause('m', true);
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? $where_mhs_kelas ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);

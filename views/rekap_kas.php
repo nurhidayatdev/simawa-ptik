@@ -27,15 +27,18 @@ if (!$periode) {
 $periode_id = $periode['id'];
 
 // Stats Calculation
-$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
+$where_mhs_only = getKelasWhereClause('', false);
+$where_mhs_sql = $where_mhs_only ? "WHERE $where_mhs_only" : "";
+$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa $where_mhs_sql");
 $total_students = mysqli_fetch_assoc($q_total_mhs)['total'] ?? 0;
 
+$where_kas = getKelasWhereClause('', true);
 // Total Kas Lunas (Count entries)
-$q_total_lunas = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kas WHERE status = 'Lunas' AND periode_id = $periode_id");
+$q_total_lunas = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kas WHERE status = 'Lunas' AND periode_id = $periode_id $where_kas");
 $total_lunas_entries = mysqli_fetch_assoc($q_total_lunas)['total'] ?? 0;
 
 // Total money collected (sum of nominal)
-$q_total_uang = mysqli_query($koneksi, "SELECT SUM(nominal) as total FROM kas WHERE status = 'Lunas' AND periode_id = $periode_id");
+$q_total_uang = mysqli_query($koneksi, "SELECT SUM(nominal) as total FROM kas WHERE status = 'Lunas' AND periode_id = $periode_id $where_kas");
 $total_collected = mysqli_fetch_assoc($q_total_uang)['total'] ?? 0;
 
 // Overall payment rate (entries vs possible entries for 16 weeks)
@@ -50,6 +53,7 @@ $kas_matrix = [];
 $q_students = "
     SELECT id, nim, nama_lengkap, foto 
     FROM mahasiswa 
+    $where_mhs_sql
     ORDER BY nim ASC
 ";
 $res_st = mysqli_query($koneksi, $q_students);
@@ -58,10 +62,12 @@ while ($row = mysqli_fetch_assoc($res_st)) {
 }
 
 // 2. Get kas records for this period
+$where_k_clause = getKelasWhereClause('', true);
 $q_kas = "
     SELECT mahasiswa_id, minggu_ke, status 
     FROM kas 
     WHERE periode_id = ?
+    $where_k_clause
 ";
 $stmt_k = mysqli_prepare($koneksi, $q_kas);
 mysqli_stmt_bind_param($stmt_k, "i", $periode_id);

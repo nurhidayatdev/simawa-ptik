@@ -27,6 +27,7 @@ if (isset($_GET['fetch_adjust_data'])) {
     $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
     $p_id = mysqli_fetch_assoc($q_p)['id'] ?? 0;
 
+    $where_jm_scope = getKelasWhereClause('jm', true);
     $query_jadwal = "SELECT jm.id, mk.nama_matkul, 
                      jk_start.jam_mulai, jk_end.jam_selesai,
                      r.nama_ruangan, r.id as ruangan_id
@@ -35,7 +36,7 @@ if (isset($_GET['fetch_adjust_data'])) {
                      LEFT JOIN ruangan r ON jm.ruangan_id = r.id
                      LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
                      LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
-                     WHERE jm.periode_id = $p_id AND jm.hari = '$target_ind'
+                     WHERE jm.periode_id = $p_id AND jm.hari = '$target_ind' $where_jm_scope
                      ORDER BY jk_start.jam_mulai ASC";
 
     $res_jadwal = mysqli_query($koneksi, $query_jadwal);
@@ -57,7 +58,7 @@ if (isset($_GET['fetch_adjust_data'])) {
     $query_mk = "SELECT DISTINCT mk.id, mk.nama_matkul 
                  FROM jadwal_matkul jm 
                  JOIN mata_kuliah mk ON jm.matkul_id = mk.id 
-                 WHERE jm.periode_id = $p_id 
+                 WHERE jm.periode_id = $p_id $where_jm_scope
                  ORDER BY mk.nama_matkul ASC";
     $res_mk = mysqli_query($koneksi, $query_mk);
     $opts_mk = [];
@@ -178,13 +179,16 @@ if (isset($_POST['action'])) {
 $now_date = date('Y-m-d');
 $now_time = date('H:i:s');
 $yesterday_date = date('Y-m-d', strtotime('-1 day'));
-$tugas_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas WHERE status='belum' AND (deadline_tanggal > '$now_date' OR (deadline_tanggal = '$now_date' AND deadline_pukul > '$now_time'))"))['cnt'] ?? 0;
+$where_t_scope = getKelasWhereClause('', true);
+$tugas_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM tugas WHERE status='belum' AND (deadline_tanggal > '$now_date' OR (deadline_tanggal = '$now_date' AND deadline_pukul > '$now_time')) $where_t_scope"))['cnt'] ?? 0;
 
 $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
 $p_id = mysqli_fetch_assoc($q_p)['id'] ?? 0;
-$krs_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM mahasiswa m LEFT JOIN (SELECT DISTINCT mahasiswa_id FROM krs WHERE periode_id = $p_id) k ON m.id = k.mahasiswa_id WHERE k.mahasiswa_id IS NULL"))['cnt'] ?? 0;
+$where_m_scope = getKelasWhereClause('m', true);
+$krs_count = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT COUNT(*) as cnt FROM mahasiswa m LEFT JOIN (SELECT DISTINCT mahasiswa_id FROM krs WHERE periode_id = $p_id) k ON m.id = k.mahasiswa_id WHERE k.mahasiswa_id IS NULL $where_m_scope"))['cnt'] ?? 0;
 
 // Fetch unique group sets
+$where_k_scope = getKelasWhereClause('k', true);
 $q_sets = mysqli_query($koneksi, "
     SELECT DISTINCT 
         k.matkul_id, 
@@ -193,7 +197,7 @@ $q_sets = mysqli_query($koneksi, "
         k.keterangan 
     FROM kelompok k 
     JOIN mata_kuliah mk ON k.matkul_id = mk.id 
-    WHERE k.periode_id = $p_id
+    WHERE k.periode_id = $p_id $where_k_scope
     ORDER BY mk.nama_matkul ASC, k.dosen ASC
 ");
 $group_sets = [];

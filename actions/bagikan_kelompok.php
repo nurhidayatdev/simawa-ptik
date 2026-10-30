@@ -19,6 +19,12 @@ $dosen = $_GET['dosen'] ?? '';
 $keterangan = $_GET['keterangan'] ?? '';
 
 if ($matkul_id && !empty($dosen)) {
+    $q_chk = mysqli_query($koneksi, "SELECT kelas_id FROM kelompok WHERE matkul_id = $matkul_id AND dosen = '" . mysqli_real_escape_string($koneksi, $dosen) . "' LIMIT 1");
+    if ($r_chk = mysqli_fetch_assoc($q_chk)) {
+        if (!empty($r_chk['kelas_id'])) {
+            requireKelasAccess($r_chk['kelas_id']);
+        }
+    }
     // Call the helper function (it already handles the response formatting)
     $res = kirimKelompokReminder($koneksi, $matkul_id, $dosen, $keterangan, 'new');
 

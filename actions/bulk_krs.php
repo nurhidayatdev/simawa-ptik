@@ -228,7 +228,7 @@ $q_mhs = "
         ), 0) AS total_sks_approved
     FROM mahasiswa m
     LEFT JOIN krs_validasi kv ON (m.id = kv.mahasiswa_id AND kv.periode_id = $periode_id)
-    WHERE 1=1 $filter_where
+    WHERE 1=1 " . getKelasWhereClause('m', true) . " $filter_where
     ORDER BY m.nim ASC
 ";
 $res_mhs = mysqli_query($koneksi, $q_mhs);
@@ -244,6 +244,8 @@ while ($row = mysqli_fetch_assoc($res_mhs)) {
 }
 
 // Hitung summary
+$where_sum_raw = getKelasWhereClause('m', false);
+$where_sum_sql = $where_sum_raw ? "WHERE $where_sum_raw" : "";
 $q_summary = "
     SELECT
         COUNT(m.id) AS total_mhs,
@@ -253,6 +255,7 @@ $q_summary = "
         SUM(CASE WHEN kv.status IS NULL THEN 1 ELSE 0 END) AS belum_isi
     FROM mahasiswa m
     LEFT JOIN krs_validasi kv ON (m.id = kv.mahasiswa_id AND kv.periode_id = $periode_id)
+    $where_sum_sql
 ";
 $res_summary = mysqli_query($koneksi, $q_summary);
 $summary     = mysqli_fetch_assoc($res_summary);

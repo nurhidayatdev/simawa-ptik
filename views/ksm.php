@@ -15,8 +15,8 @@ $role = $_SESSION['role'];
 // Include foto helpers
 include_once '../functions/foto_helpers.php';
 
-// Ambil Mahasiswa ID
-$query_mhs = "SELECT id, nim FROM mahasiswa WHERE user_id = ?";
+// Ambil Mahasiswa ID & kelas_id
+$query_mhs = "SELECT id, nim, kelas_id FROM mahasiswa WHERE user_id = ?";
 $stmt = mysqli_prepare($koneksi, $query_mhs);
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
@@ -29,6 +29,7 @@ if (!$mahasiswa) {
 }
 $mahasiswa_id = $mahasiswa['id'];
 $nim = $mahasiswa['nim'];
+$mhs_kelas_id = $mahasiswa['kelas_id'] ?? null;
 
 // Handle Minta Validasi Action
 if (isset($_GET['act']) && $_GET['act'] === 'minta_validasi') {
@@ -72,7 +73,7 @@ $q_ksm = "
         jk_selesai.jam_selesai as waktu_selesai
     FROM krs k
     JOIN mata_kuliah mk ON k.matkul_id = mk.id
-    LEFT JOIN jadwal_matkul jm ON (mk.id = jm.matkul_id AND jm.periode_id = k.periode_id)
+    LEFT JOIN jadwal_matkul jm ON (mk.id = jm.matkul_id AND jm.periode_id = k.periode_id AND (jm.kelas_id = '$mhs_kelas_id' OR jm.kelas_id IS NULL))
     LEFT JOIN dosen d1 ON jm.dosen_pengampu_id = d1.id
     LEFT JOIN dosen d2 ON jm.dosen_mitra_id = d2.id
     LEFT JOIN ruangan r ON jm.ruangan_id = r.id

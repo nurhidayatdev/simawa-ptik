@@ -44,6 +44,7 @@ $periode_id = $periode['id'];
 if (isset($_POST['simpan_kas'])) {
     $minggu = $_POST['minggu_ke'];
 
+    $target_kelas_id = getKelasScope() ?? 1;
     if (!empty($_POST['status']) && is_array($_POST['status'])) {
         foreach ($_POST['status'] as $mahasiswa_id => $status) {
             $mahasiswa_id = mysqli_real_escape_string($koneksi, $mahasiswa_id);
@@ -74,16 +75,16 @@ if (isset($_POST['simpan_kas'])) {
             if ($exists) {
                 // Update: only set tanggal_bayar if not null, otherwise set NULL
                 if ($tanggal_to_save !== null) {
-                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar='$tanggal_to_save' WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
+                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar='$tanggal_to_save', kelas_id='$target_kelas_id' WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
                 } else {
-                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar=NULL WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
+                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar=NULL, kelas_id='$target_kelas_id' WHERE mahasiswa_id='$mahasiswa_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
                 }
             } else {
                 // Insert new row
                 if ($tanggal_to_save !== null) {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$tanggal_to_save', '$periode_id')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id, kelas_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', '$tanggal_to_save', '$periode_id', '$target_kelas_id')");
                 } else {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', NULL, '$periode_id')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id, kelas_id) VALUES ('$mahasiswa_id', '$minggu_safe', '$status_safe', NULL, '$periode_id', '$target_kelas_id')");
                 }
             }
         }
@@ -93,10 +94,13 @@ if (isset($_POST['simpan_kas'])) {
     include_once '../functions/helpers.php';
 
     // Fetch all students and their status for this week to create a complete report
+    $where_mhs_rep = getKelasWhereClause('m', true);
+    $where_k_rep = getKelasWhereClause('k', true);
     $q_report = mysqli_query($koneksi, "
         SELECT m.nama_panggilan, IFNULL(k.status, 'Belum') as status_bayar
         FROM mahasiswa m
-        LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id'
+        LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_rep
+        WHERE 1=1 $where_mhs_rep
         ORDER BY m.nama_panggilan ASC
     ");
 
@@ -230,11 +234,13 @@ if (isset($_POST['simpan_kas'])) {
                                 $filter = $_GET['filter'] ?? 'all';
                                 $filter = in_array($filter, ['all', 'Lunas', 'Belum']) ? $filter : 'all';
 
-                                $where_clause = '';
+                                $where_mhs_tbl = getKelasWhereClause('m', true);
+                                $where_k_tbl = getKelasWhereClause('k', true);
+                                $where_combined = "WHERE 1=1 $where_mhs_tbl";
                                 if ($filter === 'Lunas') {
-                                    $where_clause = "WHERE k.status = 'Lunas'";
+                                    $where_combined .= " AND k.status = 'Lunas'";
                                 } elseif ($filter === 'Belum') {
-                                    $where_clause = "WHERE (k.status IS NULL OR k.status != 'Lunas')";
+                                    $where_combined .= " AND (k.status IS NULL OR k.status != 'Lunas')";
                                 }
 
                                 $mhs = mysqli_query($koneksi, "
@@ -246,8 +252,8 @@ if (isset($_POST['simpan_kas'])) {
         k.status,
         k.tanggal_bayar
     FROM mahasiswa m
-    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id'
-    $where_clause
+    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_tbl
+    $where_combined
     ORDER BY m.nim ASC
     ");
                                 while ($row = mysqli_fetch_assoc($mhs)) : ?>

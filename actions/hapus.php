@@ -292,7 +292,14 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'set_kelompok' && isset($_GET['c
     $p = mysqli_fetch_assoc($q_p);
     $p_id = $p['id'] ?? 0;
 
-    $hapus = mysqli_query($koneksi, "DELETE FROM kelompok WHERE matkul_id='$matkul_id' AND dosen='$dosen' AND keterangan='$keterangan' AND periode_id='$p_id'");
+    $q_chk = mysqli_query($koneksi, "SELECT kelas_id FROM kelompok WHERE matkul_id='$matkul_id' AND dosen='$dosen' AND keterangan='$keterangan' AND periode_id='$p_id' LIMIT 1");
+    if ($r_chk = mysqli_fetch_assoc($q_chk)) {
+        if (!empty($r_chk['kelas_id'])) {
+            requireKelasAccess($r_chk['kelas_id']);
+        }
+    }
+    $where_k_del = getKelasWhereClause('', true);
+    $hapus = mysqli_query($koneksi, "DELETE FROM kelompok WHERE matkul_id='$matkul_id' AND dosen='$dosen' AND keterangan='$keterangan' AND periode_id='$p_id' $where_k_del");
     $redirect = '../database/db_kelompok';
 
     if ($hapus) {
@@ -349,6 +356,15 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
     if (!in_array($tabel, $tabel_diizinkan)) {
         echo "Tabel tidak diizinkan!";
         exit();
+    }
+
+    if (in_array($tabel, ['mahasiswa', 'jadwal_matkul', 'users', 'tugas', 'kelompok'])) {
+        $q_chk = mysqli_query($koneksi, "SELECT kelas_id FROM $tabel WHERE id = $id LIMIT 1");
+        if ($r_chk = mysqli_fetch_assoc($q_chk)) {
+            if (!empty($r_chk['kelas_id'])) {
+                requireKelasAccess($r_chk['kelas_id']);
+            }
+        }
     }
 
     $hapus = mysqli_query($koneksi, "DELETE FROM $tabel WHERE id='$id'");

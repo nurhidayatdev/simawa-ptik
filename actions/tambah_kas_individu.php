@@ -30,6 +30,12 @@ $mahasiswa_id_selected = $_GET['mahasiswa_id'] ?? '';
 if (isset($_POST['update_kas_individu'])) {
     $m_id = mysqli_real_escape_string($koneksi, $_POST['mahasiswa_id']);
 
+    // Cek kelas mahasiswa & validasi akses
+    $q_mhs_chk = mysqli_query($koneksi, "SELECT kelas_id FROM mahasiswa WHERE id = '$m_id' LIMIT 1");
+    $r_mhs_chk = mysqli_fetch_assoc($q_mhs_chk);
+    $target_kelas_id = $r_mhs_chk['kelas_id'] ?? (getKelasScope() ?? 1);
+    requireKelasAccess($target_kelas_id);
+
     if (!empty($_POST['status']) && is_array($_POST['status'])) {
         foreach ($_POST['status'] as $minggu => $status) {
             $status_safe = mysqli_real_escape_string($koneksi, $status);
@@ -53,15 +59,15 @@ if (isset($_POST['update_kas_individu'])) {
 
             if ($exists) {
                 if ($tanggal_to_save !== null) {
-                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar='$tanggal_to_save' WHERE mahasiswa_id='$m_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
+                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar='$tanggal_to_save', kelas_id='$target_kelas_id' WHERE mahasiswa_id='$m_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
                 } else {
-                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar=NULL WHERE mahasiswa_id='$m_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
+                    mysqli_query($koneksi, "UPDATE kas SET status='$status_safe', tanggal_bayar=NULL, kelas_id='$target_kelas_id' WHERE mahasiswa_id='$m_id' AND minggu_ke='$minggu_safe' AND periode_id='$periode_id'");
                 }
             } else {
                 if ($tanggal_to_save !== null) {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$m_id', '$minggu_safe', '$status_safe', '$tanggal_to_save', '$periode_id')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id, kelas_id) VALUES ('$m_id', '$minggu_safe', '$status_safe', '$tanggal_to_save', '$periode_id', '$target_kelas_id')");
                 } else {
-                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id) VALUES ('$m_id', '$minggu_safe', '$status_safe', NULL, '$periode_id')");
+                    mysqli_query($koneksi, "INSERT INTO kas (mahasiswa_id, minggu_ke, status, tanggal_bayar, periode_id, kelas_id) VALUES ('$m_id', '$minggu_safe', '$status_safe', NULL, '$periode_id', '$target_kelas_id')");
                 }
             }
         }
@@ -72,7 +78,9 @@ if (isset($_POST['update_kas_individu'])) {
 }
 
 // Get Mahasiswa List for dropdown
-$all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa ORDER BY nim ASC");
+$where_mhs_drop = getKelasWhereClause('', false);
+$where_mhs_drop_sql = $where_mhs_drop ? "WHERE $where_mhs_drop" : "";
+$all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa $where_mhs_drop_sql ORDER BY nim ASC");
 
 ?>
 <!DOCTYPE html>
@@ -125,6 +133,9 @@ $all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa O
                 $m_id_safe = mysqli_real_escape_string($koneksi, $mahasiswa_id_selected);
                 $q_mhs_info = mysqli_query($koneksi, "SELECT * FROM mahasiswa WHERE id = '$m_id_safe'");
                 $mhs_info = mysqli_fetch_assoc($q_mhs_info);
+                if ($mhs_info && !empty($mhs_info['kelas_id'])) {
+                    requireKelasAccess($mhs_info['kelas_id']);
+                }
             ?>
                 <div class="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-4 mb-6 transition-all">
                     <div class="flex items-center gap-4">

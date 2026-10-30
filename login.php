@@ -19,16 +19,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login_message = 'Format email tidak valid!';
   } else {
     $query = "SELECT 
-    u.id AS user_id,
-    m.nim,
-    m.nama_lengkap,
-    m.nama_panggilan,
-    u.email,
-    m.foto,
-    u.password,
-    u.role
-FROM users u
-JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
+        u.id AS user_id,
+        u.kelas_id AS user_kelas_id,
+        m.nim,
+        m.nama_lengkap,
+        m.nama_panggilan,
+        m.kelas_id AS mhs_kelas_id,
+        u.email,
+        m.foto,
+        u.password,
+        u.role,
+        k.nama_kelas
+    FROM users u
+    LEFT JOIN mahasiswa m ON m.user_id = u.id
+    LEFT JOIN kelas k ON (k.id = u.kelas_id OR k.id = m.kelas_id)
+    WHERE u.email = ? AND u.password = ?";
     $stmt = mysqli_prepare($koneksi, $query);
     mysqli_stmt_bind_param($stmt, "ss", $email, $password);
     mysqli_stmt_execute($stmt);
@@ -39,14 +44,24 @@ JOIN mahasiswa m ON m.user_id = u.id WHERE email = ? AND password = ?";
         $login_status = 'error';
         $login_message = get_maintenance_message($koneksi);
       } else {
-        $_SESSION['user_id']       = $data['user_id'];
-        $_SESSION['email']         = $data['email'];
-        $_SESSION['nama_lengkap']  = $data['nama_lengkap'];
-        $_SESSION['nama_panggilan']  = $data['nama_panggilan'];
-        $_SESSION['role']          = $data['role'];
-        $_SESSION['foto']          = $data['foto'];
+        $_SESSION['user_id']        = $data['user_id'];
+        $_SESSION['email']          = $data['email'];
+        $_SESSION['nama_lengkap']   = $data['nama_lengkap'] ?? $data['email'];
+        $_SESSION['nama_panggilan'] = $data['nama_panggilan'] ?? 'User';
+        $_SESSION['role']           = $data['role'];
+        $_SESSION['foto']           = $data['foto'] ?? null;
+        
+        // Simpan kelas_id & nama_kelas ke sesi
+        if ($data['role'] === 'Administrator Utama') {
+          $_SESSION['kelas_id']   = null;
+          $_SESSION['nama_kelas'] = 'Semua Kelas';
+        } else {
+          $_SESSION['kelas_id']   = (int)($data['user_kelas_id'] ?? $data['mhs_kelas_id'] ?? 1);
+          $_SESSION['nama_kelas'] = $data['nama_kelas'] ?? 'PTIK C 2024';
+        }
+
         $login_status = 'success';
-        $login_message = "Selamat datang, " . htmlspecialchars($data['nama_lengkap']) . "!";
+        $login_message = "Selamat datang, " . htmlspecialchars($_SESSION['nama_lengkap']) . "!";
       }
     } else {
       $login_status = 'error';

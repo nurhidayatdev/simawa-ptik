@@ -26,13 +26,16 @@ $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'];
 
 // Get all subjects for filter
+$where_mhs_matkul = getKelasWhereClause('m', true);
 $query_matkul = "
 SELECT DISTINCT
     mk.id AS matkul_id,
     mk.nama_matkul
 FROM krs k
+JOIN mahasiswa m ON k.mahasiswa_id = m.id
 JOIN mata_kuliah mk ON k.matkul_id = mk.id
 WHERE k.periode_id = $periode_id
+$where_mhs_matkul
 ORDER BY mk.nama_matkul ASC
 ";
 $res_matkul = mysqli_query($koneksi, $query_matkul);
@@ -42,13 +45,16 @@ while ($m = mysqli_fetch_assoc($res_matkul)) {
 }
 
 // Stats Calculation
-$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
+$where_mhs_only = getKelasWhereClause('', false);
+$where_mhs_sql = $where_mhs_only ? "WHERE $where_mhs_only" : "";
+$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa $where_mhs_sql");
 $total_students = mysqli_fetch_assoc($q_total_mhs)['total'] ?? 0;
 
-$q_total_absen = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE periode_id = $periode_id");
+$where_abs_kelas = getKelasWhereClause('', true);
+$q_total_absen = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE periode_id = $periode_id $where_abs_kelas");
 $total_entries = mysqli_fetch_assoc($q_total_absen)['total'] ?? 0;
 
-$q_hadir = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE status = 'Hadir' AND periode_id = $periode_id");
+$q_hadir = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE status = 'Hadir' AND periode_id = $periode_id $where_abs_kelas");
 $total_hadir = mysqli_fetch_assoc($q_hadir)['total'] ?? 0;
 
 $attendance_rate = ($total_entries > 0) ? round(($total_hadir / $total_entries) * 100, 1) : 0;
@@ -62,6 +68,8 @@ $f_status = $_GET['filter'] ?? 'all';
 $attendance_data = [];
 if ($f_matkul && $f_pertemuan) {
     $where_status = ($f_status !== 'all') ? " AND a.status = '$f_status'" : "";
+    $where_mhs_kelas = getKelasWhereClause('m', true);
+    $where_a_kelas = getKelasWhereClause('a', true);
     $query_abs = "
         SELECT DISTINCT
             m.id AS mahasiswa_id,
@@ -75,8 +83,10 @@ if ($f_matkul && $f_pertemuan) {
             ON a.mahasiswa_id = m.id
             AND a.matkul_id = k.matkul_id
             AND a.pertemuan = ?
+            $where_a_kelas
         WHERE k.matkul_id = ?
         AND k.periode_id = ?
+        $where_mhs_kelas
         $where_status
         ORDER BY m.nim ASC
     ";

@@ -28,6 +28,9 @@ $data = mysqli_fetch_assoc($query);
 if (!$data) {
     die("Data tidak ditemukan!");
 }
+if (!empty($data['kelas_id'])) {
+    requireKelasAccess($data['kelas_id']);
+}
 
 if (isset($_POST['update'])) {
 

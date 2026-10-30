@@ -35,13 +35,18 @@ $periode_info = $periode ? ($periode['tahun_periode'] . ' ' . $periode['semester
 // 1. Export Arus Kas (Transaction Log)
 if (isset($_GET['action']) && $_GET['action'] === 'export_excel_arus') {
     // Need totals for the report
-    $res_other_in = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_other_masuk FROM arus_kas WHERE tipe='masuk'");
-    $total_other_masuk = mysqli_fetch_assoc($res_other_in)['total_other_masuk'];
-    $res_kas_total = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas' AND periode_id = '$periode_id'");
-    $total_kas = mysqli_fetch_assoc($res_kas_total)['total_kas'];
+    $where_ak_masuk = getKelasWhereClause('', true);
+    $res_other_in = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_other_masuk FROM arus_kas WHERE tipe='masuk' $where_ak_masuk");
+    $total_other_masuk = mysqli_fetch_assoc($res_other_in)['total_other_masuk'] ?? 0;
+
+    $where_kas = getKelasWhereClause('', true);
+    $res_kas_total = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas' AND periode_id = '$periode_id' $where_kas");
+    $total_kas = mysqli_fetch_assoc($res_kas_total)['total_kas'] ?? 0;
     $total_masuk = $total_kas + $total_other_masuk;
-    $res_out = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_keluar FROM arus_kas WHERE tipe='keluar'");
-    $total_keluar = mysqli_fetch_assoc($res_out)['total_keluar'];
+
+    $where_ak_keluar = getKelasWhereClause('', true);
+    $res_out = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_keluar FROM arus_kas WHERE tipe='keluar' $where_ak_keluar");
+    $total_keluar = mysqli_fetch_assoc($res_out)['total_keluar'] ?? 0;
     $saldo = $total_masuk - $total_keluar;
 
     $filename = 'laporan_arus_kas_' . date('Ymd_His') . '.xls';
@@ -51,7 +56,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'export_excel_arus') {
     echo '<table border="1">';
     echo '<tr><th colspan="5" style="background-color: #1e1b4b; color: white;">LAPORAN ARUS KAS SIMAWA PTIK 2024 (' . htmlspecialchars($periode_info) . ')</th></tr>';
     echo '<tr style="background-color: #f1f5f9;"><th>ID</th><th>Tipe</th><th>Deskripsi</th><th>Jumlah</th><th>Tanggal</th></tr>';
-    $q = mysqli_query($koneksi, "SELECT * FROM arus_kas ORDER BY tanggal DESC, created_at DESC");
+    $where_ak_all = getKelasWhereClause('', false);
+    $where_ak_all_sql = $where_ak_all ? "WHERE $where_ak_all" : "";
+    $q = mysqli_query($koneksi, "SELECT * FROM arus_kas $where_ak_all_sql ORDER BY tanggal DESC, created_at DESC");
     while ($r = mysqli_fetch_assoc($q)) {
         $tgl = !empty($r['tanggal']) ? date('d/m/Y', strtotime($r['tanggal'])) : '-';
         echo "<tr><td>{$r['id']}</td><td>" . ucfirst($r['tipe']) . "</td><td>" . htmlspecialchars($r['deskripsi']) . "</td><td>Rp " . number_format($r['jumlah'], 0, ',', '.') . "</td><td>$tgl</td></tr>";
@@ -69,11 +76,13 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel_mingguan' && isset($_GE
     if ($filter_exp === 'Lunas') $where_exp = "AND k.status = 'Lunas'";
     elseif ($filter_exp === 'Belum') $where_exp = "AND (k.status IS NULL OR k.status != 'Lunas')";
 
+    $where_mhs_exp = getKelasWhereClause('m', true);
+    $where_k_exp = getKelasWhereClause('k', true);
     $res = mysqli_query($koneksi, "
         SELECT m.nim, m.nama_lengkap, '$minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
         FROM mahasiswa m 
-        LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' 
-        WHERE 1=1 $where_exp 
+        LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_exp
+        WHERE 1=1 $where_mhs_exp $where_exp 
         ORDER BY m.nim ASC
     ");
 
@@ -107,6 +116,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_arus'])) {
     $jumlah = (float)$jumlah;
     $tanggal = $_POST['tanggal'] ?? date('Y-m-d');
 
+    // Cek hak akses ke baris arus_kas
+    $q_check = mysqli_query($koneksi, "SELECT kelas_id FROM arus_kas WHERE id = $id LIMIT 1");
+    if ($r_check = mysqli_fetch_assoc($q_check)) {
+        if (!empty($r_check['kelas_id'])) {
+            requireKelasAccess($r_check['kelas_id']);
+        }
+    }
+
     $stmt = mysqli_prepare($koneksi, "UPDATE arus_kas SET tipe=?, deskripsi=?, jumlah=?, tanggal=? WHERE id=?");
     mysqli_stmt_bind_param($stmt, 'ssdsi', $tipe, $deskripsi, $jumlah, $tanggal, $id);
     mysqli_stmt_execute($stmt);
@@ -121,9 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_arus'])) {
     $jumlah = str_replace(',', '.', $_POST['jumlah'] ?? '0');
     $jumlah = (float)$jumlah;
     $tanggal = $_POST['tanggal'] ?? date('Y-m-d');
+    $target_kelas_id = getKelasScope() ?? 1;
 
-    $stmt = mysqli_prepare($koneksi, "INSERT INTO arus_kas (tipe, deskripsi, jumlah, tanggal) VALUES (?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, 'ssds', $tipe, $deskripsi, $jumlah, $tanggal);
+    $stmt = mysqli_prepare($koneksi, "INSERT INTO arus_kas (tipe, deskripsi, jumlah, tanggal, kelas_id) VALUES (?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, 'ssdsi', $tipe, $deskripsi, $jumlah, $tanggal, $target_kelas_id);
     mysqli_stmt_execute($stmt);
     header("Location: manajemen_kas.php");
     exit;
@@ -132,6 +150,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah_arus'])) {
 // Handle delete
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $id = (int)$_GET['id'];
+    $q_check = mysqli_query($koneksi, "SELECT kelas_id FROM arus_kas WHERE id = $id LIMIT 1");
+    if ($r_check = mysqli_fetch_assoc($q_check)) {
+        if (!empty($r_check['kelas_id'])) {
+            requireKelasAccess($r_check['kelas_id']);
+        }
+    }
     mysqli_query($koneksi, "DELETE FROM arus_kas WHERE id=$id");
     header("Location: manajemen_kas.php");
     exit;
@@ -144,28 +168,33 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
  */
 
 // Pemasukan dari arus_kas (other)
-$res_other_in = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_other_masuk FROM arus_kas WHERE tipe='masuk'");
+$where_ak_masuk = getKelasWhereClause('', true);
+$res_other_in = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_other_masuk FROM arus_kas WHERE tipe='masuk' $where_ak_masuk");
 $total_other_masuk = mysqli_fetch_assoc($res_other_in)['total_other_masuk'] ?? 0;
 
 // Pemasukan dari tabel kas (Mahasiswa)
-$res_kas = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas' AND periode_id = '$periode_id'");
+$where_kas = getKelasWhereClause('', true);
+$res_kas = mysqli_query($koneksi, "SELECT COALESCE(SUM(nominal),0) AS total_kas FROM kas WHERE status='Lunas' AND periode_id = '$periode_id' $where_kas");
 $total_kas = mysqli_fetch_assoc($res_kas)['total_kas'] ?? 0;
 
 $total_masuk = $total_kas + $total_other_masuk;
 
-$res_out = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_keluar FROM arus_kas WHERE tipe='keluar'");
+$where_ak_keluar = getKelasWhereClause('', true);
+$res_out = mysqli_query($koneksi, "SELECT COALESCE(SUM(jumlah),0) AS total_keluar FROM arus_kas WHERE tipe='keluar' $where_ak_keluar");
 $total_keluar = mysqli_fetch_assoc($res_out)['total_keluar'] ?? 0;
 $saldo = $total_masuk - $total_keluar;
 
 // Progress Calculation
-$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
+$where_mhs_only = getKelasWhereClause('', false);
+$where_mhs_sql = $where_mhs_only ? "WHERE $where_mhs_only" : "";
+$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa $where_mhs_sql");
 $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
 
-$q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id'");
+$q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id' $where_kas");
 $current_week = (int)(mysqli_fetch_assoc($q_latest_week)['max_week'] ?? 1);
 if ($current_week < 1) $current_week = 1;
 
-$q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 AND periode_id = '$periode_id' LIMIT 1");
+$q_nominal = mysqli_query($koneksi, "SELECT nominal FROM kas WHERE nominal > 0 AND periode_id = '$periode_id' $where_kas LIMIT 1");
 $fixed_nominal = (int)(mysqli_fetch_assoc($q_nominal)['nominal'] ?? 5000);
 
 $target_kas = $total_students * $current_week * $fixed_nominal;
@@ -173,7 +202,7 @@ $progress_percent = ($target_kas > 0) ? min(100, round(($total_kas / $target_kas
 
 // Weekly Details
 $weekly_data = [];
-$q_weekly = mysqli_query($koneksi, "SELECT minggu_ke, COUNT(*) as paid_count FROM kas WHERE status='Lunas' AND periode_id = '$periode_id' GROUP BY minggu_ke");
+$q_weekly = mysqli_query($koneksi, "SELECT minggu_ke, COUNT(*) as paid_count FROM kas WHERE status='Lunas' AND periode_id = '$periode_id' $where_kas GROUP BY minggu_ke");
 while ($rw = mysqli_fetch_assoc($q_weekly)) {
     $weekly_data[$rw['minggu_ke']] = $rw['paid_count'];
 }
@@ -194,6 +223,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
     $eid = (int)$_GET['id'];
     $res_edit = mysqli_query($koneksi, "SELECT * FROM arus_kas WHERE id={$eid} LIMIT 1");
     if ($res_edit && $row_edit = mysqli_fetch_assoc($res_edit)) {
+        if (!empty($row_edit['kelas_id'])) {
+            requireKelasAccess($row_edit['kelas_id']);
+        }
         $editing = true;
         $form_tipe = $row_edit['tipe'];
         $form_deskripsi = $row_edit['deskripsi'];
@@ -203,18 +235,22 @@ if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) 
 }
 
 // Transaction List
-$entries = mysqli_query($koneksi, "SELECT * FROM arus_kas ORDER BY tanggal DESC, created_at DESC");
+$where_ak_all = getKelasWhereClause('', false);
+$where_ak_all_sql = $where_ak_all ? "WHERE $where_ak_all" : "";
+$entries = mysqli_query($koneksi, "SELECT * FROM arus_kas $where_ak_all_sql ORDER BY tanggal DESC, created_at DESC");
 
 // Weekly Table Status (from kas.php)
 $f_minggu = $_GET['minggu_ke'] ?? 1;
 $f_filter_mhs = $_GET['filter_mhs'] ?? 'all';
 $where_mhs = ($f_filter_mhs === 'Lunas') ? " AND k.status = 'Lunas'" : (($f_filter_mhs === 'Belum') ? " AND (k.status IS NULL OR k.status != 'Lunas')" : "");
 
+$where_mhs_scope = getKelasWhereClause('m', true);
+$where_k_scope = getKelasWhereClause('k', true);
 $mhs_status = mysqli_query($koneksi, "
     SELECT m.id AS mahasiswa_id, m.nim, m.nama_lengkap, m.foto, '$f_minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
     FROM mahasiswa m 
-    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$f_minggu' AND k.periode_id = '$periode_id'
-    WHERE 1=1 $where_mhs 
+    LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$f_minggu' AND k.periode_id = '$periode_id' $where_k_scope
+    WHERE 1=1 $where_mhs_scope $where_mhs 
     ORDER BY m.nim ASC
 ");
 

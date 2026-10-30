@@ -27,10 +27,14 @@ if (!$periode_id) {
     exit;
 }
 
-// 1. Ambil Semua Mahasiswa & Pisah per Gender
+$target_kelas_id = getKelasScope() ?? 1;
+
+// 1. Ambil Mahasiswa Kelas Aktif & Pisah per Gender
 $boys_master = [];
 $girls_master = [];
-$res_mhs = mysqli_query($koneksi, "SELECT id, jenis_kelamin FROM mahasiswa");
+$where_mhs_scope = getKelasWhereClause('', false);
+$where_mhs_sql = $where_mhs_scope ? "WHERE $where_mhs_scope" : "";
+$res_mhs = mysqli_query($koneksi, "SELECT id, jenis_kelamin FROM mahasiswa $where_mhs_sql");
 while ($row = mysqli_fetch_assoc($res_mhs)) {
     if ($row['jenis_kelamin'] === 'Laki-laki') {
         $boys_master[] = $row['id'];
@@ -42,11 +46,12 @@ $total_mhs = count($boys_master) + count($girls_master);
 
 // 2. Ambil Daftar Jadwal Kuliah (Offline)
 $one_week_schedules = [];
+$where_jm_scope = getKelasWhereClause('jm', true);
 $res_jadwal = mysqli_query($koneksi, "
     SELECT jm.id, jm.matkul_id
     FROM jadwal_matkul jm 
     LEFT JOIN ruangan r ON jm.ruangan_id = r.id 
-    WHERE jm.periode_id = $periode_id 
+    WHERE jm.periode_id = $periode_id $where_jm_scope
     AND (r.nama_ruangan IS NULL OR r.nama_ruangan != 'ONLINE')
     ORDER BY FIELD(jm.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), jm.id
 ");
@@ -62,7 +67,8 @@ if (empty($one_week_schedules)) {
 
 // 3. Ambil Data Enrolment (KRS)
 $course_enrollments = [];
-$q_krs = "SELECT matkul_id, mahasiswa_id FROM krs WHERE periode_id = $periode_id";
+$where_mhs_krs = getKelasWhereClause('m', true);
+$q_krs = "SELECT k.matkul_id, k.mahasiswa_id FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.periode_id = $periode_id $where_mhs_krs";
 $res_krs = mysqli_query($koneksi, $q_krs);
 while ($row = mysqli_fetch_assoc($res_krs)) {
     $course_enrollments[$row['matkul_id']][] = $row['mahasiswa_id'];
@@ -70,13 +76,14 @@ while ($row = mysqli_fetch_assoc($res_krs)) {
 
 // 4. Hapus Data Piket Lama (Semua atau Blok Tertentu)
 $filter_blok_target = isset($_GET['blok']) ? intval($_GET['blok']) : null;
+$where_p_del = getKelasWhereClause('', true);
 
 if ($filter_blok_target) {
     $w_start = ($filter_blok_target - 1) * 3 + 1;
     $w_end = $filter_blok_target * 3;
-    mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id AND (minggu_ke BETWEEN $w_start AND $w_end)");
+    mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id $where_p_del AND (minggu_ke BETWEEN $w_start AND $w_end)");
 } else {
-    mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id");
+    mysqli_query($koneksi, "DELETE FROM piket_proyektor WHERE periode_id = $periode_id $where_p_del");
 }
 
 // 5. Algoritma "Bagi Habis" Eksak dengan Pengelompokan Jenis Kelamin (Siklus 3 Mingguan)
@@ -170,7 +177,7 @@ if ($filter_blok_target) {
 
             foreach ($selected as $student_id) {
                 $student_id = intval($student_id);
-                mysqli_query($koneksi, "INSERT INTO piket_proyektor (jadwal_matkul_id, mahasiswa_id, minggu_ke, periode_id) VALUES ({$slot['jid']}, $student_id, {$slot['week']}, $periode_id)");
+                mysqli_query($koneksi, "INSERT INTO piket_proyektor (jadwal_matkul_id, mahasiswa_id, minggu_ke, periode_id, kelas_id) VALUES ({$slot['jid']}, $student_id, {$slot['week']}, $periode_id, $target_kelas_id)");
             }
         }
     }
@@ -280,7 +287,7 @@ if ($filter_blok_target) {
 
         foreach ($selected as $student_id) {
             $student_id = intval($student_id);
-            mysqli_query($koneksi, "INSERT INTO piket_proyektor (jadwal_matkul_id, mahasiswa_id, minggu_ke, periode_id) VALUES ({$slot['jid']}, $student_id, {$slot['week']}, $periode_id)");
+            mysqli_query($koneksi, "INSERT INTO piket_proyektor (jadwal_matkul_id, mahasiswa_id, minggu_ke, periode_id, kelas_id) VALUES ({$slot['jid']}, $student_id, {$slot['week']}, $periode_id, $target_kelas_id)");
         }
     }
 }

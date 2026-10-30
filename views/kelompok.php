@@ -23,10 +23,11 @@ $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'];
 
 // Ambil daftar mata kuliah yang punya kelompok tersimpan
+$where_k_kelas = getKelasWhereClause('k', true);
 $matkuls_res = mysqli_query($koneksi, "SELECT DISTINCT k.matkul_id AS id, mk.nama_matkul
 	FROM kelompok k
 	JOIN mata_kuliah mk ON k.matkul_id = mk.id
-	WHERE k.periode_id = $periode_id
+	WHERE k.periode_id = $periode_id $where_k_kelas
 	ORDER BY mk.semester, mk.nama_matkul");
 
 $selected_matkul = intval($_GET['matkul_id'] ?? 0);
@@ -37,7 +38,8 @@ $student_map = [];
 
 if ($selected_matkul) {
     // Get all unique sets for this matkul
-    $q_sets = mysqli_query($koneksi, "SELECT DISTINCT dosen, keterangan FROM kelompok WHERE matkul_id = $selected_matkul AND periode_id = $periode_id");
+    $where_k_set = getKelasWhereClause('', true);
+    $q_sets = mysqli_query($koneksi, "SELECT DISTINCT dosen, keterangan FROM kelompok WHERE matkul_id = $selected_matkul AND periode_id = $periode_id $where_k_set");
     while ($rs = mysqli_fetch_assoc($q_sets)) {
         $sets[] = $rs;
     }
@@ -47,7 +49,8 @@ if ($selected_matkul) {
         $dosen_filter = mysqli_real_escape_string($koneksi, $current_set['dosen']);
         $keterangan_filter = mysqli_real_escape_string($koneksi, $current_set['keterangan']);
 
-        $stmt = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ? ORDER BY kelompok_no");
+        $where_k_stmt = getKelasWhereClause('', true);
+        $stmt = mysqli_prepare($koneksi, "SELECT kelompok_no, anggota FROM kelompok WHERE matkul_id = ? AND periode_id = ? AND dosen = ? AND keterangan = ? $where_k_stmt ORDER BY kelompok_no");
         mysqli_stmt_bind_param($stmt, 'iiss', $selected_matkul, $periode_id, $dosen_filter, $keterangan_filter);
         mysqli_stmt_execute($stmt);
         $res = mysqli_stmt_get_result($stmt);
@@ -85,11 +88,13 @@ $q_my_nim = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE user_id = '$
 $my_nim = mysqli_fetch_assoc($q_my_nim)['nim'] ?? '';
 $my_groups_data = [];
 if ($my_nim) {
+    $where_k_my = getKelasWhereClause('k', true);
     $q_mg = mysqli_query($koneksi, "SELECT k.*, mk.nama_matkul 
         FROM kelompok k 
         JOIN mata_kuliah mk ON k.matkul_id = mk.id 
         WHERE (FIND_IN_SET('$my_nim', REPLACE(k.anggota, ' ', '')) OR k.anggota LIKE '%$my_nim%')
         AND k.periode_id = $periode_id
+        $where_k_my
         ORDER BY mk.nama_matkul ASC");
     while ($mg = mysqli_fetch_assoc($q_mg)) {
         // Ambil nama anggota

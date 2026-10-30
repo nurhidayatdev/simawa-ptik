@@ -31,8 +31,9 @@ if (isset($_POST['tambah'])) {
                 $target_file = $target_dir . $foto;
                 move_uploaded_file($_FILES["foto"]["tmp_name"], $target_file);
             }
-            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, foto)
-                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram','$foto')");
+            $target_kelas_id = getKelasScope() ?? 1;
+            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, foto, kelas_id)
+                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram','$foto', '$target_kelas_id')");
             $redirect = "../database/db_mahasiswa";
 
             break;
@@ -72,9 +73,10 @@ if (isset($_POST['tambah'])) {
             $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
             $periode = mysqli_fetch_assoc($q_periode);
             $periode_id = $periode['id'] ?? 0;
+            $target_kelas_id = getKelasScope() ?? 1;
 
-            mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_mulai_ke, jam_selesai_ke, ruangan_id, dosen_pengampu_id, dosen_mitra_id, periode_id)
-                VALUES ('$matkul_id', '$hari', '$jam_mulai_ke', '$jam_selesai_ke', '$ruangan_id', '$dosen_pengampu_id', '$dosen_mitra_id', '$periode_id')");
+            mysqli_query($koneksi, "INSERT INTO jadwal_matkul (matkul_id, hari, jam_mulai_ke, jam_selesai_ke, ruangan_id, dosen_pengampu_id, dosen_mitra_id, periode_id, kelas_id)
+                VALUES ('$matkul_id', '$hari', '$jam_mulai_ke', '$jam_selesai_ke', '$ruangan_id', '$dosen_pengampu_id', '$dosen_mitra_id', '$periode_id', '$target_kelas_id')");
             $redirect = "../database/db_jadwal";
 
             break;
@@ -83,8 +85,10 @@ if (isset($_POST['tambah'])) {
             $id = $_POST['id'];
             $password = $_POST['password'];
             $role = $_POST['role'];
-            mysqli_query($koneksi, "INSERT INTO users (id, password, role)
-                VALUES ('$id','$password','$role')");
+            $target_kelas_id = getKelasScope();
+            $kelas_val = $target_kelas_id ? "'$target_kelas_id'" : "NULL";
+            mysqli_query($koneksi, "INSERT INTO users (id, password, role, kelas_id)
+                VALUES ('$id','$password','$role', $kelas_val)");
             $redirect = "../database/db_users";
 
             break;
@@ -128,8 +132,9 @@ if (isset($_POST['tambah'])) {
             $matkul_data = mysqli_fetch_assoc($q_matkul);
             $nama_matkul = $matkul_data['nama_matkul'] ?? 'Unknown';
 
-            mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id)
-                VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id')");
+            $target_kelas_id = getKelasScope() ?? 1;
+            mysqli_query($koneksi, "INSERT INTO tugas (matkul_id, deadline_tanggal, deadline_pukul, deskripsi, file_tugas, link_kirim, periode_id, kelas_id)
+                VALUES ('$matkul_id', '$deadline_tanggal', '$deadline_pukul', '$deskripsi', '$file_tugas', '$link_kirim', '$periode_id', '$target_kelas_id')");
 
             // =====================
             // WHATSAPP NOTIFICATION

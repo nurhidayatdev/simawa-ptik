@@ -19,12 +19,14 @@ function kirimKelompokReminder($koneksi, $matkul_id, $dosen, $keterangan, $type 
     $mk_name = mysqli_fetch_assoc($q_mk)['nama_matkul'] ?? 'Mata Kuliah';
 
     // Get groups and members
+    $where_k_scope = getKelasWhereClause('', true);
     $q_groups = "SELECT kelompok_no, anggota 
                  FROM kelompok 
                  WHERE matkul_id = '$matkul_id' 
                  AND dosen = '$dosen' 
                  AND keterangan = '$keterangan' 
                  AND periode_id = '$periode_id' 
+                 $where_k_scope
                  ORDER BY kelompok_no ASC";
     $res_groups = mysqli_query($koneksi, $q_groups);
 
