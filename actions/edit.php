@@ -557,9 +557,7 @@ if (isset($_POST['update'])) {
                                             $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
                                                 mk.id AS matkul_id,
                                                 mk.nama_matkul
-                                                FROM krs k
-                                                JOIN mata_kuliah mk ON k.matkul_id = mk.id
-                                                WHERE (k.periode_id = '$pid_edit' OR mk.id = '{$data['matkul_id']}')
+                                                FROM mata_kuliah mk
                                                 ORDER BY mk.nama_matkul ASC");
                                             while ($mk = mysqli_fetch_assoc($query_mk)) {
                                                 $selected = ($data['matkul_id'] == $mk['matkul_id']) ? 'selected' : '';
@@ -610,9 +608,7 @@ if (isset($_POST['update'])) {
                                             $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
                                                 mk.id AS matkul_id,
                                                 mk.nama_matkul
-                                                FROM krs k
-                                                JOIN mata_kuliah mk ON k.matkul_id = mk.id
-                                                WHERE (k.periode_id = '$pid_edit' OR mk.id = '{$data['matkul_id']}')
+                                                FROM mata_kuliah mk
                                                 ORDER BY mk.nama_matkul ASC");
                                             while ($mk = mysqli_fetch_assoc($query_mk)) {
                                                 $selected = ($data['matkul_id'] == $mk['matkul_id']) ? 'selected' : '';

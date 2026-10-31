@@ -334,7 +334,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                         <i class="fas fa-rocket text-indigo-600 dark:text-indigo-400"></i> Pintasan Operasional Kelas
                     </h3>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                     <button type="button" onclick="openTambahMhsModal()" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all text-left group cursor-pointer">
                         <i class="fas fa-user-plus text-indigo-600 dark:text-indigo-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
                         <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Tambah Anggota</div>
@@ -347,19 +347,25 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                         <div class="text-[10px] text-slate-400 mt-0.5">Sekretaris/Bendahara</div>
                     </button>
 
+                    <a href="database/db_jadwal" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group">
+                        <i class="fas fa-calendar-week text-indigo-600 dark:text-indigo-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
+                        <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Jadwal Kuliah</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Atur jadwal kelas</div>
+                    </a>
+
+                    <a href="views/piket_proyektor" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group">
+                        <i class="fas fa-plug text-emerald-600 dark:text-emerald-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
+                        <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Piket Proyektor</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">Jadwal & acak piket</div>
+                    </a>
+
                     <a href="views/kelompok" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group">
                         <i class="fas fa-users text-blue-600 dark:text-blue-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
                         <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Kelompok Kelas</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Bagi & atur kelompok</div>
                     </a>
 
-                    <a href="views/piket_proyektor" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group">
-                        <i class="fas fa-plug text-emerald-600 dark:text-emerald-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
-                        <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Piket Proyektor</div>
-                        <div class="text-[10px] text-slate-400 mt-0.5">Jadwal giliran piket</div>
-                    </a>
-
-                    <a href="database/db_tugas" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group col-span-2 sm:col-span-1">
+                    <a href="database/db_tugas" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group">
                         <i class="fas fa-tasks text-purple-600 dark:text-purple-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
                         <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Tugas Kuliah</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Buat & kelola tugas</div>
@@ -567,9 +573,14 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                 <i class="fas fa-calendar-day text-indigo-600 dark:text-indigo-400"></i>
                                 Jadwal Kuliah Hari Ini
                             </h3>
-                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400">
-                                <?= $hari_ini ?>
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400">
+                                    <?= $hari_ini ?>
+                                </span>
+                                <a href="database/db_jadwal" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 flex items-center gap-1">
+                                    Kelola <i class="fas fa-arrow-right text-[10px]"></i>
+                                </a>
+                            </div>
                         </div>
 
                         <?php if (empty($jadwal_hari_ini)): ?>

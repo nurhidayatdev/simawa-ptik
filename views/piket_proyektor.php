@@ -215,7 +215,7 @@ if ($my_mhs_id) {
                                     <i class="fab fa-whatsapp text-xs"></i> Notifikasi
                                 </button>
                             </form>
-                            <?php if ($role === 'Administrator Utama'): ?>
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <button onclick="confirmReset()" class="bg-slate-800 text-white px-3 py-2 rounded-lg hover:bg-black text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all uppercase tracking-wide">
                                     <i class="fa fa-random text-xs"></i> Acak
                                 </button>

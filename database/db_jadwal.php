@@ -35,7 +35,7 @@ if (isset($_GET['fetch_adjust_data'])) {
                      LEFT JOIN ruangan r ON jm.ruangan_id = r.id
                      LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
                      LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
-                     WHERE jm.periode_id = $p_id AND jm.hari = '$target_ind'
+                     WHERE jm.periode_id = $p_id " . getKelasWhereClause('jm', true) . "AND jm.hari = '$target_ind' " . getKelasWhereClause('jm', true) . "
                      ORDER BY jk_start.jam_mulai ASC";
 
     $res_jadwal = mysqli_query($koneksi, $query_jadwal);
@@ -57,7 +57,7 @@ if (isset($_GET['fetch_adjust_data'])) {
     $query_mk = "SELECT DISTINCT mk.id, mk.nama_matkul 
                  FROM jadwal_matkul jm 
                  JOIN mata_kuliah mk ON jm.matkul_id = mk.id 
-                 WHERE jm.periode_id = $p_id 
+                 WHERE jm.periode_id = $p_id " . getKelasWhereClause('jm', true) . "
                  ORDER BY mk.nama_matkul ASC";
     $res_mk = mysqli_query($koneksi, $query_mk);
     $opts_mk = [];
@@ -105,6 +105,7 @@ $periode = mysqli_fetch_assoc($q_periode);
 $periode_id = $periode['id'];
 
 $search = $_GET['search'] ?? '';
+$where_jm_kelas = getKelasWhereClause('jm', true);
 
 if (!empty($search)) {
     $stmt = mysqli_prepare(
@@ -125,6 +126,7 @@ LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
          WHERE (jm.hari LIKE ? 
          OR mk.nama_matkul LIKE ?)
          AND jm.periode_id = ?
+         $where_jm_kelas
          ORDER BY jm.hari, jk_start.jam_mulai"
     );
 
@@ -146,7 +148,7 @@ LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
 LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
-WHERE jm.periode_id = $periode_id
+WHERE jm.periode_id = $periode_id $where_jm_kelas
 ORDER BY jm.hari, jk_start.jam_mulai");
 }
 
@@ -167,7 +169,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-center"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 dark:border-indigo-800/50">' . htmlspecialchars($row['sks']) . '</span></td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['dosen_pengampu']) . '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['dosen_mitra']) . '</td>';
-        if ($role === 'Administrator Utama' || $role === 'Sekretaris'):
+        if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
             echo '<div class="flex items-center justify-center gap-3">';
             echo '<a href="../actions/edit.php?tabel=jadwal_matkul&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
@@ -228,7 +230,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
                             </div>
 
-                            <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'): ?>
                                 <button type="button" onclick="confirmJadwal()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Kirim WhatsApp">
                                     <i class="fa fa-paper-plane text-xs"></i>
                                 </button>
@@ -260,7 +262,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-center text-[10px] font-bold text-white uppercase tracking-widest">SKS</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen Pengampu</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen Mitra</th>
-                            <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -283,7 +285,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-center"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 dark:border-indigo-800/50"><?= $row['sks']; ?></span></td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400"><?= $row['dosen_pengampu']; ?></td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400"><?= $row['dosen_mitra']; ?></td>
-                                <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <a href="../actions/edit.php?tabel=jadwal_matkul&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>

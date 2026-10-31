@@ -385,13 +385,12 @@ if (isset($_POST['tambah'])) {
                                     $per_add = mysqli_fetch_assoc($q_per_add);
                                     $pid_add = (int)($per_add['id'] ?? 0);
 
+                                    $target_kelas_scope = getKelasScope() ?? 1;
                                     $query_mk = mysqli_query($koneksi, "SELECT DISTINCT
                                         mk.id AS matkul_id,
                                         mk.nama_matkul
-                                        FROM krs k
-                                        JOIN mata_kuliah mk ON k.matkul_id = mk.id
-                                        WHERE k.periode_id = '$pid_add'
-                                        AND mk.id NOT IN (SELECT matkul_id FROM jadwal_matkul WHERE periode_id = '$pid_add')
+                                        FROM mata_kuliah mk
+                                        WHERE mk.id NOT IN (SELECT matkul_id FROM jadwal_matkul WHERE periode_id = '$pid_add' AND kelas_id = '$target_kelas_scope')
                                         ORDER BY mk.nama_matkul ASC");
                                     while ($mk = mysqli_fetch_assoc($query_mk)) {
                                         echo "<option value='{$mk['matkul_id']}'>{$mk['nama_matkul']}</option>";

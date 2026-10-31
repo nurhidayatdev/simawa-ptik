@@ -19,7 +19,7 @@ LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
 LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
 LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
 LEFT JOIN dosen dm ON jm.dosen_mitra_id = dm.id
-WHERE jm.periode_id = $periode_id
+WHERE jm.periode_id = $periode_id " . getKelasWhereClause('jm', true) . "
 ORDER BY FIELD(jm.hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'), jk_start.jam_mulai");
 ?>
 <!DOCTYPE html>

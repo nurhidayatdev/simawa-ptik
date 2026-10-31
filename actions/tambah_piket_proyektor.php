@@ -8,8 +8,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $role = $_SESSION['role'];
-if ($role !== 'Administrator Utama') {
-    $_SESSION['error'] = "Aksi gagal. Hanya Administrator Utama yang diizinkan untuk mengacak ulang piket.";
+if ($role !== 'Administrator Utama' && $role !== 'Ketua Tingkat') {
+    $_SESSION['error'] = "Aksi gagal. Hanya Administrator Utama dan Ketua Tingkat yang diizinkan untuk mengacak ulang piket.";
     header("Location: ../views/piket_proyektor");
     exit;
 }
