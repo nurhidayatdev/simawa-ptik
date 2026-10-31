@@ -38,7 +38,13 @@ $kelas_stats = mysqli_fetch_assoc($q_kelas_stats);
 $total_kelas = (int)($kelas_stats['total_kelas'] ?? 0);
 $kelas_aktif = (int)($kelas_stats['kelas_aktif'] ?? 0);
 
-$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa");
+$q_total_mhs = mysqli_query($koneksi, "
+    SELECT COUNT(*) as total 
+    FROM mahasiswa m 
+    LEFT JOIN users u ON m.user_id = u.id 
+    WHERE (u.role = 'Mahasiswa' OR (m.user_id IS NULL AND m.nama_lengkap NOT LIKE '%Administrator%'))
+      AND (u.role NOT IN ('Administrator Utama', 'Ketua Tingkat', 'Sekretaris', 'Bendahara') OR u.role IS NULL)
+");
 $total_mhs   = (int)(mysqli_fetch_assoc($q_total_mhs)['total'] ?? 0);
 
 $q_total_keti = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM users WHERE role = 'Ketua Tingkat'");
@@ -61,7 +67,13 @@ $q_kelas_list = mysqli_query($koneksi, "
         u.nama_lengkap as ketua_nama,
         u.foto as ketua_foto,
         u.linked_student_nim as ketua_nim,
-        (SELECT COUNT(*) FROM mahasiswa m2 LEFT JOIN users u2 ON m2.user_id = u2.id WHERE m2.kelas_id = k.id AND (u2.role = 'Mahasiswa' OR u2.role IS NULL)) as total_mahasiswa
+        (SELECT COUNT(*) 
+         FROM mahasiswa m2 
+         LEFT JOIN users u2 ON m2.user_id = u2.id 
+         WHERE m2.kelas_id = k.id 
+           AND (u2.role = 'Mahasiswa' OR (m2.user_id IS NULL AND m2.nama_lengkap NOT LIKE '%Administrator%'))
+           AND (u2.role NOT IN ('Administrator Utama', 'Ketua Tingkat', 'Sekretaris', 'Bendahara') OR u2.role IS NULL)
+        ) as total_mahasiswa
     FROM kelas k
     LEFT JOIN users u ON k.ketua_tingkat_user_id = u.id
     ORDER BY k.status_aktif ASC, k.id ASC
@@ -334,10 +346,10 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                         <!-- Aksi -->
                                         <td class="px-5 py-4 text-center">
                                             <div class="flex items-center justify-center gap-1.5">
-                                                <!-- Scope View: Meninjau Operasional Kelas Ini -->
-                                                <a href="views/manajemen_absen.php?filter_kelas=<?= $k['id'] ?>" title="Tinjau Data Kelas Ini" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/40 dark:hover:bg-indigo-600 text-indigo-600 hover:text-white dark:text-indigo-400 dark:hover:text-white border border-indigo-200 dark:border-indigo-900/50 transition-colors">
+                                                <!-- Tinjau Anggota Kelas Ini -->
+                                                <button type="button" onclick="openTinjauAnggotaModal(<?= $k['id'] ?>, '<?= htmlspecialchars(addslashes($k['nama_kelas'])) ?>')" title="Tinjau Anggota Kelas" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/40 dark:hover:bg-indigo-600 text-indigo-600 hover:text-white dark:text-indigo-400 dark:hover:text-white border border-indigo-200 dark:border-indigo-900/50 transition-colors cursor-pointer">
                                                     <i class="fas fa-eye text-xs"></i>
-                                                </a>
+                                                </button>
 
                                                 <!-- Edit Kelas Modal Trigger -->
                                                 <button type="button" onclick='openEditKelasModal(<?= json_encode($k) ?>)' title="Edit Kelas & Ketua" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 hover:bg-amber-600 dark:bg-amber-950/40 dark:hover:bg-amber-600 text-amber-600 hover:text-white dark:text-amber-400 dark:hover:text-white border border-amber-200 dark:border-amber-900/50 transition-colors cursor-pointer">
@@ -597,6 +609,84 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
         </div>
     </div>
 
+    <!-- ==========================================
+         MODAL 3: TINJAU DAFTAR ANGGOTA KELAS
+         ========================================== -->
+    <div id="modalTinjauAnggota" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col p-6">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                        <i class="fas fa-users text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Daftar Anggota Kelas</h3>
+                            <span id="modalTinjauNamaKelasBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">PTIK C 2024</span>
+                        </div>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Daftar mahasiswa resmi yang tercatat di kelas ini.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeTinjauAnggotaModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Modal Search Filter -->
+            <div class="mb-4 shrink-0">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 dark:text-slate-500 text-xs"></i>
+                    <input type="text" id="modalSearchAnggotaInput" oninput="filterAnggotaRows()" placeholder="Cari nama atau NIM anggota..." class="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white pl-9 pr-3.5 py-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                </div>
+            </div>
+
+            <!-- Modal Body (Scrollable List) -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-100 dark:border-slate-800 rounded-xl">
+                <div id="modalAnggotaLoading" class="py-12 flex flex-col items-center justify-center text-slate-400">
+                    <i class="fas fa-circle-notch fa-spin text-2xl text-indigo-600 mb-2"></i>
+                    <span class="text-xs font-medium">Memuat data anggota kelas...</span>
+                </div>
+
+                <div id="modalAnggotaEmpty" class="hidden py-12 flex flex-col items-center justify-center text-slate-400">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-2">
+                        <i class="fas fa-user-slash text-xl"></i>
+                    </div>
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Belum ada anggota</span>
+                    <span class="text-[11px] text-slate-400 mt-0.5">Kelas ini belum memiliki mahasiswa yang terdaftar.</span>
+                </div>
+
+                <table id="modalAnggotaTable" class="min-w-full divide-y divide-slate-200 dark:divide-slate-800 hidden">
+                    <thead class="bg-slate-50 dark:bg-slate-800/60 sticky top-0 z-10">
+                        <tr>
+                            <th class="px-3.5 py-2.5 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">No</th>
+                            <th class="px-3.5 py-2.5 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nama Mahasiswa</th>
+                            <th class="px-3.5 py-2.5 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">NIM</th>
+                            <th class="px-3.5 py-2.5 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Login</th>
+                            <th class="px-3.5 py-2.5 text-left text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">L/P</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalAnggotaTbody" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                <div class="text-xs text-slate-500 dark:text-slate-400">
+                    Total: <strong id="modalTotalAnggotaText" class="text-indigo-600 dark:text-indigo-400">0</strong> Mahasiswa
+                </div>
+                <div class="flex items-center gap-2">
+                    <a id="modalLinkDbMahasiswa" href="database/db_mahasiswa" class="px-3.5 py-2 rounded-xl text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-900/50 transition-colors inline-flex items-center gap-1.5">
+                        <i class="fas fa-external-link-alt text-[10px]"></i> Buka di Data Mahasiswa
+                    </a>
+                    <button type="button" onclick="closeTinjauAnggotaModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Back-office & Modal Management -->
     <?php include 'includes/script_db.php'; ?>
     <script>
@@ -633,6 +723,96 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
 
         function closeEditKelasModal() {
             document.getElementById('modalEditKelas').classList.add('hidden');
+        }
+
+        let currentAnggotaData = [];
+
+        function openTinjauAnggotaModal(kelasId, namaKelas) {
+            document.getElementById('modalTinjauNamaKelasBadge').textContent = namaKelas;
+            document.getElementById('modalSearchAnggotaInput').value = '';
+            document.getElementById('modalAnggotaLoading').classList.remove('hidden');
+            document.getElementById('modalAnggotaEmpty').classList.add('hidden');
+            document.getElementById('modalAnggotaTable').classList.add('hidden');
+            document.getElementById('modalLinkDbMahasiswa').href = 'database/db_mahasiswa?filter_kelas=' + kelasId;
+            document.getElementById('modalTinjauAnggota').classList.remove('hidden');
+
+            fetch('actions/get_anggota_kelas?kelas_id=' + kelasId, { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('modalAnggotaLoading').classList.add('hidden');
+                    if (data.success && data.anggota && data.anggota.length > 0) {
+                        currentAnggotaData = data.anggota;
+                        renderAnggotaList(currentAnggotaData);
+                        document.getElementById('modalAnggotaTable').classList.remove('hidden');
+                        document.getElementById('modalTotalAnggotaText').textContent = data.total;
+                    } else {
+                        currentAnggotaData = [];
+                        document.getElementById('modalAnggotaEmpty').classList.remove('hidden');
+                        document.getElementById('modalTotalAnggotaText').textContent = '0';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('modalAnggotaLoading').classList.add('hidden');
+                    document.getElementById('modalAnggotaEmpty').classList.remove('hidden');
+                });
+        }
+
+        function closeTinjauAnggotaModal() {
+            document.getElementById('modalTinjauAnggota').classList.add('hidden');
+        }
+
+        function renderAnggotaList(list) {
+            const tbody = document.getElementById('modalAnggotaTbody');
+            tbody.innerHTML = '';
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-xs text-slate-400">Tidak ada anggota yang cocok dengan pencarian.</td></tr>';
+                return;
+            }
+            list.forEach((m, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors';
+                const avatar = m.foto_url 
+                    ? `<img src="${m.foto_url}" class="w-7 h-7 rounded-full object-cover">`
+                    : `<div class="w-7 h-7 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-[10px]">${(m.nama_lengkap || 'MH').substring(0, 2).toUpperCase()}</div>`;
+                
+                tr.innerHTML = `
+                    <td class="px-3.5 py-2.5 text-slate-400 text-xs font-mono">${idx + 1}</td>
+                    <td class="px-3.5 py-2.5">
+                        <div class="flex items-center gap-2.5">
+                            ${avatar}
+                            <div>
+                                <div class="font-bold text-slate-800 dark:text-slate-100">${escapeHtml(m.nama_lengkap)}</div>
+                                ${m.nama_panggilan ? `<div class="text-[10px] text-slate-400">Panggilan: ${escapeHtml(m.nama_panggilan)}</div>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-3.5 py-2.5 font-mono text-slate-700 dark:text-slate-300 text-xs font-semibold">${escapeHtml(m.nim)}</td>
+                    <td class="px-3.5 py-2.5 text-slate-500 dark:text-slate-400 text-xs">${escapeHtml(m.email)}</td>
+                    <td class="px-3.5 py-2.5 text-slate-500 dark:text-slate-400 text-xs">${m.jenis_kelamin === 'Laki-laki' ? '<span class="text-blue-500 font-bold">L</span>' : (m.jenis_kelamin === 'Perempuan' ? '<span class="text-pink-500 font-bold">P</span>' : '-')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterAnggotaRows() {
+            const query = (document.getElementById('modalSearchAnggotaInput').value || '').toLowerCase();
+            const filtered = currentAnggotaData.filter(m => 
+                (m.nama_lengkap && m.nama_lengkap.toLowerCase().includes(query)) ||
+                (m.nim && m.nim.toLowerCase().includes(query)) ||
+                (m.email && m.email.toLowerCase().includes(query))
+            );
+            renderAnggotaList(filtered);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         // SweetAlert Flash Message Handling
