@@ -51,67 +51,36 @@ $data = mysqli_fetch_assoc($result);
 
 
 
-$query_krs = "
-SELECT 
-    mk.kode_matkul,
-    mk.nama_matkul,
-    mk.sks,
-    mk.semester
-FROM krs k
-JOIN mahasiswa m ON k.mahasiswa_id = m.id
-JOIN mata_kuliah mk ON k.matkul_id = mk.id
-WHERE m.user_id = ?
-";
-
-
-$stmt_krs = mysqli_prepare($koneksi, $query_krs);
-mysqli_stmt_bind_param($stmt_krs, "i", $user_id);
-mysqli_stmt_execute($stmt_krs);
-$result_krs = mysqli_stmt_get_result($stmt_krs);
-
 /* =====================
-   AMBIL PERIODE AKTIF
+   PROGRES KAS & KEHADIRAN (KHUSUS ROLE MAHASISWA)
    ===================== */
-$q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
-$periode = mysqli_fetch_assoc($q_periode);
-$periode_id = $periode['id'] ?? 0;
+$count_kas = 0;
+$res_att_matkul = null;
 
-/* =====================
-   HITUNG PROGRES & MISI
-   ===================== */
+if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
+    // Ambil Periode Aktif
+    $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
+    $periode = mysqli_fetch_assoc($q_periode);
+    $periode_id = $periode['id'] ?? 0;
 
-// 1. Kas
-$res_kas = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kas WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Lunas' AND periode_id = '$periode_id'");
-$count_kas = mysqli_fetch_assoc($res_kas)['total'] ?? 0;
+    // 1. Kas
+    $res_kas = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kas WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Lunas' AND periode_id = '$periode_id'");
+    $count_kas = mysqli_fetch_assoc($res_kas)['total'] ?? 0;
 
-
-// 3. Absensi
-$res_absensi_total = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM absensi WHERE mahasiswa_id = '$mahasiswa_id' AND status = 'Hadir' AND periode_id = '$periode_id'");
-$count_absensi = mysqli_fetch_assoc($res_absensi_total)['total'] ?? 0;
-
-// 4. Profil & Lainnya
-$profil_lengkap = (!empty($data['foto']) && $data['foto'] !== 'Yaya.png' && !empty($data['instagram']) && !empty($data['bio'])) ? 1 : 0;
-$res_krs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM krs WHERE mahasiswa_id = '$mahasiswa_id' AND periode_id = '$periode_id'");
-$count_krs = mysqli_fetch_assoc($res_krs_count)['total'] ?? 0;
-
-$q_nim = mysqli_query($koneksi, "SELECT nim FROM mahasiswa WHERE id = '$mahasiswa_id'");
-$nim_mhs = mysqli_fetch_assoc($q_nim)['nim'] ?? '';
-$res_kelompok = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM kelompok WHERE FIND_IN_SET('$nim_mhs', REPLACE(anggota, ' ', '')) OR anggota LIKE '%$nim_mhs%'");
-$count_kelompok = mysqli_fetch_assoc($res_kelompok)['total'] ?? 0;
-
-// --- Attendance per Matkul Progress ---
-$q_att_matkul = "
-    SELECT 
-        mk.nama_matkul,
-        COUNT(a.id) as hadir_count
-    FROM krs k
-    JOIN mata_kuliah mk ON k.matkul_id = mk.id
-    LEFT JOIN absensi a ON (a.mahasiswa_id = k.mahasiswa_id AND a.matkul_id = k.matkul_id AND a.status = 'Hadir' AND a.periode_id = k.periode_id)
-    WHERE k.mahasiswa_id = '$mahasiswa_id' AND k.periode_id = '$periode_id'
-    GROUP BY mk.id
-    ORDER BY mk.nama_matkul ASC
-";
-$res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
+    // 2. Attendance per Matkul Progress
+    $q_att_matkul = "
+        SELECT 
+            mk.nama_matkul,
+            COUNT(a.id) as hadir_count
+        FROM krs k
+        JOIN mata_kuliah mk ON k.matkul_id = mk.id
+        LEFT JOIN absensi a ON (a.mahasiswa_id = k.mahasiswa_id AND a.matkul_id = k.matkul_id AND a.status = 'Hadir' AND a.periode_id = k.periode_id)
+        WHERE k.mahasiswa_id = '$mahasiswa_id' AND k.periode_id = '$periode_id'
+        GROUP BY mk.id
+        ORDER BY mk.nama_matkul ASC
+    ";
+    $res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
+}
 
 
 ?>
@@ -140,7 +109,7 @@ $res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
 <body class="bg-slate-100 dark:bg-slate-950 transition-colors duration-300">
     <?php include '../includes/menu_db.php'; ?>
 
-    <main class="ml-0 md:ml-48 pt-20 p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-24 px-4 md:px-6 pb-6 flex flex-col min-h-screen">
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">User Profile</h1>
@@ -231,11 +200,10 @@ $res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
                         </div>
                     </div>
 
-                    <!-- Achievements & Progress Section -->
+                    <?php if ($role === 'Mahasiswa'): ?>
+                    <!-- Achievements & Progress Section (Khusus Mahasiswa) -->
                     <div class="mt-12 space-y-8">
                         
-
-                       
                             <!-- KAS Progress -->
                             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                 <div class="flex justify-between items-center mb-4">
@@ -258,29 +226,31 @@ $res_att_matkul = mysqli_query($koneksi, $q_att_matkul);
                                     Kehadiran Kuliah
                                 </h3>
                                 <div class="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                                    <?php while ($row = mysqli_fetch_assoc($res_att_matkul)):
-                                        $att_percent = min(100, ($row['hadir_count'] / 16) * 100);
-                                    ?>
-                                        <div>
-                                            <div class="flex justify-between text-[10px] font-bold mb-1">
-                                                <span class="text-slate-600 dark:text-slate-400 truncate"><?= htmlspecialchars($row['nama_matkul']) ?></span>
-                                                <span class="text-blue-600 dark:text-blue-400"><?= $row['hadir_count'] ?>/16</span>
+                                    <?php if ($res_att_matkul && mysqli_num_rows($res_att_matkul) > 0): ?>
+                                        <?php while ($row = mysqli_fetch_assoc($res_att_matkul)):
+                                            $att_percent = min(100, ($row['hadir_count'] / 16) * 100);
+                                        ?>
+                                            <div>
+                                                <div class="flex justify-between text-[10px] font-bold mb-1">
+                                                    <span class="text-slate-600 dark:text-slate-400 truncate"><?= htmlspecialchars($row['nama_matkul']) ?></span>
+                                                    <span class="text-blue-600 dark:text-blue-400"><?= $row['hadir_count'] ?>/16</span>
+                                                </div>
+                                                <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-blue-500 transition-all duration-1000" style="width: <?= $att_percent ?>%"></div>
+                                                </div>
                                             </div>
-                                            <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                                                <div class="h-full bg-blue-500 transition-all duration-1000" style="width: <?= $att_percent ?>%"></div>
-                                            </div>
-                                        </div>
-                                    <?php endwhile; ?>
+                                        <?php endwhile; ?>
+                                    <?php else: ?>
+                                        <p class="text-xs text-slate-400 dark:text-slate-500 italic py-2">Belum ada data kehadiran per mata kuliah.</p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
-
-                            
-                        
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
-                <?php include '../includes/footer_db.php'; ?>
+        <?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
