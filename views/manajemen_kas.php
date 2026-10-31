@@ -83,7 +83,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel_mingguan' && isset($_GE
         FROM mahasiswa m 
         LEFT JOIN users u ON m.user_id = u.id
         LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_exp
-        WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_exp $where_exp 
+        WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " $where_mhs_exp $where_exp 
         ORDER BY m.nim ASC
     ");
 
@@ -188,7 +188,8 @@ $saldo = $total_masuk - $total_keluar;
 // Progress Calculation
 $where_mhs_only = getKelasWhereClause('m', false);
 $where_mhs_sql = $where_mhs_only ? "AND $where_mhs_only" : "";
-$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_sql");
+$mhs_pure = getMahasiswaPureWhereClause('m', 'u', false);
+$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE $mhs_pure $where_mhs_sql");
 $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
 
 $q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id' $where_kas");
@@ -252,7 +253,7 @@ $mhs_status = mysqli_query($koneksi, "
     FROM mahasiswa m 
     LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$f_minggu' AND k.periode_id = '$periode_id' $where_k_scope
-    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_scope $where_mhs 
+    WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " $where_mhs_scope $where_mhs 
     ORDER BY m.nim ASC
 ");
 

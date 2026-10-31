@@ -116,7 +116,7 @@ $query_mhs = "
     JOIN krs_temp kt ON m.id = kt.mahasiswa_id
     JOIN mata_kuliah mk ON kt.matkul_id = mk.id
     LEFT JOIN krs_validasi kv ON (m.id = kv.mahasiswa_id AND kv.periode_id = $periode_id)
-    WHERE kt.periode_id = $periode_id AND (u.role = 'Mahasiswa' OR u.role IS NULL) " . getKelasWhereClause('m', true) . "
+    WHERE kt.periode_id = $periode_id " . getMahasiswaPureWhereClause('m', 'u', true) . " " . getKelasWhereClause('m', true) . "
     GROUP BY m.id
     ORDER BY m.nim ASC
 ";

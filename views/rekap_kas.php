@@ -29,7 +29,8 @@ $periode_id = $periode['id'];
 // Stats Calculation
 $where_mhs_only = getKelasWhereClause('m', false);
 $where_mhs_sql = $where_mhs_only ? "AND $where_mhs_only" : "";
-$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_sql");
+$mhs_pure = getMahasiswaPureWhereClause('m', 'u', false);
+$q_total_mhs = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE $mhs_pure $where_mhs_sql");
 $total_students = mysqli_fetch_assoc($q_total_mhs)['total'] ?? 0;
 
 $where_kas = getKelasWhereClause('', true);
@@ -54,7 +55,7 @@ $q_students = "
     SELECT m.id, m.nim, m.nama_lengkap, m.foto 
     FROM mahasiswa m 
     LEFT JOIN users u ON m.user_id = u.id
-    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL)
+    WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . "
     $where_mhs_sql
     ORDER BY m.nim ASC
 ";

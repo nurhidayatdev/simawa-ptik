@@ -173,3 +173,22 @@ if (!function_exists('getNamaKelasAktif')) {
         return $_SESSION['nama_kelas'] ?? 'PTIK C 2024';
     }
 }
+
+/**
+ * Klausa WHERE SQL untuk memfilter data mahasiswa murni
+ * (mengecualikan role fungsional Admin, Keti, Sekre, Bendahara, dan legacy dummy admin).
+ *
+ * @param string $tableAlias Alias tabel mahasiswa (misal: 'm')
+ * @param string $userAlias Alias tabel users (misal: 'u')
+ * @param bool $prefixWithAnd Apakah diawali dengan ' AND '
+ * @return string
+ */
+if (!function_exists('getMahasiswaPureWhereClause')) {
+    function getMahasiswaPureWhereClause($tableAlias = 'm', $userAlias = 'u', $prefixWithAnd = true)
+    {
+        $m = !empty($tableAlias) ? "$tableAlias." : "";
+        $u = !empty($userAlias) ? "$userAlias." : "";
+        $clause = "(({$u}role = 'Mahasiswa' OR ({$m}user_id IS NULL AND {$m}nama_lengkap NOT LIKE '%Administrator%')) AND ({$u}role NOT IN ('Administrator Utama', 'Ketua Tingkat', 'Sekretaris', 'Bendahara') OR {$u}role IS NULL))";
+        return $prefixWithAnd ? " AND $clause" : $clause;
+    }
+}

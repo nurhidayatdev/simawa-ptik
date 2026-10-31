@@ -44,7 +44,8 @@ unset($_SESSION['success'], $_SESSION['error']);
    ========================================================= */
 
 // Total Mahasiswa Kelas
-$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE m.kelas_id = '$kelas_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)");
+$mhs_pure_clause = getMahasiswaPureWhereClause('m', 'u', true);
+$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE m.kelas_id = '$kelas_id' $mhs_pure_clause");
 $total_mhs = (int)(mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0);
 
 // Total Pengurus Kelas (Sekretaris, Bendahara)
@@ -123,7 +124,7 @@ $q_mhs = mysqli_query($koneksi, "
         u.role
     FROM mahasiswa m
     LEFT JOIN users u ON m.user_id = u.id
-    WHERE m.kelas_id = '$kelas_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)
+    WHERE m.kelas_id = '$kelas_id' $mhs_pure_clause
     ORDER BY m.nim ASC
 ");
 $mhs_list = [];

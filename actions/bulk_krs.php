@@ -229,7 +229,7 @@ $q_mhs = "
     FROM mahasiswa m
     LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN krs_validasi kv ON (m.id = kv.mahasiswa_id AND kv.periode_id = $periode_id)
-    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) " . getKelasWhereClause('m', true) . " $filter_where
+    WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " " . getKelasWhereClause('m', true) . " $filter_where
     ORDER BY m.nim ASC
 ";
 $res_mhs = mysqli_query($koneksi, $q_mhs);
@@ -257,7 +257,7 @@ $q_summary = "
     FROM mahasiswa m
     LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN krs_validasi kv ON (m.id = kv.mahasiswa_id AND kv.periode_id = $periode_id)
-    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_sum_sql
+    WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " $where_sum_sql
 ";
 $res_summary = mysqli_query($koneksi, $q_summary);
 $summary     = mysqli_fetch_assoc($res_summary);

@@ -179,7 +179,7 @@ $q_top_absent = mysqli_query($koneksi, "
         FROM mahasiswa m
         LEFT JOIN users u ON m.user_id = u.id
         JOIN absensi a ON m.id = a.mahasiswa_id
-        WHERE m.kelas_id = '$kelas_id' AND a.periode_id = '$periode_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)
+        WHERE m.kelas_id = '$kelas_id' AND a.periode_id = '$periode_id' " . getMahasiswaPureWhereClause('m', 'u', true) . "
         GROUP BY m.id
     ) sub
     WHERE (sub.alpha > 0 OR (sub.izin + sub.sakit) >= 1)

@@ -54,7 +54,7 @@ JOIN mahasiswa m ON k.mahasiswa_id = m.id
 LEFT JOIN users u ON m.user_id = u.id
 JOIN mata_kuliah mk ON k.matkul_id = mk.id
 WHERE k.periode_id = $periode_id
-AND (u.role = 'Mahasiswa' OR u.role IS NULL)
+" . getMahasiswaPureWhereClause('m', 'u', true) . "
 $where_mhs_matkul
 ORDER BY mk.nama_matkul ASC
 ";
@@ -294,7 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $where_a_tbl
         WHERE k.matkul_id = ?
         AND k.periode_id = ?
-        AND (u.role = 'Mahasiswa' OR u.role IS NULL)
+        " . getMahasiswaPureWhereClause('m', 'u', true) . "
         $where_mhs_tbl
         $where_clause
         ORDER BY m.nim ASC

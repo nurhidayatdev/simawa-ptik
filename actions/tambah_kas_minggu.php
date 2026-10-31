@@ -101,7 +101,7 @@ if (isset($_POST['simpan_kas'])) {
         FROM mahasiswa m
         LEFT JOIN users u ON m.user_id = u.id
         LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_rep
-        WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_rep
+        WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " $where_mhs_rep
         ORDER BY m.nama_panggilan ASC
     ");
 
@@ -255,7 +255,7 @@ if (isset($_POST['simpan_kas'])) {
     FROM mahasiswa m
     LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_tbl
-    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_combined
+    WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " $where_combined
     ORDER BY m.nim ASC
     ");
                                 while ($row = mysqli_fetch_assoc($mhs)) : ?>
