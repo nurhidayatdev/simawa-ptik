@@ -205,7 +205,7 @@ simawa-ptik/
 | Peran Sistem | Nilai di `$_SESSION['role']` | Hak Akses & Cakupan Operasional |
 | :--- | :--- | :--- |
 | **Administrator Utama** | `'Administrator Utama'` | Hak akses penuh (*superadmin*): semua menu CRUD di folder `database/`, konfigurasi sistem, dan toggle maintenance. |
-| **Ketua Tingkat** | `'Ketua Tingkat'` | Akses manajerial perkuliahan: absensi, kas, pembagian kelompok, jadwal piket, dan manajemen tugas. |
+| **Ketua Tingkat** | `'Ketua Tingkat'` | Akses manajerial perkuliahan: monitoring absensi & kas, validasi & bulk KRS mahasiswa, broadcast notifikasi/reminder WhatsApp, pembagian kelompok, dan jadwal piket proyektor. |
 | **Sekretaris** | `'Sekretaris'` | Dedicated Presensi & Tugas Dashboard (`dashboard_sekretaris.php`), administrasi presensi (`views/manajemen_absen.php`, `views/rekap_absen.php`), serta manajemen tugas perkuliahan & reminder WhatsApp (`database/db_tugas`). |
 | **Bendahara** | `'Bendahara'` | Dedicated Kas Dashboard (`dashboard_bendahara.php`), input kas, rekapitulasi saldo, dan penagihan iuran kelas (`views/manajemen_kas.php`, `views/rekap_kas.php`). |
 | **Mahasiswa** | `'Mahasiswa'` | Dedicated Student Dashboard (`dashboard_mahasiswa.php`), memantau jadwal, tugas pribadi, histori kas sendiri, KSM, dan kelompok. |

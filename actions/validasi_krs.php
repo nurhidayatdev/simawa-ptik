@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $role = $_SESSION['role'];
-if ($role !== 'Administrator Utama') {
+if ($role !== 'Ketua Tingkat' && $role !== 'Administrator Utama') {
     include '../includes/alert_role.php';
     exit();
 }
