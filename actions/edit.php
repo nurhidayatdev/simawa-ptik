@@ -20,6 +20,12 @@ if ($tabel === 'jadwal_matkul' && !in_array($role, ['Administrator Utama', 'Ketu
     exit;
 }
 
+if ($tabel === 'mahasiswa' && !in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+    $_SESSION['error'] = "Akses ditolak! Pengelolaan data mahasiswa hanya wewenang Administrator Utama dan Ketua Tingkat.";
+    header("Location: ../database/db_mahasiswa");
+    exit;
+}
+
 // Handle jam_kuliah yang menggunakan jam_ke sebagai primary key
 if ($tabel === 'jam_kuliah') {
     $jam_ke = $_GET['jam_ke'] ?? '';
@@ -51,13 +57,20 @@ if (isset($_POST['update'])) {
     switch ($tabel) {
 
         case 'mahasiswa':
+            $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap'] ?? ''));
+            $nama_panggilan = mysqli_real_escape_string($koneksi, trim($_POST['nama_panggilan'] ?? ''));
+            $nim = mysqli_real_escape_string($koneksi, trim($_POST['nim'] ?? ''));
+            $bio = mysqli_real_escape_string($koneksi, trim($_POST['bio'] ?? ''));
+            $jenis_kelamin = mysqli_real_escape_string($koneksi, trim($_POST['jenis_kelamin'] ?? ''));
+            $instagram = mysqli_real_escape_string($koneksi, trim($_POST['instagram'] ?? ''));
+
             mysqli_query($koneksi, "UPDATE mahasiswa SET 
-                    nama_lengkap='{$_POST['nama_lengkap']}',
-                    nama_panggilan='{$_POST['nama_panggilan']}',
-                    nim='{$_POST['nim']}',
-                    bio='{$_POST['bio']}',
-                    jenis_kelamin='{$_POST['jenis_kelamin']}',
-                    instagram='{$_POST['instagram']}'
+                    nama_lengkap='$nama_lengkap',
+                    nama_panggilan='$nama_panggilan',
+                    nim='$nim',
+                    bio='$bio',
+                    jenis_kelamin='$jenis_kelamin',
+                    instagram='$instagram'
                     WHERE id='$id'");
             $redirect = "../database/db_mahasiswa";
             break;
@@ -282,44 +295,15 @@ if (isset($_POST['update'])) {
                                 <input name="bio" value="<?= $data['bio']; ?>"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
-                            <div class="md:col-span-2 space-y-4">
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto</label>
-                                <input type="file" id="foto-input" name="foto_file" accept="image/*" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                <input type="hidden" name="foto_data" id="foto_data">
-                                <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto']); ?>">
-                                <br>
-                                <div class="flex items-center space-x-4">
-                                    <img id="current-preview" src="../storage/profile/<?php echo htmlspecialchars($data['foto']); ?>" class="img-fluid rounded border dark:border-slate-700" style="width:120px; height:120px; object-fit:cover;" />
-                                    <div>
-                                        <button type="button" id="open-cropper" class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded text-xs hidden transition-colors">Buka Cropper</button>
-                                    </div>
+                            <div class="md:col-span-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 flex items-center gap-4">
+                                <div class="w-14 h-14 rounded-full overflow-hidden shadow-sm shrink-0">
+                                    <img src="<?= profilePhotoUrl($data['nama_lengkap'], '../'); ?>" class="w-full h-full object-cover" alt="Avatar Inisial" />
                                 </div>
-
-                                <!-- Cropper modal-ish area -->
-                                <div id="cropper-area" class="mt-4 hidden">
-                                    <div class="grid sm:grid-cols-2 gap-4 space-x-4">
-                                        <div class="w-full flex align-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700">
-                                            <img id="crop-image" style="max-width:100%; display:block;" />
-                                        </div>
-                                        <div class="space-y-2">
-                                            <div class="border dark:border-slate-700 p-2 rounded bg-white dark:bg-slate-800" style="width:160px; height:160px; overflow:hidden;">
-                                                <div class="preview-wrapper" style="width:100%; height:100%;">
-                                                    <img id="preview" style="width:100%; height:100%; object-fit:cover; display:block;" />
-                                                </div>
-                                            </div>
-                                            <div class="flex space-x-2">
-                                                <button type="button" id="zoom-in" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded transition-colors">+</button>
-                                                <button type="button" id="zoom-out" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded transition-colors">-</button>
-                                                <button type="button" id="rotate-left" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded transition-colors">⟲</button>
-                                                <button type="button" id="rotate-right" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded transition-colors">⟳</button>
-                                            </div>
-                                            <div>
-                                                <button type="button" id="apply-crop" class="mt-2 px-3 py-1 bg-indigo-700 text-white rounded text-sm transition-all shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-600">Gunakan Foto</button>
-                                                <button type="button" id="cancel-crop" class="mt-2 ml-2 px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded text-sm transition-colors">Batal</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-slate-100">Avatar Profil Otomatis</h4>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Avatar dibuat otomatis berdasarkan inisial nama lengkap (SVG modern).</p>
                                 </div>
+                            </div>
                             </div>
                         </div>
 

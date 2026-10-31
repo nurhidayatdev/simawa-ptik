@@ -19,18 +19,28 @@ if ($tabel === 'jadwal_matkul' && !in_array($role, ['Administrator Utama', 'Ketu
     exit;
 }
 
+if ($tabel === 'mahasiswa' && !in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+    $_SESSION['error'] = "Akses ditolak! Pengelolaan data mahasiswa hanya wewenang Administrator Utama dan Ketua Tingkat.";
+    header("Location: ../database/db_mahasiswa");
+    exit;
+}
+
 if (isset($_POST['tambah'])) {
     $redirect = "";
     switch ($tabel) {
         case 'mahasiswa':
-            $nama_lengkap = $_POST['nama_lengkap'];
-            $nama_panggilan = $_POST['nama_panggilan'];
-            $email = $_POST['email'];
-            $nim = $_POST['nim'];
-            $bio = $_POST['bio'];
-            $jenis_kelamin = $_POST['jenis_kelamin'];
-            $instagram = $_POST['instagram'];
-            $target_kelas_id = getKelasScope() ?? 1;
+            $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap'] ?? ''));
+            $nama_panggilan = mysqli_real_escape_string($koneksi, trim($_POST['nama_panggilan'] ?? ''));
+            $email = mysqli_real_escape_string($koneksi, trim($_POST['email'] ?? ''));
+            $nim = mysqli_real_escape_string($koneksi, trim($_POST['nim'] ?? ''));
+            $bio = mysqli_real_escape_string($koneksi, trim($_POST['bio'] ?? ''));
+            $jenis_kelamin = mysqli_real_escape_string($koneksi, trim($_POST['jenis_kelamin'] ?? ''));
+            $instagram = mysqli_real_escape_string($koneksi, trim($_POST['instagram'] ?? ''));
+            if ($role === 'Administrator Utama' && !empty($_POST['kelas_id'])) {
+                $target_kelas_id = (int)$_POST['kelas_id'];
+            } else {
+                $target_kelas_id = getKelasScope() ?? 1;
+            }
             mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, kelas_id)
                 VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram', '$target_kelas_id')");
             $redirect = "../database/db_mahasiswa";

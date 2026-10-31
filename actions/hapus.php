@@ -12,6 +12,14 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'jadwal_matkul') {
     }
 }
 
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'mahasiswa') {
+    $user_role = $_SESSION['role'] ?? '';
+    if (!in_array($user_role, ['Administrator Utama', 'Ketua Tingkat'])) {
+        echo "<script>alert('Akses ditolak! Pengelolaan data mahasiswa hanya wewenang Administrator Utama dan Ketua Tingkat.'); window.location.href='../database/db_mahasiswa';</script>";
+        exit();
+    }
+}
+
 // Handle jam_kuliah dengan jam_ke sebagai identifier
 if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam_ke']) && !isset($_GET['confirm'])) {
     $tabel = 'jam_kuliah';
@@ -373,6 +381,13 @@ if (isset($_GET['tabel']) && isset($_GET['id']) && isset($_GET['confirm'])) {
                 requireKelasAccess($r_chk['kelas_id']);
             }
         }
+    }
+
+    if ($tabel === 'mahasiswa') {
+        // Hapus absensi dan krs terkait agar terhindar dari constraint foreign key RESTRICT
+        mysqli_query($koneksi, "DELETE FROM absensi WHERE mahasiswa_id = $id");
+        mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $id");
+        mysqli_query($koneksi, "UPDATE users SET linked_student_nim = NULL WHERE linked_student_nim = (SELECT nim FROM mahasiswa WHERE id = $id)");
     }
 
     $hapus = mysqli_query($koneksi, "DELETE FROM $tabel WHERE id='$id'");

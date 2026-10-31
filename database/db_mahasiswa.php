@@ -74,7 +74,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
         echo '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['bio']) . '</td>';
-        if ($role === 'Administrator Utama'):
+        if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">';
             echo '<a href="../actions/edit.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3 transition-colors"></i></a>';
             echo '<a href="../actions/hapus.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Hapus"><i class="fa fa-trash text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"></i></a>';
@@ -127,7 +127,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
                                 <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
                             </div>
-                            <?php if ($role === 'Administrator Utama'): ?>
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <a href="../actions/tambah.php?tabel=mahasiswa" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
                                     <i class="fa fa-plus text-xs"></i>
                                 </a>
@@ -150,7 +150,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Gender</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Instagram</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Bio</th>
-                            <?php if ($role === 'Administrator Utama'): ?>
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -189,7 +189,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <?php endif; ?>
                                 </td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed"><?= $row['bio']; ?></td>
-                                <?php if ($role === 'Administrator Utama'): ?>
+                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <a href="../actions/edit.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors">

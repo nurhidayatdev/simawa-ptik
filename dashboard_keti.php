@@ -498,7 +498,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                         <th class="px-4 py-3">Nama Mahasiswa</th>
                                         <th class="px-4 py-3">NIM</th>
                                         <th class="px-4 py-3 text-center">Status Akun</th>
-                                        <th class="px-4 py-3 text-center w-28">Aksi</th>
+                                        <th class="px-4 py-3 text-center w-36">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
@@ -538,13 +538,19 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="px-4 py-2.5 text-center">
-                                                    <?php if (!$has_account): ?>
-                                                        <button type="button" onclick="openBuatAkunMhsModal(<?= (int)$m['id'] ?>, <?= json_encode($m['nama_lengkap']) ?>, <?= json_encode($m['nim']) ?>)" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/40 text-indigo-600 hover:text-white rounded-lg border border-indigo-200 dark:border-indigo-900/50 text-[10px] font-bold transition-colors cursor-pointer">
-                                                            <i class="fas fa-plus mr-0.5"></i> Akun
-                                                        </button>
-                                                    <?php else: ?>
-                                                        <span class="text-[10px] text-slate-400 italic">Siap</span>
-                                                    <?php endif; ?>
+                                                    <div class="flex items-center justify-center gap-1.5">
+                                                        <?php if (!$has_account): ?>
+                                                            <button type="button" onclick="openBuatAkunMhsModal(<?= (int)$m['id'] ?>, <?= json_encode($m['nama_lengkap']) ?>, <?= json_encode($m['nim']) ?>)" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/40 text-indigo-600 hover:text-white rounded-lg border border-indigo-200 dark:border-indigo-900/50 text-[10px] font-bold transition-colors cursor-pointer" title="Buat Akun Login">
+                                                                <i class="fas fa-plus mr-0.5"></i> Akun
+                                                            </button>
+                                                        <?php endif; ?>
+                                                        <a href="actions/edit.php?tabel=mahasiswa&id=<?= $m['id'] ?>" class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-200 dark:border-blue-900/50 flex items-center justify-center text-xs transition-colors" title="Edit Data Mahasiswa">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="actions/hapus.php?tabel=mahasiswa&id=<?= $m['id'] ?>" class="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-900/50 flex items-center justify-center text-xs transition-colors" title="Hapus Data Mahasiswa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
