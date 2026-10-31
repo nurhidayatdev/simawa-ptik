@@ -131,9 +131,24 @@ $foto         = $_SESSION['foto'] ?? '';
                         <span class="text-xs font-semibold">Dashboard</span>
                     </a>
 
+                    <!-- Section: Kontrol Kelas & Sistem (Penciri Utama Administrator) -->
+                    <div class="space-y-1">
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Manajemen Kelas & Sistem</p>
+                        
+                        <a href="<?= $base ?>database/db_users" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-user-shield w-4 h-4 mr-4 text-amber-500 dark:text-amber-400"></i>
+                            <span class="text-xs font-medium">Kelola Ketua Tingkat</span>
+                        </a>
+
+                        <a href="<?= $base ?>database/db_settings" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-sliders-h w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Pengaturan Sistem</span>
+                        </a>
+                    </div>
+
                     <!-- Section: Master Data Global -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Master Global</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Master Akademik</p>
                         
                         <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <div class="flex items-center">
@@ -155,22 +170,6 @@ $foto         = $_SESSION['foto'] ?? '';
                             <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Berita & Info</span>
                         </a>
-                    </div>
-
-                    <!-- Section: Sistem & Akun -->
-                    <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Sistem & Pengguna</p>
-                        
-                        <a href="<?= $base ?>database/db_settings" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-sliders-h w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Pengaturan Sistem</span>
-                        </a>
-
-                        <a href="<?= $base ?>database/db_users" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-user-shield w-4 h-4 mr-4 text-amber-500 dark:text-amber-400"></i>
-                            <span class="text-xs font-medium">Kelola Ketua Tingkat</span>
-                        </a>
-
                     </div>
 
                     <!-- Section: Akun Pribadi -->
@@ -199,9 +198,9 @@ $foto         = $_SESSION['foto'] ?? '';
                         <span class="text-xs font-semibold">Dashboard</span>
                     </a>
 
-                    <!-- Section: Kelas Saya -->
+                    <!-- Section: Operasional & Manajemen Kelas (Penciri Utama Ketua Tingkat) -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Kelas Saya</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Manajemen Kelas</p>
                         
                         <a href="<?= $base ?>database/db_mahasiswa" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user-graduate w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
@@ -213,40 +212,25 @@ $foto         = $_SESSION['foto'] ?? '';
                             <span class="text-xs font-medium">Jadwal Kuliah</span>
                         </a>
 
-                        <a href="<?= $base ?>database/db_berita" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Berita & Info</span>
-                        </a>
-                    </div>
-
-                    <!-- Section: Aktivitas Kelas -->
-                    <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Aktivitas Kelas</p>
-                        
-                        <a href="<?= $base ?>database/db_tugas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Tugas Kuliah</span>
-                        </a>
-
-                        <a href="<?= $base ?>views/kelompok" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-users w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kelompok</span>
-                        </a>
-
                         <a href="<?= $base ?>views/piket_proyektor" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-plug w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Piket Proyektor</span>
                         </a>
 
-                        <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-calendar w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kalender</span>
+                        <a href="<?= $base ?>views/kelompok" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-users w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kelompok Kelas</span>
+                        </a>
+
+                        <a href="<?= $base ?>database/db_tugas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Tugas Kuliah</span>
                         </a>
                     </div>
 
-                    <!-- Section: Monitoring Kelas -->
+                    <!-- Section: Monitoring & Rekapitulasi -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Monitoring</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Monitoring & Rekap</p>
                         
                         <a href="<?= $base ?>views/rekap_absen" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-clipboard-list w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
@@ -272,7 +256,22 @@ $foto         = $_SESSION['foto'] ?? '';
 
                         <a href="<?= $base ?>views/reminder" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-bell w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Notifikasi</span>
+                            <span class="text-xs font-medium">Pengingat & Notifikasi</span>
+                        </a>
+                    </div>
+
+                    <!-- Section: Informasi & Agenda -->
+                    <div class="space-y-1">
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi & Agenda</p>
+                        
+                        <a href="<?= $base ?>database/db_berita" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Berita & Info</span>
+                        </a>
+
+                        <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-calendar-alt w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kalender Perkuliahan</span>
                         </a>
                     </div>
 
@@ -302,18 +301,18 @@ $foto         = $_SESSION['foto'] ?? '';
                         <span class="text-xs font-semibold">Dashboard</span>
                     </a>
 
-                    <!-- Section: Administrasi Absensi -->
+                    <!-- Section: Presensi Perkuliahan (Penciri Utama Sekretaris) -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Administrasi Absensi</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Presensi & Kehadiran</p>
                         
                         <a href="<?= $base ?>actions/tambah_absensi" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-calendar-check w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <i class="fa fa-calendar-check w-4 h-4 mr-4 text-emerald-600 dark:text-emerald-400"></i>
                             <span class="text-xs font-medium">Input Absensi</span>
                         </a>
 
                         <a href="<?= $base ?>views/manajemen_absen" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-table-list w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Data Absen</span>
+                            <span class="text-xs font-medium">Data Absensi</span>
                         </a>
 
                         <a href="<?= $base ?>views/rekap_absen" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
@@ -324,17 +323,17 @@ $foto         = $_SESSION['foto'] ?? '';
 
                     <!-- Section: Manajemen Tugas -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Manajemen Tugas</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Tugas Perkuliahan</p>
                         
                         <a href="<?= $base ?>database/db_tugas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Tugas Kuliah</span>
+                            <span class="text-xs font-medium">Kelola Tugas</span>
                         </a>
                     </div>
 
-                    <!-- Section: Informasi Kelas -->
+                    <!-- Section: Informasi & Agenda -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi Kelas</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi & Agenda</p>
                         
                         <a href="<?= $base ?>database/db_mahasiswa" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user-graduate w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
@@ -346,14 +345,14 @@ $foto         = $_SESSION['foto'] ?? '';
                             <span class="text-xs font-medium">Jadwal Kuliah</span>
                         </a>
 
+                        <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-calendar-alt w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kalender Perkuliahan</span>
+                        </a>
+
                         <a href="<?= $base ?>database/db_berita" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Berita & Info</span>
-                        </a>
-
-                        <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-calendar w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kalender</span>
                         </a>
                     </div>
 
@@ -383,13 +382,13 @@ $foto         = $_SESSION['foto'] ?? '';
                         <span class="text-xs font-semibold">Dashboard</span>
                     </a>
 
-                    <!-- Section: Keuangan Kas Kelas -->
+                    <!-- Section: Keuangan Kas Kelas (Penciri Utama Bendahara) -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Kas & Keuangan</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Keuangan & Kas Kelas</p>
                         
                         <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <div class="flex items-center">
-                                <i class="fa fa-hand-holding-dollar w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                                <i class="fa fa-hand-holding-dollar w-4 h-4 mr-4 text-emerald-600 dark:text-emerald-400"></i>
                                 <span class="text-xs font-medium">Input Kas</span>
                             </div>
                             <i class="fa fa-chevron-down submenu-arrow w-3 h-3 transition-transform duration-200"></i>
@@ -406,13 +405,13 @@ $foto         = $_SESSION['foto'] ?? '';
 
                         <a href="<?= $base ?>views/rekap_kas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-chart-pie w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Rekap Kas</span>
+                            <span class="text-xs font-medium">Rekap Kas Kelas</span>
                         </a>
                     </div>
 
-                    <!-- Section: Informasi Kelas -->
+                    <!-- Section: Informasi & Agenda -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi Kelas</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi & Agenda</p>
                         
                         <a href="<?= $base ?>database/db_mahasiswa" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user-graduate w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
@@ -425,8 +424,13 @@ $foto         = $_SESSION['foto'] ?? '';
                         </a>
 
                         <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-calendar w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kalender</span>
+                            <i class="fa fa-calendar-alt w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kalender Perkuliahan</span>
+                        </a>
+
+                        <a href="<?= $base ?>database/db_berita" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Berita & Info</span>
                         </a>
                     </div>
 
@@ -456,9 +460,9 @@ $foto         = $_SESSION['foto'] ?? '';
                         <span class="text-xs font-semibold">Dashboard</span>
                     </a>
 
-                    <!-- Section: Perkuliahan Saya -->
+                    <!-- Section: Perkuliahan & Aktivitas (Penciri Utama Mahasiswa) -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akademik Saya</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Aktivitas Kuliah</p>
                         
                         <a href="<?= $base ?>database/db_jadwal" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-calendar-week w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
@@ -467,48 +471,23 @@ $foto         = $_SESSION['foto'] ?? '';
 
                         <a href="<?= $base ?>views/tugas_saya" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-tasks w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Tugas Saya</span>
+                            <span class="text-xs font-medium">Tugas Kuliah</span>
                         </a>
 
                         <a href="<?= $base ?>views/kelompok" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-users w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kelompok</span>
+                            <span class="text-xs font-medium">Kelompok Kelas</span>
                         </a>
 
                         <a href="<?= $base ?>views/piket_proyektor" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-plug w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Piket Proyektor</span>
                         </a>
-
-                        <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-calendar w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kalender</span>
-                        </a>
                     </div>
 
-                    <!-- Section: Rekapitulasi Saya -->
+                    <!-- Section: Rencana Studi & Status Mahasiswa -->
                     <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Status Saya</p>
-                        
-                        <a href="<?= $base ?>views/rekap_absen" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-calendar-check w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kehadiran Saya</span>
-                        </a>
-
-                        <a href="<?= $base ?>views/rekap_kas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-wallet w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kas Kelas</span>
-                        </a>
-
-                        <a href="<?= $base ?>database/db_berita" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Berita & Info</span>
-                        </a>
-                    </div>
-
-                    <!-- Section: Akun & KRS -->
-                    <div class="space-y-1">
-                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun Mahasiswa</p>
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Rencana Studi & Status</p>
                         
                         <button class="submenu-button flex items-center justify-between w-full px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <div class="flex items-center">
@@ -522,6 +501,36 @@ $foto         = $_SESSION['foto'] ?? '';
                             <a href="<?= $base ?>views/ksm" class="block px-4 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-indigo-950/30 rounded-lg">KSM Mahasiswa</a>
                         </div>
 
+                        <a href="<?= $base ?>views/rekap_absen" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-calendar-check w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kehadiran Saya</span>
+                        </a>
+
+                        <a href="<?= $base ?>views/rekap_kas" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-wallet w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kas Kelas</span>
+                        </a>
+                    </div>
+
+                    <!-- Section: Informasi & Agenda -->
+                    <div class="space-y-1">
+                        <p class="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi & Agenda</p>
+                        
+                        <a href="<?= $base ?>database/db_berita" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-newspaper w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Berita & Info</span>
+                        </a>
+
+                        <a href="<?= $base ?>views/kalender_view" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <i class="fa fa-calendar-alt w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <span class="text-xs font-medium">Kalender Perkuliahan</span>
+                        </a>
+                    </div>
+
+                    <!-- Section: Akun Pribadi -->
+                    <div class="space-y-1">
+                        <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Akun</p>
+                        
                         <a href="<?= $base ?>views/profile" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                             <i class="fa fa-user w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Profile Saya</span>
