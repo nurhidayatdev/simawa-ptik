@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($nama_lengkap) || empty($nim)) {
             $_SESSION['error'] = "Nama lengkap dan NIM wajib diisi!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($stmt_check);
         if (mysqli_num_rows(mysqli_stmt_get_result($stmt_check)) > 0) {
             $_SESSION['error'] = "Mahasiswa dengan NIM <strong>$nim</strong> sudah terdaftar di sistem!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($email_login)) {
             if (!filter_var($email_login, FILTER_VALIDATE_EMAIL)) {
                 $_SESSION['error'] = "Format email login mahasiswa tidak valid!";
-                header("Location: ../dashboard_keti.php");
+                header("Location: ../dashboard_keti");
                 exit();
             }
 
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mysqli_stmt_execute($stmt_em);
             if (mysqli_num_rows(mysqli_stmt_get_result($stmt_em)) > 0) {
                 $_SESSION['error'] = "Email <strong>$email_login</strong> sudah terdaftar di sistem! Gunakan email lain.";
-                header("Location: ../dashboard_keti.php");
+                header("Location: ../dashboard_keti");
                 exit();
             }
         }
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Gagal menambahkan mahasiswa: " . mysqli_error($koneksi);
         }
 
-        header("Location: ../dashboard_keti.php");
+        header("Location: ../dashboard_keti");
         exit();
     }
 
@@ -138,13 +138,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed_roles = ['Sekretaris', 'Bendahara'];
         if (!in_array($role_pengurus, $allowed_roles)) {
             $_SESSION['error'] = "Role kepengurusan tidak valid! Anda hanya dapat menunjuk Sekretaris atau Bendahara.";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
         if ($mahasiswa_id <= 0) {
             $_SESSION['error'] = "Pilih mahasiswa yang valid dari kelas Anda!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$mhs) {
             $_SESSION['error'] = "Mahasiswa tidak ditemukan di kelas Anda atau akses ditolak!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // tidak mengubah atau merangkap akun Mahasiswa yang sudah ada.
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['error'] = "Format email login untuk akun pengurus wajib valid!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($stmt_chk_em);
         if (mysqli_num_rows(mysqli_stmt_get_result($stmt_chk_em)) > 0) {
             $_SESSION['error'] = "Email <strong>$email</strong> sudah terdaftar di sistem. Gunakan email lain!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Gagal membuat akun pengurus: " . mysqli_error($koneksi);
         }
 
-        header("Location: ../dashboard_keti.php");
+        header("Location: ../dashboard_keti");
         exit();
     }
 
@@ -206,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($target_user_id <= 0) {
             $_SESSION['error'] = "User tidak valid!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -223,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$target || in_array($target['role'], ['Administrator Utama', 'Ketua Tingkat'])) {
             $_SESSION['error'] = "Aksi ditolak: Anda tidak memiliki wewenang untuk mereset password akun ini.";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -236,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Gagal mereset password: " . mysqli_error($koneksi);
         }
 
-        header("Location: ../dashboard_keti.php");
+        header("Location: ../dashboard_keti");
         exit();
     }
 
@@ -248,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($target_user_id <= 0) {
             $_SESSION['error'] = "User tidak valid!";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -261,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (!$target || !in_array($target['role'], ['Sekretaris', 'Bendahara'])) {
             $_SESSION['error'] = "Aksi ditolak: User ini bukan pengurus kelas Anda atau akses tidak diizinkan.";
-            header("Location: ../dashboard_keti.php");
+            header("Location: ../dashboard_keti");
             exit();
         }
 
@@ -275,12 +275,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['error'] = "Gagal mencopot jabatan: " . mysqli_error($koneksi);
         }
 
-        header("Location: ../dashboard_keti.php");
+        header("Location: ../dashboard_keti");
         exit();
     }
 }
 
 // Fallback jika bukan POST
-header("Location: ../dashboard_keti.php");
+header("Location: ../dashboard_keti");
 exit();
 

@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($nama_kelas)) {
             $_SESSION['error'] = 'Nama kelas wajib diisi!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $res_check = mysqli_stmt_get_result($stmt_check);
         if (mysqli_num_rows($res_check) > 0) {
             $_SESSION['error'] = "Kelas dengan nama '$nama_kelas' sudah terdaftar!";
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -44,14 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($ketua_nama) || empty($ketua_email) || empty($ketua_password)) {
             $_SESSION['error'] = 'Nama Lengkap, Email Login, dan Password untuk Ketua Tingkat baru wajib diisi!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
         // Validasi format email
         if (!filter_var($ketua_email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['error'] = 'Format email Ketua Tingkat tidak valid!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($stmt_u);
         if (mysqli_num_rows(mysqli_stmt_get_result($stmt_u)) > 0) {
             $_SESSION['error'] = "Email '$ketua_email' sudah digunakan oleh akun lain!";
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt_ins, "ssss", $nama_kelas, $angkatan, $prodi, $status_aktif);
         if (!mysqli_stmt_execute($stmt_ins)) {
             $_SESSION['error'] = 'Gagal menyimpan kelas baru: ' . mysqli_error($koneksi);
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
         $kelas_id = mysqli_insert_id($koneksi);
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // akun Mahasiswa terpisah lewat menu 'Tambah Mahasiswa' dengan NIM aslinya.
 
         $_SESSION['success'] = "Kelas <strong>" . htmlspecialchars($nama_kelas) . "</strong> dan Akun Ketua Tingkat (<strong>" . htmlspecialchars($ketua_nama) . "</strong> - <code>" . htmlspecialchars($ketua_email) . "</code>) berhasil dibuat!";
-        header('Location: ../dashboard_admin.php');
+        header('Location: ../dashboard_admin');
         exit();
     }
 
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['success'] = "Status kelas <strong>" . htmlspecialchars($row['nama_kelas']) . "</strong> diubah menjadi <strong>" . ucfirst($new_status) . "</strong>.";
             }
         }
-        header('Location: ../dashboard_admin.php');
+        header('Location: ../dashboard_admin');
         exit();
     }
 
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($kelas_id <= 0 || empty($nama_kelas)) {
             $_SESSION['error'] = 'Data edit kelas tidak valid!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($stmt_check);
         if (mysqli_num_rows(mysqli_stmt_get_result($stmt_check)) > 0) {
             $_SESSION['error'] = "Nama kelas '$nama_kelas' sudah digunakan oleh kelas lain!";
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -159,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $_SESSION['success'] = "Perubahan kelas <strong>" . htmlspecialchars($nama_kelas) . "</strong> berhasil disimpan!";
-        header('Location: ../dashboard_admin.php');
+        header('Location: ../dashboard_admin');
         exit();
     }
 
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['success'] = $new_val === '1' 
             ? "Mode Maintenance berhasil <strong>diaktifkan</strong>. Akses user non-admin diblokir."
             : "Mode Maintenance berhasil <strong>dinonaktifkan</strong>. Sistem kembali beroperasi normal.";
-        header('Location: ../dashboard_admin.php');
+        header('Location: ../dashboard_admin');
         exit();
     }
 
@@ -196,19 +196,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($kelas_id <= 0) {
             $_SESSION['error'] = 'Pilih kelas yang valid untuk penunjukan Ketua Tingkat!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
         if (empty($ketua_nama) || empty($ketua_email) || empty($ketua_password)) {
             $_SESSION['error'] = 'Nama Lengkap, Email Login, dan Password untuk Ketua Tingkat baru wajib diisi!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
         if (!filter_var($ketua_email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['error'] = 'Format email Ketua Tingkat tidak valid!';
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -218,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_execute($stmt_u);
         if (mysqli_num_rows(mysqli_stmt_get_result($stmt_u)) > 0) {
             $_SESSION['error'] = "Email '$ketua_email' sudah digunakan oleh akun lain!";
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
 
@@ -227,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt_user, "ssssi", $ketua_email, $ketua_password, $ketua_nama, $linked_nim, $kelas_id);
         if (!mysqli_stmt_execute($stmt_user)) {
             $_SESSION['error'] = 'Gagal membuat akun Ketua Tingkat: ' . mysqli_error($koneksi);
-            header('Location: ../dashboard_admin.php');
+            header('Location: ../dashboard_admin');
             exit();
         }
         $new_user_id = mysqli_insert_id($koneksi);
@@ -236,12 +236,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_query($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = $new_user_id WHERE id = $kelas_id");
 
         $_SESSION['success'] = "Akun Ketua Tingkat (<strong>" . htmlspecialchars($ketua_nama) . "</strong> - <code>" . htmlspecialchars($ketua_email) . "</code>) berhasil dibuat dan ditugaskan ke kelas!";
-        header('Location: ../dashboard_admin.php');
+        header('Location: ../dashboard_admin');
         exit();
     }
 }
 
 // Fallback jika bukan POST
-header('Location: ../dashboard_admin.php');
+header('Location: ../dashboard_admin');
 exit();
 

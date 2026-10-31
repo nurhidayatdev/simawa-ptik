@@ -455,7 +455,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                                 </button>
 
                                                 <!-- Tombol Copot Jabatan -->
-                                                <form action="actions/kelola_pengurus.php" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mencopot jabatan pengurus ini dan mengembalikannya menjadi Mahasiswa biasa?')">
+                                                <form action="actions/kelola_pengurus" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mencopot jabatan pengurus ini dan mengembalikannya menjadi Mahasiswa biasa?')">
                                                     <input type="hidden" name="action" value="copot_jabatan">
                                                     <input type="hidden" name="user_id" value="<?= (int)$p['user_id'] ?>">
                                                     <button type="submit" title="Copot Jabatan" class="inline-flex items-center justify-center px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 dark:bg-rose-950/40 text-rose-600 hover:text-white border border-rose-200 dark:border-rose-900/50 text-xs font-semibold transition-colors cursor-pointer">
@@ -667,7 +667,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                 </button>
             </div>
 
-            <form action="actions/kelola_pengurus.php" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="actions/kelola_pengurus" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="action" value="tambah_mahasiswa">
 
                 <div>
@@ -746,7 +746,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                 </button>
             </div>
 
-            <form action="actions/kelola_pengurus.php" method="POST" class="space-y-4">
+            <form action="actions/kelola_pengurus" method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="tunjuk_pengurus">
 
                 <div>
@@ -801,7 +801,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                 </button>
             </div>
 
-            <form action="actions/kelola_pengurus.php" method="POST" class="space-y-3">
+            <form action="actions/kelola_pengurus" method="POST" class="space-y-3">
                 <input type="hidden" name="action" value="reset_password_pengurus">
                 <input type="hidden" name="user_id" id="reset_user_id">
 

@@ -275,7 +275,7 @@ if (isset($_SESSION['maintenance_blocked'])) {
           const cred = new PasswordCredential({
             id: "<?= addslashes($email) ?>",
             password: "<?= addslashes($password) ?>",
-            name: "<?= addslashes($data['nama_lengkap']) ?>"
+            name: "<?= addslashes($_SESSION['nama_lengkap'] ?? '') ?>"
           });
           navigator.credentials.store(cred);
         }

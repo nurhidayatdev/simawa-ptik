@@ -348,7 +348,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                                 </button>
 
                                                 <!-- Toggle Aktif/Non-aktif -->
-                                                <form action="actions/tambah_kelas.php" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status kelas ini?')">
+                                                <form action="actions/tambah_kelas" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status kelas ini?')">
                                                     <input type="hidden" name="action" value="toggle_status_kelas">
                                                     <input type="hidden" name="kelas_id" value="<?= $k['id'] ?>">
                                                     <button type="submit" title="<?= $is_active ? 'Nonaktifkan Kelas' : 'Aktifkan Kelas' ?>" class="inline-flex items-center justify-center w-8 h-8 rounded-lg <?= $is_active ? 'bg-rose-50 hover:bg-rose-600 dark:bg-rose-950/40 text-rose-600 hover:text-white border-rose-200 dark:border-rose-900/50' : 'bg-emerald-50 hover:bg-emerald-600 dark:bg-emerald-950/40 text-emerald-600 hover:text-white border-emerald-200 dark:border-emerald-900/50' ?> border transition-colors cursor-pointer">
@@ -391,7 +391,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                         </div>
                     </div>
 
-                    <form action="actions/tambah_kelas.php" method="POST" class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <form action="actions/tambah_kelas" method="POST" class="pt-4 border-t border-slate-100 dark:border-slate-800">
                         <input type="hidden" name="action" value="quick_maintenance_toggle">
                         <div class="flex flex-col sm:flex-row items-center gap-3 justify-between">
                             <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">
@@ -479,7 +479,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                 </button>
             </div>
 
-            <form action="actions/tambah_kelas.php" method="POST" class="space-y-4">
+            <form action="actions/tambah_kelas" method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="tambah_ketua_tingkat">
 
                 <div>
@@ -539,7 +539,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                 </button>
             </div>
 
-            <form action="actions/tambah_kelas.php" method="POST" class="space-y-4">
+            <form action="actions/tambah_kelas" method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="tambah_kelas">
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -619,7 +619,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                 </button>
             </div>
 
-            <form action="actions/tambah_kelas.php" method="POST" class="space-y-4">
+            <form action="actions/tambah_kelas" method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="edit_kelas">
                 <input type="hidden" name="kelas_id" id="edit_kelas_id">
 

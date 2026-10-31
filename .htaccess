@@ -2,9 +2,12 @@ RewriteEngine On
 RewriteBase /simawa-ptik/
 DirectoryIndex index.php
 
-# Redirect /file.php to /file (handles query strings automatically)
+# Redirect GET /file.php to /file (do NOT redirect POST or other mutation requests)
+RewriteCond %{REQUEST_METHOD} !^(POST|PUT|DELETE)$ [NC]
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^/]+)/(.*)\.php [NC]
 RewriteRule ^ /%1/%2 [L,R=301]
+
+RewriteCond %{REQUEST_METHOD} !^(POST|PUT|DELETE)$ [NC]
 RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([^.]+)\.php [NC]
 RewriteRule ^ /%1 [L,R=301]
 
