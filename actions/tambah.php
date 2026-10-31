@@ -544,16 +544,20 @@ if (isset($_POST['tambah'])) {
                         </div>
 
                     <?php elseif ($tabel === 'users'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Akun Pengguna (Users)</h3>
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Tambah Akun Ketua Tingkat</h3>
+                            <p class="text-xs text-slate-400 mt-1">Buat akun login kepemimpinan kelas khusus Ketua Tingkat.</p>
+                        </div>
+                        <input type="hidden" name="role" value="Ketua Tingkat">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap *</label>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Ketua Tingkat *</label>
                                 <input type="text" name="nama_lengkap" required placeholder="Contoh: Ahmad Fauzan"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email Login *</label>
-                                <input type="email" name="email" required placeholder="fauzan@simawa.id"
+                                <input type="email" name="email" required placeholder="ketua@simawa.id"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
@@ -562,20 +566,9 @@ if (isset($_POST['tambah'])) {
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role / Peran *</label>
-                                <select name="role" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
-                                    <option value="">-- Pilih Role/Peran --</option>
-                                    <option value="Administrator Utama">Administrator Utama</option>
-                                    <option value="Ketua Tingkat" selected>Ketua Tingkat</option>
-                                    <option value="Sekretaris">Sekretaris</option>
-                                    <option value="Bendahara">Bendahara</option>
-                                    <option value="Mahasiswa">Mahasiswa</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Kelas Terkait</label>
-                                <select name="kelas_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                    <option value="">-- Tanpa Kelas (Khusus Administrator) --</option>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Kelas yang Dipimpin *</label>
+                                <select name="kelas_id" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors cursor-pointer">
+                                    <option value="">-- Pilih Kelas --</option>
                                     <?php
                                     $q_kelas_all = mysqli_query($koneksi, "SELECT id, nama_kelas FROM kelas ORDER BY id ASC");
                                     while ($kls = mysqli_fetch_assoc($q_kelas_all)) {
@@ -584,7 +577,7 @@ if (isset($_POST['tambah'])) {
                                     ?>
                                 </select>
                             </div>
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Catatan NIM Mahasiswa (Opsional)</label>
                                 <input type="text" name="linked_student_nim" placeholder="Contoh: 240209501001"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">

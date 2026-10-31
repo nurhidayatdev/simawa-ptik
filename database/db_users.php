@@ -13,7 +13,6 @@ $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
 if ($_SESSION['role'] !== 'Administrator Utama') {
-    // Kita tetap butuh HTML dikit untuk menjalankan JS
     include '../includes/alert_role.php';
     exit();
 }
@@ -26,7 +25,7 @@ if (!empty($search)) {
         "SELECT 
             u.id AS user_id,
             u.id,
-            COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, u.email) AS nama_lengkap,
+            COALESCE(NULLIF(u.nama_lengkap, ''), u.email) AS nama_lengkap,
             u.email,
             u.password,
             u.role,
@@ -34,17 +33,19 @@ if (!empty($search)) {
             u.linked_student_nim,
             k.nama_kelas
         FROM users u
-        LEFT JOIN mahasiswa m ON m.user_id = u.id
         LEFT JOIN kelas k ON u.kelas_id = k.id
-        WHERE (u.nama_lengkap LIKE ? OR m.nama_lengkap LIKE ?) 
-           OR u.email LIKE ? 
-           OR u.role LIKE ?
-           OR k.nama_kelas LIKE ?
-        ORDER BY u.id ASC"
+        WHERE u.role = 'Ketua Tingkat'
+          AND (
+            u.nama_lengkap LIKE ? 
+            OR u.email LIKE ? 
+            OR k.nama_kelas LIKE ?
+            OR u.linked_student_nim LIKE ?
+          )
+        ORDER BY k.id ASC, u.id ASC"
     );
 
     $like = "%$search%";
-    mysqli_stmt_bind_param($stmt, "sssss", $like, $like, $like, $like, $like);
+    mysqli_stmt_bind_param($stmt, "ssss", $like, $like, $like, $like);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
@@ -52,7 +53,7 @@ if (!empty($search)) {
         SELECT 
             u.id AS user_id,
             u.id,
-            COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, u.email) AS nama_lengkap,
+            COALESCE(NULLIF(u.nama_lengkap, ''), u.email) AS nama_lengkap,
             u.email,
             u.password,
             u.role,
@@ -60,9 +61,9 @@ if (!empty($search)) {
             u.linked_student_nim,
             k.nama_kelas
         FROM users u
-        LEFT JOIN mahasiswa m ON m.user_id = u.id
         LEFT JOIN kelas k ON u.kelas_id = k.id
-        ORDER BY u.id ASC
+        WHERE u.role = 'Ketua Tingkat'
+        ORDER BY k.id ASC, u.id ASC
     ");
 }
 
@@ -70,6 +71,10 @@ if (!empty($search)) {
 if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $no = 1;
     $id = 1;
+    if (mysqli_num_rows($result) === 0) {
+        echo '<tr><td colspan="6" class="px-4 py-8 text-center text-xs text-slate-400 dark:text-slate-500">Tidak ada data Ketua Tingkat yang cocok.</td></tr>';
+        exit;
+    }
     while ($row = mysqli_fetch_assoc($result)) {
         $isEven = ($id++ % 2 == 0);
         $rowClass = ($isEven ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
@@ -77,25 +82,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-100 font-bold">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200">' . htmlspecialchars($row['email']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-400 font-mono">**********</td>';
+        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400 font-semibold">' . htmlspecialchars($row['nama_kelas'] ?? '-') . '</td>';
         
-        // Role badge
-        $roleColor = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
-        if ($row['role'] === 'Administrator Utama') {
-            $roleColor = 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800/50';
-        } elseif ($row['role'] === 'Ketua Tingkat') {
-            $roleColor = 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50';
-        } elseif ($row['role'] === 'Sekretaris') {
-            $roleColor = 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/50';
-        } elseif ($row['role'] === 'Bendahara') {
-            $roleColor = 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50';
-        }
-            
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['nama_kelas'] ?? '-') . '</td>';
+        $roleColor = 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50';
         echo '<td class="px-3 py-2 text-xs">';
         echo '<span class="px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-tighter ' . $roleColor . '">' . htmlspecialchars($row['role']) . '</span>';
         if (!empty($row['linked_student_nim'])) {
-            echo '<div class="text-[10px] text-slate-400 mt-0.5">NIM: ' . htmlspecialchars($row['linked_student_nim']) . '</div>';
+            echo '<div class="text-[10px] text-slate-400 mt-0.5"><i class="fas fa-id-badge text-[9px] text-indigo-500"></i> NIM: ' . htmlspecialchars($row['linked_student_nim']) . '</div>';
         }
         echo '</td>';
         
@@ -117,7 +110,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 <head>
 
-    <title>Data Users - SIMAWA PTIK 2024</title>
+    <title>Kelola Ketua Tingkat - SIMAWA PTIK 2024</title>
     <?php include '../includes/head.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -141,83 +134,88 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <main class="ml-0 lg:ml-48 pt-20 p-6 flex flex-col min-h-screen">
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Data Users</h3>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Data Ketua Tingkat</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Daftar akun Ketua Tingkat penanggung jawab masing-masing kelas angkatan 2024.</p>
+                </div>
                 <div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <form method="GET" class="w-full">
                         <div class="flex flex-row gap-2 items-center">
                             <div class="relative flex-1 min-w-0">
-                                <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="Cari Nama / Email..." class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
+                                <input id="searchInput" type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="Cari Nama / Email / Kelas..." class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
                                 <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
                             </div>
-                            <a href="../actions/tambah.php?tabel=users" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
+                            <a href="../actions/tambah.php?tabel=users" class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0 gap-1.5 text-xs font-semibold" title="Tambah Ketua Tingkat">
                                 <i class="fa fa-plus text-xs"></i>
+                                <span class="hidden sm:inline">Tambah Ketua Tingkat</span>
                             </a>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Rest of the content remains the same -->
+            <!-- Tabel Data Ketua Tingkat -->
             <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                     <thead class="bg-indigo-900 dark:bg-slate-800">
                         <tr>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">No</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Nama Lengkap</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Email</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Kelas</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Nama Ketua Tingkat</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Email Login</th>
+                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Kelas yang Dipimpin</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Role</th>
-                            <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
+                            <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
                         <?php
                         $no = 1;
                         $id = 1;
-                        while ($row = mysqli_fetch_assoc($result)) : 
-                            $isEven = ($id++ % 2 == 0);
-                            $rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
+                        if (mysqli_num_rows($result) === 0) :
                         ?>
-                            <tr class="<?= $rowClass ?>">
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++; ?></td>
-                                <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-100 font-bold"><?= htmlspecialchars($row['nama_lengkap']); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200"><?= htmlspecialchars($row['email']); ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400">
-                                    <span class="inline-flex items-center gap-1 font-medium">
-                                        <?= htmlspecialchars($row['nama_kelas'] ?? '-'); ?>
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2 text-xs">
-                                    <?php
-                                    $roleColor = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
-                                    if ($row['role'] === 'Administrator Utama') {
-                                        $roleColor = 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800/50';
-                                    } elseif ($row['role'] === 'Ketua Tingkat') {
-                                        $roleColor = 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50';
-                                    } elseif ($row['role'] === 'Sekretaris') {
-                                        $roleColor = 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/50';
-                                    } elseif ($row['role'] === 'Bendahara') {
-                                        $roleColor = 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50';
-                                    }
-                                    ?>
-                                    <span class="px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-tighter <?= $roleColor ?>">
-                                        <?= htmlspecialchars($row['role']); ?>
-                                    </span>
-                                    <?php if (!empty($row['linked_student_nim'])): ?>
-                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                                            <i class="fas fa-id-badge text-[9px] text-indigo-500"></i> NIM: <?= htmlspecialchars($row['linked_student_nim']) ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
-                                    <div class="flex items-center justify-center gap-3">
-                                        <a href="../actions/edit.php?tabel=users&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors"><i class="fa fa-edit"></i></a>
-                                        <a href="javascript:void(0)" onclick="confirmReset(<?= $row['id']; ?>)" title="Reset Password" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 transition-colors"><i class="fa fa-key"></i></a>
-                                        <a href="javascript:void(0)" onclick="confirmDelete(<?= $row['id']; ?>)" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors"><i class="fa fa-trash"></i></a>
-                                    </div>
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+                                    <i class="fas fa-user-shield text-2xl mb-2 text-slate-300 dark:text-slate-600 block"></i>
+                                    Belum ada akun Ketua Tingkat terdaftar.
                                 </td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php
+                        else :
+                            while ($row = mysqli_fetch_assoc($result)) : 
+                                $isEven = ($id++ % 2 == 0);
+                                $rowClass = ($isEven ? 'bg-slate-50/50 dark:bg-slate-800/20' : 'bg-white dark:bg-slate-900') . ' hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors';
+                            ?>
+                                <tr class="<?= $rowClass ?>">
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++; ?></td>
+                                    <td class="px-3 py-2 text-xs text-slate-800 dark:text-slate-100 font-bold"><?= htmlspecialchars($row['nama_lengkap']); ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200"><?= htmlspecialchars($row['email']); ?></td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-600 dark:text-slate-400 font-semibold">
+                                        <span class="inline-flex items-center gap-1">
+                                            <?= htmlspecialchars($row['nama_kelas'] ?? '-'); ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-3 py-2 text-xs">
+                                        <span class="px-2 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-tighter bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50">
+                                            <?= htmlspecialchars($row['role']); ?>
+                                        </span>
+                                        <?php if (!empty($row['linked_student_nim'])): ?>
+                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                                                <i class="fas fa-id-badge text-[9px] text-indigo-500"></i> NIM: <?= htmlspecialchars($row['linked_student_nim']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
+                                        <div class="flex items-center justify-center gap-3">
+                                            <a href="../actions/edit.php?tabel=users&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors"><i class="fa fa-edit"></i></a>
+                                            <a href="javascript:void(0)" onclick="confirmReset(<?= $row['id']; ?>)" title="Reset Password" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 transition-colors"><i class="fa fa-key"></i></a>
+                                            <a href="javascript:void(0)" onclick="confirmDelete(<?= $row['id']; ?>)" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors"><i class="fa fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php 
+                            endwhile;
+                        endif;
+                        ?>
                     </tbody>
                 </table>
             </div>
@@ -233,8 +231,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then(() => {
-                // Bersihkan URL dari parameter status
-                window.history.replaceState({}, document.title, window.location.pathname);
+                window.location.href = 'db_users.php';
             });
         <?php endif; ?>
 
@@ -257,8 +254,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
         function confirmDelete(id) {
             Swal.fire({
-                title: 'Hapus User?',
-                text: "Data yang dihapus tidak dapat dikembalikan!",
+                title: 'Hapus Akun Ketua Tingkat?',
+                text: "Akun login Ketua Tingkat ini akan dihapus dari sistem!",
                 icon: 'error',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
@@ -271,6 +268,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 }
             })
         }
+
         // Live search via AJAX (debounced) - keep focus in input
         (function() {
             const input = document.getElementById('searchInput');
@@ -297,4 +295,3 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 </body>
 
 </html>
-```

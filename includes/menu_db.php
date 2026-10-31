@@ -167,8 +167,8 @@ $foto         = $_SESSION['foto'] ?? '';
                         </a>
 
                         <a href="<?= $base ?>database/db_users" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-users-gear w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
-                            <span class="text-xs font-medium">Kelola Users</span>
+                            <i class="fa fa-user-shield w-4 h-4 mr-4 text-amber-500 dark:text-amber-400"></i>
+                            <span class="text-xs font-medium">Kelola Ketua Tingkat</span>
                         </a>
 
                     </div>
