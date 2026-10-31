@@ -16,7 +16,7 @@ $role = $_SESSION['role'];
 include_once '../functions/foto_helpers.php';
 require_once '../functions/helpers.php';
 
-$where_mhs_kelas = getKelasWhereClause('m.kelas_id', false);
+$where_mhs_kelas = getKelasWhereClause('m', false);
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
@@ -26,7 +26,8 @@ if (!empty($search)) {
         $koneksi,
         "SELECT m.* FROM mahasiswa m
          LEFT JOIN users u ON m.user_id = u.id
-         WHERE (u.role = 'Mahasiswa' OR u.role IS NULL)
+         WHERE (u.role = 'Mahasiswa' OR (m.user_id IS NULL AND m.nama_lengkap NOT LIKE '%Administrator%'))
+           AND (u.role NOT IN ('Administrator Utama', 'Ketua Tingkat', 'Sekretaris', 'Bendahara') OR u.role IS NULL)
          $where_extra
          AND (m.nim LIKE ? OR m.nama_lengkap LIKE ? OR m.nama_panggilan LIKE ?)
          ORDER BY m.nim ASC"
@@ -39,7 +40,9 @@ if (!empty($search)) {
     $result = mysqli_query($koneksi, "
         SELECT m.* FROM mahasiswa m
         LEFT JOIN users u ON m.user_id = u.id
-        WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_extra
+        WHERE (u.role = 'Mahasiswa' OR (m.user_id IS NULL AND m.nama_lengkap NOT LIKE '%Administrator%'))
+          AND (u.role NOT IN ('Administrator Utama', 'Ketua Tingkat', 'Sekretaris', 'Bendahara') OR u.role IS NULL)
+        $where_extra
         ORDER BY m.nim ASC
     ");
 }

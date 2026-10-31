@@ -109,7 +109,13 @@ if (!function_exists('getKelasWhereClause')) {
             return ""; // Tanpa batasan kelas untuk admin yang melihat semua kelas
         }
 
-        $column = $tableAlias ? "`$tableAlias`.`kelas_id`" : "`kelas_id`";
+        // Defensive: Jika parameter memuat nama kolom (misal: 'm.kelas_id'), ambil alias tabel 'm' saja
+        if (strpos($tableAlias, '.') !== false) {
+            $parts = explode('.', $tableAlias);
+            $tableAlias = $parts[0];
+        }
+
+        $column = !empty($tableAlias) ? "`$tableAlias`.`kelas_id`" : "`kelas_id`";
         $clause = "$column = $scope";
 
         return $prefixWithAnd ? " AND $clause" : $clause;
