@@ -206,7 +206,7 @@ simawa-ptik/
 | :--- | :--- | :--- |
 | **Administrator Utama** | `'Administrator Utama'` | Hak akses penuh (*superadmin*): semua menu CRUD di folder `database/`, konfigurasi sistem, dan toggle maintenance. |
 | **Ketua Tingkat** | `'Ketua Tingkat'` | Akses manajerial perkuliahan: absensi, kas, pembagian kelompok, jadwal piket, dan manajemen tugas. |
-| **Sekretaris** | `'Sekretaris'` | Dedicated Presensi Dashboard (`dashboard_sekretaris.php`), input dan rekap presensi mahasiswa (`views/manajemen_absen.php`, `views/rekap_absen.php`). |
+| **Sekretaris** | `'Sekretaris'` | Dedicated Presensi & Tugas Dashboard (`dashboard_sekretaris.php`), administrasi presensi (`views/manajemen_absen.php`, `views/rekap_absen.php`), serta manajemen tugas perkuliahan & reminder WhatsApp (`database/db_tugas`). |
 | **Bendahara** | `'Bendahara'` | Dedicated Kas Dashboard (`dashboard_bendahara.php`), input kas, rekapitulasi saldo, dan penagihan iuran kelas (`views/manajemen_kas.php`, `views/rekap_kas.php`). |
 | **Mahasiswa** | `'Mahasiswa'` | Dedicated Student Dashboard (`dashboard_mahasiswa.php`), memantau jadwal, tugas pribadi, histori kas sendiri, KSM, dan kelompok. |
 
@@ -215,7 +215,7 @@ Sesuai pedoman arsitektur SIMAWA PTIK:
 1. **1 Akun = 1 Peran Tunggal Definitif (*Single Responsibility per Account*):**
    - Sistem tidak mengizinkan akun *hybrid* atau multi-peran gabungan dalam satu akun/sesi.
    - Akun `Ketua Tingkat` bertindak eksklusif sebagai pengelola manajerial kelas.
-   - Akun `Sekretaris` bertindak eksklusif untuk operasional presensi kelas.
+   - Akun `Sekretaris` bertindak eksklusif untuk operasional presensi dan tugas kuliah kelas.
    - Akun `Bendahara` bertindak eksklusif untuk tata kelola keuangan kas.
    - Akun `Mahasiswa` bertindak eksklusif sebagai peserta perkuliahan reguler.
 2. **Pemisahan Akun untuk Individu yang Sama (*Dual-Account Separation*):**

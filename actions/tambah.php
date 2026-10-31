@@ -535,7 +535,6 @@ if (isset($_POST['tambah'])) {
                                     <option value="Ketua Tingkat">Ketua Tingkat</option>
                                     <option value="Sekretaris">Sekretaris</option>
                                     <option value="Bendahara">Bendahara</option>
-                                    <option value="Koordinator Akademik">Koordinator Akademik</option>
                                     <option value="Mahasiswa">Mahasiswa</option>
                                 </select>
                             </div>

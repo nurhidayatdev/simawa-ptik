@@ -493,7 +493,6 @@ if (isset($_POST['update'])) {
                                     <option value="Ketua Tingkat" <?= ($data['role'] == 'Ketua Tingkat') ? 'selected' : '' ?>>Ketua Tingkat</option>
                                     <option value="Sekretaris" <?= ($data['role'] == 'Sekretaris') ? 'selected' : '' ?>>Sekretaris</option>
                                     <option value="Bendahara" <?= ($data['role'] == 'Bendahara') ? 'selected' : '' ?>>Bendahara</option>
-                                    <option value="Koordinator Akademik" <?= ($data['role'] == 'Koordinator Akademik') ? 'selected' : '' ?>>Koordinator Akademik</option>
                                     <option value="Mahasiswa" <?= ($data['role'] == 'Mahasiswa') ? 'selected' : '' ?>>Mahasiswa</option>
                                 </select>
                                 </div>

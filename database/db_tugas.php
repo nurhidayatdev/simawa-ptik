@@ -100,7 +100,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 				title="Info" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 transition-colors">
 				<i class="fa fa-info-circle"></i>
 			  </button>';
-		if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'):
+		if ($role === 'Administrator Utama' || $role === 'Sekretaris'):
 			echo '<a href="../actions/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
 			echo '<a href="../actions/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"><i class="fa fa-trash"></i></a>';
 		endif;
@@ -164,7 +164,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 									class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs text-slate-700 dark:text-slate-200 transition-all">
 								<i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
 							</div>
-							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
+							<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
 								<button type="button" onclick="confirmReminderWhatsApp()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Kirim Reminder WhatsApp">
 									<i class="fa fa-paper-plane text-xs"></i>
 								</button>
@@ -248,7 +248,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 											title="Info" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200 transition-colors">
 											<i class="fa fa-info-circle"></i>
 										</button>
-										<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris' || $role === 'Koordinator Akademik'): ?>
+										<?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
 											<a href="../actions/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors"><i class="fa fa-edit"></i></a>
 											<a href="../actions/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors" ><i class="fa fa-trash"></i></a>
 										<?php endif; ?>

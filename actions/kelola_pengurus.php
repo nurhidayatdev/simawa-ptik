@@ -94,9 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password      = trim($_POST['password'] ?? '');
 
         // Whitelist role: Ketua Tingkat DILARANG membuat Administrator Utama atau Ketua Tingkat lain
-        $allowed_roles = ['Sekretaris', 'Bendahara', 'Koordinator Akademik'];
+        $allowed_roles = ['Sekretaris', 'Bendahara'];
         if (!in_array($role_pengurus, $allowed_roles)) {
-            $_SESSION['error'] = "Role kepengurusan tidak valid! Anda hanya dapat menunjuk Sekretaris, Bendahara, atau Koordinator Akademik.";
+            $_SESSION['error'] = "Role kepengurusan tidak valid! Anda hanya dapat menunjuk Sekretaris atau Bendahara.";
             header("Location: ../dashboard_keti.php");
             exit();
         }
@@ -260,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $res_target = mysqli_stmt_get_result($stmt_target);
         $target = mysqli_fetch_assoc($res_target);
 
-        if (!$target || !in_array($target['role'], ['Sekretaris', 'Bendahara', 'Koordinator Akademik'])) {
+        if (!$target || !in_array($target['role'], ['Sekretaris', 'Bendahara'])) {
             $_SESSION['error'] = "Aksi ditolak: User ini bukan pengurus kelas Anda atau akses tidak diizinkan.";
             header("Location: ../dashboard_keti.php");
             exit();

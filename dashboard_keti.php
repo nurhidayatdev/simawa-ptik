@@ -47,11 +47,11 @@ unset($_SESSION['success'], $_SESSION['error']);
 $q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa WHERE kelas_id = '$kelas_id'");
 $total_mhs = (int)(mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0);
 
-// Total Pengurus Kelas (Sekretaris, Bendahara, Koordinator)
+// Total Pengurus Kelas (Sekretaris, Bendahara)
 $q_pengurus_count = mysqli_query($koneksi, "
     SELECT COUNT(*) as total 
     FROM users 
-    WHERE kelas_id = '$kelas_id' AND role IN ('Sekretaris', 'Bendahara', 'Koordinator Akademik')
+    WHERE kelas_id = '$kelas_id' AND role IN ('Sekretaris', 'Bendahara')
 ");
 $total_pengurus = (int)(mysqli_fetch_assoc($q_pengurus_count)['total'] ?? 0);
 
@@ -99,8 +99,8 @@ $q_pengurus = mysqli_query($koneksi, "
         m.jenis_kelamin
     FROM users u
     LEFT JOIN mahasiswa m ON m.user_id = u.id
-    WHERE u.kelas_id = '$kelas_id' AND u.role IN ('Sekretaris', 'Bendahara', 'Koordinator Akademik')
-    ORDER BY FIELD(u.role, 'Sekretaris', 'Bendahara', 'Koordinator Akademik'), m.nama_lengkap ASC
+    WHERE u.kelas_id = '$kelas_id' AND u.role IN ('Sekretaris', 'Bendahara')
+    ORDER BY FIELD(u.role, 'Sekretaris', 'Bendahara'), m.nama_lengkap ASC
 ");
 $pengurus_list = [];
 while ($row = mysqli_fetch_assoc($q_pengurus)) {
@@ -409,8 +409,6 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                         $badge_class = 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800';
                                     } elseif ($p['role'] === 'Bendahara') {
                                         $badge_class = 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800';
-                                    } elseif ($p['role'] === 'Koordinator Akademik') {
-                                        $badge_class = 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-400 dark:border-purple-800';
                                     }
                                 ?>
                                     <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
@@ -723,7 +721,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
             <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Tunjuk Pengurus Kelas</h3>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">Tetapkan hak akses Sekretaris, Bendahara, atau Koordinator.</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Tetapkan hak akses Sekretaris atau Bendahara.</p>
                 </div>
                 <button type="button" onclick="closeTunjukPengurusModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
                     <i class="fas fa-times text-xs"></i>
@@ -749,9 +747,8 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jabatan Pengurus *</label>
                     <select name="role_pengurus" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
-                        <option value="Sekretaris">Sekretaris (Manajemen & Input Absensi)</option>
+                        <option value="Sekretaris">Sekretaris (Manajemen Absensi & Tugas Kuliah)</option>
                         <option value="Bendahara">Bendahara (Manajemen & Input Kas Kelas)</option>
-                        <option value="Koordinator Akademik">Koordinator Akademik</option>
                     </select>
                 </div>
 
