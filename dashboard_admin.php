@@ -58,12 +58,12 @@ $q_kelas_list = mysqli_query($koneksi, "
         k.dibuat_pada,
         k.ketua_tingkat_user_id,
         u.email as ketua_email,
-        m.nama_lengkap as ketua_nama,
-        m.foto as ketua_foto,
+        u.nama_lengkap as ketua_nama,
+        u.foto as ketua_foto,
+        u.linked_student_nim as ketua_nim,
         (SELECT COUNT(*) FROM mahasiswa m2 LEFT JOIN users u2 ON m2.user_id = u2.id WHERE m2.kelas_id = k.id AND (u2.role = 'Mahasiswa' OR u2.role IS NULL)) as total_mahasiswa
     FROM kelas k
     LEFT JOIN users u ON k.ketua_tingkat_user_id = u.id
-    LEFT JOIN mahasiswa m ON m.user_id = u.id
     ORDER BY k.status_aktif ASC, k.id ASC
 ");
 $kelas_list = [];
@@ -297,6 +297,9 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                                         </div>
                                                         <div class="text-[10px] text-slate-400 dark:text-slate-500">
                                                             <?= htmlspecialchars($k['ketua_email'] ?? '-') ?>
+                                                            <?php if (!empty($k['ketua_nim'])): ?>
+                                                                • <span class="text-indigo-500 dark:text-indigo-400 font-medium">NIM Terkait: <?= htmlspecialchars($k['ketua_nim']) ?></span>
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -521,6 +524,11 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                 <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Password Awal *</label>
                                 <input type="password" name="ketua_password" required placeholder="Minimal 8 karakter" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                             </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Catatan NIM Asli Mahasiswa (Opsional)</label>
+                            <input type="text" name="linked_student_nim" placeholder="Contoh: 240209501001" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Catatan informasi identitas mahasiswa di dunia nyata tanpa menggabungkan permission/data akademik.</p>
                         </div>
                     </div>
                 </div>

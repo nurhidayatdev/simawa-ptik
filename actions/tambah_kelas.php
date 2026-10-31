@@ -75,9 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $kelas_id = mysqli_insert_id($koneksi);
 
-        // 2. Buat akun login Ketua Tingkat di users
-        $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, kelas_id) VALUES (?, ?, 'Ketua Tingkat', ?)");
-        mysqli_stmt_bind_param($stmt_user, "ssi", $ketua_email, $ketua_password, $kelas_id);
+        // 2. Buat akun login Ketua Tingkat di tabel users (Clean Architecture: Profil melekat di users)
+        $linked_nim = trim($_POST['linked_student_nim'] ?? '');
+        $linked_nim = !empty($linked_nim) ? $linked_nim : null;
+
+        $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, nama_lengkap, linked_student_nim, kelas_id) VALUES (?, ?, 'Ketua Tingkat', ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt_user, "ssssi", $ketua_email, $ketua_password, $ketua_nama, $linked_nim, $kelas_id);
         mysqli_stmt_execute($stmt_user);
         $new_user_id = mysqli_insert_id($koneksi);
 
@@ -86,14 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt_up_k, "ii", $new_user_id, $kelas_id);
         mysqli_stmt_execute($stmt_up_k);
 
-        // 4. Buat profil kepemimpinan di tabel mahasiswa (kode sistem unik KT-xxxx)
-        // Hal ini menjaga agar NIM asli mahasiswa tetap bebas & tidak bentrok saat Ketua Tingkat
-        // membuat akun Mahasiswa terpisah untuk dirinya sendiri nanti
-        $ketua_nim = 'KT' . str_pad($kelas_id, 4, '0', STR_PAD_LEFT);
-        $nama_panggilan = explode(' ', $ketua_nama)[0];
-        $stmt_mhs = mysqli_prepare($koneksi, "INSERT INTO mahasiswa (user_id, kelas_id, nim, nama_lengkap, nama_panggilan) VALUES (?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt_mhs, "iisss", $new_user_id, $kelas_id, $ketua_nim, $ketua_nama, $nama_panggilan);
-        mysqli_stmt_execute($stmt_mhs);
+        // Catatan: Akun fungsional Ketua Tingkat TIDAK dimasukkan ke tabel mahasiswa.
+        // Jika pemegang akun ini adalah mahasiswa aktif di kelasnya, dia akan mendaftarkan
+        // akun Mahasiswa terpisah lewat menu 'Tambah Mahasiswa' dengan NIM aslinya.
 
         $_SESSION['success'] = "Kelas <strong>" . htmlspecialchars($nama_kelas) . "</strong> dan Akun Ketua Tingkat (<strong>" . htmlspecialchars($ketua_nama) . "</strong> - <code>" . htmlspecialchars($ketua_email) . "</code>) berhasil dibuat!";
         header('Location: ../dashboard_admin.php');

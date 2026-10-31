@@ -78,9 +78,9 @@ if (isset($_POST['update_kas_individu'])) {
 }
 
 // Get Mahasiswa List for dropdown
-$where_mhs_drop = getKelasWhereClause('', false);
-$where_mhs_drop_sql = $where_mhs_drop ? "WHERE $where_mhs_drop" : "";
-$all_mhs = mysqli_query($koneksi, "SELECT id, nim, nama_lengkap FROM mahasiswa $where_mhs_drop_sql ORDER BY nim ASC");
+$where_mhs_drop = getKelasWhereClause('m', false);
+$where_mhs_drop_sql = $where_mhs_drop ? "AND $where_mhs_drop" : "";
+$all_mhs = mysqli_query($koneksi, "SELECT m.id, m.nim, m.nama_lengkap FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_drop_sql ORDER BY m.nim ASC");
 
 ?>
 <!DOCTYPE html>

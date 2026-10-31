@@ -29,12 +29,12 @@ if (!$periode_id) {
 
 $target_kelas_id = getKelasScope() ?? 1;
 
-// 1. Ambil Mahasiswa Kelas Aktif & Pisah per Gender
+// 1. Ambil Mahasiswa Kelas Aktif & Pisah per Gender (Murni Mahasiswa)
 $boys_master = [];
 $girls_master = [];
-$where_mhs_scope = getKelasWhereClause('', false);
-$where_mhs_sql = $where_mhs_scope ? "WHERE $where_mhs_scope" : "";
-$res_mhs = mysqli_query($koneksi, "SELECT id, jenis_kelamin FROM mahasiswa $where_mhs_sql");
+$where_mhs_scope = getKelasWhereClause('m', false);
+$where_mhs_sql = $where_mhs_scope ? "AND $where_mhs_scope" : "";
+$res_mhs = mysqli_query($koneksi, "SELECT m.id, m.jenis_kelamin FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_sql");
 while ($row = mysqli_fetch_assoc($res_mhs)) {
     if ($row['jenis_kelamin'] === 'Laki-laki') {
         $boys_master[] = $row['id'];

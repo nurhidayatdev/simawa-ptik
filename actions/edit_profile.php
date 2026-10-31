@@ -83,11 +83,13 @@ if (isset($_POST['update'])) {
                 // prefer webp if available
                 if (function_exists('imagewebp')) {
                     $ext = 'webp';
-                    $foto_baru = $nama_panggilan . '.' . $ext;
+                    $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
+                    $foto_baru = $prefix . '.' . $ext;
                     imagewebp($dst, __DIR__ . "/../storage/profile/" . $foto_baru, 80);
                 } else {
                     $ext = 'jpg';
-                    $foto_baru = $nama_panggilan . '.' . $ext;
+                    $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
+                    $foto_baru = $prefix . '.' . $ext;
                     imagejpeg($dst, __DIR__ . "/../storage/profile/" . $foto_baru, 85);
                 }
 
@@ -104,7 +106,8 @@ if (isset($_POST['update'])) {
                 if ($mime === 'image/webp') $ext = 'webp';
                 elseif ($mime === 'image/png') $ext = 'png';
                 elseif ($mime === 'image/jpeg' || $mime === 'image/jpg') $ext = 'jpg';
-                $foto_baru = $nama_panggilan . '.' . $ext;
+                $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
+                    $foto_baru = $prefix . '.' . $ext;
                 $dest = __DIR__ . "/../storage/profile/" . $foto_baru;
                 file_put_contents($dest, $decoded);
             }
@@ -119,7 +122,8 @@ if (isset($_POST['update'])) {
 
         if (in_array($ext, $allowed)) {
             // fallback: move uploaded then try to compress using GD
-            $foto_baru = $nama_panggilan . '.' . $ext;
+            $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
+                    $foto_baru = $prefix . '.' . $ext;
             $dest_path = __DIR__ . "/../storage/profile/" . $foto_baru;
             move_uploaded_file($tmp_file, $dest_path);
             // attempt to compress/resize
@@ -226,12 +230,12 @@ if (isset($_POST['update'])) {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
-                            <input type="text" name="nama_lengkap" value="<?= $data['nama_lengkap']; ?>"
+                            <input type="text" name="nama_lengkap" value="<?= htmlspecialchars($data['nama_lengkap'] ?? ''); ?>"
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
-                            <input type="text" name="email" value="<?= $data['email']; ?>"
+                            <input type="text" name="email" value="<?= htmlspecialchars($data['email'] ?? ''); ?>"
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly>
                         </div>
                         <div>
@@ -246,22 +250,22 @@ if (isset($_POST['update'])) {
                         </div>
                          <div>
                             <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
-                            <input name="instagram" value="<?= $data['instagram']; ?>" placeholder="@Username"
+                            <input name="instagram" value="<?= htmlspecialchars($data['instagram'] ?? ''); ?>" placeholder="@Username"
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly></input>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
-                            <input name="bio" value="<?= $data['bio']; ?>" maxlength="35"
+                            <input name="bio" value="<?= htmlspecialchars($data['bio'] ?? ''); ?>" maxlength="35"
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></input>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto</label>
                             <input type="file" id="foto-input" name="foto_file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             <input type="hidden" name="foto_data" id="foto_data">
-                            <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto']); ?>">
+                            <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto'] ?? ''); ?>">
 
                             <div class="flex items-center space-x-4 mt-4">
-                                <img id="current-preview" src="<?= profilePhotoUrl($data['foto'], '../') ?>" class="img-fluid rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm" style="width:120px; height:120px; object-fit:cover;" />
+                                <img id="current-preview" src="<?= profilePhotoUrl($data['foto'] ?? '', '../') ?>" class="img-fluid rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm" style="width:120px; height:120px; object-fit:cover;" />
                                 <div>
                                     <button type="button" id="open-cropper" class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 rounded text-xs hidden shadow-sm transition-all">Buka Cropper</button>
                                 </div>

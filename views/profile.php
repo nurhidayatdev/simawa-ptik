@@ -19,26 +19,28 @@ $query = "SELECT id FROM mahasiswa WHERE user_id = ?";
 $stmt  = mysqli_prepare($koneksi, $query);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
 mysqli_stmt_execute($stmt);
-$mahasiswa = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+$res_mhs = mysqli_stmt_get_result($stmt);
+$mahasiswa = mysqli_fetch_assoc($res_mhs);
 
-$mahasiswa_id = $mahasiswa['id'];
+$mahasiswa_id = $mahasiswa['id'] ?? null;
 
 
-// ambil data user
+// ambil data user (LEFT JOIN agar role fungsional non-mahasiswa tetap bisa lihat profil)
 $query = "
 SELECT 
     u.id AS user_id,
     u.role,
     u.password,
-    m.nim,
-    m.nama_lengkap,
-    m.nama_panggilan,
     u.email,
-    m.foto,
+    COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, 'Pengguna') AS nama_lengkap,
+    COALESCE(NULLIF(u.foto, ''), m.foto, '') AS foto,
+    u.linked_student_nim,
+    m.nim,
+    m.nama_panggilan,
     m.instagram,
     m.bio
 FROM users u
-JOIN mahasiswa m ON m.user_id = u.id
+LEFT JOIN mahasiswa m ON m.user_id = u.id
 WHERE u.id = ?
 LIMIT 1
 ";
@@ -113,7 +115,7 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
         <div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">User Profile</h1>
-                <a href="../actions/edit_profile.php?<?= $data['user_id']; ?>" id="edit-profile" class="px-4 py-2 bg-indigo-900 dark:bg-indigo-600 text-white rounded-lg hover:bg-indigo-800 dark:hover:bg-indigo-500 text-xs shadow-md transition-all">
+                <a href="../actions/edit_profile.php" id="edit-profile" class="px-4 py-2 bg-indigo-900 dark:bg-indigo-600 text-white rounded-lg hover:bg-indigo-800 dark:hover:bg-indigo-500 text-xs shadow-md transition-all">
                     Edit Profile
                 </a>
 
@@ -122,10 +124,17 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Profile Picture Section -->
                 <div class="md:col-span-1 flex flex-col items-center">
-                    <img src="<?= profilePhotoUrl($data['foto'], '../') ?>" alt="Profile Picture"
-                        class="w-32 h-32 rounded-full mb-4 shadow-lg border-2 border-white dark:border-slate-800">
-                    <h2 class="text-xl font-semibold mb-2 text-slate-800 dark:text-white"><?= htmlspecialchars($data['nama_lengkap']) ?></h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm"><?= htmlspecialchars($data['role']) ?></p>
+                    <img src="<?= profilePhotoUrl($data['foto'] ?? '', '../') ?>" alt="Profile Picture"
+                        class="w-32 h-32 rounded-full mb-4 shadow-lg border-2 border-white dark:border-slate-800 object-cover">
+                    <h2 class="text-xl font-semibold mb-2 text-slate-800 dark:text-white text-center"><?= htmlspecialchars($data['nama_lengkap'] ?? 'Pengguna') ?></h2>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 mb-2">
+                        <?= htmlspecialchars($data['role'] ?? '') ?>
+                    </span>
+                    <?php if (!empty($data['linked_student_nim'])): ?>
+                        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700 mt-1">
+                            <i class="fas fa-id-badge text-indigo-500"></i> Terhubung NIM: <strong class="text-slate-700 dark:text-slate-200"><?= htmlspecialchars($data['linked_student_nim']) ?></strong>
+                        </span>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Profile Details Section -->
@@ -150,13 +159,13 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
-                                <input type="text" name="instagram" value="<?= htmlspecialchars($data['instagram']) ?>"
+                                <input type="text" name="instagram" value="<?= htmlspecialchars($data['instagram'] ?? '') ?>"
                                     class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
                                     disabled>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
-                                <input type="text" name="bio" value="<?= htmlspecialchars($data['bio']) ?>"
+                                <input type="text" name="bio" value="<?= htmlspecialchars($data['bio'] ?? '') ?>"
                                     class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
                                     disabled>
                             </div>

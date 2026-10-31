@@ -93,14 +93,14 @@ $q_pengurus = mysqli_query($koneksi, "
         u.email,
         u.role,
         m.id as mahasiswa_id,
-        m.nama_lengkap,
-        m.nim,
-        m.foto,
+        COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, 'Pengurus') as nama_lengkap,
+        COALESCE(NULLIF(u.linked_student_nim, ''), m.nim, '-') as nim,
+        COALESCE(NULLIF(u.foto, ''), m.foto, '') as foto,
         m.jenis_kelamin
     FROM users u
     LEFT JOIN mahasiswa m ON m.user_id = u.id
     WHERE u.kelas_id = '$kelas_id' AND u.role IN ('Sekretaris', 'Bendahara')
-    ORDER BY FIELD(u.role, 'Sekretaris', 'Bendahara'), m.nama_lengkap ASC
+    ORDER BY FIELD(u.role, 'Sekretaris', 'Bendahara'), u.nama_lengkap ASC
 ");
 $pengurus_list = [];
 while ($row = mysqli_fetch_assoc($q_pengurus)) {

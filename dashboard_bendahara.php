@@ -49,12 +49,12 @@ unset($_SESSION['success'], $_SESSION['error']);
    1. STATISTIK RINGKASAN KEUANGAN KAS KELAS
    ========================================================= */
 
-// Total Mahasiswa Kelas (Excluding Admin)
+// Total Mahasiswa Kelas (Murni Mahasiswa)
 $q_total_mhs = mysqli_query($koneksi, "
     SELECT COUNT(*) as total 
     FROM mahasiswa m
     LEFT JOIN users u ON m.user_id = u.id
-    WHERE m.kelas_id = '$kelas_id' AND (u.role IS NULL OR u.role != 'Administrator Utama')
+    WHERE m.kelas_id = '$kelas_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)
 ");
 $total_mhs = (int)(mysqli_fetch_assoc($q_total_mhs)['total'] ?? 0);
 
@@ -243,7 +243,7 @@ $q_tunggakan = mysqli_query($koneksi, "
         GROUP BY mahasiswa_id
     ) sub ON m.id = sub.mahasiswa_id
     WHERE m.kelas_id = '$kelas_id' 
-      AND (u.role IS NULL OR u.role != 'Administrator Utama')
+      AND (u.role = 'Mahasiswa' OR u.role IS NULL)
       AND (COALESCE(sub.lunas_cnt, 0) < 16)
     ORDER BY tunggakan_minggu DESC, m.nama_lengkap ASC
     LIMIT 7

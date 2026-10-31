@@ -177,8 +177,9 @@ $q_top_absent = mysqli_query($koneksi, "
             COUNT(a.id) as total_rekam,
             SUM(CASE WHEN a.status = 'Hadir' THEN 1 ELSE 0 END) as total_hadir
         FROM mahasiswa m
+        LEFT JOIN users u ON m.user_id = u.id
         JOIN absensi a ON m.id = a.mahasiswa_id
-        WHERE m.kelas_id = '$kelas_id' AND a.periode_id = '$periode_id'
+        WHERE m.kelas_id = '$kelas_id' AND a.periode_id = '$periode_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)
         GROUP BY m.id
     ) sub
     WHERE (sub.alpha > 0 OR (sub.izin + sub.sakit) >= 1)

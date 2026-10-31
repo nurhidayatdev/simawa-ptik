@@ -16,36 +16,32 @@ $role = $_SESSION['role'];
 include_once '../functions/foto_helpers.php';
 require_once '../functions/helpers.php';
 
-$where_mhs_kelas = getKelasWhereClause('kelas_id', false);
+$where_mhs_kelas = getKelasWhereClause('m.kelas_id', false);
 $search = $_GET['search'] ?? '';
 
 if (!empty($search)) {
     $like = "%$search%";
-    if (!empty($where_mhs_kelas)) {
-        $stmt = mysqli_prepare(
-            $koneksi,
-            "SELECT * FROM mahasiswa 
-             WHERE ($where_mhs_kelas) 
-             AND (nim LIKE ? OR nama_lengkap LIKE ? OR nama_panggilan LIKE ?)
-             ORDER BY nim ASC"
-        );
-        mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
-    } else {
-        $stmt = mysqli_prepare(
-            $koneksi,
-            "SELECT * FROM mahasiswa 
-             WHERE nim LIKE ? 
-             OR nama_lengkap LIKE ? 
-             OR nama_panggilan LIKE ?
-             ORDER BY nim ASC"
-        );
-        mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
-    }
+    $where_extra = !empty($where_mhs_kelas) ? "AND ($where_mhs_kelas)" : "";
+    $stmt = mysqli_prepare(
+        $koneksi,
+        "SELECT m.* FROM mahasiswa m
+         LEFT JOIN users u ON m.user_id = u.id
+         WHERE (u.role = 'Mahasiswa' OR u.role IS NULL)
+         $where_extra
+         AND (m.nim LIKE ? OR m.nama_lengkap LIKE ? OR m.nama_panggilan LIKE ?)
+         ORDER BY m.nim ASC"
+    );
+    mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
-    $where_sql = !empty($where_mhs_kelas) ? "WHERE $where_mhs_kelas" : "";
-    $result = mysqli_query($koneksi, "SELECT * FROM mahasiswa $where_sql ORDER BY nim ASC");
+    $where_extra = !empty($where_mhs_kelas) ? "AND ($where_mhs_kelas)" : "";
+    $result = mysqli_query($koneksi, "
+        SELECT m.* FROM mahasiswa m
+        LEFT JOIN users u ON m.user_id = u.id
+        WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_extra
+        ORDER BY m.nim ASC
+    ");
 }
 
 // If this is an AJAX live-search request, return only the table rows

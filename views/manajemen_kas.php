@@ -81,8 +81,9 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel_mingguan' && isset($_GE
     $res = mysqli_query($koneksi, "
         SELECT m.nim, m.nama_lengkap, '$minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
         FROM mahasiswa m 
+        LEFT JOIN users u ON m.user_id = u.id
         LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_exp
-        WHERE 1=1 $where_mhs_exp $where_exp 
+        WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_exp $where_exp 
         ORDER BY m.nim ASC
     ");
 
@@ -185,9 +186,9 @@ $total_keluar = mysqli_fetch_assoc($res_out)['total_keluar'] ?? 0;
 $saldo = $total_masuk - $total_keluar;
 
 // Progress Calculation
-$where_mhs_only = getKelasWhereClause('', false);
-$where_mhs_sql = $where_mhs_only ? "WHERE $where_mhs_only" : "";
-$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa $where_mhs_sql");
+$where_mhs_only = getKelasWhereClause('m', false);
+$where_mhs_sql = $where_mhs_only ? "AND $where_mhs_only" : "";
+$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_sql");
 $total_students = mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0;
 
 $q_latest_week = mysqli_query($koneksi, "SELECT MAX(minggu_ke) as max_week FROM kas WHERE periode_id = '$periode_id' $where_kas");
@@ -249,8 +250,9 @@ $where_k_scope = getKelasWhereClause('k', true);
 $mhs_status = mysqli_query($koneksi, "
     SELECT m.id AS mahasiswa_id, m.nim, m.nama_lengkap, m.foto, '$f_minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
     FROM mahasiswa m 
+    LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$f_minggu' AND k.periode_id = '$periode_id' $where_k_scope
-    WHERE 1=1 $where_mhs_scope $where_mhs 
+    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_scope $where_mhs 
     ORDER BY m.nim ASC
 ");
 

@@ -99,8 +99,9 @@ if (isset($_POST['simpan_kas'])) {
     $q_report = mysqli_query($koneksi, "
         SELECT m.nama_panggilan, IFNULL(k.status, 'Belum') as status_bayar
         FROM mahasiswa m
+        LEFT JOIN users u ON m.user_id = u.id
         LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_rep
-        WHERE 1=1 $where_mhs_rep
+        WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_mhs_rep
         ORDER BY m.nama_panggilan ASC
     ");
 
@@ -252,8 +253,9 @@ if (isset($_POST['simpan_kas'])) {
         k.status,
         k.tanggal_bayar
     FROM mahasiswa m
+    LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_tbl
-    $where_combined
+    WHERE (u.role = 'Mahasiswa' OR u.role IS NULL) $where_combined
     ORDER BY m.nim ASC
     ");
                                 while ($row = mysqli_fetch_assoc($mhs)) : ?>

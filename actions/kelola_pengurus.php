@@ -166,48 +166,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = "simawa2024";
         }
 
-        // Kasus A: Mahasiswa SUDAH punya akun login di users
-        if (!empty($mhs['user_id'])) {
-            $existing_user_id = (int)$mhs['user_id'];
-
-            // Pastikan user bukan Administrator Utama atau Ketua Tingkat
-            $q_u = mysqli_query($koneksi, "SELECT role FROM users WHERE id = $existing_user_id AND (kelas_id = $kelas_id OR kelas_id IS NULL) LIMIT 1");
-            $u_data = mysqli_fetch_assoc($q_u);
-            if ($u_data && in_array($u_data['role'], ['Administrator Utama', 'Ketua Tingkat'])) {
-                $_SESSION['error'] = "Aksi ditolak: Tidak dapat mengubah peran akun pimpinan/administrator.";
-                header("Location: ../dashboard_keti.php");
-                exit();
-            }
-
-            // Update role dan email (jika diubah)
-            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                // Cek apakah email bentrok dengan user lain
-                $stmt_em = mysqli_prepare($koneksi, "SELECT id FROM users WHERE email = ? AND id != ? LIMIT 1");
-                mysqli_stmt_bind_param($stmt_em, "si", $email, $existing_user_id);
-                mysqli_stmt_execute($stmt_em);
-                if (mysqli_num_rows(mysqli_stmt_get_result($stmt_em)) > 0) {
-                    $_SESSION['error'] = "Email <strong>$email</strong> sudah digunakan oleh akun lain!";
-                    header("Location: ../dashboard_keti.php");
-                    exit();
-                }
-
-                $stmt_up = mysqli_prepare($koneksi, "UPDATE users SET role = ?, email = ?, kelas_id = ? WHERE id = ?");
-                mysqli_stmt_bind_param($stmt_up, "ssii", $role_pengurus, $email, $kelas_id, $existing_user_id);
-                mysqli_stmt_execute($stmt_up);
-            } else {
-                $stmt_up = mysqli_prepare($koneksi, "UPDATE users SET role = ?, kelas_id = ? WHERE id = ?");
-                mysqli_stmt_bind_param($stmt_up, "sii", $role_pengurus, $kelas_id, $existing_user_id);
-                mysqli_stmt_execute($stmt_up);
-            }
-
-            $_SESSION['success'] = "Jabatan <strong>" . htmlspecialchars($mhs['nama_lengkap']) . "</strong> berhasil diubah menjadi <strong>$role_pengurus</strong>!";
-            header("Location: ../dashboard_keti.php");
-            exit();
-        }
-
-        // Kasus B: Mahasiswa BELUM punya akun login -> buatkan baru
+        // Prinsip Satu-Akun-Satu-Role: Akun pengurus adalah akun fungsional baru murni
+        // tidak mengubah atau merangkap akun Mahasiswa yang sudah ada.
         if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['error'] = "Format email login untuk pengurus tidak valid!";
+            $_SESSION['error'] = "Format email login untuk akun pengurus wajib valid!";
             header("Location: ../dashboard_keti.php");
             exit();
         }
@@ -222,17 +184,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Insert ke users
-        $stmt_ins_u = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, kelas_id) VALUES (?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt_ins_u, "sssi", $email, $password, $role_pengurus, $kelas_id);
+        // Insert akun fungsional baru ke users (lengkap dengan nama_lengkap & linked_student_nim)
+        $stmt_ins_u = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, nama_lengkap, linked_student_nim, kelas_id) VALUES (?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt_ins_u, "sssssi", $email, $password, $role_pengurus, $mhs['nama_lengkap'], $mhs['nim'], $kelas_id);
         if (mysqli_stmt_execute($stmt_ins_u)) {
-            $new_user_id = mysqli_insert_id($koneksi);
-            // Hubungkan mahasiswa dengan user_id baru
-            mysqli_query($koneksi, "UPDATE mahasiswa SET user_id = $new_user_id WHERE id = $mahasiswa_id AND kelas_id = $kelas_id");
-
-            $_SESSION['success'] = "Akun pengurus <strong>$role_pengurus</strong> untuk <strong>" . htmlspecialchars($mhs['nama_lengkap']) . "</strong> berhasil dibuat! Email: <code>$email</code>";
+            $_SESSION['success'] = "Akun fungsional pengurus <strong>$role_pengurus</strong> untuk <strong>" . htmlspecialchars($mhs['nama_lengkap']) . "</strong> (NIM: {$mhs['nim']}) berhasil dibuat! Email: <code>$email</code>";
         } else {
-            $_SESSION['error'] = "Gagal membuat akun login: " . mysqli_error($koneksi);
+            $_SESSION['error'] = "Gagal membuat akun pengurus: " . mysqli_error($koneksi);
         }
 
         header("Location: ../dashboard_keti.php");
@@ -307,12 +265,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Ubah kembali menjadi Mahasiswa biasa
-        $stmt_demote = mysqli_prepare($koneksi, "UPDATE users SET role = 'Mahasiswa' WHERE id = ? AND kelas_id = ?");
-        mysqli_stmt_bind_param($stmt_demote, "ii", $target_user_id, $kelas_id);
+        // Hapus akun fungsional pengurus (akun Mahasiswa asli mahasiswa tetap aman)
+        $stmt_del = mysqli_prepare($koneksi, "DELETE FROM users WHERE id = ? AND kelas_id = ? AND role IN ('Sekretaris', 'Bendahara')");
+        mysqli_stmt_bind_param($stmt_del, "ii", $target_user_id, $kelas_id);
 
-        if (mysqli_stmt_execute($stmt_demote)) {
-            $_SESSION['success'] = "Jabatan pengurus untuk akun <strong>" . htmlspecialchars($target['email']) . "</strong> telah dicopot dan dikembalikan menjadi <strong>Mahasiswa</strong>.";
+        if (mysqli_stmt_execute($stmt_del)) {
+            $_SESSION['success'] = "Akun pengurus <strong>" . htmlspecialchars($target['email']) . "</strong> telah dicopot/dinonaktifkan.";
         } else {
             $_SESSION['error'] = "Gagal mencopot jabatan: " . mysqli_error($koneksi);
         }
