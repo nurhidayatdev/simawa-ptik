@@ -204,7 +204,7 @@ $foto         = $_SESSION['foto'] ?? '';
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Kelas Saya</p>
                         
                         <a href="<?= $base ?>database/db_mahasiswa" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-users-line w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <i class="fa fa-user-graduate w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Anggota Mahasiswa</span>
                         </a>
 
@@ -337,7 +337,7 @@ $foto         = $_SESSION['foto'] ?? '';
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi Kelas</p>
                         
                         <a href="<?= $base ?>database/db_mahasiswa" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-users-line w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <i class="fa fa-user-graduate w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Anggota Mahasiswa</span>
                         </a>
 
@@ -415,7 +415,7 @@ $foto         = $_SESSION['foto'] ?? '';
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Informasi Kelas</p>
                         
                         <a href="<?= $base ?>database/db_mahasiswa" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-users-line w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <i class="fa fa-user-graduate w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Anggota Mahasiswa</span>
                         </a>
 
@@ -491,7 +491,7 @@ $foto         = $_SESSION['foto'] ?? '';
                         <p class="px-4 text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Status Saya</p>
                         
                         <a href="<?= $base ?>views/rekap_absen" class="flex items-center px-4 py-2 text-slate-800 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-                            <i class="fa fa-clipboard-user w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
+                            <i class="fa fa-calendar-check w-4 h-4 mr-4 text-indigo-900 dark:text-indigo-400"></i>
                             <span class="text-xs font-medium">Kehadiran Saya</span>
                         </a>
 

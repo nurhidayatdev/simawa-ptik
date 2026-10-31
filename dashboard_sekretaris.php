@@ -392,7 +392,7 @@ $title = "Dashboard Sekretaris - " . $nama_kelas_aktif;
                     </a>
 
                     <a href="database/db_mahasiswa" class="p-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/60 transition-all group">
-                        <i class="fas fa-users-line text-cyan-600 dark:text-cyan-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
+                        <i class="fas fa-user-graduate text-cyan-600 dark:text-cyan-400 text-lg mb-1.5 block group-hover:scale-110 transition-transform"></i>
                         <div class="font-bold text-xs text-slate-800 dark:text-slate-200">Mahasiswa</div>
                         <div class="text-[10px] text-slate-400 mt-0.5">Anggota kelas</div>
                     </a>

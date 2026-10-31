@@ -270,7 +270,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                             </div>
                         </div>
                         <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                            <i class="fas fa-users-line"></i>
+                            <i class="fas fa-user-graduate"></i>
                         </div>
                     </div>
                 </div>
@@ -304,7 +304,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                             </div>
                         </div>
                         <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                            <i class="fas fa-clipboard-user"></i>
+                            <i class="fas fa-calendar-check"></i>
                         </div>
                     </div>
                 </div>
