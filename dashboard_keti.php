@@ -44,7 +44,7 @@ unset($_SESSION['success'], $_SESSION['error']);
    ========================================================= */
 
 // Total Mahasiswa Kelas
-$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa WHERE kelas_id = '$kelas_id'");
+$q_mhs_count = mysqli_query($koneksi, "SELECT COUNT(*) as total FROM mahasiswa m LEFT JOIN users u ON m.user_id = u.id WHERE m.kelas_id = '$kelas_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)");
 $total_mhs = (int)(mysqli_fetch_assoc($q_mhs_count)['total'] ?? 0);
 
 // Total Pengurus Kelas (Sekretaris, Bendahara)
@@ -123,7 +123,7 @@ $q_mhs = mysqli_query($koneksi, "
         u.role
     FROM mahasiswa m
     LEFT JOIN users u ON m.user_id = u.id
-    WHERE m.kelas_id = '$kelas_id'
+    WHERE m.kelas_id = '$kelas_id' AND (u.role = 'Mahasiswa' OR u.role IS NULL)
     ORDER BY m.nim ASC
 ");
 $mhs_list = [];
@@ -703,6 +703,24 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Foto Profil (Opsional)</label>
                     <input type="file" name="foto" accept="image/*" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-3.5 py-2 rounded-xl text-xs file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                </div>
+
+                                <!-- Pembuatan Akun Login Role Mahasiswa (Opsional) -->
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Akun Login Mahasiswa (Opsional)</label>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Isi jika mahasiswa ini (atau Anda sendiri) ingin memiliki akun login terpisah sebagai Mahasiswa.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Email Login</label>
+                            <input type="email" name="email" placeholder="contoh: mhs@simawa.id" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Password Awal</label>
+                            <input type="password" name="password" placeholder="Default: simawa2024" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">

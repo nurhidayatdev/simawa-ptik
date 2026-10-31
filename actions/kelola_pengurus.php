@@ -67,6 +67,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Opsi: Buat akun login role Mahasiswa jika email diisi
+        $email_login = trim($_POST['email'] ?? '');
+        $pass_login  = trim($_POST['password'] ?? '');
+
+        if (!empty($email_login)) {
+            if (!filter_var($email_login, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['error'] = "Format email login mahasiswa tidak valid!";
+                header("Location: ../dashboard_keti.php");
+                exit();
+            }
+
+            // Cek keunikan email di users
+            $stmt_em = mysqli_prepare($koneksi, "SELECT id FROM users WHERE email = ? LIMIT 1");
+            mysqli_stmt_bind_param($stmt_em, "s", $email_login);
+            mysqli_stmt_execute($stmt_em);
+            if (mysqli_num_rows(mysqli_stmt_get_result($stmt_em)) > 0) {
+                $_SESSION['error'] = "Email <strong>$email_login</strong> sudah terdaftar di sistem! Gunakan email lain.";
+                header("Location: ../dashboard_keti.php");
+                exit();
+            }
+        }
+
         // Simpan data mahasiswa otomatis dengan kelas_id sesi Ketua Tingkat
         $stmt_ins = mysqli_prepare($koneksi, "
             INSERT INTO mahasiswa (kelas_id, nim, nama_lengkap, nama_panggilan, jenis_kelamin, bio, instagram, foto)
@@ -75,7 +97,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($stmt_ins, "isssssss", $kelas_id, $nim, $nama_lengkap, $nama_panggilan, $jenis_kelamin, $bio, $instagram, $foto);
 
         if (mysqli_stmt_execute($stmt_ins)) {
-            $_SESSION['success'] = "Mahasiswa <strong>" . htmlspecialchars($nama_lengkap) . "</strong> (" . htmlspecialchars($nim) . ") berhasil ditambahkan ke kelas Anda!";
+            $new_mhs_id = mysqli_insert_id($koneksi);
+
+            // Jika email login diisi, buat akun di tabel users dengan role 'Mahasiswa'
+            if (!empty($email_login)) {
+                if (empty($pass_login)) {
+                    $pass_login = "simawa2024";
+                }
+                $stmt_u = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, kelas_id) VALUES (?, ?, 'Mahasiswa', ?)");
+                mysqli_stmt_bind_param($stmt_u, "ssi", $email_login, $pass_login, $kelas_id);
+                if (mysqli_stmt_execute($stmt_u)) {
+                    $new_uid = mysqli_insert_id($koneksi);
+                    mysqli_query($koneksi, "UPDATE mahasiswa SET user_id = $new_uid WHERE id = $new_mhs_id");
+                }
+            }
+
+            $success_text = "Mahasiswa <strong>" . htmlspecialchars($nama_lengkap) . "</strong> (" . htmlspecialchars($nim) . ") berhasil ditambahkan ke kelas Anda!";
+            if (!empty($email_login)) {
+                $success_text .= " Akun login Mahasiswa (<code>$email_login</code>) telah aktif.";
+            }
+            $_SESSION['success'] = $success_text;
         } else {
             $_SESSION['error'] = "Gagal menambahkan mahasiswa: " . mysqli_error($koneksi);
         }

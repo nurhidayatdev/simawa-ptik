@@ -12,14 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     // ==========================================
-    // 1. TAMBAH KELAS BARU
+    // 1. TAMBAH KELAS BARU & KETUA TINGKAT LANGSUNG
     // ==========================================
     if ($action === 'tambah_kelas') {
         $nama_kelas   = trim($_POST['nama_kelas'] ?? '');
-        $angkatan     = trim($_POST['angkatan'] ?? '2024');
-        $prodi        = trim($_POST['prodi'] ?? 'Pendidikan Teknik Informatika dan Komputer');
+        $angkatan     = '2024'; // Tetap & Fiks Angkatan 2024
+        $prodi        = 'Pendidikan Teknik Informatika dan Komputer'; // Tetap & Fiks Prodi PTIK
         $status_aktif = ($_POST['status_aktif'] ?? 'aktif') === 'non-aktif' ? 'non-aktif' : 'aktif';
-        $ketua_mode   = $_POST['ketua_mode'] ?? 'none';
 
         if (empty($nama_kelas)) {
             $_SESSION['error'] = 'Nama kelas wajib diisi!';
@@ -38,49 +37,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Jika mode buat akun Ketua Tingkat baru
-        $new_user_id = null;
-        if ($ketua_mode === 'new') {
-            $ketua_nama     = trim($_POST['ketua_nama'] ?? '');
-            $ketua_nim      = trim($_POST['ketua_nim'] ?? '');
-            $ketua_email    = trim($_POST['ketua_email'] ?? '');
-            $ketua_password = trim($_POST['ketua_password'] ?? '');
+        // Data Akun Baru Ketua Tingkat (Langsung Dibuat)
+        $ketua_nama     = trim($_POST['ketua_nama'] ?? '');
+        $ketua_email    = trim($_POST['ketua_email'] ?? '');
+        $ketua_password = trim($_POST['ketua_password'] ?? '');
 
-            if (empty($ketua_nama) || empty($ketua_nim) || empty($ketua_email) || empty($ketua_password)) {
-                $_SESSION['error'] = 'Semua data akun Ketua Tingkat baru wajib diisi lengkap!';
-                header('Location: ../dashboard_admin.php');
-                exit();
-            }
-
-            // Validasi format email
-            if (!filter_var($ketua_email, FILTER_VALIDATE_EMAIL)) {
-                $_SESSION['error'] = 'Format email Ketua Tingkat tidak valid!';
-                header('Location: ../dashboard_admin.php');
-                exit();
-            }
-
-            // Cek keunikan email
-            $stmt_u = mysqli_prepare($koneksi, "SELECT id FROM users WHERE email = ? LIMIT 1");
-            mysqli_stmt_bind_param($stmt_u, "s", $ketua_email);
-            mysqli_stmt_execute($stmt_u);
-            if (mysqli_num_rows(mysqli_stmt_get_result($stmt_u)) > 0) {
-                $_SESSION['error'] = "Email '$ketua_email' sudah digunakan oleh akun lain!";
-                header('Location: ../dashboard_admin.php');
-                exit();
-            }
-
-            // Cek keunikan NIM
-            $stmt_m = mysqli_prepare($koneksi, "SELECT id FROM mahasiswa WHERE nim = ? LIMIT 1");
-            mysqli_stmt_bind_param($stmt_m, "s", $ketua_nim);
-            mysqli_stmt_execute($stmt_m);
-            if (mysqli_num_rows(mysqli_stmt_get_result($stmt_m)) > 0) {
-                $_SESSION['error'] = "NIM '$ketua_nim' sudah terdaftar di sistem!";
-                header('Location: ../dashboard_admin.php');
-                exit();
-            }
+        if (empty($ketua_nama) || empty($ketua_email) || empty($ketua_password)) {
+            $_SESSION['error'] = 'Nama Lengkap, Email Login, dan Password untuk Ketua Tingkat baru wajib diisi!';
+            header('Location: ../dashboard_admin.php');
+            exit();
         }
 
-        // Simpan kelas baru
+        // Validasi format email
+        if (!filter_var($ketua_email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = 'Format email Ketua Tingkat tidak valid!';
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+
+        // Cek keunikan email di tabel users
+        $stmt_u = mysqli_prepare($koneksi, "SELECT id FROM users WHERE email = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt_u, "s", $ketua_email);
+        mysqli_stmt_execute($stmt_u);
+        if (mysqli_num_rows(mysqli_stmt_get_result($stmt_u)) > 0) {
+            $_SESSION['error'] = "Email '$ketua_email' sudah digunakan oleh akun lain!";
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+
+        // 1. Simpan data kelas baru
         $stmt_ins = mysqli_prepare($koneksi, "INSERT INTO kelas (nama_kelas, angkatan, prodi, status_aktif) VALUES (?, ?, ?, ?)");
         mysqli_stmt_bind_param($stmt_ins, "ssss", $nama_kelas, $angkatan, $prodi, $status_aktif);
         if (!mysqli_stmt_execute($stmt_ins)) {
@@ -90,35 +75,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $kelas_id = mysqli_insert_id($koneksi);
 
-        // Proses asosiasi Ketua Tingkat
-        if ($ketua_mode === 'new') {
-            // Buat akun di users
-            $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, kelas_id) VALUES (?, ?, 'Ketua Tingkat', ?)");
-            mysqli_stmt_bind_param($stmt_user, "ssi", $ketua_email, $ketua_password, $kelas_id);
-            mysqli_stmt_execute($stmt_user);
-            $new_user_id = mysqli_insert_id($koneksi);
+        // 2. Buat akun login Ketua Tingkat di users
+        $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, kelas_id) VALUES (?, ?, 'Ketua Tingkat', ?)");
+        mysqli_stmt_bind_param($stmt_user, "ssi", $ketua_email, $ketua_password, $kelas_id);
+        mysqli_stmt_execute($stmt_user);
+        $new_user_id = mysqli_insert_id($koneksi);
 
-            // Buat profil di mahasiswa
-            $nama_panggilan = explode(' ', $ketua_nama)[0];
-            $stmt_mhs = mysqli_prepare($koneksi, "INSERT INTO mahasiswa (user_id, kelas_id, nim, nama_lengkap, nama_panggilan) VALUES (?, ?, ?, ?, ?)");
-            mysqli_stmt_bind_param($stmt_mhs, "iisss", $new_user_id, $kelas_id, $ketua_nim, $ketua_nama, $nama_panggilan);
-            mysqli_stmt_execute($stmt_mhs);
+        // 3. Tautkan ketua_tingkat_user_id pada kelas
+        $stmt_up_k = mysqli_prepare($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = ? WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_up_k, "ii", $new_user_id, $kelas_id);
+        mysqli_stmt_execute($stmt_up_k);
 
-            // Update kelas dengan ketua_tingkat_user_id
-            $stmt_up_k = mysqli_prepare($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = ? WHERE id = ?");
-            mysqli_stmt_bind_param($stmt_up_k, "ii", $new_user_id, $kelas_id);
-            mysqli_stmt_execute($stmt_up_k);
-        } elseif ($ketua_mode === 'existing') {
-            $existing_user_id = (int)($_POST['existing_user_id'] ?? 0);
-            if ($existing_user_id > 0) {
-                // Update role user menjadi Ketua Tingkat dan kelas_id
-                mysqli_query($koneksi, "UPDATE users SET role = 'Ketua Tingkat', kelas_id = $kelas_id WHERE id = $existing_user_id");
-                mysqli_query($koneksi, "UPDATE mahasiswa SET kelas_id = $kelas_id WHERE user_id = $existing_user_id");
-                mysqli_query($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = $existing_user_id WHERE id = $kelas_id");
-            }
-        }
+        // 4. Buat profil kepemimpinan di tabel mahasiswa (kode sistem unik KT-xxxx)
+        // Hal ini menjaga agar NIM asli mahasiswa tetap bebas & tidak bentrok saat Ketua Tingkat
+        // membuat akun Mahasiswa terpisah untuk dirinya sendiri nanti
+        $ketua_nim = 'KT' . str_pad($kelas_id, 4, '0', STR_PAD_LEFT);
+        $nama_panggilan = explode(' ', $ketua_nama)[0];
+        $stmt_mhs = mysqli_prepare($koneksi, "INSERT INTO mahasiswa (user_id, kelas_id, nim, nama_lengkap, nama_panggilan) VALUES (?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt_mhs, "iisss", $new_user_id, $kelas_id, $ketua_nim, $ketua_nama, $nama_panggilan);
+        mysqli_stmt_execute($stmt_mhs);
 
-        $_SESSION['success'] = "Kelas <strong>" . htmlspecialchars($nama_kelas) . "</strong> berhasil ditambahkan!";
+        $_SESSION['success'] = "Kelas <strong>" . htmlspecialchars($nama_kelas) . "</strong> dan Akun Ketua Tingkat (<strong>" . htmlspecialchars($ketua_nama) . "</strong> - <code>" . htmlspecialchars($ketua_email) . "</code>) berhasil dibuat!";
         header('Location: ../dashboard_admin.php');
         exit();
     }

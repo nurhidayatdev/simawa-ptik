@@ -60,7 +60,7 @@ $q_kelas_list = mysqli_query($koneksi, "
         u.email as ketua_email,
         m.nama_lengkap as ketua_nama,
         m.foto as ketua_foto,
-        (SELECT COUNT(*) FROM mahasiswa m2 WHERE m2.kelas_id = k.id) as total_mahasiswa
+        (SELECT COUNT(*) FROM mahasiswa m2 LEFT JOIN users u2 ON m2.user_id = u2.id WHERE m2.kelas_id = k.id AND (u2.role = 'Mahasiswa' OR u2.role IS NULL)) as total_mahasiswa
     FROM kelas k
     LEFT JOIN users u ON k.ketua_tingkat_user_id = u.id
     LEFT JOIN mahasiswa m ON m.user_id = u.id
@@ -476,15 +476,10 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
             <form action="actions/tambah_kelas.php" method="POST" class="space-y-4">
                 <input type="hidden" name="action" value="tambah_kelas">
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Kelas *</label>
-                    <input type="text" name="nama_kelas" required placeholder="Contoh: PTIK A 2024, PTIK B 2024" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Angkatan *</label>
-                        <input type="text" name="angkatan" value="2024" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Kelas *</label>
+                        <input type="text" name="nama_kelas" required placeholder="Contoh: PTIK A 2024, PTIK B 2024" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Status Awal</label>
@@ -495,69 +490,44 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Program Studi *</label>
-                    <input type="text" name="prodi" value="Pendidikan Teknik Informatika dan Komputer" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                <!-- Info Tetap: Angkatan 2024 & Prodi PTIK -->
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <div>
+                        <span class="font-bold text-slate-700 dark:text-slate-300">Angkatan:</span> 2024 (Fiks)
+                    </div>
+                    <div class="border-l border-slate-200 dark:border-slate-700 pl-3">
+                        <span class="font-bold text-slate-700 dark:text-slate-300">Prodi:</span> PTIK (Fiks)
+                    </div>
                 </div>
 
+                <!-- Penunjukan Ketua Tingkat: Langsung Buat Akun Baru -->
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Penunjukan Ketua Tingkat</label>
-                    <div class="grid grid-cols-3 gap-2 mb-3">
-                        <label class="flex items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
-                            <input type="radio" name="ketua_mode" value="none" checked onchange="toggleKetuaInputs('none')">
-                            <span>Nanti Saja</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
-                            <input type="radio" name="ketua_mode" value="new" onchange="toggleKetuaInputs('new')">
-                            <span>Akun Baru</span>
-                        </label>
-                        <label class="flex items-center gap-1.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
-                            <input type="radio" name="ketua_mode" value="existing" onchange="toggleKetuaInputs('existing')">
-                            <span>Pilih User</span>
-                        </label>
+                    <div class="mb-3">
+                        <label class="block text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Pembuatan Akun Ketua Tingkat Baru *</label>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Akun kepemimpinan kelas khusus Ketua Tingkat langsung dibuatkan di sini (tanpa mengambil akun mahasiswa yang sudah ada).</p>
                     </div>
 
-                    <!-- Input Form Akun Baru -->
-                    <div id="ketuaNewSection" class="hidden space-y-3 p-3.5 bg-indigo-50/50 dark:bg-slate-800/40 rounded-xl border border-indigo-100 dark:border-slate-700/60">
+                    <div class="space-y-3 p-3.5 bg-indigo-50/50 dark:bg-slate-800/40 rounded-xl border border-indigo-100 dark:border-slate-700/60">
                         <div>
                             <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Ketua Tingkat *</label>
-                            <input type="text" name="ketua_nama" placeholder="Contoh: Ahmad Fauzan" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none">
+                            <input type="text" name="ketua_nama" required placeholder="Contoh: Ahmad Fauzan" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">NIM Mahasiswa *</label>
-                                <input type="text" name="ketua_nim" placeholder="24020950..." class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none">
+                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Email Login Ketua Tingkat *</label>
+                                <input type="email" name="ketua_email" required placeholder="ketua.a@simawa.id" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                             </div>
                             <div>
                                 <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Password Awal *</label>
-                                <input type="password" name="ketua_password" placeholder="Minimal 8 karakter" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none">
+                                <input type="password" name="ketua_password" required placeholder="Minimal 8 karakter" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Email Login *</label>
-                            <input type="email" name="ketua_email" placeholder="ketua.a@simawa.id" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none">
-                        </div>
-                    </div>
-
-                    <!-- Input Pilih User yang Ada -->
-                    <div id="ketuaExistingSection" class="hidden p-3.5 bg-indigo-50/50 dark:bg-slate-800/40 rounded-xl border border-indigo-100 dark:border-slate-700/60">
-                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Pilih User / Mahasiswa *</label>
-                        <select name="existing_user_id" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none cursor-pointer">
-                            <option value="">-- Pilih Mahasiswa / User --</option>
-                            <?php foreach ($users_keti as $uk): ?>
-                                <option value="<?= $uk['id'] ?>">
-                                    <?= htmlspecialchars($uk['nama_lengkap'] ?: $uk['email']) ?> 
-                                    <?= !empty($uk['nim']) ? '(' . htmlspecialchars($uk['nim']) . ')' : '' ?>
-                                    <?= !empty($uk['nama_kelas']) ? ' - saat ini di ' . htmlspecialchars($uk['nama_kelas']) : '' ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <button type="button" onclick="closeTambahKelasModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">Simpan Kelas</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">Simpan Kelas & Buat Akun</button>
                 </div>
             </form>
         </div>
@@ -587,23 +557,15 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                     <input type="text" name="nama_kelas" id="edit_nama_kelas" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Angkatan *</label>
-                        <input type="text" name="angkatan" id="edit_angkatan" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Status Kelas</label>
-                        <select name="status_aktif" id="edit_status_aktif" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
-                            <option value="aktif">Aktif</option>
-                            <option value="non-aktif">Non-Aktif</option>
-                        </select>
-                    </div>
-                </div>
+                <input type="hidden" name="angkatan" id="edit_angkatan" value="2024">
+                <input type="hidden" name="prodi" id="edit_prodi" value="Pendidikan Teknik Informatika dan Komputer">
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Program Studi *</label>
-                    <input type="text" name="prodi" id="edit_prodi" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Status Kelas</label>
+                    <select name="status_aktif" id="edit_status_aktif" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                        <option value="aktif">Aktif</option>
+                        <option value="non-aktif">Non-Aktif</option>
+                    </select>
                 </div>
 
                 <div>
