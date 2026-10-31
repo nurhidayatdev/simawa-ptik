@@ -44,11 +44,35 @@ $foto         = $_SESSION['foto'] ?? '';
     .dark .submenu::-webkit-scrollbar-thumb:hover {
         background: #475569;
     }
+    /* =========================================================
+       GLOBAL DASHBOARD LAYOUT: HEADER HEIGHT & MAIN OFFSET
+       Mencegah header fixed menimpa/overlapping konten dashboard di semua role
+       ========================================================= */
+    #navbar-top,
+    header.fixed {
+        height: 4rem !important; /* 64px fixed navbar */
+    }
+    #navbar-top > div,
+    header.fixed > div {
+        height: 100% !important;
+    }
+
+    /* Target elemen main di seluruh dashboard dan back-office */
+    body > main,
+    main.flex-col {
+        padding-top: 5.5rem !important; /* Mobile: 88px = 64px navbar + 24px safe clearance */
+    }
+    @media (min-width: 768px) {
+        body > main,
+        main.flex-col {
+            padding-top: 6rem !important; /* Desktop: 96px = 64px navbar + 32px generous breathing room */
+        }
+    }
 </style>
 
 <!-- Header dengan z-index lebih tinggi -->
-<header class="bg-indigo-950 fixed w-full top-0 z-50">
-    <div class="flex justify-between items-center px-6 py-2">
+<header id="navbar-top" class="bg-indigo-950 fixed w-full top-0 h-16 z-50 shadow-md">
+    <div class="flex justify-between items-center px-4 md:px-6 h-full w-full">
         <div class="flex items-center">
             <img src="<?= $base ?>assets/image/logo.webp" alt="Logo Universitas Negeri Makassar" class="h-10 w-10 mr-3">
             <span class="text-xl font-bold text-white">SIMAWA PTIK 2024</span>

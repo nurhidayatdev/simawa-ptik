@@ -338,11 +338,11 @@ $title = "Dashboard - SIMAWA PTIK 2024";
     <?php include 'includes/menu_db.php'; ?>
 
     <!-- Main Shell (Offset Margin Left ml-0 lg:ml-48, pt-20 untuk topbar) -->
-    <main class="ml-0 lg:ml-48 pt-20 p-4 md:p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-24 px-4 md:px-6 pb-6 flex flex-col min-h-screen">
         <div class="max-w-6xl mx-auto flex-grow w-full space-y-6">
 
             <!-- 1. Welcome & Realtime Section -->
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 transition-all">
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-7 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 transition-all">
                 <div class="flex items-center gap-4">
                     <div class="h-14 w-14 flex-shrink-0 aspect-square rounded-full overflow-hidden border-2 border-indigo-200 dark:border-indigo-900/50">
                         <img src="<?= profilePhotoUrl($foto) ?>" alt="Profile" class="w-full h-full object-cover">

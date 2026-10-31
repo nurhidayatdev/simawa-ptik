@@ -226,22 +226,22 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
     <?php include 'includes/menu_db.php'; ?>
 
     <!-- Main Shell (Offset Margin Left ml-0 lg:ml-48, pt-20 untuk topbar) -->
-    <main class="ml-0 lg:ml-48 pt-20 p-4 md:p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-24 px-4 md:px-6 pb-6 flex flex-col min-h-screen">
         <div class="max-w-7xl mx-auto w-full space-y-6 flex-grow">
 
             <!-- 1. Header & Quick Actions -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-7 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-900/50">
                             <i class="fas fa-crown text-[9px]"></i> Ketua Tingkat
                         </span>
                         <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">• <?= htmlspecialchars($nama_kelas_aktif) ?></span>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5 tracking-tight">
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                         Pusat Kendali <?= htmlspecialchars($nama_kelas_aktif) ?>
                     </h1>
-                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1.5">
                         Kelola data mahasiswa kelas, penunjukan pengurus (Sekretaris & Bendahara), dan aktivitas perkuliahan kelas Anda.
                     </p>
                 </div>
@@ -298,7 +298,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                         <div>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Kehadiran Kelas</span>
                             <div class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white mt-1.5"><?= $attendance_rate ?>%</div>
-                            <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                            <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5">
                                 <?= $tot_hadir ?> Hadir dari <?= $tot_absen ?> Sesi
                             </div>
                         </div>
@@ -588,7 +588,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                                 <?= htmlspecialchars($j['sks']) ?> SKS
                                             </span>
                                         </div>
-                                        <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                                        <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
                                             <span><i class="fas fa-clock mr-1 text-amber-500"></i> <?= htmlspecialchars(substr($j['jam_mulai'] ?? '', 0, 5)) ?> - <?= htmlspecialchars(substr($j['jam_selesai'] ?? '', 0, 5)) ?></span>
                                             <span>•</span>
                                             <span><i class="fas fa-door-open mr-1 text-emerald-500"></i> <?= htmlspecialchars($j['nama_ruangan'] ?? 'Ruang TBA') ?></span>

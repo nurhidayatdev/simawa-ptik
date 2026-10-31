@@ -116,20 +116,20 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
     <?php include 'includes/menu_db.php'; ?>
 
     <!-- Main Shell (Offset Margin Left ml-0 lg:ml-48, pt-20 untuk topbar) -->
-    <main class="ml-0 lg:ml-48 pt-20 p-4 md:p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-24 px-4 md:px-6 pb-6 flex flex-col min-h-screen">
         <div class="max-w-7xl mx-auto w-full space-y-6 flex-grow">
 
             <!-- 1. Header & Action Bar -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-7 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/50">
                             <i class="fas fa-crown text-[9px]"></i> Administrator Utama
                         </span>
                         <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">• Pusat Kendali Multi-Kelas</span>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5 tracking-tight">Dashboard Administrator</h1>
-                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola pembagian kelas, penunjukan Ketua Tingkat, dan pengawasan operasional lintas angkatan.</p>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard Administrator</h1>
+                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1.5">Kelola pembagian kelas, penunjukan Ketua Tingkat, dan pengawasan operasional lintas angkatan.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5">
                     <button type="button" onclick="openTambahKelasModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">
@@ -165,7 +165,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                         <div>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Total Mahasiswa</span>
                             <div class="text-2xl md:text-3xl font-black text-slate-800 dark:text-white mt-1.5"><?= $total_mhs ?></div>
-                            <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1">
+                            <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-1.5">
                                 Akumulasi Seluruh Kelas
                             </div>
                         </div>

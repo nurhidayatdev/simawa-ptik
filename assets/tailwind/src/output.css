@@ -2529,6 +2529,9 @@
   .pt-20 {
     padding-top: calc(var(--spacing) * 20);
   }
+  .pt-24 {
+    padding-top: calc(var(--spacing) * 24);
+  }
   .pr-2 {
     padding-right: calc(var(--spacing) * 2);
   }
@@ -4275,6 +4278,9 @@
     }
     .md\:p-6 {
       padding: calc(var(--spacing) * 6);
+    }
+    .md\:p-7 {
+      padding: calc(var(--spacing) * 7);
     }
     .md\:p-8 {
       padding: calc(var(--spacing) * 8);

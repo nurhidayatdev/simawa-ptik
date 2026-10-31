@@ -271,20 +271,20 @@ $title = "Dashboard Bendahara - SIMAWA PTIK 2024";
     <?php include 'includes/menu_db.php'; ?>
 
     <!-- Main Shell (Offset Margin Left ml-0 lg:ml-48, pt-20 untuk topbar) -->
-    <main class="ml-0 lg:ml-48 pt-20 p-4 md:p-6 flex flex-col min-h-screen">
+    <main class="ml-0 lg:ml-48 pt-24 px-4 md:px-6 pb-6 flex flex-col min-h-screen">
         <div class="max-w-7xl mx-auto w-full space-y-6 flex-grow">
 
             <!-- 1. Header & Action Bar -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 md:p-7 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/50">
                             <i class="fas fa-coins text-[9px]"></i> Bendahara Kelas
                         </span>
                         <span class="text-xs font-semibold text-slate-400 dark:text-slate-500">• <?= htmlspecialchars($nama_kelas_aktif) ?> (<?= htmlspecialchars($periode_nama) ?>)</span>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white mt-1.5 tracking-tight">Dashboard Bendahara</h1>
-                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">Pusat transparansi saldo kas, pencatatan arus masuk/keluar, dan penagihan iuran kelas.</p>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard Bendahara</h1>
+                    <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1.5">Pusat transparansi saldo kas, pencatatan arus masuk/keluar, dan penagihan iuran kelas.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5">
                     <a href="actions/tambah_kas_minggu.php" class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all">
