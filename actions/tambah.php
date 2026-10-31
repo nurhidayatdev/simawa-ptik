@@ -13,6 +13,12 @@ $tabel = $_GET['tabel'] ?? '';
 $file = $_GET['file'] ?? '';
 $role = $_SESSION['role'];
 
+if ($tabel === 'jadwal_matkul' && !in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+    $_SESSION['error'] = "Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.";
+    header("Location: ../database/db_jadwal");
+    exit;
+}
+
 if (isset($_POST['tambah'])) {
     $redirect = "";
     switch ($tabel) {
@@ -61,6 +67,11 @@ if (isset($_POST['tambah'])) {
             break;
 
         case 'jadwal_matkul':
+            if (!in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+                $_SESSION['error'] = "Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.";
+                header("Location: ../database/db_jadwal");
+                exit;
+            }
             $matkul_id = $_POST['matkul_id'];
             $hari = $_POST['hari'];
             $jam_mulai_ke = $_POST['jam_mulai_ke'];

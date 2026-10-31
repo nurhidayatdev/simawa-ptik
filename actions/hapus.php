@@ -4,6 +4,14 @@ include '../koneksi.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'jadwal_matkul') {
+    $user_role = $_SESSION['role'] ?? '';
+    if (!in_array($user_role, ['Administrator Utama', 'Ketua Tingkat'])) {
+        echo "<script>alert('Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.'); window.location.href='../database/db_jadwal';</script>";
+        exit();
+    }
+}
+
 // Handle jam_kuliah dengan jam_ke sebagai identifier
 if (isset($_GET['tabel']) && $_GET['tabel'] === 'jam_kuliah' && isset($_GET['jam_ke']) && !isset($_GET['confirm'])) {
     $tabel = 'jam_kuliah';

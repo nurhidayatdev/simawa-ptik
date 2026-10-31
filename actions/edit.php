@@ -14,6 +14,12 @@ $role = $_SESSION['role'];
 $tabel = $_GET['tabel'] ?? '';
 $id = $_GET['id'] ?? '';
 
+if ($tabel === 'jadwal_matkul' && !in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+    $_SESSION['error'] = "Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.";
+    header("Location: ../database/db_jadwal");
+    exit;
+}
+
 // Handle jam_kuliah yang menggunakan jam_ke sebagai primary key
 if ($tabel === 'jam_kuliah') {
     $jam_ke = $_GET['jam_ke'] ?? '';
@@ -254,6 +260,11 @@ if (isset($_POST['update'])) {
             break;
 
         case 'jadwal_matkul':
+            if (!in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+                $_SESSION['error'] = "Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.";
+                header("Location: ../database/db_jadwal");
+                exit;
+            }
             mysqli_query($koneksi, "UPDATE jadwal_matkul SET 
                     matkul_id='{$_POST['matkul_id']}',
                     hari='{$_POST['hari']}',

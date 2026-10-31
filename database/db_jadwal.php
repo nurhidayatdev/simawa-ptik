@@ -169,7 +169,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-center"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 dark:border-indigo-800/50">' . htmlspecialchars($row['sks']) . '</span></td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['dosen_pengampu']) . '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['dosen_mitra']) . '</td>';
-        if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'):
+        if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
             echo '<div class="flex items-center justify-center gap-3">';
             echo '<a href="../actions/edit.php?tabel=jadwal_matkul&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
@@ -230,14 +230,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
                             </div>
 
-                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'): ?>
+                            <a href="../jadwal" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Lihat View">
+                                    <i class="fa fa-eye text-xs"></i>
+                                </a>
+
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <button type="button" onclick="confirmJadwal()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Kirim WhatsApp">
                                     <i class="fa fa-paper-plane text-xs"></i>
                                 </button>
-
-                                <a href="../jadwal" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Lihat View">
-                                    <i class="fa fa-eye text-xs"></i>
-                                </a>
 
                                 <a href="../actions/tambah.php?tabel=jadwal_matkul" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
                                     <i class="fa fa-plus text-xs"></i>
@@ -262,7 +262,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-center text-[10px] font-bold text-white uppercase tracking-widest">SKS</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen Pengampu</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen Mitra</th>
-                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'): ?>
+                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -285,7 +285,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-center"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 dark:border-indigo-800/50"><?= $row['sks']; ?></span></td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400"><?= $row['dosen_pengampu']; ?></td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400"><?= $row['dosen_mitra']; ?></td>
-                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat' || $role === 'Sekretaris'): ?>
+                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <a href="../actions/edit.php?tabel=jadwal_matkul&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>
