@@ -19,7 +19,13 @@ if ($tabel === 'jam_kuliah') {
     $jam_ke = $_GET['jam_ke'] ?? '';
     $query = mysqli_query($koneksi, "SELECT * FROM jam_kuliah WHERE jam_ke='$jam_ke'");
 } elseif ($tabel === 'users') {
-    $query = mysqli_query($koneksi, "SELECT u.*, m.nama_lengkap FROM users u LEFT JOIN mahasiswa m ON m.user_id = u.id WHERE u.id='$id'");
+    $query = mysqli_query($koneksi, "
+        SELECT u.*, COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, u.email) AS display_nama, k.nama_kelas 
+        FROM users u 
+        LEFT JOIN mahasiswa m ON m.user_id = u.id 
+        LEFT JOIN kelas k ON u.kelas_id = k.id
+        WHERE u.id='$id'
+    ");
 } else {
     $query = mysqli_query($koneksi, "SELECT * FROM $tabel WHERE id='$id'");
 }
@@ -171,23 +177,34 @@ if (isset($_POST['update'])) {
             break;
 
         case 'users':
-            $email = mysqli_real_escape_string($koneksi, $_POST['email']);
-            $role = mysqli_real_escape_string($koneksi, $_POST['role']);
-            $password = $_POST['password'];
+            $email = mysqli_real_escape_string($koneksi, trim($_POST['email'] ?? ''));
+            $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap'] ?? ''));
+            $role = mysqli_real_escape_string($koneksi, $_POST['role'] ?? 'Mahasiswa');
+            $kelas_id = !empty($_POST['kelas_id']) ? (int)$_POST['kelas_id'] : null;
+            $linked_nim = !empty($_POST['linked_student_nim']) ? mysqli_real_escape_string($koneksi, trim($_POST['linked_student_nim'])) : null;
+            $password = $_POST['password'] ?? '';
 
-            if ($password === '**********') {
-                // Jangan update password jika value-nya adalah mask
-                mysqli_query($koneksi, "UPDATE users SET 
-                        email='$email',
-                        role='$role'
-                        WHERE id='$id'");
-            } else {
-                mysqli_query($koneksi, "UPDATE users SET 
-                        email='$email',
-                        password='$password',
-                        role='$role'
-                        WHERE id='$id'");
+            if (empty($email) || empty($nama_lengkap)) {
+                $error_message = "Nama Lengkap dan Email tidak boleh kosong.";
+                include '../includes/alert_actions.php';
+                exit;
             }
+
+            if ($password === '**********' || empty($password)) {
+                $stmt_up_u = mysqli_prepare($koneksi, "UPDATE users SET nama_lengkap = ?, email = ?, role = ?, kelas_id = ?, linked_student_nim = ? WHERE id = ?");
+                mysqli_stmt_bind_param($stmt_up_u, "sssisi", $nama_lengkap, $email, $role, $kelas_id, $linked_nim, $id);
+                mysqli_stmt_execute($stmt_up_u);
+            } else {
+                $stmt_up_u = mysqli_prepare($koneksi, "UPDATE users SET nama_lengkap = ?, email = ?, password = ?, role = ?, kelas_id = ?, linked_student_nim = ? WHERE id = ?");
+                mysqli_stmt_bind_param($stmt_up_u, "ssssisi", $nama_lengkap, $email, $password, $role, $kelas_id, $linked_nim, $id);
+                mysqli_stmt_execute($stmt_up_u);
+            }
+
+            // Jika Ketua Tingkat dan kelas_id diisi, update kelas jika belum ada ketua tingkat
+            if ($role === 'Ketua Tingkat' && !empty($kelas_id)) {
+                mysqli_query($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = $id WHERE id = $kelas_id");
+            }
+
             $redirect = "../database/db_users";
             break;
 
@@ -468,26 +485,27 @@ if (isset($_POST['update'])) {
                             </div>
 
                         <?php elseif ($tabel === 'users'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Users</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Akun Pengguna</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
-                                    <input type="text" value="<?= $data['nama_lengkap'] ?? 'Bukan Mahasiswa'; ?>" readonly
-                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-100 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
-                                    <input type="text" name="password" value="**********" readonly
-                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-100 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
-                                    <input type="text" name="email" value="<?= $data['email']; ?>"
-                                        class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                </div>
-                                <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
-                                <select name="role" class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap *</label>
+                                <input type="text" name="nama_lengkap" value="<?= htmlspecialchars($data['display_nama'] ?? ''); ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email Login *</label>
+                                <input type="email" name="email" value="<?= htmlspecialchars($data['email'] ?? ''); ?>" required
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
+                                <input type="password" name="password" value="**********"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                <p class="mt-1 text-[10px] text-slate-400">Biarkan <code>**********</code> jika tidak ingin mengganti password akun.</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role / Peran *</label>
+                                <select name="role" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
                                     <option value="">-- Pilih Role/Peran --</option>
                                     <option value="Administrator Utama" <?= ($data['role'] == 'Administrator Utama') ? 'selected' : '' ?>>Administrator Utama</option>
                                     <option value="Ketua Tingkat" <?= ($data['role'] == 'Ketua Tingkat') ? 'selected' : '' ?>>Ketua Tingkat</option>
@@ -495,7 +513,26 @@ if (isset($_POST['update'])) {
                                     <option value="Bendahara" <?= ($data['role'] == 'Bendahara') ? 'selected' : '' ?>>Bendahara</option>
                                     <option value="Mahasiswa" <?= ($data['role'] == 'Mahasiswa') ? 'selected' : '' ?>>Mahasiswa</option>
                                 </select>
-                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Kelas Terkait</label>
+                                <select name="kelas_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                    <option value="">-- Tanpa Kelas (Khusus Administrator) --</option>
+                                    <?php
+                                    $q_kelas_all = mysqli_query($koneksi, "SELECT id, nama_kelas FROM kelas ORDER BY id ASC");
+                                    while ($kls = mysqli_fetch_assoc($q_kelas_all)) {
+                                        $sel = ($data['kelas_id'] == $kls['id']) ? 'selected' : '';
+                                        echo "<option value='{$kls['id']}' $sel>" . htmlspecialchars($kls['nama_kelas']) . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Catatan NIM Mahasiswa (Opsional)</label>
+                                <input type="text" name="linked_student_nim" value="<?= htmlspecialchars($data['linked_student_nim'] ?? ''); ?>" placeholder="Contoh: 240209501001"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            </div>
+                        </div>
                             <?php elseif ($tabel === 'dosen'): ?>
                                 <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Edit Dosen</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

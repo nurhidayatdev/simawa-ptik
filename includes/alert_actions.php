@@ -1,4 +1,11 @@
 <?php
+$is_error = !empty($error_message);
+$alert_title = $is_error ? 'Perhatian!' : 'Berhasil!';
+$alert_text = $is_error ? $error_message : 'Data berhasil diproses!';
+$alert_icon = $is_error ? 'error' : 'success';
+$confirm_color = $is_error ? '#ef4444' : '#4f46e5';
+$next_action = $is_error ? "window.history.back();" : "window.location.href = '$redirect';";
+
 echo "
     <!DOCTYPE html>
     <html>
@@ -18,50 +25,27 @@ echo "
             background-color: #020617;
         }
     </style>
-    <!-- Google tag (gtag.js) -->
-    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-Q0TXETXV6Y\"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag('js', new Date());
-
-        gtag('config', 'G-Q0TXETXV6Y');
-
-        (function() {
-            const theme = localStorage.getItem('theme') || 'light';
-            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        })();
-    </script>
-  <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
     <link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'>
-        <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
     </head>
     <body>
         <script>
-            const isDarkMode = document.documentElement.classList.contains('dark');
+            const isDarkMode = localStorage.getItem('theme') === 'dark' || document.documentElement.classList.contains('dark');
             Swal.fire({
-                title: 'Berhasil!',
-                text: 'Data berhasil ditambahkan!',
-                icon: 'success',
+                title: " . json_encode($alert_title) . ",
+                html: " . json_encode($alert_text) . ",
+                icon: '$alert_icon',
                 background: isDarkMode ? '#0f172a' : '#fff',
                 color: isDarkMode ? '#f1f5f9' : '#1e293b',
-                confirmButtonColor: '#4f46e5',
+                confirmButtonColor: '$confirm_color',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 confirmButtonText: 'OK'
             }).then(() => {
-                window.location.href = '$redirect';
+                $next_action
             });
         </script>
-
     </body>
     </html>";

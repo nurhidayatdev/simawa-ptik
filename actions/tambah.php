@@ -82,15 +82,51 @@ if (isset($_POST['tambah'])) {
             break;
 
         case 'users':
-            $id = $_POST['id'];
-            $password = $_POST['password'];
-            $role = $_POST['role'];
-            $target_kelas_id = getKelasScope();
-            $kelas_val = $target_kelas_id ? "'$target_kelas_id'" : "NULL";
-            mysqli_query($koneksi, "INSERT INTO users (id, password, role, kelas_id)
-                VALUES ('$id','$password','$role', $kelas_val)");
-            $redirect = "../database/db_users";
+            $email = mysqli_real_escape_string($koneksi, trim($_POST['email'] ?? ''));
+            $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap'] ?? ''));
+            $password = $_POST['password'] ?? '';
+            $role = mysqli_real_escape_string($koneksi, $_POST['role'] ?? 'Mahasiswa');
+            $kelas_id = !empty($_POST['kelas_id']) ? (int)$_POST['kelas_id'] : null;
+            $linked_nim = !empty($_POST['linked_student_nim']) ? mysqli_real_escape_string($koneksi, trim($_POST['linked_student_nim'])) : null;
 
+            if (empty($email) || empty($password) || empty($nama_lengkap)) {
+                $error_message = "Nama Lengkap, Email, dan Password wajib diisi.";
+                include '../includes/alert_actions.php';
+                exit;
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error_message = "Format email tidak valid.";
+                include '../includes/alert_actions.php';
+                exit;
+            }
+
+            // Cek keunikan email
+            $stmt_chk = mysqli_prepare($koneksi, "SELECT id FROM users WHERE email = ? LIMIT 1");
+            mysqli_stmt_bind_param($stmt_chk, "s", $email);
+            mysqli_stmt_execute($stmt_chk);
+            if (mysqli_num_rows(mysqli_stmt_get_result($stmt_chk)) > 0) {
+                $error_message = "Email '$email' sudah digunakan oleh akun lain.";
+                include '../includes/alert_actions.php';
+                exit;
+            }
+
+            // Buat akun baru di users
+            $stmt_ins_u = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, nama_lengkap, linked_student_nim, kelas_id) VALUES (?, ?, ?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt_ins_u, "sssssi", $email, $password, $role, $nama_lengkap, $linked_nim, $kelas_id);
+            if (!mysqli_stmt_execute($stmt_ins_u)) {
+                $error_message = "Gagal membuat akun: " . mysqli_error($koneksi);
+                include '../includes/alert_actions.php';
+                exit;
+            }
+            $new_user_id = mysqli_insert_id($koneksi);
+
+            // Jika role Ketua Tingkat dan kelas_id diisi, update penanggung jawab kelas
+            if ($role === 'Ketua Tingkat' && !empty($kelas_id)) {
+                mysqli_query($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = $new_user_id WHERE id = $kelas_id");
+            }
+
+            $redirect = "../database/db_users";
             break;
 
         case 'dosen':
@@ -508,35 +544,51 @@ if (isset($_POST['tambah'])) {
                         </div>
 
                     <?php elseif ($tabel === 'users'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Users</h3>
+                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Tambah Akun Pengguna (Users)</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Mahasiswa</label>
-                                <select name="id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
-                                    <option value="">-- Pilih Mahasiswa --</option>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap *</label>
+                                <input type="text" name="nama_lengkap" required placeholder="Contoh: Ahmad Fauzan"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email Login *</label>
+                                <input type="email" name="email" required placeholder="fauzan@simawa.id"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Password *</label>
+                                <input type="password" name="password" required placeholder="Minimal 8 karakter"
+                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role / Peran *</label>
+                                <select name="role" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
+                                    <option value="">-- Pilih Role/Peran --</option>
+                                    <option value="Administrator Utama">Administrator Utama</option>
+                                    <option value="Ketua Tingkat" selected>Ketua Tingkat</option>
+                                    <option value="Sekretaris">Sekretaris</option>
+                                    <option value="Bendahara">Bendahara</option>
+                                    <option value="Mahasiswa">Mahasiswa</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Kelas Terkait</label>
+                                <select name="kelas_id" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                    <option value="">-- Tanpa Kelas (Khusus Administrator) --</option>
                                     <?php
-                                    $query_mhs = mysqli_query($koneksi, "SELECT * FROM mahasiswa ORDER BY nim ASC");
-                                    while ($mhs = mysqli_fetch_assoc($query_mhs)) {
-                                        echo "<option value='{$mhs['user_id']}'>{$mhs['nama_lengkap']}</option>";
+                                    $q_kelas_all = mysqli_query($koneksi, "SELECT id, nama_kelas FROM kelas ORDER BY id ASC");
+                                    while ($kls = mysqli_fetch_assoc($q_kelas_all)) {
+                                        echo "<option value='{$kls['id']}'>" . htmlspecialchars($kls['nama_kelas']) . "</option>";
                                     }
                                     ?>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Password</label>
-                                <input type="password" name="password"
+                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Catatan NIM Mahasiswa (Opsional)</label>
+                                <input type="text" name="linked_student_nim" placeholder="Contoh: 240209501001"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
-                                <select name="role" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors" required>
-                                    <option value="">-- Pilih Role/Peran --</option>
-                                    <option value="Administrator Utama">Administrator Utama</option>
-                                    <option value="Ketua Tingkat">Ketua Tingkat</option>
-                                    <option value="Sekretaris">Sekretaris</option>
-                                    <option value="Bendahara">Bendahara</option>
-                                    <option value="Mahasiswa">Mahasiswa</option>
-                                </select>
+                                <p class="mt-1 text-[10px] text-slate-400">Informasi identitas mahasiswa di dunia nyata tanpa menggabungkan permission/data akademik.</p>
                             </div>
                         </div>
 

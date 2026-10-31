@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Update user & mahasiswa yang ditunjuk
             mysqli_query($koneksi, "UPDATE users SET role = 'Ketua Tingkat', kelas_id = $kelas_id WHERE id = $ketua_user_id");
-            mysqli_query($koneksi, "UPDATE mahasiswa SET kelas_id = $kelas_id WHERE user_id = $ketua_user_id");
+            // Single-account-single-role: non-student accounts are not in mahasiswa table
         } else {
             // Update tanpa ketua tingkat
             $stmt_up = mysqli_prepare($koneksi, "UPDATE kelas SET nama_kelas = ?, angkatan = ?, prodi = ?, status_aktif = ?, ketua_tingkat_user_id = NULL WHERE id = ?");
@@ -179,6 +179,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['success'] = $new_val === '1' 
             ? "Mode Maintenance berhasil <strong>diaktifkan</strong>. Akses user non-admin diblokir."
             : "Mode Maintenance berhasil <strong>dinonaktifkan</strong>. Sistem kembali beroperasi normal.";
+        header('Location: ../dashboard_admin.php');
+        exit();
+    }
+
+    // ==========================================
+    // 5. TAMBAH AKUN KETUA TINGKAT BARU KE KELAS
+    // ==========================================
+    if ($action === 'tambah_ketua_tingkat') {
+        $kelas_id       = (int)($_POST['kelas_id'] ?? 0);
+        $ketua_nama     = trim($_POST['ketua_nama'] ?? '');
+        $ketua_email    = trim($_POST['ketua_email'] ?? '');
+        $ketua_password = trim($_POST['ketua_password'] ?? '');
+        $linked_nim     = trim($_POST['linked_student_nim'] ?? '');
+        $linked_nim     = !empty($linked_nim) ? $linked_nim : null;
+
+        if ($kelas_id <= 0) {
+            $_SESSION['error'] = 'Pilih kelas yang valid untuk penunjukan Ketua Tingkat!';
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+
+        if (empty($ketua_nama) || empty($ketua_email) || empty($ketua_password)) {
+            $_SESSION['error'] = 'Nama Lengkap, Email Login, dan Password untuk Ketua Tingkat baru wajib diisi!';
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+
+        if (!filter_var($ketua_email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = 'Format email Ketua Tingkat tidak valid!';
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+
+        // Cek keunikan email
+        $stmt_u = mysqli_prepare($koneksi, "SELECT id FROM users WHERE email = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt_u, "s", $ketua_email);
+        mysqli_stmt_execute($stmt_u);
+        if (mysqli_num_rows(mysqli_stmt_get_result($stmt_u)) > 0) {
+            $_SESSION['error'] = "Email '$ketua_email' sudah digunakan oleh akun lain!";
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+
+        // Insert Ketua Tingkat murni ke users
+        $stmt_user = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, nama_lengkap, linked_student_nim, kelas_id) VALUES (?, ?, 'Ketua Tingkat', ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt_user, "ssssi", $ketua_email, $ketua_password, $ketua_nama, $linked_nim, $kelas_id);
+        if (!mysqli_stmt_execute($stmt_user)) {
+            $_SESSION['error'] = 'Gagal membuat akun Ketua Tingkat: ' . mysqli_error($koneksi);
+            header('Location: ../dashboard_admin.php');
+            exit();
+        }
+        $new_user_id = mysqli_insert_id($koneksi);
+
+        // Update ketua_tingkat_user_id pada kelas
+        mysqli_query($koneksi, "UPDATE kelas SET ketua_tingkat_user_id = $new_user_id WHERE id = $kelas_id");
+
+        $_SESSION['success'] = "Akun Ketua Tingkat (<strong>" . htmlspecialchars($ketua_nama) . "</strong> - <code>" . htmlspecialchars($ketua_email) . "</code>) berhasil dibuat dan ditugaskan ke kelas!";
         header('Location: ../dashboard_admin.php');
         exit();
     }

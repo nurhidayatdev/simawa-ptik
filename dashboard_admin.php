@@ -73,12 +73,12 @@ while ($row = mysqli_fetch_assoc($q_kelas_list)) {
 
 // 3. User untuk Dropdown Ketua Tingkat (Non-Admin)
 $q_users_keti = mysqli_query($koneksi, "
-    SELECT u.id, u.email, u.role, m.nama_lengkap, m.nim, k.nama_kelas
+    SELECT u.id, u.email, u.role, COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, u.email) as nama_lengkap, COALESCE(NULLIF(u.linked_student_nim, ''), m.nim) as nim, k.nama_kelas
     FROM users u
     LEFT JOIN mahasiswa m ON m.user_id = u.id
     LEFT JOIN kelas k ON u.kelas_id = k.id
-    WHERE u.role != 'Administrator Utama'
-    ORDER BY m.nama_lengkap ASC, u.email ASC
+    WHERE u.role = 'Ketua Tingkat' OR (u.role != 'Administrator Utama' AND u.role != 'Mahasiswa')
+    ORDER BY u.nama_lengkap ASC, u.email ASC
 ");
 $users_keti = [];
 while ($row = mysqli_fetch_assoc($q_users_keti)) {
@@ -132,6 +132,9 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                     <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1.5">Kelola pembagian kelas, penunjukan Ketua Tingkat, dan pengawasan operasional lintas angkatan.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5">
+                    <button type="button" onclick="openTambahKetuaModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-amber-600/20 active:scale-95 transition-all cursor-pointer">
+                        <i class="fas fa-user-shield"></i> Tambah Ketua Tingkat
+                    </button>
                     <button type="button" onclick="openTambahKelasModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">
                         <i class="fas fa-plus-circle"></i> Tambah Kelas Baru
                     </button>
@@ -462,6 +465,66 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
     </main>
 
     <!-- ==========================================
+         MODAL 0: TAMBAH AKUN KETUA TINGKAT LANGSUNG
+         ========================================== -->
+    <div id="modalTambahKetua" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Tambah Akun Ketua Tingkat</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Buat akun login kepemimpinan kelas khusus Ketua Tingkat.</p>
+                </div>
+                <button type="button" onclick="closeTambahKetuaModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <form action="actions/tambah_kelas.php" method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="tambah_ketua_tingkat">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Pilih Kelas *</label>
+                    <select name="kelas_id" id="tambah_ketua_kelas_id" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                        <option value="">-- Pilih Kelas Terdaftar --</option>
+                        <?php foreach ($kelas_list as $kls): ?>
+                            <option value="<?= $kls['id'] ?>">
+                                <?= htmlspecialchars($kls['nama_kelas']) ?> <?= !empty($kls['ketua_nama']) ? '(Ketua saat ini: ' . htmlspecialchars($kls['ketua_nama']) . ')' : '(Belum ada Ketua)' ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="space-y-3 p-3.5 bg-indigo-50/50 dark:bg-slate-800/40 rounded-xl border border-indigo-100 dark:border-slate-700/60">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Ketua Tingkat *</label>
+                        <input type="text" name="ketua_nama" required placeholder="Contoh: Ahmad Fauzan" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Email Login Ketua *</label>
+                            <input type="email" name="ketua_email" required placeholder="ketua@simawa.id" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Password Awal *</label>
+                            <input type="password" name="ketua_password" required placeholder="Minimal 8 karakter" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Catatan NIM Asli Mahasiswa (Opsional)</label>
+                        <input type="text" name="linked_student_nim" placeholder="Contoh: 240209501001" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <p class="text-[10px] text-slate-400 mt-0.5">Informasi identitas mahasiswa di dunia nyata tanpa menggabungkan permission/data akademik.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeTambahKetuaModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-lg shadow-amber-600/20 active:scale-95 transition-all cursor-pointer">Simpan & Buat Akun Ketua</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
          MODAL 1: TAMBAH KELAS BARU & KETUA TINGKAT
          ========================================== -->
     <div id="modalTambahKelas" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
@@ -600,6 +663,17 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
     <!-- Script Back-office & Modal Management -->
     <?php include 'includes/script_db.php'; ?>
     <script>
+        function openTambahKetuaModal(kelasId = null) {
+            if (kelasId) {
+                document.getElementById('tambah_ketua_kelas_id').value = kelasId;
+            }
+            document.getElementById('modalTambahKetua').classList.remove('hidden');
+        }
+
+        function closeTambahKetuaModal() {
+            document.getElementById('modalTambahKetua').classList.add('hidden');
+        }
+
         function openTambahKelasModal() {
             document.getElementById('modalTambahKelas').classList.remove('hidden');
         }
