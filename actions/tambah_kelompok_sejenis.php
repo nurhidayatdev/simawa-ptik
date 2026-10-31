@@ -127,13 +127,13 @@ if ($selected_matkul) {
     }
 
     $where_mhs_kelas = getKelasWhereClause('m', true);
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? $where_mhs_kelas ORDER BY m.nim");
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? $where_mhs_kelas ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     while ($r = mysqli_fetch_assoc($res)) {
         // Pre-calculate photo URL for JS usage
-        $r['foto_url'] = profilePhotoUrl($r['foto'], '../');
+        $r['foto_url'] = profilePhotoUrl($r['nama_lengkap'], '../');
         $students[] = $r;
     }
 }

@@ -345,7 +345,7 @@ $title = "Dashboard - SIMAWA PTIK 2024";
             <div class="bg-white dark:bg-slate-900 p-6 md:p-7 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 transition-all">
                 <div class="flex items-center gap-4">
                     <div class="h-14 w-14 flex-shrink-0 aspect-square rounded-full overflow-hidden border-2 border-indigo-200 dark:border-indigo-900/50">
-                        <img src="<?= profilePhotoUrl($foto) ?>" alt="Profile" class="w-full h-full object-cover">
+                        <img src="<?= profilePhotoUrl($nama_lengkap) ?>" alt="Profile" class="w-full h-full object-cover">
                     </div>
                     <div>
                         <h2 class="font-bold text-lg text-slate-800 dark:text-slate-100">Selamat Datang, <span class="text-indigo-600 dark:text-indigo-400"><?= htmlspecialchars($nama_lengkap) ?></span>!</h2>

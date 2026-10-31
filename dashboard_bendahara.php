@@ -230,7 +230,6 @@ $q_tunggakan = mysqli_query($koneksi, "
         m.id, 
         m.nim, 
         m.nama_lengkap, 
-        m.foto,
         COALESCE(sub.lunas_cnt, 0) as lunas_cnt,
         (16 - COALESCE(sub.lunas_cnt, 0)) as tunggakan_minggu,
         ((16 - COALESCE(sub.lunas_cnt, 0)) * $fixed_nom) as estimasi_tunggakan
@@ -544,7 +543,7 @@ $title = "Dashboard Bendahara - SIMAWA PTIK 2024";
                                             <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                                                 <td class="py-2.5">
                                                     <div class="flex items-center gap-2.5">
-                                                        <img src="<?= profilePhotoUrl($mhs['foto']) ?>" alt="Foto" class="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-slate-700">
+                                                        <img src="<?= profilePhotoUrl($mhs['nama_lengkap']) ?>" alt="Avatar" class="w-7 h-7 rounded-full object-cover border border-slate-200 dark:border-slate-700">
                                                         <div>
                                                             <div class="font-bold text-slate-800 dark:text-slate-200"><?= htmlspecialchars($mhs['nama_lengkap']) ?></div>
                                                             <div class="text-[10px] text-slate-400 font-mono"><?= htmlspecialchars($mhs['nim']) ?></div>

@@ -33,7 +33,6 @@ SELECT
     u.password,
     u.email,
     COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, 'Pengguna') AS nama_lengkap,
-    COALESCE(NULLIF(u.foto, ''), m.foto, '') AS foto,
     u.linked_student_nim,
     m.nim,
     m.nama_panggilan,
@@ -124,7 +123,7 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Profile Picture Section -->
                 <div class="md:col-span-1 flex flex-col items-center">
-                    <img src="<?= profilePhotoUrl($data['foto'] ?? '', '../') ?>" alt="Profile Picture"
+                    <img src="<?= profilePhotoUrl($data['nama_lengkap'] ?? $nama_lengkap, '../') ?>" alt="Profile Picture"
                         class="w-32 h-32 rounded-full mb-4 shadow-lg border-2 border-white dark:border-slate-800 object-cover">
                     <h2 class="text-xl font-semibold mb-2 text-slate-800 dark:text-white text-center"><?= htmlspecialchars($data['nama_lengkap'] ?? 'Pengguna') ?></h2>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 mb-2">

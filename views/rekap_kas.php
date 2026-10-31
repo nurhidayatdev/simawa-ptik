@@ -52,7 +52,7 @@ $kas_matrix = [];
 
 // 1. Get all students
 $q_students = "
-    SELECT m.id, m.nim, m.nama_lengkap, m.foto 
+    SELECT m.id, m.nim, m.nama_lengkap 
     FROM mahasiswa m 
     LEFT JOIN users u ON m.user_id = u.id
     WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . "
@@ -299,15 +299,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                                         <td class="px-4 py-3 text-[11px] font-bold text-slate-400 dark:text-slate-600 text-center"><?= $no++ ?></td>
                                         <td class="px-4 py-3 sticky-col">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 shrink-0">
-                                                    <?php if (!empty($s['foto'])): ?>
-                                                        <img src="<?= profilePhotoUrl($s['foto'], '../') ?>" class="w-full h-full object-cover">
-                                                    <?php else: ?>
-                                                        <div class="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-700">
-                                                            <i class="fas fa-user text-[10px]"></i>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
+                                                <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 shrink-0"><img src="<?= profilePhotoUrl($s['nama_lengkap'], '../') ?>" class="w-full h-full object-cover"></div>
                                                 <div class="truncate">
                                                     <div class="text-[10px] font-bold text-slate-700 dark:text-slate-200 truncate leading-tight uppercase mhs-name"><?= htmlspecialchars($s['nama_lengkap']) ?></div>
                                                     <div class="text-[8px] text-slate-400 dark:text-slate-600 font-semibold tracking-tighter mt-0.5 mhs-nim"><?= $s['nim'] ?></div>

@@ -96,7 +96,6 @@ $q_pengurus = mysqli_query($koneksi, "
         m.id as mahasiswa_id,
         COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, 'Pengurus') as nama_lengkap,
         COALESCE(NULLIF(u.linked_student_nim, ''), m.nim, '-') as nim,
-        COALESCE(NULLIF(u.foto, ''), m.foto, '') as foto,
         m.jenis_kelamin
     FROM users u
     LEFT JOIN mahasiswa m ON m.user_id = u.id
@@ -118,7 +117,6 @@ $q_mhs = mysqli_query($koneksi, "
         m.nama_lengkap,
         m.nama_panggilan,
         m.jenis_kelamin,
-        m.foto,
         m.user_id,
         u.email,
         u.role
@@ -425,13 +423,7 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                         <td class="px-5 py-3.5">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-9 h-9 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                                    <?php if (!empty($p['foto'])): ?>
-                                                        <img src="<?= profilePhotoUrl($p['foto'], '') ?>" class="w-full h-full object-cover">
-                                                    <?php else: ?>
-                                                        <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                                                            <i class="fas fa-user"></i>
-                                                        </div>
-                                                    <?php endif; ?>
+                                                    <img src="<?= profilePhotoUrl($p['nama_lengkap']) ?>" class="w-full h-full object-cover">
                                                 </div>
                                                 <div class="font-extrabold text-slate-800 dark:text-white">
                                                     <?= htmlspecialchars($p['nama_lengkap'] ?: $p['email']) ?>

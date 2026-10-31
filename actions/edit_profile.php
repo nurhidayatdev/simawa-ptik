@@ -29,7 +29,6 @@ SELECT
     m.nama_lengkap,
     m.nama_panggilan,
     u.email,
-    m.foto,
     m.instagram,
     m.bio
 FROM users u
@@ -47,123 +46,11 @@ $data = mysqli_fetch_assoc($result);
 
 
 if (isset($_POST['update'])) {
-
-    $foto_baru = $data['foto']; // default foto lama
-
-    // prefer client-side processed image in foto_data (base64)
-    if (!empty($_POST['foto_data'])) {
-        $foto_data = $_POST['foto_data'];
-        // data URIs look like: data:image/jpeg;base64,....
-        if (preg_match('/^data:(image\/[a-zA-Z]+);base64,/', $foto_data, $m)) {
-            $mime = $m[1];
-            $base64 = substr($foto_data, strpos($foto_data, ',') + 1);
-            $decoded = base64_decode($base64);
-            if ($decoded === false) {
-                die('Gagal decode gambar.');
-            }
-
-            // If GD functions available, use them to resize/convert; otherwise write raw bytes
-            if (function_exists('imagecreatefromstring')) {
-                $src = @imagecreatefromstring($decoded);
-                if ($src === false) {
-                    die('Format gambar tidak dikenali.');
-                }
-
-                // ensure square output (client already crops to square), resize to 512x512
-                $size = 512;
-                $dst = imagecreatetruecolor($size, $size);
-                // preserve transparency for PNG/WebP
-                imagesavealpha($dst, true);
-                $trans_col = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-                imagefill($dst, 0, 0, $trans_col);
-                $w = imagesx($src);
-                $h = imagesy($src);
-                imagecopyresampled($dst, $src, 0, 0, 0, 0, $size, $size, $w, $h);
-
-                // prefer webp if available
-                if (function_exists('imagewebp')) {
-                    $ext = 'webp';
-                    $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
-                    $foto_baru = $prefix . '.' . $ext;
-                    imagewebp($dst, __DIR__ . "/../storage/profile/" . $foto_baru, 80);
-                } else {
-                    $ext = 'jpg';
-                    $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
-                    $foto_baru = $prefix . '.' . $ext;
-                    imagejpeg($dst, __DIR__ . "/../storage/profile/" . $foto_baru, 85);
-                }
-
-                $__img_destroy = 'imagedestroy';
-                if (function_exists($__img_destroy)) {
-                    $__img_destroy($src);
-                }
-                if (function_exists($__img_destroy)) {
-                    $__img_destroy($dst);
-                }
-            } else {
-                // GD not available: determine extension from mime and save raw bytes
-                $ext = 'jpg';
-                if ($mime === 'image/webp') $ext = 'webp';
-                elseif ($mime === 'image/png') $ext = 'png';
-                elseif ($mime === 'image/jpeg' || $mime === 'image/jpg') $ext = 'jpg';
-                $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
-                    $foto_baru = $prefix . '.' . $ext;
-                $dest = __DIR__ . "/../storage/profile/" . $foto_baru;
-                file_put_contents($dest, $decoded);
-            }
-        }
-    } elseif (!empty($_FILES['foto_file']['name'])) {
-
-        $nama_file = $_FILES['foto_file']['name'];
-        $tmp_file  = $_FILES['foto_file']['tmp_name'];
-        $ext       = strtolower(pathinfo($nama_file, PATHINFO_EXTENSION));
-
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-
-        if (in_array($ext, $allowed)) {
-            // fallback: move uploaded then try to compress using GD
-            $prefix = !empty($nama_panggilan) ? $nama_panggilan : ('user_' . $user_id);
-                    $foto_baru = $prefix . '.' . $ext;
-            $dest_path = __DIR__ . "/../storage/profile/" . $foto_baru;
-            move_uploaded_file($tmp_file, $dest_path);
-            // attempt to compress/resize
-            // attempt to compress/resize if GD available
-            if (function_exists('imagecreatefromstring')) {
-                $src = @imagecreatefromstring(file_get_contents($dest_path));
-                if ($src !== false) {
-                    $size = 512;
-                    $dst = imagecreatetruecolor($size, $size);
-                    imagesavealpha($dst, true);
-                    $trans_col = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-                    imagefill($dst, 0, 0, $trans_col);
-                    $w = imagesx($src);
-                    $h = imagesy($src);
-                    imagecopyresampled($dst, $src, 0, 0, 0, 0, $size, $size, $w, $h);
-                    if (function_exists('imagewebp')) {
-                        imagewebp($dst, $dest_path, 80);
-                    } else {
-                        imagejpeg($dst, $dest_path, 85);
-                    }
-                    $__img_destroy = 'imagedestroy';
-                    if (function_exists($__img_destroy)) {
-                        $__img_destroy($src);
-                    }
-                    if (function_exists($__img_destroy)) {
-                        $__img_destroy($dst);
-                    }
-                }
-            }
-        } else {
-            die("Format foto tidak valid!");
-        }
-    }
-
-
     mysqli_query($koneksi, "UPDATE mahasiswa SET 
         nama_lengkap='{$_POST['nama_lengkap']}',
+        nama_panggilan='{$_POST['nama_panggilan']}',
         bio='{$_POST['bio']}',
-        instagram='{$_POST['instagram']}',
-        foto='$foto_baru'
+        instagram='{$_POST['instagram']}'
         WHERE user_id='$user_id'
     ");
 
@@ -259,42 +146,17 @@ if (isset($_POST['update'])) {
                                 class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors"></input>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto</label>
-                            <input type="file" id="foto-input" name="foto_file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            <input type="hidden" name="foto_data" id="foto_data">
-                            <input type="hidden" name="current_foto" value="<?= htmlspecialchars($data['foto'] ?? ''); ?>">
-
-                            <div class="flex items-center space-x-4 mt-4">
-                                <img id="current-preview" src="<?= profilePhotoUrl($data['foto'] ?? '', '../') ?>" class="img-fluid rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm" style="width:120px; height:120px; object-fit:cover;" />
-                                <div>
-                                    <button type="button" id="open-cropper" class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 rounded text-xs hidden shadow-sm transition-all">Buka Cropper</button>
+                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Avatar Akun</label>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <img src="<?= profilePhotoUrl($data['nama_lengkap'] ?? $nama_lengkap, '../') ?>" class="rounded-2xl border border-gray-200 dark:border-slate-700 shadow-md" style="width:96px; height:96px;" />
+                                <div class="text-xs text-slate-500 dark:text-slate-400">
+                                    <p class="font-semibold text-slate-700 dark:text-slate-200">Avatar Inisial Otomatis</p>
+                                    <p class="text-[11px] mt-0.5">Avatar akun dibuat otomatis oleh sistem berdasarkan inisial nama Anda.</p>
                                 </div>
                             </div>
-
-                            <!-- Cropper modal-ish area -->
-                            <div id="cropper-area" class="mt-4 hidden p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all">
-                                <div class="grid sm:grid-cols-2 gap-6">
-                                    <div class="w-full flex align-center justify-center bg-slate-200 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-700 shadow-inner">
-                                        <img id="crop-image" style="max-width:100%; display:block;" />
-                                    </div>
-                                    <div class="flex flex-col justify-center space-y-4">
-                                        <div class="border border-slate-300 dark:border-slate-700 p-1 bg-white dark:bg-slate-900 rounded-lg shadow-sm" style="width:160px; height:160px; overflow:hidden;">
-                                            <div class="preview-wrapper" style="width:100%; height:100%;">
-                                                <img id="preview" style="width:100%; height:100%; object-fit:cover; display:block;" />
-                                            </div>
-                                        </div>
-                                        <div class="flex flex-wrap gap-2">
-                                            <button type="button" id="zoom-in" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all font-bold shadow-sm">+</button>
-                                            <button type="button" id="zoom-out" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all font-bold shadow-sm">-</button>
-                                            <button type="button" id="rotate-left" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all shadow-sm">⟲</button>
-                                            <button type="button" id="rotate-right" class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900 rounded-lg transition-all shadow-sm">⟳</button>
-                                        </div>
-                                        <div class="flex gap-3">
-                                            <button type="button" id="apply-crop" class="flex-grow px-4 py-2 bg-indigo-700 dark:bg-indigo-600 hover:bg-indigo-800 dark:hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg shadow-indigo-900/20">Gunakan Foto</button>
-                                            <button type="button" id="cancel-crop" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg text-xs font-bold transition-all shadow-sm">Batal</button>
-                                        </div>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                </div>
                             </div>
                         </div>
                     </div>
@@ -315,118 +177,8 @@ if (isset($_POST['update'])) {
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script>
-        // Image cropper for profile foto
-        (function() {
-            const fotoInput = document.getElementById('foto-input');
-            const cropperArea = document.getElementById('cropper-area');
-            const cropImage = document.getElementById('crop-image');
-            const currentPreview = document.getElementById('current-preview');
-            const fotoDataInput = document.getElementById('foto_data');
-            const applyBtn = document.getElementById('apply-crop');
-            const cancelBtn = document.getElementById('cancel-crop');
-            const zoomIn = document.getElementById('zoom-in');
-            const zoomOut = document.getElementById('zoom-out');
-            const rotL = document.getElementById('rotate-left');
-            const rotR = document.getElementById('rotate-right');
-            let cropper = null;
-            const form = document.querySelector('form.space-y-6');
-
-            function initCropper() {
-                if (cropper) {
-                    cropper.destroy();
-                }
-                cropper = new Cropper(cropImage, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    background: false,
-                    autoCropArea: 1,
-                    responsive: true,
-                    preview: '.preview-wrapper'
-                });
-            }
-
-            fotoInput.addEventListener('change', (e) => {
-                const file = e.target.files && e.target.files[0];
-                if (!file) return;
-                const url = URL.createObjectURL(file);
-                cropImage.src = url;
-                cropperArea.classList.remove('hidden');
-                cropImage.onload = () => {
-                    initCropper();
-                };
-            });
-
-            zoomIn.addEventListener('click', () => {
-                if (cropper) cropper.zoom(0.1);
-            });
-            zoomOut.addEventListener('click', () => {
-                if (cropper) cropper.zoom(-0.1);
-            });
-            rotL.addEventListener('click', () => {
-                if (cropper) cropper.rotate(-90);
-            });
-            rotR.addEventListener('click', () => {
-                if (cropper) cropper.rotate(90);
-            });
-
-            cancelBtn.addEventListener('click', () => {
-                if (cropper) {
-                    cropper.destroy();
-                    cropper = null;
-                }
-                cropperArea.classList.add('hidden');
-                fotoInput.value = '';
-            });
-
-            applyBtn.addEventListener('click', () => {
-                if (!cropper) return;
-                const canvas = cropper.getCroppedCanvas({
-                    width: 512,
-                    height: 512,
-                    imageSmoothingQuality: 'high'
-                });
-                canvas.toBlob((blob) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        fotoDataInput.value = reader.result; // base64 data URL
-                        currentPreview.src = reader.result;
-                        if (cropper) {
-                            cropper.destroy();
-                            cropper = null;
-                        }
-                        cropperArea.classList.add('hidden');
-                    };
-                    reader.readAsDataURL(blob);
-                }, 'image/webp', 0.8);
-            });
-
-            form.addEventListener('submit', function(e) {
-                if (cropper && !fotoDataInput.value) {
-                    e.preventDefault();
-                    const canvas = cropper.getCroppedCanvas({
-                        width: 512,
-                        height: 512,
-                        imageSmoothingQuality: 'high'
-                    });
-                    canvas.toBlob((blob) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            fotoDataInput.value = reader.result;
-                            if (cropper) {
-                                cropper.destroy();
-                                cropper = null;
-                            }
-                            cropperArea.classList.add('hidden');
-                            form.submit();
-                        };
-                        reader.readAsDataURL(blob);
-                    }, 'image/webp', 0.8);
-                }
-            });
-        })();
-    </script>
+    
+    
 </body>
 
 </html>

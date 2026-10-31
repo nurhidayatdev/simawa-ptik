@@ -255,8 +255,8 @@ $periode = mysqli_fetch_assoc($q_periode);
                                         </div>
                                     </li>
                                     <li class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300 transition-colors">
-                                        <i class="fa fa-camera-retro text-indigo-500 mt-0.5"></i>
-                                        <span><strong>Unggah Foto:</strong> Pilih menu <strong>Update Profil</strong>, klik area foto, dan <strong>unggah foto</strong> terbaik Anda (Maks 2MB).</span>
+                                        <i class="fa fa-id-badge text-indigo-500 mt-0.5"></i>
+                                        <span><strong>Avatar Otomatis:</strong> Sistem secara otomatis menghasilkan foto profil avatar inisial modern berbasis nama lengkap Anda tanpa perlu unggah file manual.</span>
                                     </li>
                                 </ul>
                             </div>

@@ -30,16 +30,9 @@ if (isset($_POST['tambah'])) {
             $bio = $_POST['bio'];
             $jenis_kelamin = $_POST['jenis_kelamin'];
             $instagram = $_POST['instagram'];
-            $foto = '';
-            if (!empty($_FILES['foto']['name'])) {
-                $target_dir = "../storage/profile/";
-                $foto = time() . "_" . basename($_FILES["foto"]["name"]);
-                $target_file = $target_dir . $foto;
-                move_uploaded_file($_FILES["foto"]["tmp_name"], $target_file);
-            }
             $target_kelas_id = getKelasScope() ?? 1;
-            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, foto, kelas_id)
-                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram','$foto', '$target_kelas_id')");
+            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, kelas_id)
+                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram', '$target_kelas_id')");
             $redirect = "../database/db_mahasiswa";
 
             break;
@@ -303,11 +296,7 @@ if (isset($_POST['tambah'])) {
                                 <input type="text" name="bio"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Foto</label>
-                                <input type="file" name="foto" accept="image/*"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
+                            
                         </div>
 
                     <?php elseif ($tabel === 'periode'): ?>

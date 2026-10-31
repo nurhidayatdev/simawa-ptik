@@ -170,7 +170,6 @@ $q_top_absent = mysqli_query($koneksi, "
             m.id,
             m.nama_lengkap,
             m.nim,
-            m.foto,
             SUM(CASE WHEN a.status = 'Alpha' THEN 1 ELSE 0 END) as alpha,
             SUM(CASE WHEN a.status = 'Izin' THEN 1 ELSE 0 END) as izin,
             SUM(CASE WHEN a.status = 'Sakit' THEN 1 ELSE 0 END) as sakit,
@@ -660,13 +659,7 @@ $title = "Dashboard Sekretaris - " . $nama_kelas_aktif;
                                 <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-3">
                                     <div class="flex items-center gap-2.5 overflow-hidden">
                                         <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                            <?php if (!empty($ta['foto'])): ?>
-                                                <img src="<?= profilePhotoUrl($ta['foto'], '') ?>" class="w-full h-full object-cover">
-                                            <?php else: ?>
-                                                <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                                                    <i class="fas fa-user"></i>
-                                                </div>
-                                            <?php endif; ?>
+                                            <img src="<?= profilePhotoUrl($ta['nama_lengkap']) ?>" class="w-full h-full object-cover">
                                         </div>
                                         <div class="overflow-hidden">
                                             <div class="font-extrabold text-xs text-slate-800 dark:text-white truncate">

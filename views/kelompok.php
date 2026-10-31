@@ -72,11 +72,11 @@ if ($selected_matkul) {
                 return "'" . mysqli_real_escape_string($koneksi, $s) . "'";
             }, array_keys($all_nims));
             $inlist = implode(',', $escaped);
-            $res2 = mysqli_query($koneksi, "SELECT nim, nama_lengkap, foto FROM mahasiswa WHERE nim IN ($inlist)");
+            $res2 = mysqli_query($koneksi, "SELECT nim, nama_lengkap FROM mahasiswa WHERE nim IN ($inlist)");
             while ($r = mysqli_fetch_assoc($res2)) {
                 $student_map[$r['nim']] = [
                     'nama' => $r['nama_lengkap'],
-                    'foto' => $r['foto']
+                    
                 ];
             }
         }
@@ -240,7 +240,7 @@ if ($my_nim) {
                                         ?>
                                             <li class="flex items-center gap-3">
                                                 <div class="h-8 w-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm">
-                                                    <img src="<?= profilePhotoUrl($s_data['foto'], '../') ?>" class="w-full h-full object-cover" alt="<?= htmlspecialchars($s_data['nama']) ?>">
+                                                    <img src="<?= profilePhotoUrl($s_data['nama'], '../') ?>" class="w-full h-full object-cover" alt="<?= htmlspecialchars($s_data['nama']) ?>">
                                                 </div>
                                                 <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300 truncate"><?= htmlspecialchars($s_data['nama']) ?></span>
                                             </li>

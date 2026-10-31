@@ -249,7 +249,7 @@ $where_mhs = ($f_filter_mhs === 'Lunas') ? " AND k.status = 'Lunas'" : (($f_filt
 $where_mhs_scope = getKelasWhereClause('m', true);
 $where_k_scope = getKelasWhereClause('k', true);
 $mhs_status = mysqli_query($koneksi, "
-    SELECT m.id AS mahasiswa_id, m.nim, m.nama_lengkap, m.foto, '$f_minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
+    SELECT m.id AS mahasiswa_id, m.nim, m.nama_lengkap, '$f_minggu' AS minggu_ke, COALESCE(k.status, 'Belum') AS status, k.tanggal_bayar 
     FROM mahasiswa m 
     LEFT JOIN users u ON m.user_id = u.id
     LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$f_minggu' AND k.periode_id = '$periode_id' $where_k_scope
@@ -530,13 +530,7 @@ $mhs_status = mysqli_query($koneksi, "
                                     <td class="px-6 py-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 text-center"><?= $no++ ?></td>
                                     <td class="px-6 py-3">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
-                                                <?php if (!empty($row['foto'])): ?>
-                                                    <img src="<?= profilePhotoUrl($row['foto'], '../') ?>" class="w-full h-full object-cover">
-                                                <?php else: ?>
-                                                    <i class="fas fa-user text-slate-300 text-[10px]"></i>
-                                                <?php endif; ?>
-                                            </div>
+                                            <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-50 dark:bg-slate-800 flex items-center justify-center"><img src="<?= profilePhotoUrl($row['nama_lengkap'], '../') ?>" class="w-full h-full object-cover"></div>
                                             <div class="truncate">
                                                 <div class="text-[10px] font-bold text-slate-700 dark:text-white leading-tight uppercase mhs-name"><?= htmlspecialchars($row['nama_lengkap']) ?></div>
                                                 <div class="text-[8px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5"><?= $row['nim'] ?></div>

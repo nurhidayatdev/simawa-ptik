@@ -50,7 +50,7 @@ if ($filter_minggu > 18) $filter_minggu = 18;
 
 // Data Piket
 $where_p_kelas = getKelasWhereClause('p', true);
-$query = "SELECT p.*, m.nama_lengkap, m.foto, jm.hari, mk.nama_matkul, r.nama_ruangan, jk_start.jam_mulai, jk_end.jam_selesai
+$query = "SELECT p.*, m.nama_lengkap, jm.hari, mk.nama_matkul, r.nama_ruangan, jk_start.jam_mulai, jk_end.jam_selesai
           FROM piket_proyektor p
           JOIN mahasiswa m ON p.mahasiswa_id = m.id
           JOIN jadwal_matkul jm ON p.jadwal_matkul_id = jm.id
@@ -293,7 +293,7 @@ if ($my_mhs_id) {
                                     <?php foreach ($data['petugas'] as $petugas): ?>
                                         <div class="flex items-center gap-2">
                                             <div class="h-6 w-6 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0 shadow-sm">
-                                                <img src="<?= profilePhotoUrl($petugas['foto'], '../') ?>" class="w-full h-full object-cover">
+                                                <img src="<?= profilePhotoUrl($petugas['nama'], '../') ?>" class="w-full h-full object-cover">
                                             </div>
                                             <span class="text-[10px] font-semibold text-slate-700 dark:text-slate-300 truncate"><?= htmlspecialchars($petugas['nama']) ?></span>
                                         </div>

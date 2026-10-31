@@ -39,7 +39,6 @@ $stmt = mysqli_prepare($koneksi, "
         m.nama_lengkap,
         m.nama_panggilan,
         m.nim,
-        m.foto,
         m.jenis_kelamin,
         u.email as user_email
     FROM mahasiswa m
@@ -60,7 +59,7 @@ while ($row = mysqli_fetch_assoc($result)) {
         'nim'            => $row['nim'],
         'nama_lengkap'   => $row['nama_lengkap'],
         'nama_panggilan' => $row['nama_panggilan'] ?? '',
-        'foto_url'       => !empty($row['foto']) ? profilePhotoUrl($row['foto'], '') : '',
+        'foto_url'       => profilePhotoUrl($row['nama_lengkap'], ''),
         'email'          => $row['user_email'] ?? '-',
         'jenis_kelamin'  => $row['jenis_kelamin'] ?? '-'
     ];

@@ -57,11 +57,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<tr class="' . $rowClass . '">';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200">' . ($no++) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
-        if (!empty($row['foto'])) {
-            echo '<img src="' . profilePhotoUrl($row['foto'], '../') . '" class="rounded shadow-sm border dark:border-slate-700" style="max-width:25px; height:auto;" />';
-        } else {
-            echo '<span class="text-[10px] text-slate-400 dark:text-slate-600 italic">None</span>';
-        }
+        echo '<div class="h-6 w-6 rounded-full overflow-hidden shadow-sm inline-block"><img src="' . profilePhotoUrl($row['nama_lengkap'], '../') . '" class="w-full h-full object-cover" /></div>';
         echo '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs font-bold text-slate-800 dark:text-slate-100">' . htmlspecialchars($row['nim']) . '</td>';
         echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
@@ -170,13 +166,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <tr class="<?= $rowClass ?>">
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 font-medium"><?= $no++; ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap">
-                                    <?php if (!empty($row['foto'])): ?>
-                                        <div class="h-6 w-6 rounded border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                                            <img src="<?= profilePhotoUrl($row['foto'], '../') ?>" class="w-full h-full object-cover" />
-                                        </div>
-                                    <?php else: ?>
-                                        <span class="text-[9px] text-slate-400 dark:text-slate-600 italic">None</span>
-                                    <?php endif; ?>
+                                    <div class="h-6 w-6 rounded-full overflow-hidden shadow-sm">
+                                        <img src="<?= profilePhotoUrl($row['nama_lengkap'], '../') ?>" class="w-full h-full object-cover" />
+                                    </div>
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs font-bold text-slate-800 dark:text-slate-100"><?= $row['nim']; ?></td>
                                 <td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200"><?= $row['nama_lengkap']; ?></td>

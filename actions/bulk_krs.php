@@ -207,7 +207,6 @@ $q_mhs = "
         m.id,
         m.nim,
         m.nama_lengkap,
-        m.foto,
         COALESCE(kv.status, 'belum_isi') AS status_krs,
         kv.tanggal_validasi,
         COALESCE((
@@ -617,7 +616,7 @@ $json_matkul   = json_encode($all_matkul);
                                         <td class="px-4 py-3">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800 shadow-xs">
-                                                    <img src="<?= profilePhotoUrl($m['foto'], '../') ?>" alt="" class="w-full h-full object-cover">
+                                                    <img src="<?= profilePhotoUrl($m['nama_lengkap'], '../') ?>" alt="" class="w-full h-full object-cover">
                                                 </div>
                                                 <div class="min-w-0">
                                                     <div class="text-[11px] font-bold text-slate-800 dark:text-slate-100 truncate uppercase leading-tight"><?= htmlspecialchars($m['nama_lengkap']) ?></div>

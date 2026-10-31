@@ -65,7 +65,6 @@ $q_kelas_list = mysqli_query($koneksi, "
         k.ketua_tingkat_user_id,
         u.email as ketua_email,
         u.nama_lengkap as ketua_nama,
-        u.foto as ketua_foto,
         u.linked_student_nim as ketua_nim,
         (SELECT COUNT(*) 
          FROM mahasiswa m2 
@@ -295,13 +294,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                             <?php if (!empty($k['ketua_nama'])): ?>
                                                 <div class="flex items-center gap-2.5">
                                                     <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0">
-                                                        <?php if (!empty($k['ketua_foto'])): ?>
-                                                            <img src="<?= profilePhotoUrl($k['ketua_foto'], '') ?>" class="w-full h-full object-cover">
-                                                        <?php else: ?>
-                                                            <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                                                                <i class="fas fa-user"></i>
-                                                            </div>
-                                                        <?php endif; ?>
+                                                        <img src="<?= profilePhotoUrl($k['ketua_nama']) ?>" class="w-full h-full object-cover">
                                                     </div>
                                                     <div>
                                                         <div class="font-bold text-slate-800 dark:text-slate-200 leading-tight">

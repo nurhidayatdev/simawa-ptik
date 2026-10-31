@@ -101,7 +101,7 @@ $foto         = $_SESSION['foto'] ?? '';
                 <div class="relative">
                     <button id="profile-button" class="flex items-center space-x-2">
                         <span class="text-white font-semibold"><?php echo htmlspecialchars($nama_lengkap); ?></span>
-                        <img src="<?= profilePhotoUrl($foto, $base) ?>" alt="Profile" class="w-8 h-8 rounded-full">
+                        <img src="<?= profilePhotoUrl($nama_lengkap, $base) ?>" alt="Profile" class="w-8 h-8 rounded-full shadow-sm">
                     </button>
                     <div id="profile-dropdown" class="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-md shadow-lg hidden overflow-hidden border dark:border-slate-700">
                         <a href="<?= $base ?>views/profile" class="block px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-slate-700 font-semibold text-indigo-900 dark:text-slate-200"><i class="fa fa-user mr-2 text-indigo-900 dark:text-indigo-400"></i>Profile</a>

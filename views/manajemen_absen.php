@@ -76,8 +76,7 @@ if ($f_matkul && $f_pertemuan) {
             m.id AS mahasiswa_id,
             m.nim,
             m.nama_lengkap,
-            m.foto,
-            a.status
+                        a.status
         FROM krs k
         JOIN mahasiswa m ON k.mahasiswa_id = m.id
         LEFT JOIN users u ON m.user_id = u.id
@@ -318,15 +317,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel' && $f_matkul && $f_per
                                         <td class="px-6 py-4 text-[11px] font-bold text-slate-400 dark:text-slate-500 text-center"><?= $no++ ?></td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-4">
-                                                <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800">
-                                                    <?php if (!empty($row['foto'])): ?>
-                                                        <img src="<?= profilePhotoUrl($row['foto'], '../') ?>" class="w-full h-full object-cover">
-                                                    <?php else: ?>
-                                                        <div class="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-700">
-                                                            <i class="fas fa-user text-lg"></i>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
+                                                <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800"><img src="<?= profilePhotoUrl($row['nama_lengkap'], '../') ?>" class="w-full h-full object-cover"></div>
                                                 <div>
                                                     <div class="text-[11px] font-bold text-slate-700 dark:text-slate-200 leading-tight uppercase mhs-name"><?= htmlspecialchars($row['nama_lengkap']) ?></div>
                                                     <div class="text-[9px] text-slate-400 dark:text-slate-500 font-semibold tracking-tighter mt-0.5"><?= $row['nim'] ?></div>

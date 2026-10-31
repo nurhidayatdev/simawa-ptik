@@ -22,13 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         u.id AS user_id,
         u.kelas_id AS user_kelas_id,
         u.nama_lengkap AS user_nama_lengkap,
-        u.foto AS user_foto,
         u.linked_student_nim,
         m.nim AS mhs_nim,
         m.nama_lengkap AS mhs_nama_lengkap,
         m.nama_panggilan AS mhs_nama_panggilan,
         m.kelas_id AS mhs_kelas_id,
-        m.foto AS mhs_foto,
         u.email,
         u.password,
         u.role,
@@ -52,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['nama_lengkap']       = !empty($data['user_nama_lengkap']) ? $data['user_nama_lengkap'] : (!empty($data['mhs_nama_lengkap']) ? $data['mhs_nama_lengkap'] : $data['email']);
         $_SESSION['nama_panggilan']     = !empty($data['mhs_nama_panggilan']) ? $data['mhs_nama_panggilan'] : explode(' ', $_SESSION['nama_lengkap'])[0];
         $_SESSION['role']               = $data['role'];
-        $_SESSION['foto']               = !empty($data['user_foto']) ? $data['user_foto'] : ($data['mhs_foto'] ?? 'Yaya.png');
+        $_SESSION['foto']               = '';
         $_SESSION['linked_student_nim'] = $data['linked_student_nim'] ?? null;
         
         // Simpan kelas_id & nama_kelas ke sesi

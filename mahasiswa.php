@@ -61,7 +61,7 @@ while ($r = mysqli_fetch_assoc($result)) {
             data-nim="<?php echo htmlspecialchars($row['nim']); ?>"
             data-panggilan="<?php echo htmlspecialchars($row['nama_panggilan']); ?>"
             data-bio="<?php echo htmlspecialchars($row['bio'] ?? ''); ?>"
-            data-foto="<?= !empty($row['foto']) ? profilePhotoUrl($row['foto']) : '' ?>"
+            data-foto="<?= profilePhotoUrl($row['nama_lengkap']) ?>"
             data-initials="<?= strtoupper(substr($row['nama_lengkap'], 0, 2)) ?>"
             data-instagram="<?php echo htmlspecialchars($row['instagram'] ?? ''); ?>"
             data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>"
@@ -69,11 +69,7 @@ while ($r = mysqli_fetch_assoc($result)) {
             <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-14 relative">
               <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shadow-lg border-4 border-white dark:border-slate-800 overflow-hidden bg-indigo-900 group-hover:scale-105 transition-transform">
-                  <?php if (!empty($row['foto'])): ?>
-                    <img src="<?= profilePhotoUrl($row['foto']) ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
-                  <?php else: ?>
-                    <span><?php echo strtoupper(substr($row['nama_lengkap'], 0, 2)); ?></span>
-                  <?php endif; ?>
+                  <img src="<?= profilePhotoUrl($row['nama_lengkap']) ?>" alt="<?php echo htmlspecialchars($row['nama_lengkap']); ?>" class="w-full h-full object-cover">
                 </div>
               </div>
             </div>

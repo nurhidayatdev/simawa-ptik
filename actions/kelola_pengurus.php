@@ -52,21 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Handle upload foto jika ada
-        $foto = '';
-        if (!empty($_FILES['foto']['name']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-            $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
-            $file_ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
-            if (in_array($file_ext, $allowed_ext)) {
-                $target_dir = "../storage/profile/";
-                if (!file_exists($target_dir)) {
-                    mkdir($target_dir, 0777, true);
-                }
-                $foto = time() . "_" . preg_replace('/[^a-zA-Z0-9._-]/', '', basename($_FILES['foto']['name']));
-                move_uploaded_file($_FILES['foto']['tmp_name'], $target_dir . $foto);
-            }
-        }
-
         // Opsi: Buat akun login role Mahasiswa jika email diisi
         $email_login = trim($_POST['email'] ?? '');
         $pass_login  = trim($_POST['password'] ?? '');
@@ -91,10 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Simpan data mahasiswa otomatis dengan kelas_id sesi Ketua Tingkat
         $stmt_ins = mysqli_prepare($koneksi, "
-            INSERT INTO mahasiswa (kelas_id, nim, nama_lengkap, nama_panggilan, jenis_kelamin, bio, instagram, foto)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO mahasiswa (kelas_id, nim, nama_lengkap, nama_panggilan, jenis_kelamin, bio, instagram)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
-        mysqli_stmt_bind_param($stmt_ins, "isssssss", $kelas_id, $nim, $nama_lengkap, $nama_panggilan, $jenis_kelamin, $bio, $instagram, $foto);
+        mysqli_stmt_bind_param($stmt_ins, "issssss", $kelas_id, $nim, $nama_lengkap, $nama_panggilan, $jenis_kelamin, $bio, $instagram);
 
         if (mysqli_stmt_execute($stmt_ins)) {
             $new_mhs_id = mysqli_insert_id($koneksi);

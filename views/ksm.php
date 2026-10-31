@@ -302,7 +302,7 @@ while ($row = mysqli_fetch_assoc($res_ksm)) {
             <!-- Student Info Block -->
             <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700 mb-6 flex flex-col md:flex-row print-student-info gap-4 items-center md:items-start relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50 dark:bg-indigo-900/20 rounded-bl-full -mr-12 -mt-12 opacity-50 no-print"></div>
-                <img src="<?= profilePhotoUrl($foto, '../') ?>" alt="Foto Profil" class="w-20 h-20 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-md z-10">
+                <img src="<?= profilePhotoUrl($nama_lengkap, '../') ?>" alt="Foto Profil" class="w-20 h-20 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-md z-10">
                 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 print-grid-2 gap-x-8 gap-y-3 text-sm w-full z-10">
                     <div class="flex flex-col">
                         <span class="text-slate-400 dark:text-slate-500 text-[9px] uppercase tracking-widest font-black mb-0.5">Nama Mahasiswa</span>

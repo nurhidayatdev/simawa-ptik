@@ -106,7 +106,6 @@ $query_mhs = "
         m.id, 
         m.nama_lengkap, 
         m.nim, 
-        m.foto,
         kv.status as status_validasi,
         kv.tanggal_validasi,
         COUNT(kt.id) as total_matkul,
@@ -224,7 +223,7 @@ $json_details = json_encode($krs_details);
                                 <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-700 dark:text-slate-300"><?= $no++ ?></td>
                                 <td class="px-3 py-3 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <img class="h-8 w-8 rounded-full object-cover mr-3 border border-slate-200 dark:border-slate-700" src="<?= profilePhotoUrl($m['foto'], '../') ?>" alt="">
+                                        <img class="h-8 w-8 rounded-full object-cover mr-3 border border-slate-200 dark:border-slate-700" src="<?= profilePhotoUrl($m['nama_lengkap'], '../') ?>" alt="">
                                         <div>
                                             <div class="text-xs font-bold text-slate-800 dark:text-slate-200"><?= htmlspecialchars($m['nama_lengkap']) ?></div>
                                             <div class="text-[10px] text-slate-500 dark:text-slate-500 font-medium"><?= htmlspecialchars($m['nim']) ?></div>

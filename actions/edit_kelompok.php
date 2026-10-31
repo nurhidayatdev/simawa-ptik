@@ -110,13 +110,13 @@ $existing_groups = [];
 if ($selected_matkul && !empty($selected_dosen)) {
     // Load students
     $where_mhs_kelas = getKelasWhereClause('m', true);
-    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin, m.foto FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? $where_mhs_kelas ORDER BY m.nim");
+    $stmt = mysqli_prepare($koneksi, "SELECT m.nim, m.nama_lengkap, m.jenis_kelamin FROM krs k JOIN mahasiswa m ON k.mahasiswa_id = m.id WHERE k.matkul_id = ? AND k.periode_id = ? $where_mhs_kelas ORDER BY m.nim");
     mysqli_stmt_bind_param($stmt, 'ii', $selected_matkul, $periode_id);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
     while ($r = mysqli_fetch_assoc($res)) {
         // Pre-calculate photo URL for JS usage
-        $r['foto_url'] = profilePhotoUrl($r['foto'], '../');
+        $r['foto_url'] = profilePhotoUrl($r['nama_lengkap'], '../');
         $students[] = $r;
     }
 
@@ -148,7 +148,7 @@ if ($selected_matkul && !empty($selected_dosen)) {
     foreach ($students as $s) {
         $student_map[$s['nim']] = [
             'nama' => $s['nama_lengkap'],
-            'foto' => $s['foto']
+            
         ];
     }
 
@@ -157,7 +157,7 @@ if ($selected_matkul && !empty($selected_dosen)) {
         $group_members = [];
         foreach ($nims as $nim) {
             $s_data = $student_map[$nim] ?? ['nama' => $nim, 'foto' => ''];
-            $group_members[] = ['nim' => $nim, 'nama_lengkap' => $s_data['nama'], 'foto_url' => profilePhotoUrl($s_data['foto'], '../')];
+            $group_members[] = ['nim' => $nim, 'nama_lengkap' => $s_data['nama'], 'foto_url' => profilePhotoUrl($s_data['nama'], '../')];
         }
         $existing_groups[] = $group_members;
     }
