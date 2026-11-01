@@ -115,6 +115,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         exit;
     }
 
+
+    // ============================================================
+    // 1B. GENERATE KRS SEMESTER LAMPAU (AUTO-APPROVED)
+    // ============================================================
+    if ($action === 'generate_krs_lampau') {
+        $target_periode_id = (int)($_POST['target_periode_id'] ?? 0);
+        $matkul_ids        = array_map('intval', (array)($_POST['matkul_ids'] ?? []));
+        $mahasiswa_ids     = array_map('intval', (array)($_POST['mahasiswa_ids'] ?? []));
+
+        if ($target_periode_id <= 0) {
+            header("Location: bulk_krs?msg=no_periode_lampau");
+            exit;
+        }
+        if (empty($matkul_ids)) {
+            header("Location: bulk_krs?msg=no_matkul_lampau");
+            exit;
+        }
+        if (empty($mahasiswa_ids)) {
+            header("Location: bulk_krs?msg=no_mhs_lampau");
+            exit;
+        }
+
+        // Ambil info periode lampau
+        $chk_p = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama FROM periode WHERE id = $target_periode_id LIMIT 1");
+        $p_info = mysqli_fetch_assoc($chk_p);
+        if (!$p_info) {
+            header("Location: bulk_krs?msg=invalid_periode");
+            exit;
+        }
+
+        // Hitung total SKS
+        $matkuls_str = implode(',', $matkul_ids);
+        $res_sks = mysqli_query($koneksi, "SELECT SUM(sks) as total FROM mata_kuliah WHERE id IN ($matkuls_str)");
+        $data_sks = mysqli_fetch_assoc($res_sks);
+        $total_sks = (int)($data_sks['total'] ?? 0);
+
+        $stmt_temp = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        $stmt_krs  = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        $stmt_val  = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status, tanggal_validasi) VALUES (?, ?, 'approved', NOW()) ON DUPLICATE KEY UPDATE status = 'approved', tanggal_validasi = NOW()");
+
+        $count_mhs = 0;
+        foreach ($mahasiswa_ids as $m_id) {
+            if ($m_id <= 0) continue;
+
+            // Hapus data krs lama di periode ini agar tidak duplikat
+            mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $m_id AND periode_id = $target_periode_id");
+            mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $m_id AND periode_id = $target_periode_id");
+
+            foreach ($matkul_ids as $mk_id) {
+                mysqli_stmt_bind_param($stmt_temp, "iii", $m_id, $mk_id, $target_periode_id);
+                mysqli_stmt_execute($stmt_temp);
+
+                mysqli_stmt_bind_param($stmt_krs, "iii", $m_id, $mk_id, $target_periode_id);
+                mysqli_stmt_execute($stmt_krs);
+            }
+
+            mysqli_stmt_bind_param($stmt_val, "ii", $m_id, $target_periode_id);
+            mysqli_stmt_execute($stmt_val);
+
+            $count_mhs++;
+        }
+
+        $sem_nama = "Semester " . $p_info['semester_ke'] . " (" . $p_info['tahun_periode'] . " " . $p_info['semester_nama'] . ")";
+        header("Location: bulk_krs?msg=lampau_success&count=$count_mhs&sks=$total_sks&sem=" . urlencode($sem_nama));
+        exit;
+    }
+
     // 2. BULK APPROVE
     if ($action === 'bulk_approve') {
         $ids_raw = $_POST['mahasiswa_ids'] ?? [];
@@ -264,6 +331,23 @@ $summary     = mysqli_fetch_assoc($res_summary);
 
 // Ambil mata kuliah sesuai semester aktif saja
 $res_matkul = mysqli_query($koneksi, "SELECT * FROM mata_kuliah WHERE semester = $semester_aktif ORDER BY kode_matkul ASC");
+
+// Ambil periode-periode lampau (non-aktif)
+$res_periode_lampau = mysqli_query($koneksi, "SELECT * FROM periode WHERE status = 'non-aktif' ORDER BY semester_ke ASC, id ASC");
+$periode_lampau_list = [];
+while ($pl = mysqli_fetch_assoc($res_periode_lampau)) {
+    $periode_lampau_list[] = $pl;
+}
+
+// Ambil semua mata kuliah untuk kurikulum lampau
+$res_matkul_lampau = mysqli_query($koneksi, "SELECT id, kode_matkul, nama_matkul, sks, semester FROM mata_kuliah ORDER BY semester ASC, kode_matkul ASC");
+$matkul_lampau_all = [];
+while ($ml = mysqli_fetch_assoc($res_matkul_lampau)) {
+    $matkul_lampau_all[] = $ml;
+}
+$json_matkul_lampau = json_encode($matkul_lampau_all);
+$json_periode_lampau = json_encode($periode_lampau_list);
+
 $all_matkul = [];
 while ($m = mysqli_fetch_assoc($res_matkul)) {
     $all_matkul[] = $m;
@@ -409,10 +493,13 @@ $json_matkul   = json_encode($all_matkul);
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-2.5">
+                    <button type="button" onclick="openKrsLampauModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-amber-600/20 active:scale-95 cursor-pointer">
+                        <i class="fas fa-history text-xs"></i> GENERATE KRS LAMPAU
+                    </button>
                     <a href="validasi_krs.php" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50 px-4 py-2.5 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-xs font-bold transition-all flex items-center gap-2 shadow-sm">
                         <i class="fas fa-user-check text-xs"></i> VALIDASI INDIVIDU
                     </a>
-                    <button type="button" onclick="openSetKrsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95">
+                    <button type="button" onclick="openSetKrsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20 active:scale-95 cursor-pointer">
                         <i class="fas fa-magic text-xs"></i> SET KRS MASSAL
                     </button>
                 </div>
@@ -738,6 +825,139 @@ $json_matkul   = json_encode($all_matkul);
     <!-- ================================================
          MODAL: SET KRS MASSAL / MANUAL
          ================================================ -->
+    
+    <!-- ================================================
+         MODAL: GENERATE KRS SEMESTER LAMPAU
+         ================================================ -->
+    <div id="krsLampauModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-3xl max-h-[92vh] flex flex-col overflow-hidden animate-fade-in">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 flex items-center justify-center shrink-0">
+                        <i class="fas fa-history text-base"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Inisialisasi KRS Semester Lampau</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            Terapkan data mata kuliah semester sebelumnya (otomatis Approved) untuk mahasiswa kelas.
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeKrsLampauModal()" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Pilih Periode & Target Section -->
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                            1. Pilih Semester Lampau *
+                        </label>
+                        <select id="lampauPeriodeSelect" onchange="onPeriodeLampauChange()" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none transition-all cursor-pointer font-medium">
+                            <option value="">-- Pilih Periode Semester --</option>
+                            <?php foreach ($periode_lampau_list as $pl): ?>
+                                <option value="<?= $pl['id'] ?>" data-sem="<?= $pl['semester_ke'] ?>">
+                                    Semester <?= $pl['semester_ke'] ?> &bull; <?= htmlspecialchars($pl['tahun_periode'] . ' ' . $pl['semester_nama']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                                2. Beban SKS Semester Ini
+                            </label>
+                            <span id="lampauTotalSksBadge" class="text-xs font-bold px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400">
+                                0 SKS
+                            </span>
+                        </div>
+                        <div class="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                            <span>Status Pengesahan:</span>
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                <i class="fas fa-check-circle text-xs"></i> Langsung Terverifikasi (Approved)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab / Split: Mata Kuliah & Mahasiswa Target -->
+            <div class="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Kolom Kiri: Mata Kuliah -->
+                    <div>
+                        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100 dark:border-slate-800">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                                    Mata Kuliah Kurikulum
+                                </h4>
+                                <p class="text-[10px] text-slate-400" id="lampauMatkulSub">Pilih semester terlebih dahulu</p>
+                            </div>
+                            <button type="button" onclick="toggleSelectAllMatkulLampau()" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                                Pilih Semua
+                            </button>
+                        </div>
+                        <div id="lampauMatkulContainer" class="space-y-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+                            <div class="py-10 text-center text-slate-400 text-xs italic">
+                                Silakan pilih semester lampau di atas untuk memuat mata kuliah.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan: Mahasiswa Target -->
+                    <div>
+                        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100 dark:border-slate-800">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                                    Mahasiswa Target Kelas
+                                </h4>
+                                <p class="text-[10px] text-slate-400">
+                                    <span id="lampauSelectedMhsCount"><?= count($list_mhs) ?></span> Mahasiswa Terpilih
+                                </p>
+                            </div>
+                            <button type="button" onclick="toggleSelectAllMhsLampau()" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                                Toggle Semua
+                            </button>
+                        </div>
+                        <div class="space-y-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+                            <?php foreach ($list_mhs as $m): ?>
+                                <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors select-none cursor-pointer">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <input type="checkbox" class="lampau-mhs-cb w-4 h-4 rounded text-amber-600 border-slate-300 dark:border-slate-600 focus:ring-amber-500 cursor-pointer"
+                                            value="<?= $m['id'] ?>" checked onchange="updateLampauMhsCount()">
+                                        <div class="min-w-0">
+                                            <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"><?= htmlspecialchars($m['nama_lengkap']) ?></div>
+                                            <div class="text-[10px] font-mono text-slate-400"><?= htmlspecialchars($m['nim']) ?></div>
+                                        </div>
+                                    </div>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50 dark:bg-slate-900/40">
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <i class="fas fa-info-circle text-amber-500 text-xs"></i>
+                    <span>KRS lampau ini akan otomatis dihitung dalam <strong>Progres 146 SKS Kelulusan</strong>.</span>
+                </p>
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button type="button" onclick="closeKrsLampauModal()" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="button" onclick="submitKrsLampau()" class="px-5 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition-all shadow-md shadow-amber-600/20 active:scale-95 flex items-center gap-2 cursor-pointer">
+                        <i class="fas fa-check-double text-xs"></i> Terapkan & Sahkan KRS
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="setKrsModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
         <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in">
             <!-- Modal Header -->
@@ -835,6 +1055,7 @@ $json_matkul   = json_encode($all_matkul);
     <!-- Hidden Form for Actions -->
     <form id="bulkForm" method="POST" class="hidden">
         <input type="hidden" name="action" id="bulkAction">
+        <input type="hidden" name="target_periode_id" id="bulkTargetPeriodeId">
         <div id="bulkMhsInputs"></div>
         <div id="bulkMatkulInputs"></div>
     </form>
@@ -844,6 +1065,165 @@ $json_matkul   = json_encode($all_matkul);
         const krsDataTemp     = <?= $json_temp ?>;
         const krsDataApproved = <?= $json_approved ?>;
         const allMatkul       = <?= $json_matkul ?>;
+
+        // ============================================================
+        // Modal KRS Semester Lampau Logic
+        // ============================================================
+        const allMatkulLampauList = <?= $json_matkul_lampau ?>;
+        const periodeLampauList   = <?= $json_periode_lampau ?>;
+
+        function openKrsLampauModal() {
+            document.getElementById("krsLampauModal").classList.remove("hidden");
+            document.getElementById("krsLampauModal").classList.add("flex");
+            const sel = document.getElementById("lampauPeriodeSelect");
+            if (sel && sel.options.length > 1 && !sel.value) {
+                sel.selectedIndex = 1;
+                onPeriodeLampauChange();
+            }
+        }
+
+        function closeKrsLampauModal() {
+            document.getElementById("krsLampauModal").classList.add("hidden");
+            document.getElementById("krsLampauModal").classList.remove("flex");
+        }
+
+        function onPeriodeLampauChange() {
+            const sel = document.getElementById("lampauPeriodeSelect");
+            const opt = sel.options[sel.selectedIndex];
+            const sem = opt ? opt.getAttribute("data-sem") : null;
+            const container = document.getElementById("lampauMatkulContainer");
+            const sub = document.getElementById("lampauMatkulSub");
+
+            if (!sem) {
+                container.innerHTML = `<div class="py-10 text-center text-slate-400 text-xs italic">Silakan pilih semester lampau di atas untuk memuat mata kuliah.</div>`;
+                sub.textContent = "Pilih semester terlebih dahulu";
+                updateLampauSksCounter();
+                return;
+            }
+
+            const matchedMatkul = allMatkulLampauList.filter(m => String(m.semester) === String(sem));
+            sub.textContent = `${matchedMatkul.length} Mata Kuliah kurikulum resmi`;
+
+            if (matchedMatkul.length === 0) {
+                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs italic">Tidak ada mata kuliah kurikulum untuk Semester ${sem}.</div>`;
+                updateLampauSksCounter();
+                return;
+            }
+
+            let html = "";
+            matchedMatkul.forEach(mk => {
+                html += `
+                    <label class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors select-none cursor-pointer">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <input type="checkbox" class="lampau-mk-cb w-4 h-4 rounded text-amber-600 border-slate-300 dark:border-slate-600 focus:ring-amber-500 cursor-pointer"
+                                value="${mk.id}" data-sks="${mk.sks}" checked onchange="updateLampauSksCounter()">
+                            <div class="min-w-0">
+                                <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${escapeHtml(mk.nama_matkul)}</div>
+                                <div class="text-[10px] font-mono text-slate-400">${escapeHtml(mk.kode_matkul)}</div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/50 px-2 py-0.5 rounded-lg shrink-0">
+                            ${mk.sks} SKS
+                        </span>
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+            updateLampauSksCounter();
+        }
+
+        function updateLampauSksCounter() {
+            let total = 0;
+            document.querySelectorAll(".lampau-mk-cb:checked").forEach(cb => {
+                total += parseInt(cb.getAttribute("data-sks") || 0);
+            });
+            document.getElementById("lampauTotalSksBadge").textContent = `${total} SKS`;
+        }
+
+        function toggleSelectAllMatkulLampau() {
+            const cbs = document.querySelectorAll(".lampau-mk-cb");
+            const allChecked = Array.from(cbs).every(cb => cb.checked);
+            cbs.forEach(cb => cb.checked = !allChecked);
+            updateLampauSksCounter();
+        }
+
+        function toggleSelectAllMhsLampau() {
+            const cbs = document.querySelectorAll(".lampau-mhs-cb");
+            const allChecked = Array.from(cbs).every(cb => cb.checked);
+            cbs.forEach(cb => cb.checked = !allChecked);
+            updateLampauMhsCount();
+        }
+
+        function updateLampauMhsCount() {
+            const count = document.querySelectorAll(".lampau-mhs-cb:checked").length;
+            document.getElementById("lampauSelectedMhsCount").textContent = count;
+        }
+
+        async function submitKrsLampau() {
+            const periodeId = document.getElementById("lampauPeriodeSelect").value;
+            if (!periodeId) {
+                Swal.fire({ icon: "warning", title: "Pilih Semester", text: "Silakan pilih semester lampau terlebih dahulu!" });
+                return;
+            }
+
+            const sel = document.getElementById("lampauPeriodeSelect");
+            const semText = sel.options[sel.selectedIndex].text;
+
+            const selectedMks = Array.from(document.querySelectorAll(".lampau-mk-cb:checked")).map(cb => cb.value);
+            if (selectedMks.length === 0) {
+                Swal.fire({ icon: "warning", title: "Pilih Mata Kuliah", text: "Silakan pilih minimal 1 mata kuliah!" });
+                return;
+            }
+
+            const selectedMhs = Array.from(document.querySelectorAll(".lampau-mhs-cb:checked")).map(cb => cb.value);
+            if (selectedMhs.length === 0) {
+                Swal.fire({ icon: "warning", title: "Pilih Mahasiswa", text: "Silakan pilih minimal 1 mahasiswa target!" });
+                return;
+            }
+
+            let totalSks = 0;
+            document.querySelectorAll(".lampau-mk-cb:checked").forEach(cb => {
+                totalSks += parseInt(cb.getAttribute("data-sks") || 0);
+            });
+
+            const confirm = await Swal.fire({
+                title: "Terapkan KRS Lampau?",
+                html: `Anda akan menerapkan <strong>${selectedMks.length} Mata Kuliah (${totalSks} SKS)</strong> untuk <strong>${selectedMhs.length} Mahasiswa</strong> pada <strong>${escapeHtml(semText)}</strong>.<br><br><span class="text-xs text-slate-500">KRS ini akan otomatis berstatus Approved dan langsung dihitung pada progres kelulusan 146 SKS.</span>`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Terapkan Sekarang!",
+                cancelButtonText: "Batal",
+                confirmButtonColor: "#d97706"
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            document.getElementById("bulkAction").value = "generate_krs_lampau";
+            document.getElementById("bulkTargetPeriodeId").value = periodeId;
+
+            const mhsBox = document.getElementById("bulkMhsInputs");
+            mhsBox.innerHTML = "";
+            selectedMhs.forEach(id => {
+                const inp = document.createElement("input");
+                inp.type = "hidden";
+                inp.name = "mahasiswa_ids[]";
+                inp.value = id;
+                mhsBox.appendChild(inp);
+            });
+
+            const mkBox = document.getElementById("bulkMatkulInputs");
+            mkBox.innerHTML = "";
+            selectedMks.forEach(id => {
+                const inp = document.createElement("input");
+                inp.type = "hidden";
+                inp.name = "matkul_ids[]";
+                inp.value = id;
+                mkBox.appendChild(inp);
+            });
+
+            document.getElementById("bulkForm").submit();
+        }
+
         const allMahasiswaIds = <?= json_encode($mhs_ids) ?>;
 
         // ============================================================
@@ -1281,6 +1661,12 @@ $json_matkul   = json_encode($all_matkul);
                 const sks   = "<?= htmlspecialchars($_GET['sks'] ?? '0') ?>";
 
                 const toastMap = {
+                    
+                    lampau_success: { icon: 'success', title: 'KRS Lampau Ditetapkan!', text: `KRS ${new URLSearchParams(window.location.search).get("sem") || "Semester Lampau"} berhasil diterapkan untuk ${count} mahasiswa (${sks} SKS per mahasiswa).` },
+                    no_periode_lampau: { icon: 'warning', title: 'Pilih Semester', text: 'Pilih periode semester lampau terlebih dahulu.' },
+                    no_matkul_lampau:  { icon: 'warning', title: 'Pilih Mata Kuliah', text: 'Pilih minimal 1 mata kuliah semester lampau.' },
+                    no_mhs_lampau:     { icon: 'warning', title: 'Pilih Mahasiswa', text: 'Pilih minimal 1 mahasiswa target.' },
+
                     bulk_approved: { icon: 'success', title: 'Berhasil Approve!',      text: `${count} mahasiswa KRS-nya telah disetujui dan aktif sebagai KSM.` },
                     bulk_rejected: { icon: 'warning', title: 'KRS Ditolak',            text: `${count} mahasiswa KRS-nya telah ditolak.` },
                     bulk_set:      { icon: 'success', title: 'Set KRS Berhasil!',      text: `KRS ${count} mahasiswa berhasil diset (${sks} SKS) dan langsung diapprove.` },
