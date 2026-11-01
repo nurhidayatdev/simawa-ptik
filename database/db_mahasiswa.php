@@ -128,9 +128,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <i class="fa fa-search absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
                             </div>
                             <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
-                                <a href="../actions/tambah.php?tabel=mahasiswa" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
+                                <button type="button" onclick="openTambahMhsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0 cursor-pointer" title="Tambah Mahasiswa">
                                     <i class="fa fa-plus text-xs"></i>
-                                </a>
+                                </button>
                             <?php endif; ?>
                         </div>
                     </form>
@@ -207,7 +207,88 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 </table>
             </div>
         </div>
-        <?php include '../includes/footer_db.php'; ?>
+        
+    <!-- ==========================================
+         MODAL TAMBAH MAHASISWA KELAS (SERAGAM DENGAN DASHBOARD)
+         ========================================== -->
+    <div id="modalTambahMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Tambah Mahasiswa Baru</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Otomatis terdaftar ke kelas <strong><?= htmlspecialchars(getNamaKelasAktif()) ?></strong>.</p>
+                </div>
+                <button type="button" onclick="closeTambahMhsModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <form action="../actions/kelola_pengurus.php" method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="tambah_mahasiswa">
+                <input type="hidden" name="redirect_to" value="../database/db_mahasiswa.php">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Lengkap *</label>
+                    <input type="text" name="nama_lengkap" required placeholder="Contoh: Muhammad Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">NIM Mahasiswa *</label>
+                        <input type="text" name="nim" required placeholder="24020950..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
+                        <input type="text" name="nama_panggilan" placeholder="Contoh: Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
+                        <input type="text" name="instagram" placeholder="@username" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Biodata / Minat (Opsional)</label>
+                    <input type="text" name="bio" placeholder="Contoh: Minat Cyber Security & Programming" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <!-- Pembuatan Akun Login Role Mahasiswa (Opsional) -->
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Akun Login Mahasiswa (Opsional)</label>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Isi jika mahasiswa ini (atau Anda sendiri) ingin memiliki akun login terpisah sebagai Mahasiswa.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Email Login</label>
+                            <input type="email" name="email" placeholder="contoh: mhs@simawa.id" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Password Awal</label>
+                            <input type="password" name="password" placeholder="Default: simawa2024" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeTambahMhsModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">Simpan Mahasiswa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<?php include '../includes/footer_db.php'; ?>
     </main>
     <?php include '../includes/script_db.php'; ?>
     <script>
@@ -234,6 +315,40 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             });
         })();
     </script>
+
+    <script>
+        function openTambahMhsModal() {
+            document.getElementById("modalTambahMhs").classList.remove("hidden");
+        }
+        function closeTambahMhsModal() {
+            document.getElementById("modalTambahMhs").classList.add("hidden");
+        }
+    </script>
+
+
+<?php if (!empty($_SESSION['success'])): ?>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            html: <?= json_encode($_SESSION['success']) ?>,
+            confirmButtonColor: '#4f46e5'
+        });
+    </script>
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+<?php if (!empty($_SESSION['error'])): ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            html: <?= json_encode($_SESSION['error']) ?>,
+            confirmButtonColor: '#ef4444'
+        });
+    </script>
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+
 </body>
 
 </html>

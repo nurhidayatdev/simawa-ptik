@@ -42,15 +42,30 @@ if (isset($_POST['tambah'])) {
             $bio = mysqli_real_escape_string($koneksi, trim($_POST['bio'] ?? ''));
             $jenis_kelamin = mysqli_real_escape_string($koneksi, trim($_POST['jenis_kelamin'] ?? ''));
             $instagram = mysqli_real_escape_string($koneksi, trim($_POST['instagram'] ?? ''));
+            $password = trim($_POST['password'] ?? '');
+
             if ($role === 'Administrator Utama' && !empty($_POST['kelas_id'])) {
                 $target_kelas_id = (int)$_POST['kelas_id'];
             } else {
                 $target_kelas_id = getKelasScope() ?? 1;
             }
+
             mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, kelas_id)
                 VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram', '$target_kelas_id')");
-            $redirect = "../database/db_mahasiswa";
+            $new_mhs_id = mysqli_insert_id($koneksi);
 
+            if (!empty($email)) {
+                $pass_to_use = !empty($password) ? $password : 'simawa2024';
+                $stmt_u = mysqli_prepare($koneksi, "INSERT INTO users (email, password, role, nama_lengkap, linked_student_nim, kelas_id) VALUES (?, ?, 'Mahasiswa', ?, ?, ?)");
+                mysqli_stmt_bind_param($stmt_u, "ssssi", $email, $pass_to_use, $nama_lengkap, $nim, $target_kelas_id);
+                if (mysqli_stmt_execute($stmt_u)) {
+                    $new_uid = mysqli_insert_id($koneksi);
+                    mysqli_query($koneksi, "UPDATE mahasiswa SET user_id = $new_uid WHERE id = $new_mhs_id");
+                }
+            }
+
+            $_SESSION['success'] = "Mahasiswa <strong>" . htmlspecialchars($nama_lengkap) . "</strong> berhasil ditambahkan!";
+            $redirect = "../database/db_mahasiswa";
             break;
 
         case 'periode':
@@ -271,48 +286,66 @@ if (isset($_POST['tambah'])) {
             <form class="space-y-6" method="POST" enctype="multipart/form-data">
                 <div class="border-b border-slate-200 dark:border-slate-800 pb-6">
                     <?php if ($tabel === 'mahasiswa'): ?>
-                        <h3 class="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Mahasiswa</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex items-center justify-between mb-6">
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap</label>
-                                <input type="text" name="nama_lengkap"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                <h3 class="text-xl font-bold text-slate-800 dark:text-slate-100">Tambah Mahasiswa Baru</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Otomatis terdaftar ke kelas <strong><?= htmlspecialchars(getNamaKelasAktif()) ?></strong>.</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Lengkap *</label>
+                                <input type="text" name="nama_lengkap" required placeholder="Contoh: Muhammad Ihsan"
+                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Panggilan</label>
-                                <input type="text" name="nama_panggilan"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">NIM Mahasiswa *</label>
+                                <input type="text" name="nim" required placeholder="24020950..."
+                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
-                                <input type="email" name="email"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
+                                <input type="text" name="nama_panggilan" placeholder="Contoh: Ihsan"
+                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">NIM</label>
-                                <input type="number" name="nim"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Jenis Kelamin</label>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
                                 <select name="jenis_kelamin"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                                    <option value="">-- Pilih Jenis Kelamin --</option>
+                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors cursor-pointer">
                                     <option value="Laki-laki">Laki-laki</option>
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
                                 <input type="text" name="instagram" placeholder="@username"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Biodata</label>
-                                <input type="text" name="bio"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Biodata / Minat (Opsional)</label>
+                                <input type="text" name="bio" placeholder="Contoh: Minat Cyber Security & Programming"
+                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
                             </div>
                             
+                            <!-- Pembuatan Akun Login Mahasiswa (Opsional) -->
+                            <div class="md:col-span-2 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Akun Login Mahasiswa (Opsional)</label>
+                                    <p class="text-[10px] text-slate-400 mt-0.5">Isi jika mahasiswa ini ingin memiliki akun login terpisah sebagai Mahasiswa.</p>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Email Login</label>
+                                        <input type="email" name="email" placeholder="contoh: mhs@simawa.id"
+                                            class="w-full px-3.5 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Password Awal</label>
+                                        <input type="password" name="password" placeholder="Default: simawa2024"
+                                            class="w-full px-3.5 py-2 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     <?php elseif ($tabel === 'periode'): ?>
