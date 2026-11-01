@@ -1072,6 +1072,13 @@ $json_matkul   = json_encode($all_matkul);
         const allMatkulLampauList = <?= $json_matkul_lampau ?>;
         const periodeLampauList   = <?= $json_periode_lampau ?>;
 
+        function escapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function openKrsLampauModal() {
             document.getElementById("krsLampauModal").classList.remove("hidden");
             document.getElementById("krsLampauModal").classList.add("flex");
