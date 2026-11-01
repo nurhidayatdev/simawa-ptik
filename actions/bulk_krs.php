@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
 
         $stmt_temp = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
-        $stmt_krs  = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        $stmt_krs  = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE periode_id = VALUES(periode_id)");
         $stmt_val  = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status) VALUES (?, ?, 'approved') ON DUPLICATE KEY UPDATE status = 'approved', tanggal_validasi = NOW()");
 
         $count = 0;
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $total_sks = (int)($data_sks['total'] ?? 0);
 
         $stmt_temp = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
-        $stmt_krs  = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        $stmt_krs  = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE periode_id = VALUES(periode_id)");
         $stmt_val  = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status, tanggal_validasi) VALUES (?, ?, 'approved', NOW()) ON DUPLICATE KEY UPDATE status = 'approved', tanggal_validasi = NOW()");
 
         $count_mhs = 0;
@@ -199,10 +199,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id");
             mysqli_query($koneksi, "
+                DELETE FROM krs 
+                WHERE mahasiswa_id = $mhs_id 
+                AND matkul_id IN (
+                    SELECT matkul_id FROM krs_temp WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id
+                )
+            ");
+            mysqli_query($koneksi, "
                 INSERT INTO krs (mahasiswa_id, matkul_id, periode_id)
                 SELECT mahasiswa_id, matkul_id, periode_id
                 FROM krs_temp
                 WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id
+                ON DUPLICATE KEY UPDATE periode_id = VALUES(periode_id)
             ");
 
             mysqli_stmt_bind_param($stmt_val, "ii", $mhs_id, $periode_id);

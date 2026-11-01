@@ -4272,6 +4272,12 @@
       border-color: color-mix(in oklab, var(--color-amber-800) 50%, transparent);
     }
   }
+  .dark\:border-amber-800\/60:where(.dark, .dark *) {
+    border-color: color-mix(in srgb, oklch(47.3% 0.137 46.201) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-amber-800) 60%, transparent);
+    }
+  }
   .dark\:border-amber-900\/40:where(.dark, .dark *) {
     border-color: color-mix(in srgb, oklch(41.4% 0.112 45.904) 40%, transparent);
     @supports (color: color-mix(in lab, red, red)) {

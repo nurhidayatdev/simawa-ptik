@@ -57,12 +57,21 @@ function approveOneMahasiswa($koneksi, $mhs_id, $periode_id)
 {
     // Hapus krs lama
     mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id");
+    // Switch: Hapus dari periode lain jika matkul tersebut ada di krs_temp periode ini
+    mysqli_query($koneksi, "
+        DELETE FROM krs 
+        WHERE mahasiswa_id = $mhs_id 
+        AND matkul_id IN (
+            SELECT matkul_id FROM krs_temp WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id
+        )
+    ");
     // Copy dari temp ke krs
     mysqli_query($koneksi, "
         INSERT INTO krs (mahasiswa_id, matkul_id, periode_id)
         SELECT mahasiswa_id, matkul_id, periode_id
         FROM krs_temp
         WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id
+        ON DUPLICATE KEY UPDATE periode_id = VALUES(periode_id)
     ");
     // Set status approved
     $stmt = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status)

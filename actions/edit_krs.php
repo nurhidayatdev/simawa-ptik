@@ -114,11 +114,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($is_periode_aktif) {
         // PERIODE AKTIF: Simpan ke krs_temp sebagai draft dan status menjadi pending
         mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
-        $stmt = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
-        foreach ($matkul as $matkul_id) {
-            mysqli_stmt_bind_param($stmt, "iii", $mahasiswa_id, $matkul_id, $periode_id);
-            mysqli_stmt_execute($stmt);
+
+        if (!empty($matkul)) {
+            $escaped_matkul = implode(',', array_map('intval', $matkul));
+            // Hapus dari draft periode lain jika ada
+            mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND matkul_id IN ($escaped_matkul) AND periode_id != $periode_id");
+
+            $stmt = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+            foreach ($matkul as $matkul_id) {
+                $m_id = (int)$matkul_id;
+                mysqli_stmt_bind_param($stmt, "iii", $mahasiswa_id, $m_id, $periode_id);
+                mysqli_stmt_execute($stmt);
+            }
         }
+
         $stmt_val = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending'");
         mysqli_stmt_bind_param($stmt_val, "ii", $mahasiswa_id, $periode_id);
         mysqli_stmt_execute($stmt_val);
@@ -127,18 +136,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } else {
         // PERIODE LAMPAU: Langsung perbarui tabel krs resmi dan disahkan (approved)
+        // 1. Hapus krs & krs_temp lama untuk mahasiswa ini di periode ini
         mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
         mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
 
-        $stmt_krs = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
-        $stmt_temp = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
-        foreach ($matkul as $matkul_id) {
-            mysqli_stmt_bind_param($stmt_krs, "iii", $mahasiswa_id, $matkul_id, $periode_id);
-            mysqli_stmt_execute($stmt_krs);
+        if (!empty($matkul)) {
+            $escaped_matkul = implode(',', array_map('intval', $matkul));
 
-            mysqli_stmt_bind_param($stmt_temp, "iii", $mahasiswa_id, $matkul_id, $periode_id);
-            mysqli_stmt_execute($stmt_temp);
+            // 2. PINDAHKAN (SWITCH): Jika ada matkul yang sebelumnya tercatat di periode LAIN,
+            // hapus dari periode lain tersebut agar berpindah ke periode ini tanpa melanggar unique_krs!
+            mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $mahasiswa_id AND matkul_id IN ($escaped_matkul)");
+            mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND matkul_id IN ($escaped_matkul)");
+
+            $stmt_krs = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE periode_id = VALUES(periode_id)");
+            $stmt_temp = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+            foreach ($matkul as $matkul_id) {
+                $m_id = (int)$matkul_id;
+                mysqli_stmt_bind_param($stmt_krs, "iii", $mahasiswa_id, $m_id, $periode_id);
+                mysqli_stmt_execute($stmt_krs);
+
+                mysqli_stmt_bind_param($stmt_temp, "iii", $mahasiswa_id, $m_id, $periode_id);
+                mysqli_stmt_execute($stmt_temp);
+            }
         }
+
         $stmt_val = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status, tanggal_validasi) VALUES (?, ?, 'approved', NOW()) ON DUPLICATE KEY UPDATE status = 'approved', tanggal_validasi = NOW()");
         mysqli_stmt_bind_param($stmt_val, "ii", $mahasiswa_id, $periode_id);
         mysqli_stmt_execute($stmt_val);
@@ -159,32 +180,40 @@ while ($r = mysqli_fetch_assoc($res_matkul)) {
 }
 
 /* =====================
-   MATKUL YANG SUDAH DIAMBIL
+   MATKUL YANG SUDAH DIAMBIL DI PERIODE INI & PERIODE LAIN
    ===================== */
-// Cek di krs_temp dulu
-$krs = mysqli_query($koneksi, "
-    SELECT matkul_id FROM krs_temp
-    WHERE mahasiswa_id = $mahasiswa_id
-    AND periode_id = $periode_id
-");
-
-// Kalau temp kosong, cek krs (active), KECUALI status rejected (rejected means draft needs fix, so might be in temp, but if user cleared it, fall back to active?)
-// Actually, if krs_temp has rows, use it. If not, use krs.
 $diambil = [];
-if (mysqli_num_rows($krs) > 0) {
-    while ($row = mysqli_fetch_assoc($krs)) {
-        $diambil[] = $row['matkul_id'];
+if ($is_periode_aktif) {
+    // Di periode aktif, prioritaskan krs_temp jika ada draft
+    $krs_temp_q = mysqli_query($koneksi, "SELECT matkul_id FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
+    if (mysqli_num_rows($krs_temp_q) > 0) {
+        while ($row = mysqli_fetch_assoc($krs_temp_q)) {
+            $diambil[] = (int)$row['matkul_id'];
+        }
+    } else {
+        $krs_act_q = mysqli_query($koneksi, "SELECT matkul_id FROM krs WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
+        while ($row = mysqli_fetch_assoc($krs_act_q)) {
+            $diambil[] = (int)$row['matkul_id'];
+        }
     }
 } else {
-    // Fallback to active KRS
-    $krs_active = mysqli_query($koneksi, "
-        SELECT matkul_id FROM krs
-        WHERE mahasiswa_id = $mahasiswa_id
-        AND periode_id = $periode_id
-    ");
-    while ($row = mysqli_fetch_assoc($krs_active)) {
-        $diambil[] = $row['matkul_id'];
+    // Di periode lampau, ambil data resmi dari krs
+    $krs_lampau_q = mysqli_query($koneksi, "SELECT matkul_id FROM krs WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
+    while ($row = mysqli_fetch_assoc($krs_lampau_q)) {
+        $diambil[] = (int)$row['matkul_id'];
     }
+}
+
+// Cek matkul yang saat ini tercatat di periode LAIN untuk mahasiswa ini
+$taken_other_periods = [];
+$q_other = mysqli_query($koneksi, "
+    SELECT k.matkul_id, p.semester_ke, p.tahun_periode, p.semester_nama
+    FROM krs k
+    JOIN periode p ON k.periode_id = p.id
+    WHERE k.mahasiswa_id = $mahasiswa_id AND k.periode_id != $periode_id
+");
+while ($ro = mysqli_fetch_assoc($q_other)) {
+    $taken_other_periods[(int)$ro['matkul_id']] = $ro['semester_ke'];
 }
 ?>
 <!DOCTYPE html>
@@ -401,14 +430,25 @@ if (mysqli_num_rows($krs) > 0) {
                                         </tr>
                                     <?php else: ?>
                                         <?php foreach ($sem_matkul_list as $m): 
-                                            $is_checked = in_array($m['id'], $diambil);
+                                            $m_id = (int)$m['id'];
+                                            $is_checked = in_array($m_id, $diambil);
+                                            $other_sem = $taken_other_periods[$m_id] ?? null;
                                         ?>
                                             <tr class="matkul-row <?= ($row_id++ % 2 == 0) ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900/20' ?> hover:bg-indigo-50/70 dark:hover:bg-indigo-900/40 transition-colors group cursor-pointer" data-sem="<?= $s ?>" data-search="<?= strtolower(htmlspecialchars($m['kode_matkul'] . ' ' . $m['nama_matkul'])) ?>">
                                                 <td class="px-3 py-2.5 whitespace-nowrap text-xs text-center">
-                                                    <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" data-sks="<?= $m['sks'] ?>" data-sem="<?= $s ?>" class="sks-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:bg-slate-800 cursor-pointer w-4 h-4" <?= $is_checked ? 'checked' : '' ?>>
+                                                    <input type="checkbox" name="matkul[]" value="<?= $m_id ?>" data-sks="<?= $m['sks'] ?>" data-sem="<?= $s ?>" <?= $other_sem ? 'data-other-sem="' . $other_sem . '"' : '' ?> class="sks-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:bg-slate-800 cursor-pointer w-4 h-4" <?= $is_checked ? 'checked' : '' ?>>
                                                 </td>
                                                 <td class="px-3 py-2.5 whitespace-nowrap text-xs font-mono font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                                <td class="px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors font-medium"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                                <td class="px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors font-medium">
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <span><?= htmlspecialchars($m['nama_matkul']) ?></span>
+                                                        <?php if ($other_sem && !$is_checked): ?>
+                                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60" title="Matkul ini saat ini tercatat di Semester <?= $other_sem ?>. Centang untuk memindahkannya ke semester ini.">
+                                                                <i class="fas fa-exchange-alt text-[8px]"></i> Tercatat di Sem <?= $other_sem ?> (Centang utk pindahkan)
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </td>
                                                 <td class="px-3 py-2.5 whitespace-nowrap text-xs font-bold text-indigo-600 dark:text-indigo-400 text-center"><?= htmlspecialchars($m['sks']) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -644,9 +684,15 @@ if (mysqli_num_rows($krs) > 0) {
             }
 
             const isDark = document.documentElement.classList.contains('dark');
+            const switchingCbs = Array.from(document.querySelectorAll('.sks-checkbox:checked[data-other-sem]'));
+            let switchNotice = '';
+            if (switchingCbs.length > 0) {
+                switchNotice = '<div class="mt-3 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-[11px] font-semibold text-amber-700 dark:text-amber-300 text-left flex items-start gap-2"><i class="fas fa-exchange-alt mt-0.5 text-amber-500"></i><span>Perhatian: Terdapat <b>' + switchingCbs.length + ' mata kuliah</b> yang sebelumnya tercatat di semester lain. Menyimpan akan memindahkannya ke semester ini secara otomatis.</span></div>';
+            }
+
             Swal.fire({
                 title: 'Simpan KRS?',
-                text: "Total SKS terpilih: " + currentTotal + ". Pastikan pilihan Anda sudah benar.",
+                html: '<p class="text-xs text-slate-600 dark:text-slate-300">Total SKS terpilih: <b class="text-indigo-600 dark:text-indigo-400">' + currentTotal + ' SKS</b>. Pastikan pilihan Anda sudah benar.</p>' + switchNotice,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3730a3',

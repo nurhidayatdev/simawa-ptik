@@ -76,12 +76,21 @@ if (isset($_POST['action'])) {
         if ($act === 'approve') {
             // Delete old active krs
             mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id");
+            // Switch: Hapus matkul dari periode lain jika matkul tersebut diajukan di periode ini
+            mysqli_query($koneksi, "
+                DELETE FROM krs 
+                WHERE mahasiswa_id = $mhs_id 
+                AND matkul_id IN (
+                    SELECT matkul_id FROM krs_temp WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id
+                )
+            ");
             // Copy from temp
             mysqli_query($koneksi, "
                 INSERT INTO krs (mahasiswa_id, matkul_id, periode_id)
                 SELECT mahasiswa_id, matkul_id, periode_id
                 FROM krs_temp
                 WHERE mahasiswa_id = $mhs_id AND periode_id = $periode_id
+                ON DUPLICATE KEY UPDATE periode_id = VALUES(periode_id)
             ");
             // (Optional) Delete from temp or keep history? 
             // Let's keep distinct draft logic: once approved, temp is no longer needed? 
