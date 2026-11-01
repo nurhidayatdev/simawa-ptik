@@ -106,7 +106,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 				title="Info" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 transition-colors">
 				<i class="fa fa-info-circle"></i>
 			  </button>';
-		if ($role === 'Sekretaris' || $role === 'Ketua Tingkat'):
+		if ($role === 'Sekretaris'):
 			echo '<a href="../actions/edit.php?tabel=tugas&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
 			echo '<a href="../actions/hapus.php?tabel=tugas&id=' . $row['id'] . '" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"><i class="fa fa-trash"></i></a>';
 		endif;
@@ -149,7 +149,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 		<div class="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 p-6 flex-grow w-full shadow-sm">
 			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
 				<div>
+					<div class="flex items-center gap-2 flex-wrap">
 					<h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Data Tugas Kuliah</h1>
+					<?php if ($role === 'Ketua Tingkat'): ?>
+						<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50">Mode Notifikasi & Monitoring</span>
+					<?php endif; ?>
+				</div>
 				</div>
 
 				<div class="flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -177,6 +182,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 								<a href="../tugas" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Lihat View">
 									<i class="fa fa-eye text-xs"></i>
 								</a>
+							<?php endif; ?>
+							<?php if ($role === 'Sekretaris'): ?>
 								<a href="../actions/tambah.php?tabel=tugas" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Tambah">
 									<i class="fa fa-plus text-xs"></i>
 								</a>
@@ -254,7 +261,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 											title="Info" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200 transition-colors">
 											<i class="fa fa-info-circle"></i>
 										</button>
-										<?php if ($role === 'Sekretaris' || $role === 'Ketua Tingkat'): ?>
+										<?php if ($role === 'Sekretaris'): ?>
 											<a href="../actions/edit.php?tabel=tugas&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors"><i class="fa fa-edit"></i></a>
 											<a href="../actions/hapus.php?tabel=tugas&id=<?= $row['id']; ?>" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors" ><i class="fa fa-trash"></i></a>
 										<?php endif; ?>

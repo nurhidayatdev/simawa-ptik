@@ -80,7 +80,7 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_tugas.php') {
     session_start();
     include '../koneksi.php';
 
-    if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'Administrator Utama' && $_SESSION['role'] !== 'Sekretaris')) {
+    if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['Administrator Utama', 'Sekretaris', 'Ketua Tingkat'])) {
         header("Location: ../../index");
         exit;
     }

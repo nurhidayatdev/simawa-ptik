@@ -19,9 +19,9 @@ if ($tabel === 'jadwal_matkul' && $role !== 'Ketua Tingkat') {
     exit;
 }
 
-if ($tabel === 'tugas' && !in_array($role, ['Sekretaris', 'Ketua Tingkat'])) {
-    $_SESSION['error'] = "Akses ditolak! Pengelolaan tugas hanya wewenang Sekretaris dan Ketua Tingkat.";
-    header("Location: ../dashboard.php");
+if ($tabel === 'tugas' && $role !== 'Sekretaris') {
+    $_SESSION['error'] = "Akses ditolak! Penambahan tugas hanya wewenang Sekretaris.";
+    header("Location: ../database/db_tugas.php");
     exit;
 }
 

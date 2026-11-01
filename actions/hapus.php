@@ -14,8 +14,8 @@ if (isset($_GET['tabel']) && $_GET['tabel'] === 'jadwal_matkul') {
 
 if (isset($_GET['tabel']) && $_GET['tabel'] === 'tugas') {
     $user_role = $_SESSION['role'] ?? '';
-    if (!in_array($user_role, ['Sekretaris', 'Ketua Tingkat'])) {
-        echo "<script>alert('Akses ditolak! Pengelolaan tugas hanya wewenang Sekretaris dan Ketua Tingkat.'); window.location.href='../dashboard.php';</script>";
+    if ($user_role !== 'Sekretaris') {
+        echo "<script>alert('Akses ditolak! Penghapusan tugas hanya wewenang Sekretaris.'); window.location.href='../database/db_tugas.php';</script>";
         exit();
     }
 }
