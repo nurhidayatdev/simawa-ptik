@@ -311,46 +311,111 @@ if (mysqli_num_rows($krs) > 0) {
 
             <form method="POST">
 
-                <?php for ($s = $semester_aktif; $s <= $semester_aktif; $s++): ?>
-                    <div class="flex justify-between items-end mt-4 mb-2">
-                        <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Semester <?= $s ?></h4>
-                        <button type="button" onclick="toggleSelectAll()" class="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors font-semibold flex items-center shadow-sm">
-                            <i class="fas fa-check-double mr-2"></i> Pilih Semua
-                        </button>
+                <!-- Filter & Search Toolbar Lintas Semester -->
+                <div class="mb-5 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                            <input type="text" id="searchMatkulInput" placeholder="Cari nama atau kode mata kuliah lintas semester..." oninput="filterMatkulLive(this.value)" class="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-100 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                        </div>
+                        <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 shrink-0">
+                            <i class="fas fa-layer-group text-indigo-500"></i>
+                            <span>Tersedia: <strong>72 Mata Kuliah (Sem 1 - 8)</strong></span>
+                        </div>
                     </div>
-                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
-                            <thead class="bg-indigo-900 dark:bg-indigo-950">
-                                <tr>
-                                    <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">Ambil</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Kode</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Nama Mata Kuliah</th>
-                                    <th class="px-3 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">SKS</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-slate-900/50 divide-y divide-slate-200 dark:divide-slate-800">
-                                <?php
-                                $found = false;
-                                foreach ($matkul_rows as $m) {
-                                    if ((int)$m['semester'] !== $s) continue;
-                                    $found = true;
-                                ?>
-                                    <tr class="<?= ($id++ % 2 == 0) ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900/20' ?> hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-colors group">
-                                        <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center">
-                                            <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" data-sks="<?= $m['sks'] ?>" class="sks-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:bg-slate-800" <?= in_array($m['id'], $diambil) ? 'checked' : '' ?>>
-                                        </td>
-                                        <td class="px-3 py-3 whitespace-nowrap text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors"><?= htmlspecialchars($m['kode_matkul']) ?></td>
-                                        <td class="px-3 py-3 text-xs text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors font-medium"><?= htmlspecialchars($m['nama_matkul']) ?></td>
-                                        <td class="px-3 py-3 whitespace-nowrap text-xs text-slate-700 dark:text-slate-300 text-center"><?= htmlspecialchars($m['sks']) ?></td>
-                                    </tr>
-                                <?php } ?>
-                                <?php if (!$found): ?>
-                                    <tr>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800" colspan="4">Tidak ada mata kuliah untuk semester ini.</td>
-                                    </tr>
+
+                    <!-- Tab Buttons Semester -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
+                        <button type="button" onclick="showMatkulSem('all')" class="sem-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm shrink-0 cursor-pointer" data-sem="all">
+                            Semua Semester (1-8)
+                        </button>
+                        <?php for ($s = 1; $s <= 8; $s++): 
+                            $is_current_target = ($s === $semester_aktif);
+                        ?>
+                            <button type="button" onclick="showMatkulSem(<?= $s ?>)" class="sem-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 shrink-0 cursor-pointer flex items-center gap-1" data-sem="<?= $s ?>">
+                                <span>Sem <?= $s ?></span>
+                                <?php if ($is_current_target): ?>
+                                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
                                 <?php endif; ?>
-                            </tbody>
-                        </table>
+                            </button>
+                        <?php endfor; ?>
+                    </div>
+                </div>
+
+                <!-- Loop Seluruh Semester (1 s/d 8) -->
+                <?php 
+                $row_id = 1;
+                for ($s = 1; $s <= 8; $s++): 
+                    $is_current_target = ($s === $semester_aktif);
+                    // Hitung jumlah matkul di semester ini
+                    $sem_matkul_list = array_filter($matkul_rows, function($m) use ($s) {
+                        return (int)$m['semester'] === $s;
+                    });
+                ?>
+                    <div class="sem-container mb-6" id="sem-section-<?= $s ?>" data-semester="<?= $s ?>">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-indigo-50/70 dark:bg-indigo-950/30 rounded-t-xl border border-indigo-100 dark:border-indigo-900/50">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-7 h-7 rounded-lg <?= $is_current_target ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300' ?> flex items-center justify-center font-bold text-xs shrink-0">
+                                    <?= $s ?>
+                                </span>
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                        <span>Semester <?= $s ?></span>
+                                        <?php if ($is_current_target): ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                                Paket Semester Ini
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                                Lintas Semester
+                                            </span>
+                                        <?php endif; ?>
+                                    </h4>
+                                    <p class="text-[10px] text-slate-400"><?= count($sem_matkul_list) ?> Mata Kuliah Terdaftar</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="sem-badge-count-<?= $s ?>" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-indigo-100 dark:border-indigo-900/50">
+                                    0 MK Terpilih
+                                </span>
+                                <button type="button" onclick="toggleSelectSemester(<?= $s ?>)" class="text-xs bg-white dark:bg-slate-900 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-lg border border-indigo-200 dark:border-indigo-800 font-semibold flex items-center shadow-2xs transition-colors cursor-pointer">
+                                    <i class="fas fa-check-double mr-1.5 text-[10px]"></i> Pilih Semua Sem <?= $s ?>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-b-xl border-x border-b border-slate-200 dark:border-slate-800 shadow-sm">
+                            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                                <thead class="bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400">
+                                    <tr>
+                                        <th class="px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider w-16">Ambil</th>
+                                        <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider w-28">Kode</th>
+                                        <th class="px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider">Nama Mata Kuliah</th>
+                                        <th class="px-3 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider w-20">SKS</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-slate-900/50 divide-y divide-slate-200 dark:divide-slate-800">
+                                    <?php if (empty($sem_matkul_list)): ?>
+                                        <tr>
+                                            <td class="px-3 py-4 text-center text-xs text-slate-400 italic" colspan="4">Tidak ada mata kuliah untuk semester <?= $s ?>.</td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach ($sem_matkul_list as $m): 
+                                            $is_checked = in_array($m['id'], $diambil);
+                                        ?>
+                                            <tr class="matkul-row <?= ($row_id++ % 2 == 0) ? 'bg-slate-50/60 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900/20' ?> hover:bg-indigo-50/70 dark:hover:bg-indigo-900/40 transition-colors group cursor-pointer" data-sem="<?= $s ?>" data-search="<?= strtolower(htmlspecialchars($m['kode_matkul'] . ' ' . $m['nama_matkul'])) ?>">
+                                                <td class="px-3 py-2.5 whitespace-nowrap text-xs text-center">
+                                                    <input type="checkbox" name="matkul[]" value="<?= $m['id'] ?>" data-sks="<?= $m['sks'] ?>" data-sem="<?= $s ?>" class="sks-checkbox rounded border-slate-300 dark:border-slate-700 text-indigo-600 dark:text-indigo-500 focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:bg-slate-800 cursor-pointer w-4 h-4" <?= $is_checked ? 'checked' : '' ?>>
+                                                </td>
+                                                <td class="px-3 py-2.5 whitespace-nowrap text-xs font-mono font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"><?= htmlspecialchars($m['kode_matkul']) ?></td>
+                                                <td class="px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors font-medium"><?= htmlspecialchars($m['nama_matkul']) ?></td>
+                                                <td class="px-3 py-2.5 whitespace-nowrap text-xs font-bold text-indigo-600 dark:text-indigo-400 text-center"><?= htmlspecialchars($m['sks']) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 <?php endfor; ?>
 
@@ -418,9 +483,93 @@ if (mysqli_num_rows($krs) > 0) {
         const sksCheckboxes = document.querySelectorAll('.sks-checkbox');
         const totalSksDisplay = document.getElementById('total-sks-display');
 
+        
+        // ============================================================
+        // Lintas Semester Tab Filter & Live Search
+        // ============================================================
+        let activeSemFilter = "all";
+
+        function showMatkulSem(sem) {
+            activeSemFilter = sem;
+            document.querySelectorAll(".sem-tab-btn").forEach(btn => {
+                const bsem = btn.getAttribute("data-sem");
+                if (String(bsem) === String(sem)) {
+                    btn.classList.add("bg-indigo-600", "text-white", "shadow-sm");
+                    btn.classList.remove("bg-white", "dark:bg-slate-900", "text-slate-600", "dark:text-slate-400", "bg-slate-200", "dark:bg-slate-700");
+                } else {
+                    btn.classList.remove("bg-indigo-600", "text-white", "shadow-sm");
+                    btn.classList.add("bg-white", "dark:bg-slate-900", "text-slate-600", "dark:text-slate-400");
+                }
+            });
+
+            document.querySelectorAll(".sem-container").forEach(el => {
+                const esem = el.getAttribute("data-semester");
+                if (sem === "all" || String(esem) === String(sem)) {
+                    el.classList.remove("hidden");
+                } else {
+                    el.classList.add("hidden");
+                }
+            });
+        }
+
+        function filterMatkulLive(keyword) {
+            const q = keyword.trim().toLowerCase();
+            document.querySelectorAll(".matkul-row").forEach(row => {
+                const s = row.getAttribute("data-search") || "";
+                if (!q || s.includes(q)) {
+                    row.classList.remove("hidden");
+                } else {
+                    row.classList.add("hidden");
+                }
+            });
+
+            // Jika sedang mencari keyword, pastikan semua container semester terbuka
+            if (q.length > 0) {
+                document.querySelectorAll(".sem-container").forEach(el => el.classList.remove("hidden"));
+            } else {
+                showMatkulSem(activeSemFilter);
+            }
+        }
+
+        function toggleSelectSemester(sem) {
+            const cbs = document.querySelectorAll(`.sks-checkbox[data-sem="${sem}"]`);
+            const allChecked = Array.from(cbs).every(cb => cb.checked);
+            cbs.forEach(cb => cb.checked = !allChecked);
+            updateTotalSks();
+        }
+
+        function updateSemesterBadges() {
+            for (let s = 1; s <= 8; s++) {
+                const count = document.querySelectorAll(`.sks-checkbox[data-sem="${s}"]:checked`).length;
+                const badge = document.getElementById(`sem-badge-count-${s}`);
+                if (badge) {
+                    badge.textContent = `${count} MK Terpilih`;
+                    if (count > 0) {
+                        badge.classList.add("text-indigo-600", "dark:text-indigo-400", "font-black");
+                    } else {
+                        badge.classList.remove("font-black");
+                    }
+                }
+            }
+        }
+
         function updateTotalSks() {
+            updateSemesterBadges();
             let total = 0;
-            sksCheckboxes.forEach(cb => {
+            
+        // Click row to toggle checkbox
+        document.querySelectorAll(".matkul-row").forEach(row => {
+            row.addEventListener("click", (e) => {
+                if (e.target.tagName.toLowerCase() === "input") return;
+                const cb = row.querySelector(".sks-checkbox");
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    updateTotalSks();
+                }
+            });
+        });
+
+        sksCheckboxes.forEach(cb => {
                 if (cb.checked) {
                     total += parseInt(cb.dataset.sks);
                 }
@@ -435,6 +584,19 @@ if (mysqli_num_rows($krs) > 0) {
                 totalSksDisplay.parentElement.classList.remove('animate-bounce');
             }
         }
+
+        
+        // Click row to toggle checkbox
+        document.querySelectorAll(".matkul-row").forEach(row => {
+            row.addEventListener("click", (e) => {
+                if (e.target.tagName.toLowerCase() === "input") return;
+                const cb = row.querySelector(".sks-checkbox");
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    updateTotalSks();
+                }
+            });
+        });
 
         sksCheckboxes.forEach(cb => {
             cb.addEventListener('change', () => {
