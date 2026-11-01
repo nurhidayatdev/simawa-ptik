@@ -1,7 +1,19 @@
 <?php
-function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok', $custom_data = null, $minggu_ke = null)
+// functions/kirim_piket_reminder.php - Multi-Class WhatsApp Routing
+require_once __DIR__ . '/helpers.php';
+
+function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'besok', $custom_data = null, $minggu_ke = null, $kelas_id = null)
 {
     date_default_timezone_set('Asia/Makassar');
+
+    $target_kelas_id = !empty($kelas_id) ? (int)$kelas_id : (function_exists('getKelasScope') ? getKelasScope() : 1);
+    $nama_kelas = 'PTIK 2024';
+    if (!empty($target_kelas_id)) {
+        $qk = mysqli_query($koneksi, "SELECT nama_kelas FROM kelas WHERE id = $target_kelas_id LIMIT 1");
+        if ($rk = mysqli_fetch_assoc($qk)) {
+            $nama_kelas = $rk['nama_kelas'];
+        }
+    }
 
     // 1. Ambil Periode Aktif
     $q_p = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
@@ -56,6 +68,8 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     }
 
     // 4. Query Data Piket Target
+    $where_p_scope = !empty($target_kelas_id) ? " AND p.kelas_id = $target_kelas_id " : "";
+
     $query = "SELECT p.*, m.nama_lengkap, jm.hari, mk.nama_matkul, r.nama_ruangan, jk_start.jam_mulai, jk_end.jam_selesai
               FROM piket_proyektor p
               JOIN mahasiswa m ON p.mahasiswa_id = m.id
@@ -65,7 +79,8 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
               LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
               LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
               WHERE p.periode_id = $p_id 
-              AND p.minggu_ke = $minggu_ke ";
+              AND p.minggu_ke = $minggu_ke 
+              $where_p_scope ";
     
     if (!$is_weekly) {
         $query .= " AND jm.hari = '$target_ind' ";
@@ -76,11 +91,11 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
     $res = mysqli_query($koneksi, $query);
 
     if (mysqli_num_rows($res) == 0) {
-        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor untuk periode yang dipilih (Minggu $minggu_ke)."];
+        return ['status' => 'info', 'message' => "Tidak ada jadwal piket proyektor untuk periode yang dipilih (Minggu $minggu_ke) di {$nama_kelas}."];
     }
 
     // 5. Format Pesan
-    $msg = "📢 *REMINDER PIKET PROYEKTOR*\n";
+    $msg = "📢 *REMINDER PIKET PROYEKTOR - {$nama_kelas}*\n";
     if ($is_weekly) {
         $start_week_date = date('d M', strtotime($target_date_start));
         $end_week_date = date('d M Y', strtotime($target_date_end));
@@ -90,33 +105,26 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
         $msg .= "📅 {$header_label}: *{$target_ind}, " . date('d M Y', strtotime($target_date)) . "* | Minggu ke-{$minggu_ke}\n\n";
     }
 
-    $piket_grouped = [];
+    $grouped = [];
     while ($row = mysqli_fetch_assoc($res)) {
-        $hari = $row['hari'];
-        $jid = $row['jadwal_matkul_id'];
-        $matkul_name = trim($row['nama_matkul']);
-        $jam = date('H:i', strtotime($row['jam_mulai'])) . ' - ' . date('H:i', strtotime($row['jam_selesai']));
-        $ruangan = $row['nama_ruangan'] ?? '-';
-        
-        $group_key = $is_weekly ? $hari . '_' . $jid : $jid;
-
-        if (!isset($piket_grouped[$group_key])) {
-            $piket_grouped[$group_key] = [
-                'hari' => $hari,
-                'matkul' => $matkul_name,
-                'jam' => $jam,
-                'ruangan' => $ruangan,
+        $key = $row['jadwal_matkul_id'];
+        if (!isset($grouped[$key])) {
+            $grouped[$key] = [
+                'hari' => $row['hari'],
+                'matkul' => $row['nama_matkul'],
+                'ruangan' => $row['nama_ruangan'] ?? 'Ruang Belum Diatur',
+                'jam' => date('H.i', strtotime($row['jam_mulai'])) . ' - ' . date('H.i', strtotime($row['jam_selesai'])) . ' WITA',
                 'petugas' => []
             ];
         }
-        $piket_grouped[$group_key]['petugas'][] = $row['nama_lengkap'];
+        $grouped[$key]['petugas'][] = $row['nama_lengkap'];
     }
 
-    $current_day_print = "";
-    foreach ($piket_grouped as $data) {
-        if ($is_weekly && $current_day_print !== $data['hari']) {
-            $current_day_print = $data['hari'];
-            $msg .= "📌 *HARI " . strtoupper($current_day_print) . "*\n";
+    $current_hari = '';
+    foreach ($grouped as $data) {
+        if ($is_weekly && $current_hari !== $data['hari']) {
+            $current_hari = $data['hari'];
+            $msg .= "🗓️ *HARI {$current_hari}:*\n";
         }
         $msg .= "📘 *{$data['matkul']}*\n";
         $msg .= "⏰ {$data['jam']}\n";
@@ -124,14 +132,13 @@ function kirimPiketReminder($koneksi, $token = null, $chat_id = null, $day = 'be
         $msg .= "👤 Petugas:\n- " . implode("\n- ", $data['petugas']) . "\n\n";
     }
 
-    $msg .= "⚠️ *Catatan:*\n_Jadwal di atas bersifat situasional. Waktu dan lokasi dapat berubah mengikuti kondisi perkuliahan. Harap tetap memantau instruksi final dari Ketua Tingkat sebelum bertugas._";
+    $msg .= "⚠️ *Catatan:*\n_Jadwal di atas bersifat situasional. Harap tetap memantau instruksi final dari Ketua Tingkat sebelum bertugas._";
 
-    // 6. Kirim ke WhatsApp via Fonnte
-    require_once __DIR__ . '/helpers.php';
-    $status = sendFonnteMessage($msg);
+    // 6. Kirim ke WhatsApp via Fonnte dengan scoping kelas
+    $status = sendFonnteMessage($msg, null, null, null, $target_kelas_id);
 
     if ($status['success']) {
-        return ['status' => 'success', 'message' => "Notifikasi piket proyektor Minggu ke-{$minggu_ke} berhasil dikirim ke WhatsApp!"];
+        return ['status' => 'success', 'message' => "Notifikasi piket proyektor Minggu ke-{$minggu_ke} berhasil dikirim ke WhatsApp {$nama_kelas}!"];
     } else {
         return ['status' => 'error', 'message' => 'Gagal mengirim pesan ke WhatsApp. Error: ' . ($status['error'] ?? 'Unknown')];
     }

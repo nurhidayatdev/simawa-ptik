@@ -202,6 +202,26 @@ if ($is_mahasiswa && !empty($mahasiswa_id)) {
                             <i class="fas fa-id-badge text-indigo-500"></i> Terhubung NIM: <strong class="text-slate-700 dark:text-slate-200"><?= htmlspecialchars($data['linked_student_nim']) ?></strong>
                         </span>
                     <?php endif; ?>
+
+                    <?php
+                    $u_kelas_id = $_SESSION['kelas_id'] ?? null;
+                    if ($u_kelas_id):
+                        $qk_link = mysqli_query($koneksi, "SELECT nama_kelas, wa_link_group FROM kelas WHERE id = '$u_kelas_id' LIMIT 1");
+                        if ($rk_link = mysqli_fetch_assoc($qk_link)):
+                            if (!empty($rk_link['wa_link_group'])):
+                    ?>
+                        <div class="mt-3">
+                            <a href="<?= htmlspecialchars($rk_link['wa_link_group']) ?>" target="_blank" class="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 active:scale-95 transition-all">
+                                <i class="fab fa-whatsapp text-sm"></i>
+                                <span>Grup WA <?= htmlspecialchars($rk_link['nama_kelas']) ?></span>
+                                <i class="fas fa-external-link-alt text-[9px] opacity-75"></i>
+                            </a>
+                        </div>
+                    <?php 
+                            endif;
+                        endif;
+                    endif; 
+                    ?>
                 </div>
 
                 <!-- Profile Details Section -->

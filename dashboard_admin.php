@@ -63,6 +63,10 @@ $q_kelas_list = mysqli_query($koneksi, "
         k.status_aktif,
         k.dibuat_pada,
         k.ketua_tingkat_user_id,
+        k.wa_group_id,
+        k.wa_link_group,
+        k.wa_token,
+        k.wa_endpoint,
         u.email as ketua_email,
         u.nama_lengkap as ketua_nama,
         u.linked_student_nim as ketua_nim,
@@ -143,6 +147,9 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                     <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1.5">Kelola pembagian kelas, penunjukan Ketua Tingkat, dan pengawasan operasional lintas angkatan.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5">
+                    <a href="#section-whatsapp-kelas" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer">
+                        <i class="fab fa-whatsapp"></i> Konfigurasi WhatsApp Kelas
+                    </a>
                     <button type="button" onclick="openTambahKelasModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">
                         <i class="fas fa-plus-circle"></i> Tambah Kelas Baru
                     </button>
@@ -229,6 +236,93 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                 </div>
             </div>
 
+                        <!-- SECTION KHUSUS: PUSAT GATEWAY & GRUP WHATSAPP MULTI-KELAS (1 KELAS 1 GRUP) -->
+            <div id="section-whatsapp-kelas" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden scroll-mt-24">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gradient-to-r from-emerald-50/50 via-teal-50/30 to-transparent dark:from-emerald-950/20 dark:via-transparent">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-lg shadow-emerald-600/20">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+                                <span>Konfigurasi WhatsApp Multi-Kelas</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">1 Kelas = 1 Grup</span>
+                            </h3>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Atur endpoint, ID grup WhatsApp, dan link undangan resmi untuk setiap kelas (PTIK A s/d PTIK I).</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Total <strong><?= count($kelas_list) ?> Kelas</strong></span>
+                    </div>
+                </div>
+
+                <div class="p-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <?php foreach ($kelas_list as $k_item): 
+                            $has_wa = !empty($k_item['wa_group_id']);
+                            $has_link = !empty($k_item['wa_link_group']);
+                        ?>
+                            <div class="rounded-xl border <?= $has_wa ? 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/20 dark:bg-emerald-950/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/40' ?> p-4 hover:shadow-md transition-all flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-extrabold text-xs flex items-center justify-center border border-indigo-200 dark:border-indigo-900/50">
+                                                <?= htmlspecialchars(substr($k_item['nama_kelas'], 0, 2)) ?>
+                                            </div>
+                                            <div>
+                                                <div class="font-extrabold text-sm text-slate-800 dark:text-white">
+                                                    <?= htmlspecialchars($k_item['nama_kelas']) ?>
+                                                </div>
+                                                <div class="text-[10px] text-slate-400">
+                                                    Ketua: <?= htmlspecialchars($k_item['ketua_nama'] ?: 'Belum Ada') ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php if ($has_wa): ?>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                                <i class="fas fa-check-circle text-[8px]"></i> Terhubung
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                                                <i class="fas fa-exclamation-circle text-[8px] text-amber-500"></i> Belum Diatur
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-400 py-2 border-t border-slate-100 dark:border-slate-800/80">
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="text-slate-400">ID Grup / Target:</span>
+                                            <span class="font-mono font-medium text-slate-700 dark:text-slate-300 truncate max-w-[140px]" title="<?= htmlspecialchars($k_item['wa_group_id'] ?? '') ?>">
+                                                <?= htmlspecialchars($k_item['wa_group_id'] ?: '— (Belum diisi)') ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-[11px]">
+                                            <span class="text-slate-400">Link Undangan:</span>
+                                            <?php if ($has_link): ?>
+                                                <a href="<?= htmlspecialchars($k_item['wa_link_group']) ?>" target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 truncate max-w-[140px]">
+                                                    <i class="fas fa-link text-[9px]"></i> Buka Grup
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-slate-400 italic">Belum ada</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2">
+                                    <button type="button" onclick='openSettingWaModal(<?= json_encode($k_item) ?>)' class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-95 transition-all text-center cursor-pointer">
+                                        <i class="fab fa-whatsapp mr-1"></i> Atur WhatsApp
+                                    </button>
+                                    <button type="button" onclick="testQuickWa(<?= $k_item['id'] ?>, '<?= htmlspecialchars(addslashes($k_item['nama_kelas'])) ?>', '<?= htmlspecialchars(addslashes($k_item['wa_group_id'] ?? '')) ?>')" class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer" title="Tes Kirim Pesan Cepat">
+                                        <i class="fas fa-paper-plane text-[10px]"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
             <!-- 3. Section Utama 1: Manajemen Multi-Kelas & Ketua Tingkat -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50/50 dark:bg-slate-900/50">
@@ -252,8 +346,9 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                 <th class="px-5 py-3.5">Nama Kelas & Program Studi</th>
                                 <th class="px-5 py-3.5">Ketua Tingkat</th>
                                 <th class="px-5 py-3.5 text-center">Anggota</th>
+                                <th class="px-5 py-3.5 text-center">Grup WhatsApp</th>
                                 <th class="px-5 py-3.5 text-center">Status</th>
-                                <th class="px-5 py-3.5 text-center w-52">Aksi</th>
+                                <th class="px-5 py-3.5 text-center w-56">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
@@ -323,6 +418,21 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                             </span>
                                         </td>
 
+                                        <!-- WhatsApp Gateway Kelas -->
+                                        <td class="px-5 py-4 text-center">
+                                            <?php if (!empty($k['wa_group_id'])): ?>
+                                                <button type="button" onclick='openSettingWaModal(<?= json_encode($k) ?>)' class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer" title="Target: <?= htmlspecialchars($k['wa_group_id']) ?>">
+                                                    <i class="fab fa-whatsapp text-emerald-600"></i>
+                                                    <span>Terhubung</span>
+                                                </button>
+                                            <?php else: ?>
+                                                <button type="button" onclick='openSettingWaModal(<?= json_encode($k) ?>)' class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer" title="Klik untuk atur ID Grup WhatsApp">
+                                                    <i class="fab fa-whatsapp opacity-40"></i>
+                                                    <span>Belum Diatur</span>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+
                                         <!-- Status Kelas -->
                                         <td class="px-5 py-4 text-center">
                                             <?php if ($is_active): ?>
@@ -342,6 +452,11 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                                                 <!-- Tinjau Anggota Kelas Ini -->
                                                 <button type="button" onclick="openTinjauAnggotaModal(<?= $k['id'] ?>, '<?= htmlspecialchars(addslashes($k['nama_kelas'])) ?>')" title="Tinjau Anggota Kelas" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/40 dark:hover:bg-indigo-600 text-indigo-600 hover:text-white dark:text-indigo-400 dark:hover:text-white border border-indigo-200 dark:border-indigo-900/50 transition-colors cursor-pointer">
                                                     <i class="fas fa-eye text-xs"></i>
+                                                </button>
+
+                                                <!-- Edit Kelas Modal Trigger -->
+                                                <button type="button" onclick='openSettingWaModal(<?= json_encode($k) ?>)' title="Atur Endpoint & Grup WhatsApp" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-600 dark:bg-emerald-950/40 dark:hover:bg-emerald-600 text-emerald-600 hover:text-white dark:text-emerald-400 dark:hover:text-white border border-emerald-200 dark:border-emerald-900/50 transition-colors cursor-pointer">
+                                                    <i class="fab fa-whatsapp text-xs"></i>
                                                 </button>
 
                                                 <!-- Edit Kelas Modal Trigger -->
@@ -538,6 +653,38 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                     </div>
                 </div>
 
+                <!-- Konfigurasi WhatsApp Kelas -->
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div class="mb-3">
+                        <label class="block text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fab fa-whatsapp text-sm"></i> Konfigurasi Grup & Endpoint WhatsApp Kelas
+                        </label>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Tiap kelas memiliki grup WhatsApp tersendiri untuk notifikasi tugas dan informasi perkuliahan.</p>
+                    </div>
+
+                    <div class="space-y-3 p-3.5 bg-emerald-50/40 dark:bg-slate-800/40 rounded-xl border border-emerald-100 dark:border-slate-700/60">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">ID Grup WhatsApp / Target Fonnte</label>
+                            <input type="text" name="wa_group_id" placeholder="Contoh: 120363xxxxxxxx@g.us atau nomor tujuan" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                            <p class="text-[10px] text-slate-400 mt-0.5">ID grup WhatsApp tujuan broadcast notifikasi otomatis.</p>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Link Undangan Grup WhatsApp (Opsional)</label>
+                            <input type="url" name="wa_link_group" placeholder="https://chat.whatsapp.com/..." class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Token API Khusus (Opsional)</label>
+                                <input type="text" name="wa_token" placeholder="Default dari .env" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">Endpoint API (Opsional)</label>
+                                <input type="text" name="wa_endpoint" placeholder="https://api.fonnte.com/send" class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3 py-2 rounded-lg text-xs outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
                     <button type="button" onclick="closeTambahKelasModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">Simpan Kelas & Buat Akun</button>
@@ -680,6 +827,80 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
         </div>
     </div>
 
+        <!-- ==========================================
+         MODAL 4: PENGATURAN GRUP & ENDPOINT WHATSAPP KELAS
+         ========================================== -->
+    <div id="modalSettingWaKelas" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-center font-black text-lg">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>WhatsApp Kelas:</span>
+                            <span id="wa_modal_nama_kelas" class="text-emerald-600 dark:text-emerald-400">PTIK A</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 dark:text-slate-500">Satu kelas satu grup: memuat langsung tugas dan informasi kelas.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeSettingWaModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <form action="actions/tambah_kelas" method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="update_wa_kelas">
+                <input type="hidden" name="kelas_id" id="wa_kelas_id">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1 flex items-center justify-between">
+                        <span>ID Grup WhatsApp / Target Fonnte *</span>
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold lowercase">contoh: 120363xxxxxxxx@g.us</span>
+                    </label>
+                    <input type="text" name="wa_group_id" id="wa_group_id" required placeholder="120363028123456789@g.us" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all">
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">ID grup WhatsApp resmi kelas ini. Semua notifikasi tugas baru, perubahan tugas, jadwal, dan pengumuman kelas akan otomatis terkirim ke grup ini.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Link Undangan Grup WhatsApp (Opsional)</label>
+                    <input type="url" name="wa_link_group" id="wa_link_group" placeholder="https://chat.whatsapp.com/..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all">
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">Tautan bergabung grup untuk ditampilkan ke profil/dashboard mahasiswa dan pengurus kelas.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Token API (Opsional)</label>
+                        <input type="text" name="wa_token" id="wa_token" placeholder="Gunakan default sistem (.env)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all">
+                        <p class="text-[10px] text-slate-400 mt-0.5">Isi jika kelas menggunakan device/token Fonnte tersendiri.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Endpoint Gateway (Opsional)</label>
+                        <input type="text" name="wa_endpoint" id="wa_endpoint" placeholder="https://api.fonnte.com/send" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all">
+                        <p class="text-[10px] text-slate-400 mt-0.5">Default URL API Fonnte.</p>
+                    </div>
+                </div>
+
+                <!-- Live Test Button -->
+                <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-slate-800 dark:text-white">Uji Koneksi Gateway</div>
+                        <div class="text-[10px] text-slate-400">Kirim pesan uji coba ke grup WA ini sekarang</div>
+                    </div>
+                    <button type="button" id="btnTestWa" onclick="testWhatsAppKoneksi()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer">
+                        <i class="fas fa-paper-plane text-[10px]"></i> Tes Kirim Pesan
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeSettingWaModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer">Simpan Konfigurasi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Script Back-office & Modal Management -->
     <?php include 'includes/script_db.php'; ?>
     <script>
@@ -704,6 +925,143 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
             }
         }
 
+                function openSettingWaModal(data) {
+            document.getElementById('wa_kelas_id').value = data.id;
+            document.getElementById('wa_modal_nama_kelas').textContent = data.nama_kelas;
+            document.getElementById('wa_group_id').value = data.wa_group_id || '';
+            document.getElementById('wa_link_group').value = data.wa_link_group || '';
+            document.getElementById('wa_token').value = data.wa_token || '';
+            document.getElementById('wa_endpoint').value = data.wa_endpoint || '';
+            document.getElementById('btnTestWa').disabled = false;
+            document.getElementById('btnTestWa').innerHTML = '<i class="fas fa-paper-plane text-[10px]"></i> Tes Kirim Pesan';
+            document.getElementById('modalSettingWaKelas').classList.remove('hidden');
+        }
+
+        function closeSettingWaModal() {
+            document.getElementById('modalSettingWaKelas').classList.add('hidden');
+        }
+
+                function testQuickWa(kelasId, namaKelas, groupId) {
+            if (!groupId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ID Grup Belum Diatur',
+                    text: 'Silakan atur terlebih dahulu ID Grup WhatsApp untuk ' + namaKelas + ' sebelum melakukan tes kirim.',
+                    confirmButtonColor: '#4f46e5'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Tes WhatsApp ' + namaKelas,
+                text: 'Kirim pesan uji coba ke grup ' + namaKelas + ' (' + groupId + ')?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fas fa-paper-plane mr-1"></i> Kirim Sekarang',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.showLoading();
+                    const formData = new FormData();
+                    formData.append('action', 'test_wa_kelas');
+                    formData.append('kelas_id', kelasId);
+
+                    fetch('actions/tambah_kelas', {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        body: formData
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil Terkirim!',
+                                text: res.message,
+                                confirmButtonColor: '#10b981'
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal Mengirim',
+                                text: res.message,
+                                confirmButtonColor: '#ef4444'
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan Sistem',
+                            text: 'Gagal menghubungi server.',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    });
+                }
+            });
+        }
+
+        function testWhatsAppKoneksi() {
+            const kelasId = document.getElementById('wa_kelas_id').value;
+            const groupId = document.getElementById('wa_group_id').value.trim();
+            const btn = document.getElementById('btnTestWa');
+
+            if (!groupId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ID Grup Kosong',
+                    text: 'Silakan isi ID Grup WhatsApp terlebih dahulu sebelum melakukan uji coba kirim!',
+                    confirmButtonColor: '#4f46e5'
+                });
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin text-[10px]"></i> Mengirim...';
+
+            const formData = new FormData();
+            formData.append('action', 'test_wa_kelas');
+            formData.append('kelas_id', kelasId);
+
+            fetch('actions/tambah_kelas', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            })
+            .then(r => r.json())
+            .then(res => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane text-[10px]"></i> Tes Kirim Pesan';
+                if (res.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil Terkirim!',
+                        text: res.message,
+                        confirmButtonColor: '#10b981'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Mengirim',
+                        text: res.message,
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane text-[10px]"></i> Tes Kirim Pesan';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Jaringan',
+                    text: 'Gagal menghubungi server atau endpoint gateway.',
+                    confirmButtonColor: '#ef4444'
+                });
+            });
+        }
+
         function openEditKelasModal(data) {
             document.getElementById('edit_kelas_id').value = data.id;
             document.getElementById('edit_nama_kelas').value = data.nama_kelas;
@@ -711,6 +1069,10 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
             document.getElementById('edit_prodi').value = data.prodi;
             document.getElementById('edit_status_aktif').value = data.status_aktif;
             document.getElementById('edit_ketua_user_id').value = data.ketua_tingkat_user_id || '';
+            document.getElementById('edit_wa_group_id').value = data.wa_group_id || '';
+            document.getElementById('edit_wa_link_group').value = data.wa_link_group || '';
+            document.getElementById('edit_wa_token').value = data.wa_token || '';
+            document.getElementById('edit_wa_endpoint').value = data.wa_endpoint || '';
             document.getElementById('modalEditKelas').classList.remove('hidden');
         }
 

@@ -15,38 +15,107 @@ if (!defined('FONNTE_TUGAS_GROUP_ID')) {
     define('FONNTE_TUGAS_GROUP_ID', env('FONNTE_TUGAS_GROUP_ID'));
 }
 
-if (!function_exists('sendFonnteMessage')) {
-    function sendFonnteMessage($message, $target = FONNTE_GROUP_ID)
+if (!function_exists('getKelasWhatsAppConfig')) {
+    /**
+     * Ambil konfigurasi WhatsApp per kelas (Target Group, Link, Token, Endpoint).
+     * Jika tidak dikonfigurasi khusus pada kelas, fallback ke konfigurasi default .env.
+     */
+    function getKelasWhatsAppConfig($db = null, $kelas_id = null)
     {
+        if ($db === null && isset($GLOBALS['koneksi'])) {
+            $db = $GLOBALS['koneksi'];
+        }
+
+        if (empty($kelas_id) && function_exists('getKelasScope')) {
+            $kelas_id = getKelasScope();
+        }
+
+        $default_target   = defined('FONNTE_GROUP_ID') ? (FONNTE_GROUP_ID ?: '') : '';
+        $default_token    = defined('FONNTE_TOKEN') ? (FONNTE_TOKEN ?: '') : '';
+        $default_endpoint = 'https://api.fonnte.com/send';
+
+        if (!empty($kelas_id) && $db) {
+            $stmt = mysqli_prepare($db, "SELECT id, nama_kelas, wa_group_id, wa_link_group, wa_token, wa_endpoint FROM kelas WHERE id = ? LIMIT 1");
+            if ($stmt) {
+                mysqli_stmt_bind_param($stmt, "i", $kelas_id);
+                mysqli_stmt_execute($stmt);
+                $res = mysqli_stmt_get_result($stmt);
+                if ($row = mysqli_fetch_assoc($res)) {
+                    return [
+                        'kelas_id'   => (int)$row['id'],
+                        'nama_kelas' => $row['nama_kelas'],
+                        'target'     => !empty($row['wa_group_id']) ? trim($row['wa_group_id']) : $default_target,
+                        'token'      => !empty($row['wa_token']) ? trim($row['wa_token']) : $default_token,
+                        'endpoint'   => !empty($row['wa_endpoint']) ? trim($row['wa_endpoint']) : $default_endpoint,
+                        'link_group' => !empty($row['wa_link_group']) ? trim($row['wa_link_group']) : ''
+                    ];
+                }
+            }
+        }
+
+        return [
+            'kelas_id'   => null,
+            'nama_kelas' => 'Default Sistem',
+            'target'     => $default_target,
+            'token'      => $default_token,
+            'endpoint'   => $default_endpoint,
+            'link_group' => ''
+        ];
+    }
+}
+
+if (!function_exists('sendFonnteMessage')) {
+    function sendFonnteMessage($message, $target = null, $token = null, $endpoint = null, $kelas_id = null)
+    {
+        $db = $GLOBALS['koneksi'] ?? null;
+        $config = getKelasWhatsAppConfig($db, $kelas_id);
+
+        $final_target   = !empty($target) ? $target : $config['target'];
+        $final_token    = !empty($token) ? $token : $config['token'];
+        $final_endpoint = !empty($endpoint) ? $endpoint : $config['endpoint'];
+
+        if (empty($final_target) || empty($final_token)) {
+            return [
+                'success' => false,
+                'error'   => 'Target Grup WhatsApp atau Token belum dikonfigurasi untuk kelas ini/sistem.',
+                'code'    => 400
+            ];
+        }
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_URL => $final_endpoint,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
+            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => array(
-                'target' => $target,
+                'target' => $final_target,
                 'message' => $message,
-                'countryCode' => '62', // Optional
+                'countryCode' => '62',
             ),
             CURLOPT_HTTPHEADER => array(
-                'Authorization: ' . FONNTE_TOKEN
+                'Authorization: ' . $final_token
             ),
         ));
 
         $response_raw = curl_exec($curl);
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curl_err = curl_error($curl);
         curl_close($curl);
+
+        if ($curl_err) {
+            return ['success' => false, 'error' => 'cURL Error: ' . $curl_err, 'code' => $http_code];
+        }
 
         if ($http_code == 200) {
             return ['success' => true, 'response' => json_decode($response_raw, true)];
         } else {
-            return ['success' => false, 'error' => 'Fonnte API Error: ' . $response_raw, 'code' => $http_code];
+            return ['success' => false, 'error' => 'WhatsApp Gateway Error: ' . $response_raw, 'code' => $http_code];
         }
     }
 }

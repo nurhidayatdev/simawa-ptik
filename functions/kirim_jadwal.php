@@ -1,11 +1,20 @@
 <?php
-// functions/kirim_jadwal.php
+// functions/kirim_jadwal.php - Multi-Class WhatsApp Routing
 include_once __DIR__ . '/helpers.php';
 
-function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_data = null, $day = 'besok')
+function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_data = null, $day = 'besok', $kelas_id = null)
 {
     // Set timezone to WITA
     date_default_timezone_set('Asia/Makassar');
+
+    $target_kelas_id = !empty($kelas_id) ? (int)$kelas_id : (function_exists('getKelasScope') ? getKelasScope() : 1);
+    $nama_kelas = 'PTIK 2024';
+    if (!empty($target_kelas_id)) {
+        $qk = mysqli_query($koneksi, "SELECT nama_kelas FROM kelas WHERE id = $target_kelas_id LIMIT 1");
+        if ($rk = mysqli_fetch_assoc($qk)) {
+            $nama_kelas = $rk['nama_kelas'];
+        }
+    }
 
     $days_map = [
         'Sunday' => 'Minggu',
@@ -23,18 +32,9 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
 
     $header_label = ($day === 'hari_ini') ? 'HARI INI' : 'BESOK';
 
-    $message = "📅 *JADWAL KULIAH {$header_label}* 📅\nHari: *{$target_ind}*, " . date('d M Y', strtotime($offset)) . "\n\n";
+    $message = "📅 *JADWAL KULIAH {$header_label} - {$nama_kelas}* 📅\nHari: *{$target_ind}*, " . date('d M Y', strtotime($offset)) . "\n\n";
 
     if ($custom_data) {
-        // Use custom data
-        // Expecting $custom_data to be an array of schedules
-        // e.g., [['matkul' => '...', 'jam' => '...', 'ruangan' => '...']]
-
-        // Single custom schedule for now based on user request "matkul, jam, dan ruangan"
-        // Or handle multiple. Given user said "pengeditan... matkul, jam, dan ruangan", implying singular or a text block.
-        // Let's assume user inputs standard fields for one or more items.
-        // For simplicity based on prompt "edit popup", let's handle single item or iterating if array.
-
         $no = 1;
         foreach ($custom_data as $item) {
             if (isset($item['status']) && $item['status'] === 'tidak_masuk') {
@@ -46,9 +46,9 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
         }
         $message .= "_Tetap semangat kuliahnya!_ 🚀";
 
-        $res = sendFonnteMessage($message);
+        $res = sendFonnteMessage($message, null, null, null, $target_kelas_id);
         if ($res['success']) {
-            return ['status' => 'success', 'message' => "Jadwal Custom " . strtolower($header_label) . " berhasil dikirim ke WhatsApp!"];
+            return ['status' => 'success', 'message' => "Jadwal Custom " . strtolower($header_label) . " berhasil dikirim ke WhatsApp {$nama_kelas}!"];
         } else {
             return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
         }
@@ -58,6 +58,8 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
         $periode = mysqli_fetch_assoc($q_periode);
         $periode_id = $periode['id'] ?? 0;
 
+        $where_jm_scope = !empty($target_kelas_id) ? " AND jm.kelas_id = $target_kelas_id " : "";
+
         $query = "SELECT jk_start.jam_mulai, jk_end.jam_selesai, r.nama_ruangan AS ruangan, mk.nama_matkul, dp.nama_dosen AS dosen_pengampu
                   FROM jadwal_matkul jm
                   JOIN mata_kuliah mk ON jm.matkul_id = mk.id
@@ -65,7 +67,7 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
                   LEFT JOIN jam_kuliah jk_start ON jm.jam_mulai_ke = jk_start.jam_ke
                   LEFT JOIN jam_kuliah jk_end ON jm.jam_selesai_ke = jk_end.jam_ke
                   LEFT JOIN dosen dp ON jm.dosen_pengampu_id = dp.id
-                  WHERE jm.periode_id = $periode_id AND jm.hari = '$target_ind'
+                  WHERE jm.periode_id = $periode_id AND jm.hari = '$target_ind' $where_jm_scope
                   ORDER BY jk_start.jam_mulai ASC";
 
         $result = mysqli_query($koneksi, $query);
@@ -78,14 +80,14 @@ function kirimJadwalReminder($koneksi, $token = null, $chat_id = null, $custom_d
             }
             $message .= "_Tetap semangat kuliahnya!_ 🚀";
 
-            $res = sendFonnteMessage($message);
+            $res = sendFonnteMessage($message, null, null, null, $target_kelas_id);
             if ($res['success']) {
-                return ['status' => 'success', 'message' => "Jadwal $target_ind " . strtolower($header_label) . " berhasil dikirim ke WhatsApp!"];
+                return ['status' => 'success', 'message' => "Jadwal $target_ind " . strtolower($header_label) . " berhasil dikirim ke WhatsApp {$nama_kelas}!"];
             } else {
                 return ['status' => 'error', 'message' => "Gagal: " . ($res['error'] ?? '')];
             }
         } else {
-            return ['status' => 'info', 'message' => "Tidak ada jadwal untuk hari $target_ind " . strtolower($header_label) . "."];
+            return ['status' => 'info', 'message' => "Tidak ada jadwal untuk hari $target_ind " . strtolower($header_label) . " ({$nama_kelas})."];
         }
     }
 }
@@ -95,17 +97,15 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_jadwal.php') {
     session_start();
     include '../koneksi.php';
 
-    if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'Administrator Utama' && $_SESSION['role'] !== 'Sekretaris')) {
+    if (!isset($_SESSION['user_id']) || (!in_array($_SESSION['role'], ['Administrator Utama', 'Sekretaris', 'Ketua Tingkat']))) {
         header("Location: ../../index");
         exit;
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'kirim_custom') {
-        // Handle custom data via JSON payload
         if (isset($_POST['custom_payload'])) {
             $custom_data = json_decode($_POST['custom_payload'], true);
         } else {
-            // Fallback for single item (jaga-jaga)
             $custom_data = [
                 [
                     'matkul' => $_POST['matkul'] ?? '',
@@ -116,7 +116,6 @@ if (basename($_SERVER['PHP_SELF']) == 'kirim_jadwal.php') {
         }
         $res = kirimJadwalReminder($koneksi, null, null, $custom_data);
     } else {
-        // Default / 'kirim_langsung'
         $res = kirimJadwalReminder($koneksi);
     }
 
