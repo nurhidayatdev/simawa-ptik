@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $nama_lengkap = $_SESSION['nama_lengkap'];
-$foto = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 $tabel = $_GET['tabel'] ?? '';
 $file = $_GET['file'] ?? '';
 $role = $_SESSION['role'];

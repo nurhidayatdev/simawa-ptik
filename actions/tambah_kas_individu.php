@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
-$foto = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
 if ($role !== 'Bendahara') {
@@ -141,13 +141,7 @@ $all_mhs = mysqli_query($koneksi, "SELECT m.id, m.nim, m.nama_lengkap FROM mahas
             ?>
                 <div class="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 rounded-xl p-4 mb-6 transition-all">
                     <div class="flex items-center gap-4">
-                        <?php if (!empty($mhs_info['foto'])): ?>
-                            <img src="../storage/profile/<?= htmlspecialchars($mhs_info['foto']) ?>" class="w-12 h-12 rounded-full border-2 border-white dark:border-slate-700 shadow-sm">
-                        <?php else: ?>
-                            <div class="w-12 h-12 rounded-full bg-indigo-200 dark:bg-indigo-900 flex items-center justify-center text-indigo-700 dark:text-indigo-400">
-                                <i class="fa fa-user text-xl"></i>
-                            </div>
-                        <?php endif; ?>
+                        <img src="<?= profilePhotoUrl($mhs_info['nama_lengkap'], '../') ?>" class="w-12 h-12 rounded-full border-2 border-white dark:border-slate-700 shadow-sm" alt="Avatar">
                         <div>
                             <h4 class="font-bold text-slate-800 dark:text-slate-100"><?= htmlspecialchars($mhs_info['nama_lengkap']) ?></h4>
                             <p class="text-xs text-slate-600 dark:text-slate-400">NIM: <?= htmlspecialchars($mhs_info['nim']) ?></p>

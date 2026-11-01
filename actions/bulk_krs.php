@@ -17,7 +17,7 @@ if ($role !== 'Ketua Tingkat') {
 
 $user_id    = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
-$foto       = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 
 include_once '../functions/foto_helpers.php';
 

@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $user_id = $_SESSION['user_id'];
-$foto = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
 if ($role === 'Administrator Utama') {
@@ -83,8 +83,7 @@ while ($row = mysqli_fetch_assoc($res_piket)) {
     }
     $piket_data[$jid]['petugas'][] = [
         'nama' => $row['nama_lengkap'],
-        'foto' => $row['foto']
-    ];
+        ];
 }
 
 $week_options = [];

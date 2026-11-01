@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
-$foto = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
 // Include foto helpers

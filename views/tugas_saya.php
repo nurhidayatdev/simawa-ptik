@@ -16,7 +16,7 @@ if ($role === 'Administrator Utama') {
     exit;
 }
 $nama_lengkap = $_SESSION['nama_lengkap'];
-$foto = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 
 // Filter logic
 $show_done = isset($_GET['show_done']) && $_GET['show_done'] == '1';

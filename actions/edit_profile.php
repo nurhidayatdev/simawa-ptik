@@ -5,7 +5,7 @@ include '../koneksi.php';
 $nama_panggilan = $_SESSION['nama_panggilan'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $user_id = $_SESSION['user_id'];
-$foto = $_SESSION['foto'];
+$foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
 // Include foto helpers for cache busting
