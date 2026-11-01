@@ -13,13 +13,35 @@ $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
 /* =====================
-   AMBIL PERIODE AKTIF
+   AMBIL PERIODE (AKTIF ATAU PILIHAN USER)
    ===================== */
-$q_periode = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama FROM periode WHERE status = 'aktif' LIMIT 1");
-$periode = mysqli_fetch_assoc($q_periode);
-$periode_id = $periode['id'];
-$semester_aktif = (int)$periode['semester_ke'];
-$periode_info = $periode['tahun_periode'] . ' ' . $periode['semester_nama'];
+$all_periodes_q = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama, status FROM periode ORDER BY semester_ke ASC, id ASC");
+$all_periodes = [];
+while ($pr = mysqli_fetch_assoc($all_periodes_q)) {
+    $all_periodes[] = $pr;
+}
+
+$req_periode_id = isset($_GET['periode_id']) ? (int)$_GET['periode_id'] : 0;
+$periode = null;
+
+if ($req_periode_id > 0) {
+    $q_p_req = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama, status FROM periode WHERE id = $req_periode_id LIMIT 1");
+    $periode = mysqli_fetch_assoc($q_p_req);
+}
+
+if (!$periode) {
+    // Default: periode aktif
+    $q_p_act = mysqli_query($koneksi, "SELECT id, semester_ke, tahun_periode, semester_nama, status FROM periode WHERE status = 'aktif' LIMIT 1");
+    $periode = mysqli_fetch_assoc($q_p_act);
+    if (!$periode && !empty($all_periodes)) {
+        $periode = $all_periodes[0];
+    }
+}
+
+$periode_id        = (int)$periode['id'];
+$semester_aktif    = (int)$periode['semester_ke'];
+$periode_info      = $periode['tahun_periode'] . ' ' . $periode['semester_nama'];
+$is_periode_aktif  = ($periode['status'] === 'aktif');
 /* =====================
    AMBIL MAHASISWA_ID
    ===================== */
@@ -30,7 +52,18 @@ $stmt = mysqli_prepare(
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $mahasiswa = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
-$mahasiswa_id = $mahasiswa['id'];
+$mahasiswa_id = $mahasiswa['id'] ?? null;
+
+// Fallback jika akun pengurus kelas linked via linked_student_nim
+if (empty($mahasiswa_id)) {
+    $q_u_nim = mysqli_query($koneksi, "SELECT linked_student_nim FROM users WHERE id = $user_id LIMIT 1");
+    $u_nim_data = mysqli_fetch_assoc($q_u_nim);
+    if (!empty($u_nim_data['linked_student_nim'])) {
+        $q_m_fb = mysqli_query($koneksi, "SELECT id FROM mahasiswa WHERE nim = '" . mysqli_real_escape_string($koneksi, $u_nim_data['linked_student_nim']) . "' LIMIT 1");
+        $m_fb = mysqli_fetch_assoc($q_m_fb);
+        $mahasiswa_id = $m_fb['id'] ?? 0;
+    }
+}
 
 /* =====================
    AMBIL STATUS VALIDASI
@@ -78,30 +111,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // hapus KRS TEMP lama (Draft)
-    mysqli_query(
-        $koneksi,
-        "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id"
-    );
+    if ($is_periode_aktif) {
+        // PERIODE AKTIF: Simpan ke krs_temp sebagai draft dan status menjadi pending
+        mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
+        $stmt = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        foreach ($matkul as $matkul_id) {
+            mysqli_stmt_bind_param($stmt, "iii", $mahasiswa_id, $matkul_id, $periode_id);
+            mysqli_stmt_execute($stmt);
+        }
+        $stmt_val = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending'");
+        mysqli_stmt_bind_param($stmt_val, "ii", $mahasiswa_id, $periode_id);
+        mysqli_stmt_execute($stmt_val);
 
-    // insert KRS TEMP baru
-    $stmt = mysqli_prepare(
-        $koneksi,
-        "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)"
-    );
+        header("Location: edit_krs.php?periode_id=$periode_id&sukses=1");
+        exit;
+    } else {
+        // PERIODE LAMPAU: Langsung perbarui tabel krs resmi dan disahkan (approved)
+        mysqli_query($koneksi, "DELETE FROM krs WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
+        mysqli_query($koneksi, "DELETE FROM krs_temp WHERE mahasiswa_id = $mahasiswa_id AND periode_id = $periode_id");
 
-    foreach ($matkul as $matkul_id) {
-        mysqli_stmt_bind_param($stmt, "iii", $mahasiswa_id, $matkul_id, $periode_id);
-        mysqli_stmt_execute($stmt);
+        $stmt_krs = mysqli_prepare($koneksi, "INSERT INTO krs (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        $stmt_temp = mysqli_prepare($koneksi, "INSERT INTO krs_temp (mahasiswa_id, matkul_id, periode_id) VALUES (?, ?, ?)");
+        foreach ($matkul as $matkul_id) {
+            mysqli_stmt_bind_param($stmt_krs, "iii", $mahasiswa_id, $matkul_id, $periode_id);
+            mysqli_stmt_execute($stmt_krs);
+
+            mysqli_stmt_bind_param($stmt_temp, "iii", $mahasiswa_id, $matkul_id, $periode_id);
+            mysqli_stmt_execute($stmt_temp);
+        }
+        $stmt_val = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status, tanggal_validasi) VALUES (?, ?, 'approved', NOW()) ON DUPLICATE KEY UPDATE status = 'approved', tanggal_validasi = NOW()");
+        mysqli_stmt_bind_param($stmt_val, "ii", $mahasiswa_id, $periode_id);
+        mysqli_stmt_execute($stmt_val);
+
+        header("Location: edit_krs.php?periode_id=$periode_id&sukses_lampau=1");
+        exit;
     }
-
-    // Update Status Validasi -> Pending
-    $stmt_val = mysqli_prepare($koneksi, "INSERT INTO krs_validasi (mahasiswa_id, periode_id, status) VALUES (?, ?, 'pending') ON DUPLICATE KEY UPDATE status = 'pending'");
-    mysqli_stmt_bind_param($stmt_val, "ii", $mahasiswa_id, $periode_id);
-    mysqli_stmt_execute($stmt_val);
-
-    header("Location: edit_krs.php?sukses=1");
-    exit;
 }
 
 /* =====================
@@ -176,7 +220,10 @@ if (mysqli_num_rows($krs) > 0) {
                 <div class="flex items-center gap-4">
                     <div>
                         <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Kartu Rencana Studi (KRS)</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Periode Aktif: <span class="text-indigo-600 dark:text-indigo-400"><?= htmlspecialchars($periode_info) ?></span></p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                            Semester <?= $semester_aktif ?> &bull; <?= htmlspecialchars($periode_info) ?> 
+                            <?= $is_periode_aktif ? '<span class="ml-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Semester Aktif</span>' : '<span class="ml-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Semester Lampau</span>' ?>
+                        </p>
                     </div>
                     <button type="button" onclick="showKrsRules()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-700" title="Informasi Aturan">
                         <i class="fas fa-info-circle"></i>
@@ -192,6 +239,39 @@ if (mysqli_num_rows($krs) > 0) {
                     </div>
                 </div>
             </div>
+
+            
+            <!-- Dropdown Pemilihan Semester / Periode -->
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-indigo-500 text-sm"></i>
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Pilih Periode / Semester:</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select onchange="location.href='edit_krs.php?periode_id=' + this.value" class="w-full sm:w-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20">
+                        <?php foreach ($all_periodes as $p_item): 
+                            $is_sel = ($p_item['id'] == $periode_id);
+                            $tag = ($p_item['status'] === 'aktif') ? ' (Semester Aktif)' : ' (Semester Lampau)';
+                        ?>
+                            <option value="<?= $p_item['id'] ?>" <?= $is_sel ? 'selected' : '' ?>>
+                                Semester <?= $p_item['semester_ke'] ?> &bull; <?= htmlspecialchars($p_item['tahun_periode'] . ' ' . $p_item['semester_nama']) ?><?= $tag ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <?php if (!$is_periode_aktif): ?>
+                <div class="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 px-4 py-3 rounded-xl mb-6 flex items-start shadow-sm transition-all">
+                    <i class="fas fa-history mt-1 mr-3 text-amber-600 dark:text-amber-400"></i>
+                    <div>
+                        <p class="font-bold text-sm">Mode Penyesuaian Riwayat SKS (Semester Lampau)</p>
+                        <p class="text-xs leading-relaxed mt-0.5">
+                            Anda sedang menyesuaikan mata kuliah untuk <strong>Semester <?= $semester_aktif ?> (<?= htmlspecialchars($periode_info) ?>)</strong>. Centang mata kuliah yang telah Anda lulusi pada semester ini. Perubahan yang Anda simpan akan langsung disahkan dan otomatis memperbarui <strong>Progres 146 SKS Kelulusan</strong> di profil Anda.
+                        </p>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Success logic handled by SweetAlert -->
 
@@ -432,7 +512,15 @@ if (mysqli_num_rows($krs) > 0) {
         }
 
         // Show Success Alert
-        <?php if (isset($_GET['sukses'])): ?>
+        <?php if (isset($_GET['sukses_lampau'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Riwayat SKS Diperbarui!',
+                text: 'Mata kuliah semester lampau berhasil disesuaikan dan langsung disahkan pada progres kelulusan 146 SKS Anda.',
+                confirmButtonColor: '#4f46e5',
+                timer: 4000
+            });
+        <?php elseif (isset($_GET['sukses'])): ?>
             (() => {
                 const isDark = document.documentElement.classList.contains('dark');
                 Swal.fire({

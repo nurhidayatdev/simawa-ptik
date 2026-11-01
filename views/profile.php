@@ -376,6 +376,9 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
                                                             </div>
                                                         </div>
                                                         <div class="flex items-center gap-2">
+                                                            <a href="../actions/edit_krs.php?periode_id=<?= $sem_data['periode_id'] ?>" onclick="event.stopPropagation()" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/50 hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-1 shadow-2xs" title="Sesuaikan Mata Kuliah Semester Ini">
+                                                                <i class="fas fa-edit text-[9px]"></i> Sesuaikan
+                                                            </a>
                                                             <?php if ($is_aktif): ?>
                                                                 <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                                                                     Semester Aktif
