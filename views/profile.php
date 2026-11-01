@@ -15,22 +15,18 @@ $role = $_SESSION['role'];
 // Include foto helpers for cache busting
 include_once '../functions/foto_helpers.php';
 
-$query = "SELECT id FROM mahasiswa WHERE user_id = ?";
-$stmt  = mysqli_prepare($koneksi, $query);
-mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
-mysqli_stmt_execute($stmt);
-$res_mhs = mysqli_stmt_get_result($stmt);
-$mahasiswa = mysqli_fetch_assoc($res_mhs);
+$is_mahasiswa = ($role === 'Mahasiswa');
+$mahasiswa_id = null;
 
-$mahasiswa_id = $mahasiswa['id'] ?? null;
-// Fallback jika user terhubung lewat linked_student_nim (misal akun Ketua Tingkat/Pengurus)
-if (empty($mahasiswa_id) && !empty($data['linked_student_nim'])) {
-    $q_link = mysqli_query($koneksi, "SELECT id FROM mahasiswa WHERE nim = '" . mysqli_real_escape_string($koneksi, $data['linked_student_nim']) . "' LIMIT 1");
-    if ($r_link = mysqli_fetch_assoc($q_link)) {
-        $mahasiswa_id = $r_link['id'];
-    }
+if ($is_mahasiswa) {
+    $query = "SELECT id FROM mahasiswa WHERE user_id = ?";
+    $stmt  = mysqli_prepare($koneksi, $query);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $res_mhs = mysqli_stmt_get_result($stmt);
+    $mahasiswa = mysqli_fetch_assoc($res_mhs);
+    $mahasiswa_id = $mahasiswa['id'] ?? null;
 }
-
 
 // ambil data user (LEFT JOIN agar role fungsional non-mahasiswa tetap bisa lihat profil)
 $query = "
@@ -65,7 +61,7 @@ $total_sks_lulus = 0;
 $sks_berjalan    = 0;
 $sks_per_semester = [];
 
-if (!empty($mahasiswa_id)) {
+if ($is_mahasiswa && !empty($mahasiswa_id)) {
     $q_sks_all = mysqli_query($koneksi, "
         SELECT 
             p.id as periode_id,
@@ -130,7 +126,7 @@ $persen_kelulusan = round(($total_sks_lulus / $target_sks_ptik) * 100, 1);
 $count_kas = 0;
 $res_att_matkul = null;
 
-if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
+if ($is_mahasiswa && !empty($mahasiswa_id)) {
     // Ambil Periode Aktif
     $q_periode = mysqli_query($koneksi, "SELECT id FROM periode WHERE status = 'aktif' LIMIT 1");
     $periode = mysqli_fetch_assoc($q_periode);
@@ -272,7 +268,7 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
                         </div>
                     </div>
 
-                    <?php if ($role === 'Mahasiswa' || !empty($mahasiswa_id)): ?>
+                    <?php if ($is_mahasiswa && !empty($mahasiswa_id)): ?>
                     <!-- Achievements & Progress Section (Khusus Mahasiswa) -->
                     <div class="mt-12 space-y-8">
 
@@ -459,6 +455,34 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
                                     <?php endif; ?>
                                 </div>
                             </div>
+                    </div>
+                    <?php else: ?>
+                    <!-- Informasi Akun Fungsional Kepengurusan / Administrator -->
+                    <div class="mt-8 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                <i class="fas fa-user-shield text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                                    Informasi Akun <?= htmlspecialchars($role) ?>
+                                </h3>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    Akun ini bertindak sebagai pengelola dan pemegang hak administratif kelas SIMAWA PTIK.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <p>
+                                Sebagai <strong><?= htmlspecialchars($role) ?></strong>, Anda memiliki wewenang untuk mengelola data operasional kelas, validasi KRS, keuangan kas, dan presensi mahasiswa. Widget pemantauan beban studi individu (progres 146 SKS, presensi, dan kas pribadi) hanya aktif pada akun dengan peran <strong>Mahasiswa</strong>.
+                            </p>
+                            <div class="mt-4 pt-4 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+                                <span class="text-[11px] text-slate-400">Pusat Kendali Pengurus:</span>
+                                <a href="../<?= ($role === 'Ketua Tingkat') ? 'dashboard_keti.php' : 'dashboard_admin.php' ?>" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-2 shadow-sm">
+                                    <i class="fas fa-tachometer-alt"></i> Buka Dashboard
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <?php endif; ?>
                 </div>

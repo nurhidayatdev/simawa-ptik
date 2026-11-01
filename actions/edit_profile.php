@@ -2,7 +2,6 @@
 session_start();
 include '../koneksi.php';
 
-$nama_panggilan = $_SESSION['nama_panggilan'];
 $nama_lengkap = $_SESSION['nama_lengkap'];
 $user_id = $_SESSION['user_id'];
 $foto = $_SESSION['foto'] ?? '';
@@ -12,12 +11,10 @@ $role = $_SESSION['role'];
 include_once '../functions/foto_helpers.php';
 $query = "SELECT id FROM mahasiswa WHERE user_id = ?";
 $stmt  = mysqli_prepare($koneksi, $query);
-mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
 $mahasiswa = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
-
-$mahasiswa_id = $mahasiswa['id'];
-
+$mahasiswa_id = $mahasiswa['id'] ?? null;
 
 // ambil data user
 $query = "
@@ -25,12 +22,12 @@ SELECT
     u.id AS user_id,
     u.role,
     u.password,
+    u.email,
+    COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, 'Pengguna') AS nama_lengkap,
     m.nim,
-    m.nama_lengkap,
-        u.email,
-        m.bio
+    m.bio
 FROM users u
-JOIN mahasiswa m ON m.user_id = u.id
+LEFT JOIN mahasiswa m ON m.user_id = u.id
 WHERE u.id = ?
 LIMIT 1
 ";
@@ -44,11 +41,15 @@ $data = mysqli_fetch_assoc($result);
 
 
 if (isset($_POST['update'])) {
-    mysqli_query($koneksi, "UPDATE mahasiswa SET 
-        nama_lengkap='{$_POST['nama_lengkap']}',
-                bio='{$_POST['bio']}',
-                WHERE user_id='$user_id'
-    ");
+    if (!empty($mahasiswa_id)) {
+        $nama_esc = mysqli_real_escape_string($koneksi, $_POST['nama_lengkap'] ?? '');
+        $bio_esc  = mysqli_real_escape_string($koneksi, $_POST['bio'] ?? '');
+        mysqli_query($koneksi, "UPDATE mahasiswa SET 
+            nama_lengkap='$nama_esc',
+            bio='$bio_esc'
+            WHERE user_id='$user_id'
+        ");
+    }
 
     // Server-side password validation
     $password = $_POST['password'];
