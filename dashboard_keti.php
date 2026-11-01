@@ -117,6 +117,8 @@ $q_mhs = mysqli_query($koneksi, "
         m.nama_lengkap,
         m.nama_panggilan,
         m.jenis_kelamin,
+        m.bio,
+        m.instagram,
         m.user_id,
         u.email,
         u.role
@@ -544,9 +546,17 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
                                                                 <i class="fas fa-plus mr-0.5"></i> Akun
                                                             </button>
                                                         <?php endif; ?>
-                                                        <a href="actions/edit.php?tabel=mahasiswa&id=<?= $m['id'] ?>" class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-200 dark:border-blue-900/50 flex items-center justify-center text-xs transition-colors" title="Edit Data Mahasiswa">
+                                                        <button type="button" onclick='openEditMhsModal(<?= htmlspecialchars(json_encode([
+                                                            "id" => (int)$m["id"],
+                                                            "nama_lengkap" => $m["nama_lengkap"],
+                                                            "nim" => $m["nim"],
+                                                            "nama_panggilan" => $m["nama_panggilan"] ?? "",
+                                                            "jenis_kelamin" => $m["jenis_kelamin"] ?? "Laki-laki",
+                                                            "instagram" => $m["instagram"] ?? "",
+                                                            "bio" => $m["bio"] ?? ""
+                                                        ]), ENT_QUOTES, "UTF-8") ?>)' class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-200 dark:border-blue-900/50 flex items-center justify-center text-xs transition-colors cursor-pointer" title="Edit Data Mahasiswa">
                                                             <i class="fas fa-edit"></i>
-                                                        </a>
+                                                        </button>
                                                         <a href="actions/hapus.php?tabel=mahasiswa&id=<?= $m['id'] ?>" class="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white border border-red-200 dark:border-red-900/50 flex items-center justify-center text-xs transition-colors" title="Hapus Data Mahasiswa">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
@@ -665,7 +675,71 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
     <!-- ==========================================
          MODAL 1: TAMBAH MAHASISWA KELAS
          ========================================== -->
-    <div id="modalTambahMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+    
+    <!-- ==========================================
+         MODAL 1B: EDIT DATA MAHASISWA KELAS
+         ========================================== -->
+    <div id="modalEditMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Edit Data Mahasiswa</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Perbarui profil dan identitas mahasiswa.</p>
+                </div>
+                <button type="button" onclick="closeEditMhsModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <form action="actions/kelola_pengurus.php" method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="edit_mahasiswa">
+                <input type="hidden" name="redirect_to" value="../dashboard_keti">
+                <input type="hidden" name="id" id="dash_edit_mhs_id">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Lengkap *</label>
+                    <input type="text" name="nama_lengkap" id="dash_edit_nama_lengkap" required placeholder="Contoh: Muhammad Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">NIM Mahasiswa *</label>
+                        <input type="text" name="nim" id="dash_edit_nim" required placeholder="24020950..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
+                        <input type="text" name="nama_panggilan" id="dash_edit_nama_panggilan" placeholder="Contoh: Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" id="dash_edit_jenis_kelamin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
+                        <input type="text" name="instagram" id="dash_edit_instagram" placeholder="@username" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Biodata / Minat (Opsional)</label>
+                    <input type="text" name="bio" id="dash_edit_bio" placeholder="Contoh: Minat Cyber Security & Programming" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeEditMhsModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<div id="modalTambahMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
             <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
@@ -891,6 +965,23 @@ $title = "Dashboard Ketua Tingkat - " . $nama_kelas_aktif;
             });
         <?php endif; ?>
     </script>
+
+    <script>
+        function openEditMhsModal(mhs) {
+            document.getElementById("dash_edit_mhs_id").value = mhs.id || "";
+            document.getElementById("dash_edit_nama_lengkap").value = mhs.nama_lengkap || "";
+            document.getElementById("dash_edit_nim").value = mhs.nim || "";
+            document.getElementById("dash_edit_nama_panggilan").value = mhs.nama_panggilan || "";
+            document.getElementById("dash_edit_jenis_kelamin").value = mhs.jenis_kelamin || "Laki-laki";
+            document.getElementById("dash_edit_instagram").value = mhs.instagram || "";
+            document.getElementById("dash_edit_bio").value = mhs.bio || "";
+            document.getElementById("modalEditMhs").classList.remove("hidden");
+        }
+        function closeEditMhsModal() {
+            document.getElementById("modalEditMhs").classList.add("hidden");
+        }
+    </script>
+
 </body>
 
 </html>

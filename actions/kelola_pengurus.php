@@ -112,6 +112,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // ==========================================
+    
+    // ==========================================
+    // 1B. EDIT DATA MAHASISWA KELAS
+    // ==========================================
+    if ($action === 'edit_mahasiswa') {
+        $redirect_to    = !empty($_POST['redirect_to']) ? $_POST['redirect_to'] : '../dashboard_keti';
+        $mhs_id         = (int)($_POST['id'] ?? 0);
+        $nama_lengkap   = trim($_POST['nama_lengkap'] ?? '');
+        $nama_panggilan = trim($_POST['nama_panggilan'] ?? '');
+        $nim            = trim($_POST['nim'] ?? '');
+        $jenis_kelamin  = $_POST['jenis_kelamin'] ?? 'Laki-laki';
+        $bio            = trim($_POST['bio'] ?? '');
+        $instagram      = trim($_POST['instagram'] ?? '');
+
+        if ($mhs_id <= 0 || empty($nama_lengkap) || empty($nim)) {
+            $_SESSION['error'] = "Data mahasiswa, nama lengkap, dan NIM wajib diisi!";
+            header("Location: $redirect_to");
+            exit();
+        }
+
+        // Verifikasi mahasiswa milik kelas Ketua Tingkat (jika role bukan Admin)
+        if ($role !== 'Administrator Utama') {
+            $stmt_chk_own = mysqli_prepare($koneksi, "SELECT id, user_id, nim FROM mahasiswa WHERE id = ? AND kelas_id = ? LIMIT 1");
+            mysqli_stmt_bind_param($stmt_chk_own, "ii", $mhs_id, $kelas_id);
+            mysqli_stmt_execute($stmt_chk_own);
+            $res_chk = mysqli_stmt_get_result($stmt_chk_own);
+            $curr_mhs = mysqli_fetch_assoc($res_chk);
+            if (!$curr_mhs) {
+                $_SESSION['error'] = "Akses ditolak: Mahasiswa tidak ditemukan di kelas Anda.";
+                header("Location: $redirect_to");
+                exit();
+            }
+        } else {
+            $curr_mhs = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id, user_id, nim FROM mahasiswa WHERE id = $mhs_id LIMIT 1"));
+        }
+
+        // Cek duplikasi NIM terhadap mahasiswa lain
+        $stmt_check = mysqli_prepare($koneksi, "SELECT id FROM mahasiswa WHERE nim = ? AND id != ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt_check, "si", $nim, $mhs_id);
+        mysqli_stmt_execute($stmt_check);
+        if (mysqli_num_rows(mysqli_stmt_get_result($stmt_check)) > 0) {
+            $_SESSION['error'] = "NIM <strong>$nim</strong> sudah digunakan oleh mahasiswa lain!";
+            header("Location: $redirect_to");
+            exit();
+        }
+
+        // Update data mahasiswa
+        $stmt_up = mysqli_prepare($koneksi, "
+            UPDATE mahasiswa 
+            SET nama_lengkap = ?, nama_panggilan = ?, nim = ?, jenis_kelamin = ?, bio = ?, instagram = ? 
+            WHERE id = ?
+        ");
+        mysqli_stmt_bind_param($stmt_up, "ssssssi", $nama_lengkap, $nama_panggilan, $nim, $jenis_kelamin, $bio, $instagram, $mhs_id);
+
+        if (mysqli_stmt_execute($stmt_up)) {
+            // Jika ada user account terhubung, sinkronkan nama_lengkap dan linked_student_nim
+            if (!empty($curr_mhs['user_id'])) {
+                $uid = (int)$curr_mhs['user_id'];
+                $stmt_up_u = mysqli_prepare($koneksi, "UPDATE users SET nama_lengkap = ?, linked_student_nim = ? WHERE id = ?");
+                mysqli_stmt_bind_param($stmt_up_u, "ssi", $nama_lengkap, $nim, $uid);
+                mysqli_stmt_execute($stmt_up_u);
+            }
+
+            $_SESSION['success'] = "Data mahasiswa <strong>" . htmlspecialchars($nama_lengkap) . "</strong> berhasil diperbarui!";
+        } else {
+            $_SESSION['error'] = "Gagal memperbarui data mahasiswa: " . mysqli_error($koneksi);
+        }
+
+        header("Location: $redirect_to");
+        exit();
+    }
+
     // 2. TUNJUK / BUAT AKUN PENGURUS KELAS
     // ==========================================
     if ($action === 'tunjuk_pengurus') {

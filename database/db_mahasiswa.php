@@ -76,7 +76,16 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['bio']) . '</td>';
         if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">';
-            echo '<a href="../actions/edit.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Edit"><i class="fa fa-edit text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3 transition-colors"></i></a>';
+            $mhsJson = htmlspecialchars(json_encode([
+                "id" => (int)$row["id"],
+                "nama_lengkap" => $row["nama_lengkap"],
+                "nim" => $row["nim"],
+                "nama_panggilan" => $row["nama_panggilan"] ?? "",
+                "jenis_kelamin" => $row["jenis_kelamin"] ?? "Laki-laki",
+                "instagram" => $row["instagram"] ?? "",
+                "bio" => $row["bio"] ?? ""
+            ]), ENT_QUOTES, "UTF-8");
+            echo '<button type="button" onclick="openEditMhsModal(' . $mhsJson . ')" title="Edit" class="cursor-pointer mr-3"><i class="fa fa-edit text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"></i></button>';
             echo '<a href="../actions/hapus.php?tabel=mahasiswa&id=' . $row['id'] . '" title="Hapus"><i class="fa fa-trash text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"></i></a>';
             echo '</td>';
         endif;
@@ -192,9 +201,17 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
-                                            <a href="../actions/edit.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors">
+                                            <button type="button" onclick='openEditMhsModal(<?= htmlspecialchars(json_encode([
+                                                "id" => (int)$row["id"],
+                                                "nama_lengkap" => $row["nama_lengkap"],
+                                                "nim" => $row["nim"],
+                                                "nama_panggilan" => $row["nama_panggilan"] ?? "",
+                                                "jenis_kelamin" => $row["jenis_kelamin"] ?? "Laki-laki",
+                                                "instagram" => $row["instagram"] ?? "",
+                                                "bio" => $row["bio"] ?? ""
+                                            ]), ENT_QUOTES, "UTF-8") ?>)' title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors cursor-pointer">
                                                 <i class="fa fa-edit"></i>
-                                            </a>
+                                            </button>
                                             <a href="../actions/hapus.php?tabel=mahasiswa&id=<?= $row['id']; ?>" title="Hapus" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors">
                                                 <i class="fa fa-trash"></i>
                                             </a>
@@ -211,7 +228,71 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     <!-- ==========================================
          MODAL TAMBAH MAHASISWA KELAS (SERAGAM DENGAN DASHBOARD)
          ========================================== -->
-    <div id="modalTambahMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+    
+    <!-- ==========================================
+         MODAL EDIT MAHASISWA KELAS (SERAGAM DENGAN DASHBOARD)
+         ========================================== -->
+    <div id="modalEditMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Edit Data Mahasiswa</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Perbarui profil dan identitas mahasiswa.</p>
+                </div>
+                <button type="button" onclick="closeEditMhsModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <form action="../actions/kelola_pengurus.php" method="POST" class="space-y-4">
+                <input type="hidden" name="action" value="edit_mahasiswa">
+                <input type="hidden" name="redirect_to" value="../database/db_mahasiswa.php">
+                <input type="hidden" name="id" id="dbm_edit_mhs_id">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Lengkap *</label>
+                    <input type="text" name="nama_lengkap" id="dbm_edit_nama_lengkap" required placeholder="Contoh: Muhammad Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">NIM Mahasiswa *</label>
+                        <input type="text" name="nim" id="dbm_edit_nim" required placeholder="24020950..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
+                        <input type="text" name="nama_panggilan" id="dbm_edit_nama_panggilan" placeholder="Contoh: Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
+                        <select name="jenis_kelamin" id="dbm_edit_jenis_kelamin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
+                        <input type="text" name="instagram" id="dbm_edit_instagram" placeholder="@username" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Biodata / Minat (Opsional)</label>
+                    <input type="text" name="bio" id="dbm_edit_bio" placeholder="Contoh: Minat Cyber Security & Programming" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button type="button" onclick="closeEditMhsModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all cursor-pointer">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<div id="modalTambahMhs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden transition-opacity">
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6">
             <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
@@ -317,6 +398,21 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     </script>
 
     <script>
+        
+        function openEditMhsModal(mhs) {
+            document.getElementById("dbm_edit_mhs_id").value = mhs.id || "";
+            document.getElementById("dbm_edit_nama_lengkap").value = mhs.nama_lengkap || "";
+            document.getElementById("dbm_edit_nim").value = mhs.nim || "";
+            document.getElementById("dbm_edit_nama_panggilan").value = mhs.nama_panggilan || "";
+            document.getElementById("dbm_edit_jenis_kelamin").value = mhs.jenis_kelamin || "Laki-laki";
+            document.getElementById("dbm_edit_instagram").value = mhs.instagram || "";
+            document.getElementById("dbm_edit_bio").value = mhs.bio || "";
+            document.getElementById("modalEditMhs").classList.remove("hidden");
+        }
+        function closeEditMhsModal() {
+            document.getElementById("modalEditMhs").classList.add("hidden");
+        }
+
         function openTambahMhsModal() {
             document.getElementById("modalTambahMhs").classList.remove("hidden");
         }

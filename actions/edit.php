@@ -78,6 +78,12 @@ if (isset($_POST['update'])) {
                     jenis_kelamin='$jenis_kelamin',
                     instagram='$instagram'
                     WHERE id='$id'");
+
+            $chk_u = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT user_id FROM mahasiswa WHERE id='$id' LIMIT 1"));
+            if (!empty($chk_u['user_id'])) {
+                $uid = (int)$chk_u['user_id'];
+                mysqli_query($koneksi, "UPDATE users SET nama_lengkap='$nama_lengkap', linked_student_nim='$nim' WHERE id='$uid'");
+            }
             $redirect = "../database/db_mahasiswa";
             break;
 
