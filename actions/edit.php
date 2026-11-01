@@ -64,19 +64,15 @@ if (isset($_POST['update'])) {
 
         case 'mahasiswa':
             $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap'] ?? ''));
-            $nama_panggilan = mysqli_real_escape_string($koneksi, trim($_POST['nama_panggilan'] ?? ''));
-            $nim = mysqli_real_escape_string($koneksi, trim($_POST['nim'] ?? ''));
+                        $nim = mysqli_real_escape_string($koneksi, trim($_POST['nim'] ?? ''));
             $bio = mysqli_real_escape_string($koneksi, trim($_POST['bio'] ?? ''));
             $jenis_kelamin = mysqli_real_escape_string($koneksi, trim($_POST['jenis_kelamin'] ?? ''));
-            $instagram = mysqli_real_escape_string($koneksi, trim($_POST['instagram'] ?? ''));
-
+            
             mysqli_query($koneksi, "UPDATE mahasiswa SET 
                     nama_lengkap='$nama_lengkap',
-                    nama_panggilan='$nama_panggilan',
                     nim='$nim',
                     bio='$bio',
-                    jenis_kelamin='$jenis_kelamin',
-                    instagram='$instagram'
+                    jenis_kelamin='$jenis_kelamin'
                     WHERE id='$id'");
 
             $chk_u = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT user_id FROM mahasiswa WHERE id='$id' LIMIT 1"));
@@ -278,11 +274,7 @@ if (isset($_POST['update'])) {
                                 <input type="text" name="nama_lengkap" value="<?= $data['nama_lengkap']; ?>"
                                     class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Panggilan</label>
-                                <input type="text" name="nama_panggilan" value="<?= $data['nama_panggilan']; ?>"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
+                            
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">NIM</label>
                                 <input type="number" name="nim" value="<?= $data['nim']; ?>"
@@ -297,11 +289,7 @@ if (isset($_POST['update'])) {
                                     <option value="Perempuan" <?= ($data['jenis_kelamin'] == 'Perempuan') ? 'selected' : '' ?>>Perempuan</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
-                                <input type="text" name="instagram" value="<?= $data['instagram'] ?? ''; ?>" placeholder="@username"
-                                    class="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-600 text-xs transition-colors">
-                            </div>
+                            
                             <div>
                                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
                                 <input name="bio" value="<?= $data['bio']; ?>"

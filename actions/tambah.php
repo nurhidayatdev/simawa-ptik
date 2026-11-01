@@ -36,13 +36,11 @@ if (isset($_POST['tambah'])) {
     switch ($tabel) {
         case 'mahasiswa':
             $nama_lengkap = mysqli_real_escape_string($koneksi, trim($_POST['nama_lengkap'] ?? ''));
-            $nama_panggilan = mysqli_real_escape_string($koneksi, trim($_POST['nama_panggilan'] ?? ''));
-            $email = mysqli_real_escape_string($koneksi, trim($_POST['email'] ?? ''));
+                        $email = mysqli_real_escape_string($koneksi, trim($_POST['email'] ?? ''));
             $nim = mysqli_real_escape_string($koneksi, trim($_POST['nim'] ?? ''));
             $bio = mysqli_real_escape_string($koneksi, trim($_POST['bio'] ?? ''));
             $jenis_kelamin = mysqli_real_escape_string($koneksi, trim($_POST['jenis_kelamin'] ?? ''));
-            $instagram = mysqli_real_escape_string($koneksi, trim($_POST['instagram'] ?? ''));
-            $password = trim($_POST['password'] ?? '');
+                        $password = trim($_POST['password'] ?? '');
 
             if ($role === 'Administrator Utama' && !empty($_POST['kelas_id'])) {
                 $target_kelas_id = (int)$_POST['kelas_id'];
@@ -50,8 +48,8 @@ if (isset($_POST['tambah'])) {
                 $target_kelas_id = getKelasScope() ?? 1;
             }
 
-            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, nama_panggilan, email, nim, bio, jenis_kelamin, instagram, kelas_id)
-                VALUES ('$nama_lengkap','$nama_panggilan','$email','$nim','$bio','$jenis_kelamin','$instagram', '$target_kelas_id')");
+            mysqli_query($koneksi, "INSERT INTO mahasiswa (nama_lengkap, email, nim, bio, jenis_kelamin, kelas_id)
+                VALUES ('$nama_lengkap','$email','$nim','$bio','$jenis_kelamin', '$target_kelas_id')");
             $new_mhs_id = mysqli_insert_id($koneksi);
 
             if (!empty($email)) {
@@ -303,11 +301,7 @@ if (isset($_POST['tambah'])) {
                                 <input type="text" name="nim" required placeholder="24020950..."
                                     class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
-                                <input type="text" name="nama_panggilan" placeholder="Contoh: Ihsan"
-                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
-                            </div>
+                            
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
                                 <select name="jenis_kelamin"
@@ -316,11 +310,7 @@ if (isset($_POST['tambah'])) {
                                     <option value="Perempuan">Perempuan</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
-                                <input type="text" name="instagram" placeholder="@username"
-                                    class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs transition-colors">
-                            </div>
+                            
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Biodata / Minat (Opsional)</label>
                                 <input type="text" name="bio" placeholder="Contoh: Minat Cyber Security & Programming"

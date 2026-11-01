@@ -776,7 +776,7 @@ $title = "Dashboard Administrator - SIMAWA PTIK 2024";
                             ${avatar}
                             <div>
                                 <div class="font-bold text-slate-800 dark:text-slate-100">${escapeHtml(m.nama_lengkap)}</div>
-                                ${m.nama_panggilan ? `<div class="text-[10px] text-slate-400">Panggilan: ${escapeHtml(m.nama_panggilan)}</div>` : ''}
+                                
                             </div>
                         </div>
                     </td>

@@ -47,24 +47,22 @@ while ($r = mysqli_fetch_assoc($result)) {
     <p class="text-gray-500 dark:text-slate-400 mb-8 scroll-reveal text-sm text-center italic">Direktori profil seluruh rekan mahasiswa PTIK C 2024, jalin silaturahmi dan kenali lebih dalam setiap jiwa di angkatan kita.</p>
 
     <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10 scroll-reveal">
-      <input id="searchInput" type="search" placeholder="Cari nama, panggilan, NIM..." class="w-full sm:w-1/2 px-5 py-3 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />
+      <input id="searchInput" type="search" placeholder="Cari nama, NIM..." class="w-full sm:w-1/2 px-5 py-3 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />
     </div>
 
     <!-- Card view (hidden by default) -->
     <div id="cardView">
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
         <?php foreach ($rows as $row) :
-          $searchTextCard = strtolower($row['nim'] . ' ' . $row['nama_lengkap'] . ' ' . $row['nama_panggilan']);
+          $searchTextCard = strtolower($row['nim'] . ' ' . $row['nama_lengkap']);
         ?>
           <div onclick="openModal(this)"
             data-nama="<?php echo htmlspecialchars($row['nama_lengkap']); ?>"
             data-nim="<?php echo htmlspecialchars($row['nim']); ?>"
-            data-panggilan="<?php echo htmlspecialchars($row['nama_panggilan']); ?>"
-            data-bio="<?php echo htmlspecialchars($row['bio'] ?? ''); ?>"
+                        data-bio="<?php echo htmlspecialchars($row['bio'] ?? ''); ?>"
             data-foto="<?= profilePhotoUrl($row['nama_lengkap']) ?>"
             data-initials="<?= strtoupper(substr($row['nama_lengkap'], 0, 2)) ?>"
-            data-instagram="<?php echo htmlspecialchars($row['instagram'] ?? ''); ?>"
-            data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>"
+                        data-search="<?php echo htmlspecialchars($searchTextCard, ENT_QUOTES); ?>"
             class="cursor-pointer bg-white dark:bg-slate-900 rounded-2xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-all group hover:-translate-y-1 scroll-reveal">
             <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 h-14 relative">
               <div class="absolute -bottom-8 left-1/2 -translate-x-1/2">
@@ -76,12 +74,7 @@ while ($r = mysqli_fetch_assoc($result)) {
             <div class="pt-10 pb-4 px-3 text-center">
               <h4 class="text-xs font-bold text-slate-900 dark:text-slate-100 truncate mb-1"><?php echo htmlspecialchars($row['nama_lengkap']); ?></h4>
               <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-2 truncate"><?php echo htmlspecialchars($row['bio'] ?? ''); ?></p>
-              <?php if (!empty($row['instagram'])): ?>
-                <a href="https://instagram.com/<?php echo ltrim(htmlspecialchars($row['instagram']), '@'); ?>" target="_blank" class="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[9px] rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-sm">
-                  <i class="fab fa-instagram"></i>
-                  <span><?php echo htmlspecialchars($row['instagram']); ?></span>
-                </a>
-              <?php endif; ?>
+              
             </div>
           </div>
         <?php endforeach; ?>
@@ -129,18 +122,10 @@ while ($r = mysqli_fetch_assoc($result)) {
                   <i class="fas fa-id-card text-indigo-400"></i>
                   <span id="modalNim"></span>
                 </div>
-                <div class="px-4 py-1.5 bg-pink-50 dark:bg-pink-950/50 text-pink-700 dark:text-pink-400 rounded-full text-xs font-semibold border border-pink-100 dark:border-pink-800 shadow-sm flex items-center gap-1.5">
-                  <i class="fas fa-user-tag text-pink-400"></i>
-                  <span id="modalPanggilan"></span>
-                </div>
+                
               </div>
 
-              <div id="modalInstagramContainer" class="mt-6 hidden">
-                <a id="modalInstagramLink" href="#" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-md shadow-purple-200 hover:shadow-purple-300 hover:-translate-y-0.5 transition-all font-medium text-sm group">
-                  <i class="fab fa-instagram text-lg group-hover:rotate-12 transition-transform"></i>
-                  <span>Instagram</span>
-                </a>
-              </div>
+              
             </div>
           </div>
 
@@ -178,8 +163,7 @@ while ($r = mysqli_fetch_assoc($result)) {
 
       document.getElementById('modalNama').textContent = data.nama;
       document.getElementById('modalNim').textContent = data.nim;
-      document.getElementById('modalPanggilan').textContent = data.panggilan;
-
+      
       const bioEl = document.getElementById('modalBio');
       if (data.bio) {
         bioEl.textContent = data.bio;
@@ -196,16 +180,7 @@ while ($r = mysqli_fetch_assoc($result)) {
         fotoContainer.innerHTML = `<span>${data.initials}</span>`;
       }
 
-      // Instagram
-      const igContainer = document.getElementById('modalInstagramContainer');
-      const igLink = document.getElementById('modalInstagramLink');
-      if (data.instagram) {
-        igContainer.classList.remove('hidden');
-        let handle = data.instagram.replace('@', '');
-        igLink.href = `https://instagram.com/${handle}`;
-      } else {
-        igContainer.classList.add('hidden');
-      }
+      
 
       // Show Modal with Animation
       modal.classList.remove('hidden');

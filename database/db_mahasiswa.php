@@ -29,10 +29,10 @@ if (!empty($search)) {
          WHERE (u.role = 'Mahasiswa' OR (m.user_id IS NULL AND m.nama_lengkap NOT LIKE '%Administrator%'))
            AND (u.role NOT IN ('Administrator Utama', 'Ketua Tingkat', 'Sekretaris', 'Bendahara') OR u.role IS NULL)
          $where_extra
-         AND (m.nim LIKE ? OR m.nama_lengkap LIKE ? OR m.nama_panggilan LIKE ?)
+         AND (m.nim LIKE ? OR m.nama_lengkap LIKE ?)
          ORDER BY m.nim ASC"
     );
-    mysqli_stmt_bind_param($stmt, "sss", $like, $like, $like);
+    mysqli_stmt_bind_param($stmt, "ss", $like, $like);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 } else {
@@ -61,18 +61,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs font-bold text-slate-800 dark:text-slate-100">' . htmlspecialchars($row['nim']) . '</td>';
         echo '<td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200">' . htmlspecialchars($row['nama_lengkap']) . '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300">' . htmlspecialchars($row['nama_panggilan']) . '</td>';
-        $jkColor = ($row['jenis_kelamin'] === 'Laki-laki') ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 border-pink-200 dark:border-pink-800';
+                $jkColor = ($row['jenis_kelamin'] === 'Laki-laki') ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300 border-pink-200 dark:border-pink-800';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
         echo '<span class="px-1.5 py-0.5 rounded-full border text-[9px] font-bold ' . $jkColor . '">' . ($row['jenis_kelamin'] ?? '-') . '</span>';
         echo '</td>';
-        echo '<td class="px-3 py-2 whitespace-nowrap text-xs">';
-        if (!empty($row['instagram'])) {
-            echo '<a href="https://instagram.com/' . ltrim(htmlspecialchars($row['instagram']), '@') . '" target="_blank" class="text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-300"><i class="fab fa-instagram mr-1"></i>' . htmlspecialchars($row['instagram']) . '</a>';
-        } else {
-            echo '<span class="text-slate-400 dark:text-slate-600">-</span>';
-        }
-        echo '</td>';
+        
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['bio']) . '</td>';
         if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">';
@@ -80,9 +73,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 "id" => (int)$row["id"],
                 "nama_lengkap" => $row["nama_lengkap"],
                 "nim" => $row["nim"],
-                "nama_panggilan" => $row["nama_panggilan"] ?? "",
                 "jenis_kelamin" => $row["jenis_kelamin"] ?? "Laki-laki",
-                "instagram" => $row["instagram"] ?? "",
                 "bio" => $row["bio"] ?? ""
             ]), ENT_QUOTES, "UTF-8");
             echo '<button type="button" onclick="openEditMhsModal(' . $mhsJson . ')" title="Edit" class="cursor-pointer mr-3"><i class="fa fa-edit text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"></i></button>';
@@ -155,10 +146,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Foto</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">NIM</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Nama Lengkap</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Panggilan</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Gender</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Instagram</th>
-                            <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Bio</th>
+                                                        <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Gender</th>
+                                                        <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Bio</th>
                             <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
@@ -181,22 +170,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs font-bold text-slate-800 dark:text-slate-100"><?= $row['nim']; ?></td>
                                 <td class="px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200"><?= $row['nama_lengkap']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-300"><?= $row['nama_panggilan']; ?></td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs">
+                                                                <td class="px-3 py-2 whitespace-nowrap text-xs">
                                     <?php
                                     $jkColor = ($row['jenis_kelamin'] === 'Laki-laki') ? 'bg-sky-50 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-100 dark:border-sky-800' : 'bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-100 dark:border-pink-800';
                                     ?>
                                     <span class="px-1.5 py-0.5 rounded-full border text-[9px] font-bold <?= $jkColor ?>"><?= ucfirst($row['jenis_kelamin']) ?></span>
                                 </td>
-                                <td class="px-3 py-2 whitespace-nowrap text-xs">
-                                    <?php if (!empty($row['instagram'])): ?>
-                                        <a href="https://instagram.com/<?= ltrim(htmlspecialchars($row['instagram']), '@') ?>" target="_blank" class="text-pink-600 dark:text-pink-400 hover:text-pink-800 dark:hover:text-pink-300 font-medium transition-colors">
-                                            <i class="fab fa-instagram mr-1"></i><?= htmlspecialchars($row['instagram']); ?>
-                                        </a>
-                                    <?php else: ?>
-                                        <span class="text-slate-400 dark:text-slate-600">-</span>
-                                    <?php endif; ?>
-                                </td>
+                                
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed"><?= $row['bio']; ?></td>
                                 <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
@@ -205,9 +185,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                                 "id" => (int)$row["id"],
                                                 "nama_lengkap" => $row["nama_lengkap"],
                                                 "nim" => $row["nim"],
-                                                "nama_panggilan" => $row["nama_panggilan"] ?? "",
                                                 "jenis_kelamin" => $row["jenis_kelamin"] ?? "Laki-laki",
-                                                "instagram" => $row["instagram"] ?? "",
                                                 "bio" => $row["bio"] ?? ""
                                             ]), ENT_QUOTES, "UTF-8") ?>)' title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors cursor-pointer">
                                                 <i class="fa fa-edit"></i>
@@ -260,22 +238,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         <input type="text" name="nim" id="dbm_edit_nim" required placeholder="24020950..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
-                        <input type="text" name="nama_panggilan" id="dbm_edit_nama_panggilan" placeholder="Contoh: Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
                         <select name="jenis_kelamin" id="dbm_edit_jenis_kelamin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
-                        <input type="text" name="instagram" id="dbm_edit_instagram" placeholder="@username" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                     </div>
                 </div>
 
@@ -319,22 +286,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                         <input type="text" name="nim" required placeholder="24020950..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nama Panggilan</label>
-                        <input type="text" name="nama_panggilan" placeholder="Contoh: Ihsan" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Jenis Kelamin</label>
                         <select name="jenis_kelamin" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer">
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
                         </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Instagram (Opsional)</label>
-                        <input type="text" name="instagram" placeholder="@username" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white px-3.5 py-2.5 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
                     </div>
                 </div>
 
@@ -403,10 +359,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             document.getElementById("dbm_edit_mhs_id").value = mhs.id || "";
             document.getElementById("dbm_edit_nama_lengkap").value = mhs.nama_lengkap || "";
             document.getElementById("dbm_edit_nim").value = mhs.nim || "";
-            document.getElementById("dbm_edit_nama_panggilan").value = mhs.nama_panggilan || "";
-            document.getElementById("dbm_edit_jenis_kelamin").value = mhs.jenis_kelamin || "Laki-laki";
-            document.getElementById("dbm_edit_instagram").value = mhs.instagram || "";
-            document.getElementById("dbm_edit_bio").value = mhs.bio || "";
+                        document.getElementById("dbm_edit_jenis_kelamin").value = mhs.jenis_kelamin || "Laki-laki";
+                        document.getElementById("dbm_edit_bio").value = mhs.bio || "";
             document.getElementById("modalEditMhs").classList.remove("hidden");
         }
         function closeEditMhsModal() {

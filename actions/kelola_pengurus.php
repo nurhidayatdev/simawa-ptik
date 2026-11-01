@@ -31,12 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'tambah_mahasiswa') {
         $redirect_to = !empty($_POST['redirect_to']) ? $_POST['redirect_to'] : '../dashboard_keti';
         $nama_lengkap   = trim($_POST['nama_lengkap'] ?? '');
-        $nama_panggilan = trim($_POST['nama_panggilan'] ?? '');
-        $nim            = trim($_POST['nim'] ?? '');
+                $nim            = trim($_POST['nim'] ?? '');
         $jenis_kelamin  = $_POST['jenis_kelamin'] ?? 'Laki-laki';
         $bio            = trim($_POST['bio'] ?? '');
-        $instagram      = trim($_POST['instagram'] ?? '');
-
+        
         if (empty($nama_lengkap) || empty($nim)) {
             $_SESSION['error'] = "Nama lengkap dan NIM wajib diisi!";
             header("Location: $redirect_to");
@@ -77,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Simpan data mahasiswa otomatis dengan kelas_id sesi Ketua Tingkat
         $stmt_ins = mysqli_prepare($koneksi, "
-            INSERT INTO mahasiswa (kelas_id, nim, nama_lengkap, nama_panggilan, jenis_kelamin, bio, instagram)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO mahasiswa (kelas_id, nim, nama_lengkap, jenis_kelamin, bio)
+            VALUES (?, ?, ?, ?, ?)
         ");
-        mysqli_stmt_bind_param($stmt_ins, "issssss", $kelas_id, $nim, $nama_lengkap, $nama_panggilan, $jenis_kelamin, $bio, $instagram);
+        mysqli_stmt_bind_param($stmt_ins, "issss", $kelas_id, $nim, $nama_lengkap, $jenis_kelamin, $bio);
 
         if (mysqli_stmt_execute($stmt_ins)) {
             $new_mhs_id = mysqli_insert_id($koneksi);
@@ -120,12 +118,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $redirect_to    = !empty($_POST['redirect_to']) ? $_POST['redirect_to'] : '../dashboard_keti';
         $mhs_id         = (int)($_POST['id'] ?? 0);
         $nama_lengkap   = trim($_POST['nama_lengkap'] ?? '');
-        $nama_panggilan = trim($_POST['nama_panggilan'] ?? '');
-        $nim            = trim($_POST['nim'] ?? '');
+                $nim            = trim($_POST['nim'] ?? '');
         $jenis_kelamin  = $_POST['jenis_kelamin'] ?? 'Laki-laki';
         $bio            = trim($_POST['bio'] ?? '');
-        $instagram      = trim($_POST['instagram'] ?? '');
-
+        
         if ($mhs_id <= 0 || empty($nama_lengkap) || empty($nim)) {
             $_SESSION['error'] = "Data mahasiswa, nama lengkap, dan NIM wajib diisi!";
             header("Location: $redirect_to");
@@ -161,10 +157,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update data mahasiswa
         $stmt_up = mysqli_prepare($koneksi, "
             UPDATE mahasiswa 
-            SET nama_lengkap = ?, nama_panggilan = ?, nim = ?, jenis_kelamin = ?, bio = ?, instagram = ? 
+            SET nama_lengkap = ?, nim = ?, jenis_kelamin = ?, bio = ? 
             WHERE id = ?
         ");
-        mysqli_stmt_bind_param($stmt_up, "ssssssi", $nama_lengkap, $nama_panggilan, $nim, $jenis_kelamin, $bio, $instagram, $mhs_id);
+        mysqli_stmt_bind_param($stmt_up, "ssssi", $nama_lengkap, $nim, $jenis_kelamin, $bio, $mhs_id);
 
         if (mysqli_stmt_execute($stmt_up)) {
             // Jika ada user account terhubung, sinkronkan nama_lengkap dan linked_student_nim

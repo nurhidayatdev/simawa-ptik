@@ -25,8 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         u.linked_student_nim,
         m.nim AS mhs_nim,
         m.nama_lengkap AS mhs_nama_lengkap,
-        m.nama_panggilan AS mhs_nama_panggilan,
-        m.kelas_id AS mhs_kelas_id,
+                m.kelas_id AS mhs_kelas_id,
         u.email,
         u.password,
         u.role,
@@ -48,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id']            = $data['user_id'];
         $_SESSION['email']              = $data['email'];
         $_SESSION['nama_lengkap']       = !empty($data['user_nama_lengkap']) ? $data['user_nama_lengkap'] : (!empty($data['mhs_nama_lengkap']) ? $data['mhs_nama_lengkap'] : $data['email']);
-        $_SESSION['nama_panggilan']     = !empty($data['mhs_nama_panggilan']) ? $data['mhs_nama_panggilan'] : explode(' ', $_SESSION['nama_lengkap'])[0];
+        $_SESSION['nama_panggilan']     = explode(' ', $_SESSION['nama_lengkap'])[0];
         $_SESSION['role']               = $data['role'];
         $_SESSION['foto']               = '';
         $_SESSION['linked_student_nim'] = $data['linked_student_nim'] ?? null;

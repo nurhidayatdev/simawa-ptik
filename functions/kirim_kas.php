@@ -10,14 +10,14 @@ function kirimKasReminder($koneksi, $minggu_ke, $token = null, $chat_id = null)
     $p = mysqli_fetch_assoc($q_p);
     $periode_id = (int)($p['id'] ?? 0);
 
-    $q_belum = "SELECT m.nama_panggilan FROM mahasiswa m LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu_ke' AND k.periode_id = '$periode_id' WHERE (k.status IS NULL OR k.status != 'Lunas') ORDER BY m.nim ASC";
+    $q_belum = "SELECT m.nama_lengkap FROM mahasiswa m LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu_ke' AND k.periode_id = '$periode_id' WHERE (k.status IS NULL OR k.status != 'Lunas') ORDER BY m.nim ASC";
     $res_belum = mysqli_query($koneksi, $q_belum);
 
     if ($res_belum && mysqli_num_rows($res_belum) > 0) {
         $message = "💰 *PENGINGAT PEMBAYARAN KAS MINGGUAN*\n📅 *Minggu ke-{$minggu_ke}*\n\nBelum bayar:\n\n";
         $no = 1;
         while ($row = mysqli_fetch_assoc($res_belum)) {
-            $message .= $no . ". " . $row['nama_panggilan'] . "\n";
+            $message .= $no . ". " . $row['nama_lengkap'] . "\n";
             $no++;
         }
         $message .= "\n_Segera lakukan pembayaran!_ 🙏";

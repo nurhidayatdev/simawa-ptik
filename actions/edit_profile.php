@@ -27,10 +27,8 @@ SELECT
     u.password,
     m.nim,
     m.nama_lengkap,
-    m.nama_panggilan,
-    u.email,
-    m.instagram,
-    m.bio
+        u.email,
+        m.bio
 FROM users u
 JOIN mahasiswa m ON m.user_id = u.id
 WHERE u.id = ?
@@ -48,10 +46,8 @@ $data = mysqli_fetch_assoc($result);
 if (isset($_POST['update'])) {
     mysqli_query($koneksi, "UPDATE mahasiswa SET 
         nama_lengkap='{$_POST['nama_lengkap']}',
-        nama_panggilan='{$_POST['nama_panggilan']}',
-        bio='{$_POST['bio']}',
-        instagram='{$_POST['instagram']}'
-        WHERE user_id='$user_id'
+                bio='{$_POST['bio']}',
+                WHERE user_id='$user_id'
     ");
 
     // Server-side password validation
@@ -135,11 +131,7 @@ if (isset($_POST['update'])) {
                                 required>
                             <p class="mt-1 text-[10px] text-slate-500 dark:text-slate-500 italic">* Minimal 8 karakter, harus ada huruf besar, kecil, angka, dan tanpa simbol.</p>
                         </div>
-                         <div>
-                            <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
-                            <input name="instagram" value="<?= htmlspecialchars($data['instagram'] ?? ''); ?>" placeholder="@Username"
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-lg focus:outline-none bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 text-xs cursor-not-allowed transition-colors" readonly></input>
-                        </div>
+                         
                         <div>
                             <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
                             <input name="bio" value="<?= htmlspecialchars($data['bio'] ?? ''); ?>" maxlength="35"

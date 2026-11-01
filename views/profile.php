@@ -35,9 +35,7 @@ SELECT
     COALESCE(NULLIF(u.nama_lengkap, ''), m.nama_lengkap, 'Pengguna') AS nama_lengkap,
     u.linked_student_nim,
     m.nim,
-    m.nama_panggilan,
-    m.instagram,
-    m.bio
+            m.bio
 FROM users u
 LEFT JOIN mahasiswa m ON m.user_id = u.id
 WHERE u.id = ?
@@ -155,19 +153,11 @@ if ($role === 'Mahasiswa' && !empty($mahasiswa_id)) {
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Instagram</label>
-                                <input type="text" name="instagram" value="<?= htmlspecialchars($data['instagram'] ?? '') ?>"
-                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
-                                    disabled>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
-                                <input type="text" name="bio" value="<?= htmlspecialchars($data['bio'] ?? '') ?>"
-                                    class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
-                                    disabled>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Bio</label>
+                            <input type="text" name="bio" value="<?= htmlspecialchars($data['bio'] ?? '') ?>"
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-xs"
+                                disabled>
                         </div>
                     </form>
 

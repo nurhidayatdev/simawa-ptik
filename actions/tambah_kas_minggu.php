@@ -98,12 +98,12 @@ if (isset($_POST['simpan_kas'])) {
     $where_mhs_rep = getKelasWhereClause('m', true);
     $where_k_rep = getKelasWhereClause('k', true);
     $q_report = mysqli_query($koneksi, "
-        SELECT m.nama_panggilan, IFNULL(k.status, 'Belum') as status_bayar
+        SELECT m.nama_lengkap, IFNULL(k.status, 'Belum') as status_bayar
         FROM mahasiswa m
         LEFT JOIN users u ON m.user_id = u.id
         LEFT JOIN kas k ON k.mahasiswa_id = m.id AND k.minggu_ke = '$minggu' AND k.periode_id = '$periode_id' $where_k_rep
         WHERE " . getMahasiswaPureWhereClause('m', 'u', false) . " $where_mhs_rep
-        ORDER BY m.nama_panggilan ASC
+        ORDER BY m.nama_lengkap ASC
     ");
 
     $lunas = [];
@@ -111,9 +111,9 @@ if (isset($_POST['simpan_kas'])) {
 
     while ($row = mysqli_fetch_assoc($q_report)) {
         if ($row['status_bayar'] === 'Lunas') {
-            $lunas[] = $row['nama_panggilan'];
+            $lunas[] = $row['nama_lengkap'];
         } else {
-            $belum[] = $row['nama_panggilan'];
+            $belum[] = $row['nama_lengkap'];
         }
     }
 
