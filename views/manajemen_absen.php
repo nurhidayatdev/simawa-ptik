@@ -12,9 +12,10 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
-// Only Admin and Secretary can manage attendance
-if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara') {
-    include '../includes/alert_role.php';
+// Only Secretary can manage attendance
+if ($role !== 'Sekretaris') {
+    $_SESSION['error'] = 'Akses ditolak! Pengelolaan presensi kelas hanya wewenang Sekretaris.';
+    header('Location: ' . ($role === 'Administrator Utama' ? '../dashboard_admin.php' : '../dashboard.php'));
     exit();
 }
 

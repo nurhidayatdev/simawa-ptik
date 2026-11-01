@@ -14,9 +14,15 @@ $role = $_SESSION['role'];
 $tabel = $_GET['tabel'] ?? '';
 $id = $_GET['id'] ?? '';
 
-if ($tabel === 'jadwal_matkul' && !in_array($role, ['Administrator Utama', 'Ketua Tingkat'])) {
+if ($tabel === 'jadwal_matkul' && $role !== 'Ketua Tingkat') {
     $_SESSION['error'] = "Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.";
     header("Location: ../database/db_jadwal");
+    exit;
+}
+
+if ($tabel === 'tugas' && !in_array($role, ['Sekretaris', 'Ketua Tingkat'])) {
+    $_SESSION['error'] = "Akses ditolak! Pengelolaan tugas hanya wewenang Sekretaris dan Ketua Tingkat.";
+    header("Location: ../dashboard.php");
     exit;
 }
 

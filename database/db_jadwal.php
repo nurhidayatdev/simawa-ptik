@@ -12,6 +12,12 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+if ($role === 'Administrator Utama') {
+    $_SESSION['error'] = 'Akses ditolak! Administrator Utama tidak mengelola jadwal kuliah kelas.';
+    header('Location: ../dashboard_admin.php');
+    exit;
+}
+
 // AJAX Handler for "Sesuaikan Jadwal" Data Fetching
 if (isset($_GET['fetch_adjust_data'])) {
     header('Content-Type: application/json');
@@ -169,7 +175,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-center"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 dark:border-indigo-800/50">' . htmlspecialchars($row['sks']) . '</span></td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['dosen_pengampu']) . '</td>';
         echo '<td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400">' . htmlspecialchars($row['dosen_mitra']) . '</td>';
-        if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
+        if ($role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
             echo '<div class="flex items-center justify-center gap-3">';
             echo '<a href="../actions/edit.php?tabel=jadwal_matkul&id=' . $row['id'] . '" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>';
@@ -234,7 +240,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                     <i class="fa fa-eye text-xs"></i>
                                 </a>
 
-                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                            <?php if ($role === 'Ketua Tingkat'): ?>
                                 <button type="button" onclick="confirmJadwal()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg transition-all shadow-sm flex items-center justify-center shrink-0" title="Kirim WhatsApp">
                                     <i class="fa fa-paper-plane text-xs"></i>
                                 </button>
@@ -262,7 +268,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-center text-[10px] font-bold text-white uppercase tracking-widest">SKS</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen Pengampu</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen Mitra</th>
-                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                            <?php if ($role === 'Ketua Tingkat'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -285,7 +291,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-center"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold border border-indigo-100 dark:border-indigo-800/50"><?= $row['sks']; ?></span></td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400"><?= $row['dosen_pengampu']; ?></td>
                                 <td class="px-3 py-2 text-xs text-slate-600 dark:text-slate-400"><?= $row['dosen_mitra']; ?></td>
-                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                                <?php if ($role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <a href="../actions/edit.php?tabel=jadwal_matkul&id=<?= $row['id']; ?>" title="Edit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"><i class="fa fa-edit"></i></a>

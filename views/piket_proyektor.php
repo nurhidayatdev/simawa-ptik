@@ -12,8 +12,14 @@ $user_id = $_SESSION['user_id'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+if ($role === 'Administrator Utama') {
+    $_SESSION['error'] = 'Akses ditolak! Administrator Utama tidak mengelola piket proyektor kelas.';
+    header('Location: ../dashboard_admin.php');
+    exit;
+}
+
 // Allowed roles for admin actions
-$admin_roles = ['Administrator Utama', 'Ketua Tingkat', 'Sekretaris'];
+$admin_roles = ['Ketua Tingkat'];
 $is_admin = in_array($role, $admin_roles);
 
 // Include foto helpers for cache busting
@@ -215,7 +221,7 @@ if ($my_mhs_id) {
                                     <i class="fab fa-whatsapp text-xs"></i> Notifikasi
                                 </button>
                             </form>
-                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                            <?php if ($role === 'Ketua Tingkat'): ?>
                                 <button onclick="confirmReset()" class="bg-slate-800 text-white px-3 py-2 rounded-lg hover:bg-black text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all uppercase tracking-wide">
                                     <i class="fa fa-random text-xs"></i> Acak
                                 </button>

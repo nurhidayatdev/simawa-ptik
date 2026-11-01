@@ -12,8 +12,9 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
-if ($_SESSION['role'] === 'Mahasiswa' || $_SESSION['role'] === 'Bendahara' || $_SESSION['role'] === 'Ketua Tingkat') {
-    include '../includes/alert_role.php';
+if ($role !== 'Sekretaris') {
+    $_SESSION['error'] = 'Akses ditolak! Input absensi hanya wewenang Sekretaris.';
+    header('Location: ' . ($role === 'Administrator Utama' ? '../dashboard_admin.php' : '../dashboard.php'));
     exit();
 }
 

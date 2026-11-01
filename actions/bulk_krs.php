@@ -9,9 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $role = $_SESSION['role'];
-if ($role !== 'Ketua Tingkat' && $role !== 'Administrator Utama') {
-    include '../includes/alert_role.php';
-    exit;
+if ($role !== 'Ketua Tingkat') {
+    $_SESSION['error'] = 'Akses ditolak! KRS Massal hanya wewenang Ketua Tingkat.';
+    header('Location: ' . ($role === 'Administrator Utama' ? '../dashboard_admin.php' : '../dashboard.php'));
+    exit();
 }
 
 $user_id    = $_SESSION['user_id'];

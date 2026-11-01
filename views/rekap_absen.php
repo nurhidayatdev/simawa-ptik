@@ -12,6 +12,12 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+if ($role === 'Administrator Utama') {
+    $_SESSION['error'] = 'Akses ditolak! Administrator Utama tidak mengelola absensi kelas.';
+    header('Location: ../dashboard_admin.php');
+    exit;
+}
+
 /* =====================
    AMBIL PERIODE AKTIF
    ===================== */
@@ -268,7 +274,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'excel') {
                     <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Monitoring Attendance Matrix (P1-P16)</p>
                 </div>
                 <div class="flex gap-2">
-                    <?php if ($role === 'Administrator Utama' || $role === 'Sekretaris'): ?>
+                    <?php if ($role === 'Sekretaris' || $role === 'Ketua Tingkat'): ?>
                         <button onclick="confirmExport()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-bold flex items-center gap-2 transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
                             <i class="fas fa-file-excel"></i> EXPORT REKAP
                         </button>

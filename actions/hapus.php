@@ -6,8 +6,16 @@ ini_set('display_errors', 1);
 
 if (isset($_GET['tabel']) && $_GET['tabel'] === 'jadwal_matkul') {
     $user_role = $_SESSION['role'] ?? '';
-    if (!in_array($user_role, ['Administrator Utama', 'Ketua Tingkat'])) {
-        echo "<script>alert('Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.'); window.location.href='../database/db_jadwal';</script>";
+    if ($user_role !== 'Ketua Tingkat') {
+        echo "<script>alert('Akses ditolak! Pengelolaan jadwal kuliah hanya wewenang Ketua Tingkat.'); window.location.href='../dashboard.php';</script>";
+        exit();
+    }
+}
+
+if (isset($_GET['tabel']) && $_GET['tabel'] === 'tugas') {
+    $user_role = $_SESSION['role'] ?? '';
+    if (!in_array($user_role, ['Sekretaris', 'Ketua Tingkat'])) {
+        echo "<script>alert('Akses ditolak! Pengelolaan tugas hanya wewenang Sekretaris dan Ketua Tingkat.'); window.location.href='../dashboard.php';</script>";
         exit();
     }
 }

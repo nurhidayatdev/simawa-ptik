@@ -12,9 +12,15 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+if ($role === 'Administrator Utama') {
+    $_SESSION['error'] = 'Akses ditolak! Administrator Utama tidak mengelola kas kelas.';
+    header('Location: ../dashboard_admin.php');
+    exit;
+}
+
 // Following rekap_absen.php role restriction logic (optional, but requested to be similar)
 // However, Rekap Kas is usually for transparency. I will allow Mahasiswa to view but only Admin/Bendahara to see "Input" buttons.
-$is_admin_or_bendahara = ($role === 'Administrator Utama' || $role === 'Bendahara');
+$is_admin_or_bendahara = ($role === 'Bendahara');
 
 /* =====================
    AMBIL PERIODE AKTIF

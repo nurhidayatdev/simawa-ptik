@@ -12,6 +12,12 @@ $nama_lengkap = $_SESSION['nama_lengkap'];
 $foto = $_SESSION['foto'];
 $role = $_SESSION['role'];
 
+if ($role === 'Administrator Utama') {
+    $_SESSION['error'] = 'Akses ditolak! Administrator Utama tidak mengelola kelompok kelas.';
+    header('Location: ../dashboard_admin.php');
+    exit;
+}
+
 $search = $_GET['search'] ?? '';
 
 // Ambil periode aktif untuk filter data terbaru saja (opsional, tapi bagus untuk performa)
@@ -56,7 +62,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200">' . htmlspecialchars($row['dosen']) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center font-medium">' . date('d M Y, H:i', strtotime($row['tgl_dibuat'])) . '</td>';
         echo '<td class="px-3 py-2 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400">' . htmlspecialchars($row['keterangan']) . '</td>';
-        if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'):
+        if ($role === 'Ketua Tingkat'):
             echo '<td class="px-3 py-2 whitespace-nowrap text-sm text-center">';
             echo '<div class="flex items-center justify-center gap-3">';
             echo '<a href="../actions/hapus.php?tabel=set_kelompok&matkul_id=' . $row['matkul_id'] . '&dosen=' . urlencode($row['dosen']) . '&keterangan=' . urlencode($row['keterangan']) . '" title="Hapus Seluruh Set Kelompok" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200"><i class="fa fa-trash"></i></a>';
@@ -122,7 +128,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Dosen</th>
                             <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Waktu Dibuat</th>
                             <th class="px-3 py-3 text-left text-[10px] font-bold text-white uppercase tracking-widest">Keterangan</th>
-                            <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                            <?php if ($role === 'Ketua Tingkat'): ?>
                                 <th class="px-3 py-3 text-[10px] font-bold text-white uppercase tracking-widest text-center">Actions</th>
                             <?php endif; ?>
                         </tr>
@@ -142,7 +148,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200"><?= htmlspecialchars($row['dosen']); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-800 dark:text-slate-200 text-center font-medium"><?= date('d M Y, H:i', strtotime($row['tgl_dibuat'])); ?></td>
                                 <td class="px-3 py-2 whitespace-nowrap text-xs text-slate-500 dark:text-slate-400 capitalize"><?= htmlspecialchars($row['keterangan'] ?: '-'); ?></td>
-                                <?php if ($role === 'Administrator Utama' || $role === 'Ketua Tingkat'): ?>
+                                <?php if ($role === 'Ketua Tingkat'): ?>
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <a href="../actions/hapus.php?tabel=set_kelompok&matkul_id=<?= $row['matkul_id']; ?>&dosen=<?= urlencode($row['dosen']); ?>&keterangan=<?= urlencode($row['keterangan']); ?>" title="Hapus Seluruh Set Kelompok" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors"><i class="fa fa-trash"></i></a>

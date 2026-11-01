@@ -12,6 +12,12 @@ $nama_lengkap = $_SESSION['nama_lengkap'] ?? '';
 $foto = $_SESSION['foto'] ?? '';
 $role = $_SESSION['role'];
 
+if ($role === 'Administrator Utama') {
+    $_SESSION['error'] = 'Akses ditolak! Administrator Utama tidak mengelola notifikasi kelas.';
+    header('Location: ../dashboard_admin.php');
+    exit;
+}
+
 // AJAX Handler for "Sesuaikan Jadwal" Data Fetching
 if (isset($_GET['fetch_adjust_data'])) {
     header('Content-Type: application/json');
